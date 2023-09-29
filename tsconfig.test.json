@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"module": "NodeNext",
+		"target": "ES2022",
+		"strict": true,
+		"pretty": true,
+		"baseUrl": "./",
+		"forceConsistentCasingInFileNames": true,
+		"noEmitOnError": true,
+		"outDir": "dist",
+		"rootDir": ".",
+		"esModuleInterop": true,
+		"strictNullChecks": true,
+		"moduleResolution": "NodeNext",
+		"skipLibCheck": true
+	},
+	"include": ["test/index.ts", "test/indexdef.ts"]
+}
