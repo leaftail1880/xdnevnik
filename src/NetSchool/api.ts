@@ -1,320 +1,395 @@
-import md5 from "md5";
-import { AssignmentInfo } from "./classes/Assignment";
-import Client from "./classes/Client";
-import {
-	NetSchoolContext,
-	NetSchoolFetchedContext,
-	NetSchoolFetchedContextStudents,
-} from "./classes/Context";
-import Diary, { DiaryObject } from "./classes/Diary";
-import Info from "./classes/Info";
-import { School } from "./classes/SchoolSearch";
-import Session from "./classes/Session";
+import { URL, URLSearchParams } from 'react-native-url-polyfill'
+import { ROUTES } from './routes'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Diary from './diary'
 
 export interface NSEntity {
-	id: number;
-	name: string;
+	id: number
+	name: string
 }
 
-export type PasswordType = string | { hash: string; length: number };
-
-export interface Credentials {
-	school: School;
-	login: string;
-	password: PasswordType;
+interface StudentId {
+	studentId: number
 }
 
-export type Endpoints = Awaited<
-	ReturnType<(typeof NetSchoolApi)["getEndpoints"]>
->;
+interface StudentAndYear extends StudentId {
+	schoolYearId: number
+}
+
+interface RawEndpoints {
+	items: ({ demo: boolean } & Endpoint)[]
+}
+
+export interface Endpoint {
+	name: string
+	url: string
+}
+
+export interface Student {
+	name: string
+	shortName: string
+	studentId: number
+}
+
+export interface Education {
+	class: NSEntity & {
+		isFree: boolean
+	}
+	isAddSchool: boolean
+	school: NSEntity
+	schoolyear: NSEntity & {
+		endDate: string
+		startDate: string
+	}
+}
+
+export interface Subject extends NSEntity {
+	order: number
+	federalСurriculum: boolean
+}
+
+export interface AssignmentForCurrentTerm {
+	classmeetingId: number
+	assignmentId: number
+	assignmentName: string
+	description: any
+	result: any
+	classAssignment: boolean
+	duty: boolean
+	comment: any
+	assignmentTypeId: number
+	assignmentTypeAbbr: string
+	assignmentTypeName: string
+	weight: number
+	attachmentsExists: boolean
+	hasTextAnswer: boolean
+	hasFileAnswers: boolean
+	subjectId: number
+	subjectName: string
+	dueDate: string
+	answerFilesCount: number
+	extraActivity: boolean
+	resultDate: any
+	assignmentDate: string
+	canAnswer: boolean
+}
+
+export interface Lesson {
+	classmeetingId: number
+	studentId: number
+	assignmentId: number[]
+	order: number
+	scheduleTimeNumber: number
+	scheduleTimeRelay: number
+	day: string
+	subjectName: string
+	subjectId: number
+	subjectGroupId: number
+	startTime: string
+	endTime: string
+	teachers: NSEntity[]
+	lessonTheme: string
+	roomName: string
+	attachmentsExists: boolean
+	resultsExists: boolean
+	attendance: any
+	addEducation: boolean
+	extraActivity: boolean
+}
+
+interface SubjectPerformance {
+	subject: NSEntity
+	term: NSEntity
+	averageMark: number
+	classAverageMark: number
+	maxMark: number
+	classmeetingsStats: {
+		passed: number
+		scheduled: number
+	}
+	teachers: NSEntity
+	results: {
+		date: string
+		assignmentId: number
+		classMeetingId: number
+		classMeetingDate: string
+		result: number
+		duty: boolean
+		comment: any
+		weight: number
+		assignmentTypeId: number
+		assignmentTypeAbbr: string
+		assignmentTypeName: string
+	}[]
+	markStats: {
+		mark: number
+		count: number
+		fraction: number
+	}[]
+	attendance: []
+}
+
+interface Total {
+	subjectId: number
+	termTotals: {
+		term: NSEntity
+		mark: string | number | null
+		avgMark: number
+	}[]
+	yearTotals: {
+		period: {
+			id: number
+			periodName: string
+			periodType: string
+		}
+		mark: string | number | null
+	}[]
+}
+
+interface ReqInit extends RequestInit {
+	auth?: boolean
+	params?: Record<string, any>
+}
 
 export default class NetSchoolApi {
 	static async getEndpoints() {
-		return new Client("https://mobile.ir-tech.ru/")
-			.get("https://mobile.ir-tech.ru/api/v1/mobile/parent/end-points")
-			.then(
-				(res) =>
-					res.json() as Promise<{
-						items: { name: string; url: string; demo: boolean }[];
-					}>
-			)
-			.then((e) =>
-				e.items
-					.filter((e) => !e.demo && !/demo/i.test(e.name))
-					.map((e) => {
-						return { name: e.name, url: e.url };
+		return fetch(ROUTES.getEndPointsList)
+			.then<RawEndpoints>(res => res.json())
+			.then<Endpoint[]>(res =>
+				res.items
+					.filter(e => !e.demo && !/demo/i.test(e.name))
+					.map(e => {
+						return { name: e.name, url: e.url }
 					})
-			);
+			)
 	}
 
-	public context: null | NetSchoolContext = null;
-	protected session: null | Session = null;
-	protected client: Client;
-
-	/**
-	 * Создание пользователя
-	 * @param credentials Данные пользователя
-	 */
-	constructor(origin: string) {
-		this.client = new Client(origin);
-		this.client.headers.set("at", () =>
-			this.session?.isValid() ? this.session.accessToken : undefined
-		);
+	static getOrigin(api: NetSchoolApi) {
+		return api.origin
 	}
 
-	async getSchools() {
-		return this.client
-			.get("schools/search")
-			.then((res) => res.json() as Promise<School[]>)
-			.then((schools) =>
-				schools.filter((school) => !/детский сад/i.test(school.name))
-			);
+	private _cache: Record<string, [number, any]> = {}
+	get cache() {
+		return this._cache
+	}
+	set cache(value) {
+		// Update all react effects
+		this.changes++
+		this._cache = value
 	}
 
-	async logIn(credentials: Credentials) {
-		const [{ lt, ver, salt }] = await Promise.all([
-			this.client
-				.post("/auth/getData")
-				.then((res) => res.json() as Promise<Record<string, string>>),
+	public loggedIn = false
+	public changes = 0
 
-			// Сохранение куки
-			this.client.get("logindata"),
-		]);
+	private session = {
+		access_token: '',
+		refresh_token: '',
+		expires: new Date(),
+	}
+	private origin = ''
+	private base = '/api/mobile'
 
-		if (!lt || !ver || !salt) {
-			throw new Error("Сетевой не вернул данные для авторизации.");
+	constructor(endpoint?: string) {
+		if (endpoint) this.setEndpoint(endpoint)
+	}
+
+	public setEndpoint(endpoint: string) {
+		const url = new URL(endpoint)
+		this.origin = url.origin
+		this.base = url.pathname
+		// Update all react effects
+		if (this.loggedIn) this.changes++
+	}
+
+	private isAbsolute(path: string) {
+		// http://example -> true
+		// /path -> false
+		return /^(?:[a-z]+:)?\/\//i.test(path)
+	}
+
+	public join(...paths: string[]) {
+		return [this.origin, this.base, ...paths]
+			.map(path => path.replace(/^\//, ''))
+			.map((path, i, a) =>
+				path.endsWith('/') || i + 1 === a.length ? path : `${path}/`
+			)
+			.join('')
+	}
+
+	public async request<T>(url: string, init: ReqInit = {}): Promise<T> {
+		const request: RequestInit = { headers: {} }
+
+		// Make relative request absolute
+		if (!this.isAbsolute(url)) url = this.join(url)
+
+		// Apply custom options
+		if (init.params) {
+			if (!url.endsWith('?')) url += '?'
+			url += new URLSearchParams(init.params).toString()
 		}
 
-		function md5a(str: string): string {
-			return md5(str);
+		if (init.auth) {
+			if (!this.session.access_token) throw new Error('Unauthorized!')
+			request.headers['Authorization'] = `Bearer ${this.session.access_token}`
 		}
 
-		const hash =
-			typeof credentials.password === "string"
-				? md5a(credentials.password)
-				: credentials.password.hash;
+		let response: Response | null
+		try {
+			response = await fetch(url, { ...init, ...request })
+		} catch (error) {
+			if (this.cache[url]) {
+				return this.cache[url][1]
+			}
+		}
+		if (response && !response.ok) {
+			const error = new Error(
+				`${this.getErrorReason(response.status)}\nКод ошибки сервера: ${
+					response.status
+				}`
+			)
+			console.error(
+				`NetSchoolFetch failed with status ${response.status} URL: ${url}. Auth: ${init.auth}`
+			)
+			throw error
+		}
 
-		const pw2 = md5a(salt + hash);
-		const pw = pw2.substring(0, credentials.password.length);
+		const json = await response.json()
+		this.cache[url] = [Date.now(), json]
+		AsyncStorage.setItem('cache', JSON.stringify(this.cache))
 
-		const credentialsToSave = {
-			password: {
-				hash,
-				length: credentials.password.length,
-			},
-			login: credentials.login,
-			school: credentials.school,
-		};
-
-		const loginForm = {
-			un: credentials.login,
-			lt,
-			ver,
-			loginType: 1,
-			pw,
-			pw2,
-			pid: credentials.school.provinceId,
-			cn: credentials.school.cityId,
-			sft: 2,
-			scid: credentials.school.id,
-		};
-
-		// console.log(loginForm);
-
-		const {
-			at: accessToken,
-			timeOut,
-		}: {
-			at: string;
-			timeOut: number;
-		} = await this.client
-			.post("/login", Client.formData(loginForm))
-			.then((res) => res.json() as any)
-			.catch((e) => {
-				console.error("LOGIN FAILED");
-				throw e;
-			});
-
-		console.info("LOGIN SUCCESSED");
-
-		this.session = new Session({
-			ver,
-			accessToken,
-			expiryDate: Date.now() + timeOut,
-		});
-
-		if (this.context) return credentialsToSave;
-
-		const [sysInfo, context, students] = (await Promise.all([
-			this.client.get("sysInfo").then((res) => res.text()),
-			this.client.get("context").then((res) => res.json()),
-			this.client.get("context/students").then((res) => res.json()),
-		])) as [string, NetSchoolFetchedContext, NetSchoolFetchedContextStudents];
-
-		const schoolInfo = (await this.client
-			.get(`schools/${context.schoolId}/card`)
-			.then((res) => res.json())) as {
-			commonInfo: {
-				schoolName: string;
-				fullSchoolName: string;
-			};
-		};
-
-		// console.log("cookie set test");
-
-		// console.log(
-		// 	"set",
-		// 	(await fetch("https://httpbin.org/cookies/set/fetch/value")).ok
-		// );
-
-		// console.log(
-		// 	"get",
-		// 	await (await fetch("https://httpbin.org/cookies")).text()
-		// );
-
-		// const client = new Client("https://httpbin.org/");
-
-		// console.log(
-		// 	"setc",
-		// 	(await client.get("https://httpbin.org/cookies/set/c/value")).ok
-		// );
-
-		// console.log(
-		// 	"getc",
-		// 	await (await client.get("https://httpbin.org/cookies")).json()
-		// );
-
-		// console.log("cookie set test end");
-
-		this.context = new NetSchoolContext({
-			year: {
-				id: context.schoolyear.id,
-				gId: context.schoolyear.globalYear.id,
-				name: context.schoolyear.name,
-				start: new Date(context.schoolyear.startDate),
-				end: new Date(context.schoolyear.endDate),
-			},
-			user: { id: context.user.id, name: context.user.name },
-			server: {
-				id: sysInfo.match(/Id: (.+)/)?.[1] ?? "",
-				dateFormat: context.dateFormat,
-				timeFormat: context.timeFormat,
-			},
-			school: {
-				fullName: schoolInfo.commonInfo.fullSchoolName,
-				name: schoolInfo.commonInfo.schoolName,
-				id: context.schoolId,
-			},
-			students,
-		});
-
-		return credentialsToSave;
+		return json
 	}
 
-	private dateValid(...dates: Date[]) {
-		if (!this.context) throw new Error("Авторизуйся!");
-		for (let date of dates) {
-			const { start, end } = this.context.year;
-			if (!(+start <= +date && +date <= +end))
-				throw new Error("Дата выходит за рамки учебного года");
+	private getErrorReason(code: number) {
+		return {
+			503: 'Сервер дневника недоступен, технические работы. Загрузка данных из кэша...',
+			401: 'Недостаточно прав или ошибка авторизации',
+			404: 'Дневник обновился или указан неправильный путь запроса. Создайте сообщение об ошибке',
+		}[code]
+	}
+
+	async get<T extends {}>(url: string, init?: Omit<ReqInit, 'method'>) {
+		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
+	}
+
+	async getToken(form: Record<string, string>) {
+		const response = await fetch(ROUTES.getToken, {
+			body: new URLSearchParams(form).toString(),
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			method: 'POST',
+		})
+
+		if (response.status === 400) {
+			throw new Error('Неверные логин/пароль или устарел токен')
 		}
 
-		return true;
+		if (response.ok) {
+			const json = await response.json()
+			this.session = {
+				access_token: json.access_token || '',
+				refresh_token: json.refresh_token || '',
+				expires: new Date(
+					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
+				),
+			}
+			this.loggedIn = true
+			this.changes++
+
+			return this.session
+		} else
+			throw new Error(
+				'Запрос токена не удался ' + response.status + ' ' + response.statusText
+			)
 	}
 
 	async logOut() {
-		if (!this.session) throw new Error("Авторизуйся!");
-
-		await this.client.post(
-			"auth/logout",
-			Client.formData({
-				at: this.session.accessToken,
-				ver: this.session.ver,
-			})
-		);
-
-		this.session = null;
-	}
-
-	async sessionValid() {
-		if (!this.session) return false;
-
-		const { accessToken: token } = this.session;
-
-		return this.client
-			.get("context/expired", { params: { token } })
-			.then((res) => res.json())
-			.then((b) => (typeof b == "boolean" ? !b : false));
-	}
-
-	// ⭐️ Пользователь
-	async info() {
-		return this.client
-			.get("mysettings")
-			.then((res) => res.json())
-			.then((data) => new Info(data as any));
-	}
-
-	// ⭐️ Дневник
-	async diary(credentials: { studentId: number; start?: Date; end?: Date }) {
-		if (!this.context) throw new Error("Авторизуйся!");
-
-		let { studentId, start, end } = credentials;
-		if (start && end) this.dateValid(start, end);
-		else {
-			const { weekStart } = await this.client
-				.get("student/diary/init")
-				.then((res) => res.json() as any);
-
-			start = new Date(weekStart);
-			end = new Date(weekStart);
-			end.setDate(end.getDate() + 7);
+		this.session = {
+			access_token: '',
+			refresh_token: '',
+			expires: new Date(),
 		}
+		this.loggedIn = false
+		this.changes = 0
+	}
 
-		const diaryRaw = await this.client
-			.get("student/diary", {
+	async students() {
+		return this.get<Student[]>(ROUTES.students)
+	}
+
+	async education({ studentId }: StudentId) {
+		return this.get<Education[]>(ROUTES.education, {
+			params: { studentId },
+		})
+	}
+
+	async diary({
+		studentId,
+		startDate,
+		endDate,
+	}: StudentId & {
+		startDate?: string
+		endDate?: string
+	}) {
+		return new Diary(
+			await this.get<Lesson[]>(ROUTES.classmeetings, {
 				params: {
-					yearId: this.context.year.id,
-					studentId,
-					weekEnd: end.toJSON().replace(/T.+/, ""),
-					weekStart: start.toJSON().replace(/T.+/, ""),
+					studentIds: [studentId],
+					startDate: startDate ?? Date.week[0],
+					endDate: endDate ?? Date.week[6],
+					extraActivity: null,
 				},
 			})
-			.then((res) => res.json() as Promise<DiaryObject>);
-
-		return new Diary(diaryRaw);
+		)
 	}
 
-	/** Информация о задание */
-	async assignment(credentials: { studentId?: number; id: number }) {
-		let { id, studentId } = credentials;
-
-		return this.client
-			.get(`student/diary/assigns/${id}`, { params: { studentId } })
-			.then((res) => res.json() as Promise<AssignmentInfo>);
+	async assignmentForCurrentTerm({
+		studentId,
+		withoutMarks,
+		withExpiredClassAssign,
+	}: StudentId & {
+		withoutMarks?: boolean
+		withExpiredClassAssign?: boolean
+	}) {
+		return this.get<AssignmentForCurrentTerm[]>(
+			ROUTES.assignmentsForCurrentTerm,
+			{
+				params: {
+					studentId,
+					withoutMarks: withoutMarks ?? true,
+					withExpiredClassAssign: withExpiredClassAssign ?? false,
+				},
+			}
+		)
 	}
 
-	/** Типы заданий */
-	async assignmentTypes() {
-		return this.client
-			.get("grade/assignment/types", { params: { all: false } })
-			.then(
-				(res) =>
-					res.json() as Promise<
-						{
-							id: number;
-							name: string;
-							abbr: string;
-							order: number;
-						}[]
-					>
-			);
+	async subjects({ studentId, schoolYearId }: StudentAndYear) {
+		return this.get<Subject[]>(ROUTES.subjects, {
+			params: { studentId, schoolYearId },
+		})
 	}
 
-	// ⭐️ Расписание
+	async subjectPerformance({
+		studentId,
+		subjectId,
+		termId,
+	}: StudentId & { subjectId: number; termId?: number }) {
+		return this.get<SubjectPerformance>(ROUTES.subjectPerformance, {
+			params: {
+				studentId,
+				subjectId,
+				termId,
+			},
+		})
+	}
 
-	/** Расписание на неделю */
-	scheduleWeek(credentials?: { date?: Date; classId?: number }) {
-		// TODO! Implement
+	async totals({ studentId, schoolYearId }: StudentAndYear) {
+		return this.get<Total[]>(ROUTES.totals, {
+			params: {
+				studentId,
+				schoolYearId,
+			},
+		})
 	}
 }
+
+export const API = new NetSchoolApi()
