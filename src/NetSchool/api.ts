@@ -1,7 +1,7 @@
-import { URL, URLSearchParams } from 'react-native-url-polyfill'
-import { ROUTES } from './routes'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { URL, URLSearchParams } from 'react-native-url-polyfill'
 import Diary from './diary'
+import { ROUTES } from './routes'
 
 export interface NSEntity {
 	id: number
@@ -52,11 +52,11 @@ export interface AssignmentForCurrentTerm {
 	classmeetingId: number
 	assignmentId: number
 	assignmentName: string
-	description: any
-	result: any
+	description: string | number | null
+	result: string | number | null
 	classAssignment: boolean
 	duty: boolean
-	comment: any
+	comment: string | number | null
 	assignmentTypeId: number
 	assignmentTypeAbbr: string
 	assignmentTypeName: string
@@ -69,7 +69,7 @@ export interface AssignmentForCurrentTerm {
 	dueDate: string
 	answerFilesCount: number
 	extraActivity: boolean
-	resultDate: any
+	resultDate: string | number | null
 	assignmentDate: string
 	canAnswer: boolean
 }
@@ -92,7 +92,7 @@ export interface Lesson {
 	roomName: string
 	attachmentsExists: boolean
 	resultsExists: boolean
-	attendance: any
+	attendance: string | number | null
 	addEducation: boolean
 	extraActivity: boolean
 }
@@ -115,7 +115,7 @@ interface SubjectPerformance {
 		classMeetingDate: string
 		result: number
 		duty: boolean
-		comment: any
+		comment: string | number | null
 		weight: number
 		assignmentTypeId: number
 		assignmentTypeAbbr: string
@@ -146,14 +146,18 @@ interface Total {
 	}[]
 }
 
+type Primitive = string | number | boolean | null | undefined
+
 interface ReqInit extends RequestInit {
 	auth?: boolean
-	params?: Record<string, any>
+	params?: Record<string, Primitive | Primitive[]>
 }
+
+class NetSchoolError extends Error {}
 
 export default class NetSchoolApi {
 	static async getEndpoints() {
-		return fetch(ROUTES.getEndPointsList)
+		const result = await fetch(ROUTES.getEndPointsList)
 			.then<RawEndpoints>(res => res.json())
 			.then<Endpoint[]>(res =>
 				res.items
@@ -162,13 +166,15 @@ export default class NetSchoolApi {
 						return { name: e.name, url: e.url }
 					})
 			)
+
+		return result
 	}
 
 	static getOrigin(api: NetSchoolApi) {
 		return api.origin
 	}
 
-	private _cache: Record<string, [number, any]> = {}
+	private _cache: Record<string, [number, object]> = {}
 	get cache() {
 		return this._cache
 	}
@@ -178,7 +184,19 @@ export default class NetSchoolApi {
 		this._cache = value
 	}
 
-	public loggedIn = false
+	public loggedState = {
+		getter() {
+			return false
+		},
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		setter(_: boolean) {},
+	}
+	public get loggedIn() {
+		return this.loggedState.getter()
+	}
+	public set loggedIn(v) {
+		this.loggedState.setter(v)
+	}
 	public changes = 0
 
 	private session = {
@@ -217,7 +235,9 @@ export default class NetSchoolApi {
 	}
 
 	public async request<T>(url: string, init: ReqInit = {}): Promise<T> {
-		const request: RequestInit = { headers: {} }
+		const request: RequestInit & Required<Pick<RequestInit, 'headers'>> = {
+			headers: {},
+		}
 
 		// Make relative request absolute
 		if (!this.isAbsolute(url)) url = this.join(url)
@@ -225,24 +245,27 @@ export default class NetSchoolApi {
 		// Apply custom options
 		if (init.params) {
 			if (!url.endsWith('?')) url += '?'
-			url += new URLSearchParams(init.params).toString()
+			url += new URLSearchParams(
+				init.params as unknown as [string, string][]
+			).toString()
 		}
 
 		if (init.auth) {
-			if (!this.session.access_token) throw new Error('Unauthorized!')
+			if (!this.session.access_token)
+				throw new NetSchoolError('Запрос до авторизации: ' + url)
 			request.headers['Authorization'] = `Bearer ${this.session.access_token}`
 		}
 
-		let response: Response | null
+		let response: Response
 		try {
 			response = await fetch(url, { ...init, ...request })
 		} catch (error) {
-			if (this.cache[url]) {
-				return this.cache[url][1]
-			}
+			if (error.name !== NetSchoolError.name && this.cache[url]) {
+				return this.cache[url][1] as T
+			} else throw error
 		}
 		if (response && !response.ok) {
-			const error = new Error(
+			const error = new NetSchoolError(
 				`${this.getErrorReason(response.status)}\nКод ошибки сервера: ${
 					response.status
 				}`
@@ -268,7 +291,7 @@ export default class NetSchoolApi {
 		}[code]
 	}
 
-	async get<T extends {}>(url: string, init?: Omit<ReqInit, 'method'>) {
+	async get<T extends object>(url: string, init?: Omit<ReqInit, 'method'>) {
 		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
 	}
 
@@ -280,7 +303,7 @@ export default class NetSchoolApi {
 		})
 
 		if (response.status === 400) {
-			throw new Error('Неверные логин/пароль или устарел токен')
+			throw new NetSchoolError('Неверные логин/пароль или устарел токен')
 		}
 
 		if (response.ok) {
@@ -297,7 +320,7 @@ export default class NetSchoolApi {
 
 			return this.session
 		} else
-			throw new Error(
+			throw new NetSchoolError(
 				'Запрос токена не удался ' + response.status + ' ' + response.statusText
 			)
 	}

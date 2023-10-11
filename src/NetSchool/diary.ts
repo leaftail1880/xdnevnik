@@ -39,9 +39,7 @@ export default class Diary {
 
 	constructor(diary: TLesson[]) {
 		this.lessons = diary.map(lesson => new Lesson(lesson))
-		// this.lessons.filter(lesson => typeof lesson.roomName !== 'string').map((lesson, i ,a) => {
-		// 	a.find(l => typeof  l.roomName === 'string' && l.subjectName === lesson.subjectName)
-		// })
+		// TODO Apply custom lesson names, add custom lessons
 	}
 
 	forDay(date: Date | string) {

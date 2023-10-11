@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native'
 
-export const ACCENT_COLOR = '#88f'
+export const ACCENT_COLOR = '#4d914f'
 export const RED_ACCENT_COLOR = '#f88'
 export const SECONDARY_COLOR = '#888'
 export const BUTTON_TEXT_COLOR = '#fff'
 export const NOTIFICATION_COLOR = '#8888ff'
 export const BACKGROUND_COLOR = '#fff'
+export const INVISIBLE_COLOR = '#fff0'
 
 export const STYLES = StyleSheet.create({
 	container: {
@@ -21,6 +22,9 @@ export const STYLES = StyleSheet.create({
 		borderWidth: 3,
 		borderRadius: 5,
 		minWidth: 250,
+	},
+	pressedButton: {
+		backgroundColor: SECONDARY_COLOR,
 	},
 	button: {
 		margin: 15,
@@ -195,6 +199,7 @@ Date.prototype.toHHMM = function (this: Date) {
 		this.getMinutes().toString().padStart(2, '0')
 	)
 }
+
 const dayInMs = 1000 * 60 * 60 * 24
 Date.week = new Array(7)
 	.fill('')

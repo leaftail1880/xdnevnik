@@ -38,6 +38,7 @@ export const ROUTES = {
 	answerEndSaveText: '/answer/text?',
 	answerEndFiles: '/answer/files?',
 	getToken: 'https://identity.ir-tech.ru/connect/token',
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	getTokenTemplate(device_code: string) {
 		return {
 			grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
@@ -46,6 +47,7 @@ export const ROUTES = {
 			client_secret: '04064338-13df-4747-8dea-69849f9ecdf0',
 		}
 	}, // modified from object
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	getRefreshTokenTemplate(refresh_token: string = '') {
 		return {
 			grant_type: 'refresh_token',
