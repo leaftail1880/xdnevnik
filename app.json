@@ -30,7 +30,8 @@
     },
     "extra": {
       "eas": {
-        "projectId": "97163afe-5c7e-4856-ba8f-348e00aa7c04"
+        "projectId": "97163afe-5c7e-4856-ba8f-348e00aa7c04",
+        "owner": "leaftail1880"
       }
     },
     "runtimeVersion": {
