@@ -15,7 +15,7 @@ export const STYLES = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	text_field: {
+	textField: {
 		margin: 15,
 		padding: 15,
 		borderColor: ACCENT_COLOR,
@@ -38,7 +38,7 @@ export const STYLES = StyleSheet.create({
 	buttonText: {
 		color: BUTTON_TEXT_COLOR,
 	},
-	invertedSchedule_item: {
+	invertedScheduleItem: {
 		margin: 15,
 		padding: 15,
 		backgroundColor: BUTTON_TEXT_COLOR,
@@ -49,7 +49,7 @@ export const STYLES = StyleSheet.create({
 	invertedButtonText: {
 		color: ACCENT_COLOR,
 	},
-	schedule_item: {
+	scheduleItem: {
 		margin: 15,
 		padding: 15,
 		backgroundColor: ACCENT_COLOR,
@@ -73,36 +73,36 @@ export const STYLES = StyleSheet.create({
 		color: ACCENT_COLOR,
 		justifyContent: 'flex-end',
 	},
-	table_head: {
-		flexDirection: 'row',
-		borderBottomWidth: 1,
-		borderColor: SECONDARY_COLOR,
-		padding: 7,
-		backgroundColor: ACCENT_COLOR,
-	},
-	table_head_captions: {
-		fontSize: 15,
-		color: BUTTON_TEXT_COLOR,
-	},
 
-	table_body_single_row: {
-		backgroundColor: BACKGROUND_COLOR,
-		flexDirection: 'row',
-		borderBottomWidth: 1,
-		borderColor: SECONDARY_COLOR,
-		padding: 7,
-	},
-	table_data: {
-		fontSize: 11,
-	},
 	table: {
-		margin: 15,
+		margin: 0,
 		justifyContent: 'center',
 		alignItems: 'center',
+		minWidth: 400,
+		padding: 5,
+		width: '100%',
 		elevation: 1,
 		backgroundColor: BACKGROUND_COLOR,
 	},
+	tableRow: {
+		flexDirection: 'row',
+		alignSelf: 'center',
+		padding: 7,
+		// maxWidth: 400,
+
+		borderRadius: 3,
+		borderWidth: 3,
+		borderTopWidth: 0,
+		borderColor: ACCENT_COLOR,
+	},
+	tableCell: {
+		padding: 7,
+		margin: 3,
+		borderRadius: 5,
+		borderColor: ACCENT_COLOR,
+	},
 })
+
 
 export const LANG = {
 	monday: 'Понедельник',

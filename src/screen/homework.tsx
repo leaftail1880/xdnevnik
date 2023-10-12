@@ -27,7 +27,7 @@ export function HomeworkScreen(props: { ctx: { studentId?: number } }) {
 			>
 				{homework.map(lesson => (
 					<View
-						style={STYLES.schedule_item}
+						style={STYLES.scheduleItem}
 						key={lesson.subjectId + lesson.subjectName + lesson.dueDate}
 					>
 						<Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>

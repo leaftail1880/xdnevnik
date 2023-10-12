@@ -1,6 +1,6 @@
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, TextStyle, View } from 'react-native'
 import { API } from '../NetSchool/api'
-import { STYLES } from '../constants'
+import { ACCENT_COLOR, INVISIBLE_COLOR, STYLES } from '../constants'
 import { useAsync } from '../hooks/async'
 
 export function TotalsScreen(props: { ctx: { studentId?: number } }) {
@@ -27,123 +27,95 @@ export function TotalsScreen(props: { ctx: { studentId?: number } }) {
 		[API.changes, studentId, schoolYearId]
 	)
 
+	const headerWidth = 50
+	const termTotalWidth =
+		totals &&
+		(`${~~((100 - headerWidth) / totals[0].termTotals.length)}%` as const)
+
+	function getSubjectName(id: number) {
+		return (
+			(subjects && subjects.find(subject => id === subject.id)?.name) ??
+			'Предмет404'
+		)
+	}
+
+	function getAvgMark(mark: number): TextStyle {
+		let color: string
+		if (mark >= 4.6) {
+			color = '#2a8700'
+		} else if (mark >= 3.6) {
+			color = '#ffe500'
+		} else if (mark && mark <= 2.6) {
+			color = '#ff1900'
+		} else {
+			color = INVISIBLE_COLOR
+		}
+		return { backgroundColor: color, color: STYLES.buttonText.color }
+	}
+
+	if (totals)
+		console.log(
+			'AAAAAAAA',
+			JSON.stringify([totals[3], totals[4], totals[5]], null, 2)
+		)
+
 	return (
 		FallbackEducation ||
 		FallbackSubjects ||
 		FallbackTotals || (
-			<ScrollView>
-				{totals!.map((total, i) => (
-					<View key={i + ''} style={STYLES.button}>
-						<Text style={{ fontSize: 25, ...STYLES.buttonText }}>
-							{subjects!.find(e => e.id === total.subjectId)?.name ??
-								'Предмет404'}
-						</Text>
-						<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-							{total.termTotals.map((x, i) => (
-								<View style={STYLES.invertedSchedule_item} key={i + ''}>
-									<Text style={STYLES.invertedButtonText}>{x.avgMark}</Text>
-								</View>
-							))}
-						</View>
-						{total.yearTotals.map((e, i) => (
-							<View key={i + ''}>
-								<Text style={STYLES.buttonText}>{e.period.periodName}</Text>
-								<Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>
-									{e.mark}
-								</Text>
-							</View>
-						))}
-						{/* <Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>
-							{LANG['avg_summative'] + i.summative_avg_value}
-							</Text>
-						<Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>
-						{LANG['avg_formative'] + i.formative_avg_value}
-						</Text>
-						<Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>
-						{LANG['avg_final'] + i.result_final_mark}
-						</Text> */}
+			<ScrollView contentContainerStyle={STYLES.table}>
+				{/* Table head */}
+				<View style={{ ...STYLES.tableRow, backgroundColor: ACCENT_COLOR }}>
+					{/* Table first row */}
+					<Text style={{ ...STYLES.buttonText, width: `${headerWidth}%` }}>
+						{new Date(schoolYear!.startDate).getFullYear()}/
+						{new Date(schoolYear!.endDate).getFullYear()} Четверти
+					</Text>
 
-						{/* <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-							{i.summative_list.map(x => (
-								<Button
-								onPress={() => Alert.alert(x.lesson_thema, x.created_at)}
-								style={STYLES.invertedSchedule_item}
-								>
-								<Text style={STYLES.invertedButtonText}>
-								{(x.mark_criterion ?? 'F') + ' ' + x.mark_value}
-								</Text>
-								</Button>
-								))}
-							</View> */}
-						{/* <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-							{total.yearTotals.map(x => (
-								<View style={STYLES.invertedSchedule_item} key={x.mark}>
-								<Text style={STYLES.invertedButtonText}>{x.mark}</Text>
-								</View>
-								))}
-							</View> */}
+					{/* Table rows */}
+					{totals[0].termTotals.map((_, i, a) => (
+						<Text
+							style={{ width: termTotalWidth, ...STYLES.buttonText }}
+							key={i.toString()}
+						>
+							{i + 1}/{a.length}
+						</Text>
+					))}
+				</View>
+
+				{/* Table body */}
+				{totals.map(total => (
+					<View
+						style={{ ...STYLES.tableRow, padding: 0 }}
+						key={total.subjectId.toString()}
+					>
+						{/* Table first row */}
+						<View
+							style={{
+								width: `${headerWidth}%`,
+								...STYLES.tableCell,
+							}}
+						>
+							<Text>{getSubjectName(total.subjectId)}</Text>
+						</View>
+
+						{/* Table rows */}
+						{total.termTotals.map((term, i) => (
+							<Text
+								style={{
+									...STYLES.tableCell,
+									...getAvgMark(term.avgMark),
+									width: termTotalWidth,
+									textAlign: 'center',
+								}}
+								key={i.toString() + term.avgMark + term.term.name}
+							>
+								{term.avgMark}
+							</Text>
+						))}
 					</View>
 				))}
 			</ScrollView>
 		)
 	)
-
-	// return (
-	// 	subjects &&
-	// 	totals && (
-	// 		<ScrollView
-	// 			contentContainerStyle={{
-	// 				justifyContent: 'center',
-	// 				alignContent: 'center',
-	// 				flex: 1,
-	// 			}}
-	// 		>
-	// 			<View style={STYLES.table}>
-	// 				{/* Table Head */}
-	// 				<View style={STYLES.table_head}>
-	// 					<View style={{ width: `${HeaderSize}%` }}>
-	// 						<Text style={STYLES.table_head_captions}>
-	// 							Четверти {/* TODO Add select for school year */}
-	// 							{new Date(schoolYear.startDate).getFullYear()}/
-	// 							{new Date(schoolYear.endDate).getFullYear()}
-	// 						</Text>
-	// 					</View>
-	// 					{totals[0].termTotals.map((_, i, a) => (
-	// 						<View
-	// 							style={{ width: `${~~((100 - HeaderSize) / a.length)}%` }}
-	// 							key={i.toString()}
-	// 						>
-	// 							<Text style={STYLES.table_head_captions}>
-	// 								{i + 1}/{a.length}
-	// 							</Text>
-	// 						</View>
-	// 					))}
-	// 				</View>
-
-	// 				{/* Table Body - Single Row */}
-	// 				{totals.map(total => (
-	// 					<View
-	// 						style={STYLES.table_body_single_row}
-	// 						key={Date.now().toString()}
-	// 					>
-	// 						<View style={{ width: HeaderSize }}>
-	// 							<Text style={STYLES.table_data}>
-	// 								{subjects.find(subject => total.subjectId === subject.id)
-	// 									?.name ?? 'Предмет404'}
-	// 							</Text>
-	// 						</View>
-	// 						{total.termTotals.map((term, i, a) => (
-	// 							<View
-	// 								style={{ width: `${~~((100 - HeaderSize) / a.length)}%` }}
-	// 								key={i.toString()}
-	// 							>
-	// 								<Text style={STYLES.table_data}>{term.avgMark}</Text>
-	// 							</View>
-	// 						))}
-	// 					</View>
-	// 				))}
-	// 			</View>
-	// 		</ScrollView>
-	// 	)
-	// )
 }

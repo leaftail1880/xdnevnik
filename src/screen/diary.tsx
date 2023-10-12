@@ -35,11 +35,11 @@ export function DiaryScreen(props: {
 				for (const [i, lesson] of diary.lessons.entries()) {
 					let period: Date | undefined
 					let date: Date
-					const previous = diary.lessons[-i]
+					const previous = diary.lessons[i - 1]
 
 					if (
 						previous &&
-						lesson.start.toYYYYMMDD() === previous.day.toYYYYMMDD()
+						lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD()
 					) {
 						// If previous lesson in the same day, send notification in the end of it
 						date = previous.end

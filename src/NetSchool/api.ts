@@ -406,11 +406,39 @@ export default class NetSchoolApi {
 	}
 
 	async totals({ studentId, schoolYearId }: StudentAndYear) {
-		return this.get<Total[]>(ROUTES.totals, {
-			params: {
-				studentId,
-				schoolYearId,
-			},
+		return (
+			await this.get<Total[]>(ROUTES.totals, {
+				params: {
+					studentId,
+					schoolYearId,
+				},
+			})
+		).map(total => {
+			total.termTotals = total.termTotals.sort(
+				(a, b) => parseInt(a.term.name) - parseInt(b.term.name)
+			)
+
+			if (total.termTotals.length < 4) {
+				const oldLength = total.termTotals.length
+				total.termTotals.length = 4
+
+				total.termTotals.fill(
+					{
+						avgMark: 0,
+						mark: null,
+						term: { id: 0, name: '0' },
+					},
+					oldLength,
+					4
+				)
+			}
+
+			const visitedIds = new Set<number>()
+			total.yearTotals = total.yearTotals.filter(e =>
+				visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id)
+			)
+
+			return total
 		})
 	}
 }
