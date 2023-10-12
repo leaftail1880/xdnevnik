@@ -53,12 +53,6 @@ export function TotalsScreen(props: { ctx: { studentId?: number } }) {
 		return { backgroundColor: color, color: STYLES.buttonText.color }
 	}
 
-	if (totals)
-		console.log(
-			'AAAAAAAA',
-			JSON.stringify([totals[3], totals[4], totals[5]], null, 2)
-		)
-
 	return (
 		FallbackEducation ||
 		FallbackSubjects ||

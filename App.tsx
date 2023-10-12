@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { NavigationContainer } from '@react-navigation/native'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
+import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
 import { Alert, Platform } from 'react-native'
 import 'react-native-gesture-handler'
@@ -100,6 +101,7 @@ export default function App() {
 
 	return (
 		<NavigationContainer>
+			<StatusBar hidden={false} translucent={true} />
 			<Tab.Navigator
 				screenOptions={({ route }) => ({
 					tabBarIcon: ({ focused, color, size }) => {

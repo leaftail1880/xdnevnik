@@ -34,15 +34,7 @@ export function HomeworkScreen(props: { ctx: { studentId?: number } }) {
 							{lesson.subjectName + '\n'}
 						</Text>
 						<Text style={{ fontWeight: 'bold', ...STYLES.buttonText }}>
-							{[
-								LANG['monday'],
-								LANG['tuesday'],
-								LANG['wednesday'],
-								LANG['thursday'],
-								LANG['friday'],
-								LANG['saturday'],
-								LANG['sunday'],
-							][new Date(lesson.dueDate).getDayMon()] + '\n'}
+							{LANG.days[new Date(lesson.dueDate).getDayMon()] + '\n'}
 						</Text>
 						<Text style={STYLES.buttonText}>{lesson.assignmentName}</Text>
 					</View>

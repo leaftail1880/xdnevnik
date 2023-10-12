@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Loading } from '../components/loading'
-import { LANG, SECONDARY_COLOR, STYLES } from '../constants'
+import { ACCENT_COLOR, LANG, SECONDARY_COLOR, STYLES } from '../constants'
 import { useAsync } from '../hooks/async'
 import { SettingsCtx } from '../hooks/settings'
 
@@ -87,19 +87,27 @@ export function DiaryScreen(props: {
 				style={{
 					alignSelf: 'stretch',
 					backgroundColor: SECONDARY_COLOR,
-					borderRadius: 10,
+					borderRadius: 5,
 					color: STYLES.buttonText.color,
 				}}
 				selectedValue={diaryDay}
 				onValueChange={setDiaryDay}
 			>
-				<Picker.Item label={LANG['monday']} value={Date.week[0]} />
-				<Picker.Item label={LANG['tuesday']} value={Date.week[1]} />
-				<Picker.Item label={LANG['wednesday']} value={Date.week[2]} />
-				<Picker.Item label={LANG['thursday']} value={Date.week[3]} />
-				<Picker.Item label={LANG['friday']} value={Date.week[4]} />
-				<Picker.Item label={LANG['saturday']} value={Date.week[5]} />
-				<Picker.Item label={LANG['sunday']} value={Date.week[6]} />
+				{Date.week.map((day, i) => {
+					return (
+						<Picker.Item
+							label={`${LANG.days[i]}${
+								new Date().toYYYYMMDD() === day
+									? ', cегодня'
+									: ' ' +
+									  new Date(day).toLocaleDateString([], { dateStyle: 'full' })
+							}`}
+							value={day}
+							key={day}
+							style={day === diaryDay ? { color: ACCENT_COLOR } : {}}
+						/>
+					)
+				})}
 			</Picker>
 			{FallbackDiary ||
 				diary.forDay(diaryDay).map(lesson => (
