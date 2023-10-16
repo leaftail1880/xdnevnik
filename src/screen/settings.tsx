@@ -1,7 +1,7 @@
 import { Picker } from '@react-native-picker/picker'
 import * as Application from 'expo-application'
 import { Switch, Text, View } from 'react-native'
-import { Student } from '../NetSchool/api'
+import { Student } from '../NetSchool/classes'
 import {
 	ACCENT_COLOR,
 	BUTTON_TEXT_COLOR,

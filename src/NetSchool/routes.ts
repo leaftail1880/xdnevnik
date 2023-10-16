@@ -29,7 +29,7 @@ export const ROUTES = {
 	attachments: '/attachments?',
 	getAttachment: '/attachments/',
 	classmeetings: '/classmeetings', // used
-	assignments: '/assignments',
+	assignments: '/assignments', // used
 	assignmentsForCurrentTerm: '/assignments/for-current-term?', // used
 	answer: '/assignments/',
 	distance: '/distancemeetings/',

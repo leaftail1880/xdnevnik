@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react'
 import { Alert, Platform } from 'react-native'
 import 'react-native-gesture-handler'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { API, Student } from './src/NetSchool/api'
+import { API } from './src/NetSchool/api'
+import { Student } from './src/NetSchool/classes'
 import {
 	ACCENT_COLOR,
 	LANG,
@@ -29,7 +30,6 @@ console.log(' ')
 console.log('reload')
 console.log(' ')
 
-// a
 Notifications.setNotificationHandler({
 	handleNotification: async () => ({
 		shouldShowAlert: true,

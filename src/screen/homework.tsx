@@ -7,7 +7,7 @@ import { useAsync } from '../hooks/async'
 export function HomeworkScreen(props: { ctx: { studentId?: number } }) {
 	const { studentId } = props.ctx
 	const [homework, HomeworkFallback] = useAsync(
-		() => API.assignmentForCurrentTerm({ studentId: studentId! }),
+		() => API.homework({ studentId: studentId! }),
 		'дз',
 		[API.changes, studentId]
 	)

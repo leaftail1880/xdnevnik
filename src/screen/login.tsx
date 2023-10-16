@@ -4,7 +4,7 @@ import { Alert, ScrollView, Text, View } from 'react-native'
 import 'react-native-gesture-handler'
 import { URL } from 'react-native-url-polyfill'
 import WebView from 'react-native-webview'
-import NetSchoolApi, { API } from '../NetSchool/api'
+import { API, NetSchoolApi } from '../NetSchool/api'
 import { ROUTES } from '../NetSchool/routes'
 import { Button } from '../components/button'
 import { Loading } from '../components/loading'
@@ -15,7 +15,7 @@ import { logout } from './logout'
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
 	const [endpoints, EndpointsFallback] = useAsync(
-		() => NetSchoolApi.getEndpoints(),
+		() => NetSchoolApi.fetchEndpoints(),
 		'списка регионов'
 	)
 	const [regionName, setRegionName] = useState('')

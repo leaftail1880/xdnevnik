@@ -1,13 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
-import Diary from './diary'
+import {
+	AssignmentForCurrentTerm as Assignment,
+	Diary,
+	Education,
+	Endpoint,
+	RawEndpoints,
+	Student,
+	Subject,
+	SubjectPerformance,
+	Total,
+} from './classes'
 import { ROUTES } from './routes'
 
-export interface NSEntity {
-	id: number
-	name: string
-}
-
+// Common request options
 interface StudentId {
 	studentId: number
 }
@@ -16,148 +22,28 @@ interface StudentAndYear extends StudentId {
 	schoolYearId: number
 }
 
-interface RawEndpoints {
-	items: ({ demo: boolean } & Endpoint)[]
-}
-
-export interface Endpoint {
-	name: string
-	url: string
-}
-
-export interface Student {
-	name: string
-	shortName: string
-	studentId: number
-}
-
-export interface Education {
-	class: NSEntity & {
-		isFree: boolean
-	}
-	isAddSchool: boolean
-	school: NSEntity
-	schoolyear: NSEntity & {
-		endDate: string
-		startDate: string
-	}
-}
-
-export interface Subject extends NSEntity {
-	order: number
-	federalСurriculum: boolean
-}
-
-export interface AssignmentForCurrentTerm {
-	classmeetingId: number
-	assignmentId: number
-	assignmentName: string
-	description: string | number | null
-	result: string | number | null
-	classAssignment: boolean
-	duty: boolean
-	comment: string | number | null
-	assignmentTypeId: number
-	assignmentTypeAbbr: string
-	assignmentTypeName: string
-	weight: number
-	attachmentsExists: boolean
-	hasTextAnswer: boolean
-	hasFileAnswers: boolean
-	subjectId: number
-	subjectName: string
-	dueDate: string
-	answerFilesCount: number
-	extraActivity: boolean
-	resultDate: string | number | null
-	assignmentDate: string
-	canAnswer: boolean
-}
-
-export interface Lesson {
-	classmeetingId: number
-	studentId: number
-	assignmentId: number[]
-	order: number
-	scheduleTimeNumber: number
-	scheduleTimeRelay: number
-	day: string
-	subjectName: string
-	subjectId: number
-	subjectGroupId: number
-	startTime: string
-	endTime: string
-	teachers: NSEntity[]
-	lessonTheme: string
-	roomName: string
-	attachmentsExists: boolean
-	resultsExists: boolean
-	attendance: string | number | null
-	addEducation: boolean
-	extraActivity: boolean
-}
-
-interface SubjectPerformance {
-	subject: NSEntity
-	term: NSEntity
-	averageMark: number
-	classAverageMark: number
-	maxMark: number
-	classmeetingsStats: {
-		passed: number
-		scheduled: number
-	}
-	teachers: NSEntity
-	results: {
-		date: string
-		assignmentId: number
-		classMeetingId: number
-		classMeetingDate: string
-		result: number
-		duty: boolean
-		comment: string | number | null
-		weight: number
-		assignmentTypeId: number
-		assignmentTypeAbbr: string
-		assignmentTypeName: string
-	}[]
-	markStats: {
-		mark: number
-		count: number
-		fraction: number
-	}[]
-	attendance: []
-}
-
-interface Total {
-	subjectId: number
-	termTotals: {
-		term: NSEntity
-		mark: string | number | null
-		avgMark: number
-	}[]
-	yearTotals: {
-		period: {
-			id: number
-			periodName: string
-			periodType: string
-		}
-		mark: string | number | null
-	}[]
-}
-
+// Request interface
 type Primitive = string | number | boolean | null | undefined
 
 interface ReqInit extends RequestInit {
 	auth?: boolean
-	params?: Record<string, Primitive | Primitive[]>
+	params?: Record<string, Primitive | Primitive[]> | [Primitive, Primitive][]
 }
 
+/**
+ * Main error class.
+ */
 class NetSchoolError extends Error {}
+/**
+ * Internal error class. Used in internal catch blocks. Should never go out from NetSchoolApi class
+ */
 class InternalNetSchoolError extends Error {}
 
-export default class NetSchoolApi {
-	static async getEndpoints() {
+/**
+ * Main api class
+ */
+export class NetSchoolApi {
+	public static async fetchEndpoints() {
 		const result = await fetch(ROUTES.getEndPointsList)
 			.then<RawEndpoints>(res => res.json())
 			.then<Endpoint[]>(res =>
@@ -171,20 +57,30 @@ export default class NetSchoolApi {
 		return result
 	}
 
-	static getOrigin(api: NetSchoolApi) {
+	/**
+	 * The function "getOrigin" returns the origin of a NetSchoolApi object.
+	 * @param {NetSchoolApi} api - Api to get origin from
+	 */
+	public static getOrigin(api: NetSchoolApi) {
 		return api.origin
 	}
 
 	private _cache: Record<string, [number, object]> = {}
-	get cache() {
+	/**
+	 * Cache to store responses to work in offline mode
+	 */
+	public get cache() {
 		return this._cache
 	}
-	set cache(value) {
+	public set cache(value) {
 		// Update all react effects
 		this.changes++
 		this._cache = value
 	}
 
+	/**
+	 * Used to link react state with class props
+	 */
 	public loggedState = {
 		getter() {
 			return false
@@ -192,9 +88,15 @@ export default class NetSchoolApi {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		setter(_: boolean) {},
 	}
+	/**
+	 * Used to link react state with class props
+	 */
 	public get loggedIn() {
 		return this.loggedState.getter()
 	}
+	/**
+	 * Used to link react state with class props
+	 */
 	public set loggedIn(v) {
 		this.loggedState.setter(v)
 	}
@@ -208,7 +110,7 @@ export default class NetSchoolApi {
 	private origin = ''
 	private base = '/api/mobile'
 
-	constructor(endpoint?: string) {
+	public constructor(endpoint?: string) {
 		if (endpoint) this.setEndpoint(endpoint)
 	}
 
@@ -367,21 +269,24 @@ export default class NetSchoolApi {
 		Loading503: this[503] + 'Загрузка данных из кэша...',
 	}
 
-	async get<T extends object>(url: string, init?: Omit<ReqInit, 'method'>) {
+	private async get<T extends object>(
+		url: string,
+		init?: Omit<ReqInit, 'method'>
+	) {
 		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
 	}
 
-	async students() {
+	public async students() {
 		return this.get<Student[]>(ROUTES.students)
 	}
 
-	async education({ studentId }: StudentId) {
+	public async education({ studentId }: StudentId) {
 		return this.get<Education[]>(ROUTES.education, {
 			params: { studentId },
 		})
 	}
 
-	async diary({
+	public async diary({
 		studentId,
 		startDate,
 		endDate,
@@ -390,7 +295,7 @@ export default class NetSchoolApi {
 		endDate?: string
 	}) {
 		return new Diary(
-			await this.get<Lesson[]>(ROUTES.classmeetings, {
+			await this.get(ROUTES.classmeetings, {
 				params: {
 					studentIds: [studentId],
 					startDate: startDate ?? Date.week[0],
@@ -401,7 +306,30 @@ export default class NetSchoolApi {
 		)
 	}
 
-	async assignmentForCurrentTerm({
+	public async assignment({
+		studentId,
+		assignmentId,
+	}: StudentId & { assignmentId: number }) {
+		return this.get<Assignment>(`${ROUTES.assignments}/${assignmentId}`, {
+			params: {
+				studentId,
+			},
+		})
+	}
+
+	public async assignments({
+		studentId,
+		classsmetingsIds,
+	}: StudentId & { classsmetingsIds: number[] }) {
+		return this.get<Assignment[]>(ROUTES.assignments, {
+			params: [
+				['studentId', studentId],
+				...classsmetingsIds.map(e => ['classmeetingId', e] as [string, number]),
+			],
+		})
+	}
+
+	public async homework({
 		studentId,
 		withoutMarks,
 		withExpiredClassAssign,
@@ -409,7 +337,7 @@ export default class NetSchoolApi {
 		withoutMarks?: boolean
 		withExpiredClassAssign?: boolean
 	}) {
-		return this.get<AssignmentForCurrentTerm[]>(
+		return this.get<Assignment[]>(
 			ROUTES.assignmentsForCurrentTerm,
 			{
 				params: {
@@ -421,13 +349,13 @@ export default class NetSchoolApi {
 		)
 	}
 
-	async subjects({ studentId, schoolYearId }: StudentAndYear) {
+	public async subjects({ studentId, schoolYearId }: StudentAndYear) {
 		return this.get<Subject[]>(ROUTES.subjects, {
 			params: { studentId, schoolYearId },
 		})
 	}
 
-	async subjectPerformance({
+	public async subjectPerformance({
 		studentId,
 		subjectId,
 		termId,
@@ -441,7 +369,7 @@ export default class NetSchoolApi {
 		})
 	}
 
-	async totals({ studentId, schoolYearId }: StudentAndYear) {
+	public async totals({ studentId, schoolYearId }: StudentAndYear) {
 		return (
 			await this.get<Total[]>(ROUTES.totals, {
 				params: {

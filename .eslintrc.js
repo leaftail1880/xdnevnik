@@ -13,6 +13,7 @@ module.exports = {
 	parser: '@typescript-eslint/parser',
 	rules: {
 		'@typescript-eslint/no-unused-vars': 'warn',
+		'@typescript-eslint/explicit-member-accessibility': 'warn',
 		'@typescript-eslint/naming-convention': [
 			'warn',
 			{
