@@ -154,6 +154,7 @@ interface ReqInit extends RequestInit {
 }
 
 class NetSchoolError extends Error {}
+class InternalNetSchoolError extends Error {}
 
 export default class NetSchoolApi {
 	static async getEndpoints() {
@@ -215,12 +216,75 @@ export default class NetSchoolApi {
 		const url = new URL(endpoint)
 		this.origin = url.origin
 		this.base = url.pathname
-		// Update all react effects
+
+		// Mark react effects who depend on endpoint changes
 		if (this.loggedIn) this.changes++
 	}
 
+	public async getToken(
+		form: Record<string, string>,
+		error400: string = 'Неверные данные для входа'
+	) {
+		const response = await fetch(ROUTES.getToken, {
+			method: 'POST',
+			body: new URLSearchParams(form).toString(),
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		})
+
+		if (response.status === 400) {
+			throw new NetSchoolError(error400)
+		}
+
+		if (response.ok) {
+			const json = await response.json()
+			this.session = {
+				access_token: json.access_token || '',
+				refresh_token: json.refresh_token || '',
+				expires: new Date(
+					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
+				),
+			}
+			this.loggedIn = true
+			this.changes++
+
+			return this.session
+		} else
+			throw new NetSchoolError(
+				'Запрос токена не удался, код ошибки ' + response.status
+			)
+	}
+
+	public restoreSessionFromMemory(session: NetSchoolApi['session']) {
+		session.expires = new Date(session.expires)
+		this.session = session
+		this.changes++
+		this.loggedIn = true
+	}
+
+	public async refreshTokenIfExpired() {
+		if (
+			this.session &&
+			this.session.expires.getTime() - 1000 * 60 * 60 < Date.now()
+		) {
+			await this.getToken(
+				ROUTES.refreshTokenTemplate(this.session.refresh_token),
+				'Не удалось обновить токен, зайдите в приложение заново.'
+			)
+		}
+	}
+
+	public async logOut() {
+		this.session = {
+			access_token: '',
+			refresh_token: '',
+			expires: new Date(),
+		}
+		this.loggedIn = false
+		this.changes = 0
+	}
+
 	private isAbsolute(path: string) {
-		// http://example -> true
+		// https://example -> true
 		// /path -> false
 		return /^(?:[a-z]+:)?\/\//i.test(path)
 	}
@@ -256,83 +320,55 @@ export default class NetSchoolApi {
 			request.headers['Authorization'] = `Bearer ${this.session.access_token}`
 		}
 
-		let response: Response
 		try {
-			response = await fetch(url, { ...init, ...request })
+			const response = await fetch(url, { ...init, ...request })
+
+			if (response.status === 503)
+				throw new InternalNetSchoolError(this.errorReasons.Loading503)
+
+			if (!response.ok) {
+				console.error(
+					`NetSchoolFetch failed with status ${response.status} URL: ${url}. Auth: ${init.auth}`
+				)
+				throw new NetSchoolError(
+					`${this.errorReasons[response.status]}\nКод ошибки сервера: ${
+						response.status
+					}`
+				)
+			}
+
+			const json = await response.json()
+			this.cache[url] = [Date.now(), json]
+			AsyncStorage.setItem('cache', JSON.stringify(this.cache))
+
+			return json
 		} catch (error) {
-			if (error.name !== NetSchoolError.name && this.cache[url]) {
+			if (error?.name !== NetSchoolError.name && this.cache[url]) {
+				console.error(error)
 				return this.cache[url][1] as T
-			} else throw error
+			} else {
+				if (
+					error instanceof Error &&
+					error.message === this.errorReasons.Loading503
+				) {
+					throw new NetSchoolError(this.errorReasons.NoCache503)
+				}
+				throw error
+			}
 		}
-		if (response && !response.ok) {
-			const error = new NetSchoolError(
-				`${this.getErrorReason(response.status)}\nКод ошибки сервера: ${
-					response.status
-				}`
-			)
-			console.error(
-				`NetSchoolFetch failed with status ${response.status} URL: ${url}. Auth: ${init.auth}`
-			)
-			throw error
-		}
-
-		const json = await response.json()
-		this.cache[url] = [Date.now(), json]
-		AsyncStorage.setItem('cache', JSON.stringify(this.cache))
-
-		return json
 	}
 
-	private getErrorReason(code: number) {
-		return {
-			503: 'Сервер дневника недоступен, технические работы. Загрузка данных из кэша...',
-			401: 'Недостаточно прав или ошибка авторизации',
-			404: 'Дневник обновился или указан неправильный путь запроса. Создайте сообщение об ошибке',
-		}[code]
+	private errorReasons = {
+		401: 'Недостаточно прав или ошибка авторизации',
+		404: 'Дневник обновился или указан неправильный путь запроса. Сообщите об ошибке разработчику',
+
+		503: 'Сервер дневника недоступен, технические работы. ',
+		NoCache503: this[503] + 'Данных в кэше не было.',
+		Loading503: this[503] + 'Загрузка данных из кэша...',
 	}
 
 	async get<T extends object>(url: string, init?: Omit<ReqInit, 'method'>) {
 		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
-	}
-
-	async getToken(form: Record<string, string>) {
-		const response = await fetch(ROUTES.getToken, {
-			body: new URLSearchParams(form).toString(),
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			method: 'POST',
-		})
-
-		if (response.status === 400) {
-			throw new NetSchoolError('Неверные логин/пароль или устарел токен')
-		}
-
-		if (response.ok) {
-			const json = await response.json()
-			this.session = {
-				access_token: json.access_token || '',
-				refresh_token: json.refresh_token || '',
-				expires: new Date(
-					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
-				),
-			}
-			this.loggedIn = true
-			this.changes++
-
-			return this.session
-		} else
-			throw new NetSchoolError(
-				'Запрос токена не удался ' + response.status + ' ' + response.statusText
-			)
-	}
-
-	async logOut() {
-		this.session = {
-			access_token: '',
-			refresh_token: '',
-			expires: new Date(),
-		}
-		this.loggedIn = false
-		this.changes = 0
 	}
 
 	async students() {

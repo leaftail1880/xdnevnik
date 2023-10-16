@@ -55,8 +55,8 @@ export function DiaryScreen(props: {
 							title: `${lesson.subjectName} | ${
 								lesson.roomName ?? 'Нет кабинета'
 							}`,
-							body: `Время урока ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
-								period ? 'Сейчас перемена ' + period.getMinutes() + ' мин' : ''
+							body: `Урок ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
+								period ? 'Перемена ' + period.getMinutes() + ' мин' : ''
 							}`,
 							sound: false,
 						},

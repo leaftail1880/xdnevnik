@@ -14,7 +14,6 @@ import { logout } from './logout'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
-
 	const [endpoints, EndpointsFallback] = useAsync(
 		() => NetSchoolApi.getEndpoints(),
 		'списка регионов'
@@ -22,40 +21,16 @@ export function LoginScreen() {
 	const [regionName, setRegionName] = useState('')
 
 	useEffect(() => {
-		console.log('AUTOGGING')
-		// Session
 		if (!API.loggedIn) {
 			;(async function restoreSessionEffect() {
 				const loadedEndpoint = await AsyncStorage.getItem('endpoint')
 				const loadedSession = await AsyncStorage.getItem('session')
 				if (loadedSession && loadedEndpoint) {
-					setLoggingIn(true)
 					API.setEndpoint(loadedEndpoint)
-
-					const oldSession = JSON.parse(
-						loadedSession
-					) as NetSchoolApi['session']
-
-					const newSession = await API.getToken(
-						ROUTES.getRefreshTokenTemplate(oldSession.refresh_token)
-					)
-
-					await AsyncStorage.setItem('session', JSON.stringify(newSession))
-					setLoggingIn(false)
+					API.restoreSessionFromMemory(JSON.parse(loadedSession))
 				}
 			})().catch(error => {
-				setLoggingIn(false)
-				console.error('RESTORE SESSION ERROR', error)
-				Alert.alert('Ошибка при восстановлении сессии', error + '', [
-					// { onPress: r, text: 'Попробовать снова' },
-					{ text: 'Выйти из сессии', onPress: logout },
-					{
-						text: 'Закрыть',
-						onPress() {
-							API.loggedIn = false
-						},
-					},
-				])
+				console.error('RESTORE SESSION EFFECT ERROR', error)
 			})
 		}
 	}, [])
@@ -129,3 +104,18 @@ export function LoginScreen() {
 		></WebView>
 	)
 }
+
+setInterval(() => {
+	console.log('refresh token check')
+	try {
+		API.refreshTokenIfExpired()
+	} catch (error) {
+		Alert.alert('Не удалось получить новый токен', error.message, [
+			{ text: 'Попробовать позже' },
+			{
+				text: 'Выйти и зайти нормально',
+				onPress: logout,
+			},
+		])
+	}
+}, 1000 * 60 * 5)

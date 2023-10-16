@@ -1,17 +1,17 @@
 import { useState } from 'react'
-import { Pressable, PressableProps } from 'react-native'
+import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 import { STYLES } from '../constants'
 
 export function Button({
 	children,
 	onPress,
 	style,
-}: Pick<PressableProps, 'children' | 'style'> & {
+}: Pick<TouchableOpacityProps, 'children' | 'style'> & {
 	onPress(): void | Promise<void>
 }) {
 	const [presssed, setPressed] = useState(false)
 	return (
-		<Pressable
+		<TouchableOpacity
 			onPress={async () => {
 				setPressed(true)
 				const result = onPress?.()
@@ -33,6 +33,6 @@ export function Button({
 			}
 		>
 			{children}
-		</Pressable>
+		</TouchableOpacity>
 	)
 }

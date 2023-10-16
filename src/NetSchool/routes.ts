@@ -48,7 +48,7 @@ export const ROUTES = {
 		}
 	}, // modified from object
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	getRefreshTokenTemplate(refresh_token: string = '') {
+	refreshTokenTemplate(refresh_token: string = '') {
 		return {
 			grant_type: 'refresh_token',
 			client_id: 'parent-mobile',
