@@ -1,7 +1,9 @@
 import { Picker } from '@react-native-picker/picker'
 import * as Application from 'expo-application'
-import { Switch, Text, View } from 'react-native'
+import * as Updates from 'expo-updates'
+import { Alert, Switch, Text, View } from 'react-native'
 import { Student } from '../NetSchool/classes'
+import { Button } from '../components/button'
 import {
 	ACCENT_COLOR,
 	BUTTON_TEXT_COLOR,
@@ -10,13 +12,13 @@ import {
 	SECONDARY_COLOR,
 	STYLES,
 } from '../constants'
-import { useAsync } from '../hooks/async'
+import { AsyncState } from '../hooks/async'
 import { SettingsCtx } from '../hooks/settings'
 
 export function SettingsScreen(props: {
 	ctx: {
 		settings: SettingsCtx
-		students: ReturnType<typeof useAsync<Student[]>>
+		students: AsyncState<Student[]>
 	}
 }) {
 	const { settings, students } = props.ctx
@@ -28,6 +30,7 @@ export function SettingsScreen(props: {
 				minWidth: 350,
 				minHeight: 400,
 				alignContent: 'flex-start',
+				justifyContent: 'flex-start',
 			}}
 		>
 			{students[1] || (
@@ -65,6 +68,25 @@ export function SettingsScreen(props: {
 					onValueChange={notifications => settings.save({ notifications })}
 					value={settings.notifications}
 				/>
+			</View>
+			<View>
+				<Button
+					style={STYLES.button}
+					onPress={async () => {
+						try {
+							const update = await Updates.checkForUpdateAsync()
+
+							if (update.isAvailable) {
+								await Updates.fetchUpdateAsync()
+								await Updates.reloadAsync()
+							}
+						} catch (error) {
+							Alert.alert(`Не удалось получить обновление`, '' + error)
+						}
+					}}
+				>
+					<Text style={STYLES.buttonText}>Проверить обновления</Text>
+				</Button>
 			</View>
 			<View>
 				<Text>Название: {Application.applicationName}</Text>

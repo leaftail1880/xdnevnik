@@ -21,9 +21,9 @@ export function DiaryScreen(props: {
 		'дневника',
 		[API.changes, studentId]
 	)
+	console.log('render diary screen, ', diary + '', FallbackDiary + '')
 
 	useEffect(() => {
-		// console.log('useEffect::notifications')
 		if (!settings.notifications) {
 			console.log('notifications are disabled')
 			Notifications.cancelAllScheduledNotificationsAsync()

@@ -4,17 +4,17 @@ import { Button } from '../components/button'
 import { Loading } from '../components/loading'
 import { RED_ACCENT_COLOR, STYLES } from '../constants'
 
+export type AsyncState<T> = [T, undefined] | [undefined, React.JSX.Element]
 export function useAsync<T>(
 	fn: () => Promise<T>,
 	name: string,
 	requirements: React.DependencyList = [],
 	defaultValue?: T
-): [T, undefined] | [undefined, React.JSX.Element] {
+): AsyncState<T> {
 	const [value, setValue] = useState<T | undefined>(defaultValue)
 	const [[errorNum, errorObj], setError] = useState<
 		[number, Error | undefined]
-	>([0, void 0])
-	const [updateRequest, setUpdateRequest] = useState(1)
+	>([0, undefined])
 
 	useEffect(() => {
 		;(async function useAsyncEffect() {
@@ -27,17 +27,19 @@ export function useAsync<T>(
 			}
 		})()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [...requirements, updateRequest])
+	}, [...requirements, errorNum])
 
 	// Value is present, all okay
-	if (typeof value !== 'undefined' && value) return [value, void 0]
+	if (typeof value !== 'undefined' && value) return [value, undefined]
 
-	const element: React.JSX.Element = errorObj ? (
-		ErrorHandler(
-			[errorNum, errorObj],
-			() => setUpdateRequest(updateRequest + 1),
-			name
-		)
+	const element = errorObj ? (
+		<ErrorHandler
+			error={[errorNum, errorObj]}
+			reload={() => {
+				setError([errorNum + 1, undefined])
+			}}
+			name={name}
+		/>
 	) : (
 		<Loading text={`Загрузка ${name}{dots}`} />
 	)
@@ -46,11 +48,13 @@ export function useAsync<T>(
 	return [void 0, element]
 }
 
-function ErrorHandler(
-	error: [number, Error],
-	reload: () => void,
+interface ErrorHandlerProps {
+	error: [number, Error]
+	reload: () => void
 	name: string
-) {
+}
+
+function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 	return (
 		<View style={{ ...STYLES.container, backgroundColor: '#fff0' }}>
 			<Text style={{ fontSize: 30, color: RED_ACCENT_COLOR, margin: 10 }}>

@@ -1,9 +1,50 @@
-import { ScrollView, Text, TextStyle, View } from 'react-native'
+import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
+import { ScrollView, Text, View } from 'react-native'
+// import { TouchableOpacity } from 'react-native-gesture-handler'
+// import Ionicons from 'react-native-vector-icons/Ionicons'
 import { API } from '../NetSchool/api'
-import { ACCENT_COLOR, INVISIBLE_COLOR, STYLES } from '../constants'
+import { Mark } from '../components/mark'
+import { ACCENT_COLOR, LANG, STYLES } from '../constants'
 import { useAsync } from '../hooks/async'
 
-export function TotalsScreen(props: { ctx: { studentId?: number } }) {
+const ParamMapObj = {
+	[`${LANG['s_totals']} ` as const]: void 0,
+	[LANG['s_subject_totals']]: {} as SubjectTotalsRouteParams,
+}
+type ParamMap = typeof ParamMapObj
+
+type TotalsNavigationProps = { ctx: { studentId?: number } }
+
+const Stack = createStackNavigator<ParamMap>()
+
+export function TotalsNavigation(props: TotalsNavigationProps) {
+	return (
+		<Stack.Navigator
+		// screenOptions={({ navigation }) => {
+		// 	return {
+		// 		headerLeft(props) {
+		// 			return (
+		// 				<TouchableOpacity onPress={() => navigation.goBack()}>
+		// 					<Ionicons name="chevron-back" {...props} />
+		// 				</TouchableOpacity>
+		// 			)
+		// 		},
+		// 	}
+		// }}
+		>
+			<Stack.Screen name={`${LANG['s_totals']} `}>
+				{nav => <TotalsScreen {...props} {...nav} />}
+			</Stack.Screen>
+			<Stack.Screen name={LANG['s_subject_totals']}>
+				{nav => <SubjectTotals {...nav} />}
+			</Stack.Screen>
+		</Stack.Navigator>
+	)
+}
+
+export function TotalsScreen(
+	props: TotalsNavigationProps & StackScreenProps<ParamMap, 'Оценки '>
+) {
 	const { studentId } = props.ctx
 	const [education, FallbackEducation] = useAsync(
 		() => API.education({ studentId: studentId! }),
@@ -11,7 +52,7 @@ export function TotalsScreen(props: { ctx: { studentId?: number } }) {
 		[API.changes, studentId]
 	)
 
-	// TODO Create option to schoose school year
+	// TODO Let user to schoose school year
 	const schoolYear = education && education[0].schoolyear
 	const schoolYearId = schoolYear && schoolYear.id
 
@@ -31,27 +72,6 @@ export function TotalsScreen(props: { ctx: { studentId?: number } }) {
 	const termTotalWidth =
 		totals &&
 		(`${~~((100 - headerWidth) / totals[0].termTotals.length)}%` as const)
-
-	function getSubjectName(id: number) {
-		return (
-			(subjects && subjects.find(subject => id === subject.id)?.name) ??
-			'Предмет404'
-		)
-	}
-
-	function getAvgMark(mark: number): TextStyle {
-		let color: string
-		if (mark >= 4.6) {
-			color = '#2a8700'
-		} else if (mark >= 3.6) {
-			color = '#ffe500'
-		} else if (mark && mark <= 2.6) {
-			color = '#ff1900'
-		} else {
-			color = INVISIBLE_COLOR
-		}
-		return { backgroundColor: color, color: STYLES.buttonText.color }
-	}
 
 	return (
 		FallbackEducation ||
@@ -86,30 +106,119 @@ export function TotalsScreen(props: { ctx: { studentId?: number } }) {
 						{/* Table first row */}
 						<View
 							style={{
-								width: `${headerWidth}%`,
 								...STYLES.tableCell,
+								width: `${headerWidth}%`,
 							}}
 						>
-							<Text>{getSubjectName(total.subjectId)}</Text>
+							<Text>
+								{(subjects &&
+									subjects.find(subject => total.subjectId === subject.id)
+										?.name) ??
+									'Предмет404'}
+							</Text>
 						</View>
 
 						{/* Table rows */}
 						{total.termTotals.map((term, i) => (
-							<Text
+							<Mark
+								mark={term.avgMark}
 								style={{
 									...STYLES.tableCell,
-									...getAvgMark(term.avgMark),
 									width: termTotalWidth,
-									textAlign: 'center',
+								}}
+								onPress={() => {
+									props.navigation.navigate(LANG['s_subject_totals'], {
+										termId: term.term.id,
+										studentId: studentId!,
+										subjectId: total.subjectId,
+									})
 								}}
 								key={i.toString() + term.avgMark + term.term.name}
-							>
-								{term.avgMark}
-							</Text>
+							/>
 						))}
 					</View>
 				))}
 			</ScrollView>
 		)
+	)
+}
+
+interface SubjectTotalsRouteParams {
+	termId: number
+	subjectId: number
+	studentId: number
+}
+
+export function SubjectTotals({
+	route,
+}: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
+	const { termId, studentId, subjectId } = route.params ?? {}
+	const [totals, FallbackTotals] = useAsync(
+		() => API.subjectPerformance({ termId, studentId, subjectId }),
+		'итогов по предмету',
+		[termId, studentId, subjectId]
+	)
+
+	if (FallbackTotals) return FallbackTotals
+
+	// const oldLength = totals.results.length
+	// totals.results.length = totals.classmeetingsStats.scheduled - 1
+	// const totalsAndSheduledTotals = (
+	// 	totals.results as (
+	// 		| SubjectPerformance['results'][0]
+	// 		| Record<string, null>
+	// 	)[]
+	// ).fill({}, oldLength)
+	const totalsAndSheduledTotals = [
+		...new Array(totals.classmeetingsStats.passed - totals.results.length).fill(
+			{ result: 'Нет' }
+		),
+		...totals.results,
+		...new Array(
+			totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
+		).fill({}),
+	]
+	console.log(JSON.stringify(totalsAndSheduledTotals, null, 2))
+
+	return (
+		<ScrollView>
+			<View
+				style={{
+					padding: 10,
+					flexDirection: 'row',
+					justifyContent: 'space-between',
+					alignContent: 'stretch',
+				}}
+			>
+				<Text style={{ fontSize: 20, margin: 5 }}>{totals.subject.name}</Text>
+				<Mark mark={totals.averageMark} style={{ height: 50, width: 60 }} />
+			</View>
+			<ScrollView
+				contentContainerStyle={{
+					padding: 10,
+					flexDirection: 'row',
+					justifyContent: 'space-between',
+					alignContent: 'stretch',
+				}}
+				horizontal
+			>
+				{totalsAndSheduledTotals.map((e, i) => (
+					<Mark
+						mark={e.result}
+						markWeight={e.weight}
+						key={e.assignmentId ?? i.toString()}
+						style={{
+							minHeight: 30,
+							minWidth: 30,
+							...(e.result === 'Нет' ? { backgroundColor: '#88888857' } : {}),
+						}}
+					/>
+				))}
+			</ScrollView>
+			<Text style={{ alignSelf: 'flex-end', margin: 7, fontSize: 15 }}>
+				Прошло уроков {totals.classmeetingsStats.passed}/
+				{totals.classmeetingsStats.scheduled}
+			</Text>
+		</ScrollView>
 	)
 }

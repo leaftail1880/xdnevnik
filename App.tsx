@@ -16,14 +16,14 @@ import {
 	NOTIFICATION_COLOR,
 	SECONDARY_COLOR,
 } from './src/constants'
-import { useAsync } from './src/hooks/async'
+import { AsyncState, useAsync } from './src/hooks/async'
 import { useSettingProvider } from './src/hooks/settings'
 import { DiaryScreen } from './src/screen/diary'
 import { HomeworkScreen } from './src/screen/homework'
 import { LoginScreen } from './src/screen/login'
 import { LogoutScreen } from './src/screen/logout'
 import { SettingsScreen } from './src/screen/settings'
-import { TotalsScreen } from './src/screen/totals'
+import { TotalsNavigation } from './src/screen/totals'
 
 console.log(' ')
 console.log(' ')
@@ -57,7 +57,6 @@ export default function App() {
 	const studentId = student && student.studentId
 
 	useEffect(() => {
-		// console.log('effect::setup, loggingIn: ' + loggingIn)/.
 		;(async function loadCache() {
 			const raw = await AsyncStorage.getItem('cache')
 			if (raw) API.cache = JSON.parse(raw)
@@ -101,7 +100,7 @@ export default function App() {
 
 	return (
 		<NavigationContainer>
-			<StatusBar hidden={false} translucent={true} />
+			<StatusBar hidden={false} translucent={true} style="dark" />
 			<Tab.Navigator
 				screenOptions={({ route }) => ({
 					tabBarIcon: ({ focused, color, size }) => {
@@ -114,7 +113,7 @@ export default function App() {
 							[LANG['s_settings']]: 'settings',
 						}[route.name]
 						if (focused) iconName += '-outline'
-						return <Ionicons name={iconName} size={size} color={color} />
+						return <Ionicons name={iconName!} size={size} color={color} />
 					},
 					tabBarActiveTintColor: ACCENT_COLOR,
 					tabBarInactiveTintColor: SECONDARY_COLOR,
@@ -132,16 +131,14 @@ export default function App() {
 				<Tab.Screen name={LANG['s_homework']}>
 					{() => StudentFallback || <HomeworkScreen ctx={{ studentId }} />}
 				</Tab.Screen>
-				<Tab.Screen name={LANG['s_totals']}>
-					{() => <TotalsScreen ctx={{ studentId }} />}
+				<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
+					{props => <TotalsNavigation ctx={{ studentId }} {...props} />}
 				</Tab.Screen>
 				<Tab.Screen name={LANG['s_settings']}>
 					{() => (
 						<SettingsScreen
 							ctx={{
-								students: [students, StudentFallback] as ReturnType<
-									typeof useAsync<Student[]>
-								>,
+								students: [students, StudentFallback] as AsyncState<Student[]>,
 								settings,
 							}}
 						/>
@@ -155,4 +152,3 @@ export default function App() {
 		</NavigationContainer>
 	)
 }
-//

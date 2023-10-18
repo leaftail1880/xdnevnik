@@ -106,10 +106,7 @@ export function LoginScreen() {
 }
 
 setInterval(() => {
-	console.log('refresh token check')
-	try {
-		API.refreshTokenIfExpired()
-	} catch (error) {
+	API.refreshTokenIfExpired(error =>
 		Alert.alert('Не удалось получить новый токен', error.message, [
 			{ text: 'Попробовать позже' },
 			{
@@ -117,5 +114,5 @@ setInterval(() => {
 				onPress: logout,
 			},
 		])
-	}
-}, 1000 * 60 * 5)
+	)
+}, 1000 * 10)

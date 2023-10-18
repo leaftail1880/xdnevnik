@@ -163,7 +163,7 @@ export class Diary {
 }
 
 /**
- * Terms, marks etc
+ * ALl marks for one subject
  */
 export interface SubjectPerformance {
 	subject: NSEntity
@@ -205,7 +205,7 @@ export interface Total {
 	termTotals: {
 		term: NSEntity
 		mark: string | number | null
-		avgMark: number
+		avgMark: number | null
 	}[]
 	yearTotals: {
 		period: {

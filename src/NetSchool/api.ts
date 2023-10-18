@@ -163,15 +163,23 @@ export class NetSchoolApi {
 		this.loggedIn = true
 	}
 
-	public async refreshTokenIfExpired() {
+	public async refreshTokenIfExpired(onError: (e: Error) => void) {
 		if (
-			this.session &&
-			this.session.expires.getTime() - 1000 * 60 * 60 < Date.now()
+			this.session.access_token &&
+			this.session.expires.getTime() - 1000 * 60 < Date.now()
 		) {
-			await this.getToken(
-				ROUTES.refreshTokenTemplate(this.session.refresh_token),
-				'Не удалось обновить токен, зайдите в приложение заново.'
+			console.log(
+				this.session.expires.toLocaleTimeString(),
+				new Date().toLocaleTimeString()
 			)
+			try {
+				await this.getToken(
+					ROUTES.refreshTokenTemplate(this.session.refresh_token),
+					'Не удалось обновить токен, зайдите в приложение заново.'
+				)
+			} catch (error) {
+				onError(error)
+			}
 		}
 	}
 
@@ -337,16 +345,13 @@ export class NetSchoolApi {
 		withoutMarks?: boolean
 		withExpiredClassAssign?: boolean
 	}) {
-		return this.get<Assignment[]>(
-			ROUTES.assignmentsForCurrentTerm,
-			{
-				params: {
-					studentId,
-					withoutMarks: withoutMarks ?? true,
-					withExpiredClassAssign: withExpiredClassAssign ?? false,
-				},
-			}
-		)
+		return this.get<Assignment[]>(ROUTES.assignmentsForCurrentTerm, {
+			params: {
+				studentId,
+				withoutMarks: withoutMarks ?? true,
+				withExpiredClassAssign: withExpiredClassAssign ?? false,
+			},
+		})
 	}
 
 	public async subjects({ studentId, schoolYearId }: StudentAndYear) {
@@ -388,7 +393,7 @@ export class NetSchoolApi {
 
 				total.termTotals.fill(
 					{
-						avgMark: 0,
+						avgMark: null,
 						mark: null,
 						term: { id: 0, name: '0' },
 					},

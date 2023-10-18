@@ -122,10 +122,11 @@ export const LANG = {
 	s_totals: 'Оценки',
 	s_homework: 'Домашка',
 	s_settings: 'Настройки',
+	s_subject_totals: 'Итоги по предмету',
 	notification: 'Уведомления',
 	notification_disable: 'Выключить уведомления',
 	notification_enable: 'Включить уведомления',
-}
+} as const
 
 declare global {
 	interface DateConstructor {
