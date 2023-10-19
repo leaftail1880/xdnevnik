@@ -6,7 +6,7 @@ on:
 
 jobs:
   update:
-    name: EAS Update
+    name: EAS Release APK Publish
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Check for EXPO_TOKEN
@@ -34,10 +34,10 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🚀 Publish build
-        run: eas build -p android --non-interactive --output release/
+      - name: 🏗 Build
+        run: eas build -p android --non-interactive --output release/ --local
 
-      - name: Upload binaries to release
+      - name: 🚀 Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
