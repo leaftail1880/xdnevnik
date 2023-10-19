@@ -12,6 +12,8 @@ module.exports = {
 	plugins: ['react', 'react-hooks', '@typescript-eslint'],
 	parser: '@typescript-eslint/parser',
 	rules: {
+		'no-empty': 'warn',
+		'prefer-const': 'warn',
 		'@typescript-eslint/no-unused-vars': 'warn',
 		'@typescript-eslint/explicit-member-accessibility': 'warn',
 		'@typescript-eslint/naming-convention': [

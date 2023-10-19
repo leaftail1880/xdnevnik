@@ -21,7 +21,6 @@ export function DiaryScreen(props: {
 		'дневника',
 		[API.changes, studentId]
 	)
-	console.log('render diary screen, ', diary + '', FallbackDiary + '')
 
 	useEffect(() => {
 		if (!settings.notifications) {

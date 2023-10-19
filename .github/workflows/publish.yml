@@ -1,11 +1,8 @@
-name: update
+name: publish
 on: 
   push:
-    branches:
-      - update
-    paths:
-      - '**.ts'
-      - '**.tsx'
+    tags:
+      '*'
 
 jobs:
   update:
@@ -37,5 +34,14 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🚀 Publish update
-        run: eas update --auto --non-interactive
+      - name: 🚀 Publish build
+        run: eas build -p android --non-interactive --output release/
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/xdnevnik.apk
+          asset_name: XDNevnik.apk
+          tag: ${{ github.ref }}
+          overwrite: true

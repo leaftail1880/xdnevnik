@@ -162,14 +162,6 @@ export function SubjectTotals({
 
 	if (FallbackTotals) return FallbackTotals
 
-	// const oldLength = totals.results.length
-	// totals.results.length = totals.classmeetingsStats.scheduled - 1
-	// const totalsAndSheduledTotals = (
-	// 	totals.results as (
-	// 		| SubjectPerformance['results'][0]
-	// 		| Record<string, null>
-	// 	)[]
-	// ).fill({}, oldLength)
 	const totalsAndSheduledTotals = [
 		...new Array(totals.classmeetingsStats.passed - totals.results.length).fill(
 			{ result: 'Нет' }
@@ -185,10 +177,11 @@ export function SubjectTotals({
 		| Record<string, null>
 	)[]
 
-	const maxWeight = totalsAndSheduledTotals.reduce(
-		(prev, cur) => (cur.weight ? Math.max(prev, cur.weight) : prev),
-		0
-	)
+	if (totals.attendance) console.log(JSON.stringify(totals.attendance, null, 2))
+
+	const weights = totals.results.map(e => e.weight)
+	const maxWeight = Math.max(...weights)
+	const minWeight = Math.min(...weights)
 
 	return (
 		<ScrollView>
@@ -208,8 +201,13 @@ export function SubjectTotals({
 				{totalsAndSheduledTotals.map((e, i) => (
 					<Mark
 						mark={e.result}
-						markWeight={e.weight}
-						maxWeight={maxWeight}
+						markWeight={
+							typeof e.weight === 'number' && {
+								current: e.weight,
+								max: maxWeight,
+								min: minWeight,
+							}
+						}
 						key={e.assignmentId ?? i.toString()}
 						style={{
 							minHeight: 30,
@@ -224,6 +222,11 @@ export function SubjectTotals({
 				<Text style={{ fontSize: 15 }}>
 					Прошло уроков {totals.classmeetingsStats.passed}/
 					{totals.classmeetingsStats.scheduled}
+				</Text>
+			</View>
+			<View style={STYLES.stretch}>
+				<Text style={{ fontSize: 15 }}>
+					Средний бал класса {totals.classAverageMark}
 				</Text>
 			</View>
 		</ScrollView>
