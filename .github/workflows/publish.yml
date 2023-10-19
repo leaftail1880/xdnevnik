@@ -41,7 +41,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/xdnevnik.apk
+          file: release/app-release.apk
           asset_name: XDNevnik.apk
           tag: ${{ github.ref }}
           overwrite: true
