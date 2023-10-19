@@ -31,10 +31,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📦 Install dependencies
-        run: yarn install
-
-      - name: 🏗 Build
+      - name: 📦 Build
         run: eas build -p android --non-interactive --output release/ --local
 
       - name: 🚀 Upload binaries to release
