@@ -15,6 +15,12 @@ export const STYLES = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+	stretch: {
+		padding: 10,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignContent: 'stretch',
+	},
 	textField: {
 		margin: 15,
 		padding: 15,

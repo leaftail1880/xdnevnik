@@ -2,7 +2,7 @@
   "expo": {
 		"name": "XDnevnik",
 		"slug": "xdnevnik",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"owner": "leaftail1880",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -25,9 +25,6 @@
 			"googleServicesFile": "./google-services.json",
 			"package": "com.leaftail1880.xdnevnik"
 		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		},
 		"extra": {
 			"eas": {
 				"projectId": "97163afe-5c7e-4856-ba8f-348e00aa7c04"
@@ -49,6 +46,7 @@
 		]
 	}
 }
+
 
 
 

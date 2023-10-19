@@ -28,6 +28,13 @@ export function LoginScreen() {
 				if (loadedSession && loadedEndpoint) {
 					API.setEndpoint(loadedEndpoint)
 					API.restoreSessionFromMemory(JSON.parse(loadedSession))
+
+					await API.getToken(
+						ROUTES.refreshTokenTemplate(
+							JSON.parse(loadedSession).refresh_token
+						),
+						'Зайдите в приложение заново.'
+					)
 				}
 			})().catch(error => {
 				console.error('RESTORE SESSION EFFECT ERROR', error)
@@ -105,14 +112,22 @@ export function LoginScreen() {
 	)
 }
 
+let skip = 0
 setInterval(() => {
-	API.refreshTokenIfExpired(error =>
-		Alert.alert('Не удалось получить новый токен', error.message, [
-			{ text: 'Попробовать позже' },
-			{
-				text: 'Выйти и зайти нормально',
-				onPress: logout,
-			},
-		])
+	if (skip) {
+		skip--
+		return
+	}
+	API.refreshTokenIfExpired(
+		error => (
+			(skip = 9999999),
+			Alert.alert('Не удалось получить новый токен', error.message, [
+				{ text: 'Попробовать позже', onPress: () => (skip = 60 * 10) },
+				{
+					text: 'Выйти и зайти нормально',
+					onPress: logout,
+				},
+			])
+		)
 	)
 }, 1000 * 10)

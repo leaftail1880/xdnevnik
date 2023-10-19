@@ -175,7 +175,7 @@ export class NetSchoolApi {
 			try {
 				await this.getToken(
 					ROUTES.refreshTokenTemplate(this.session.refresh_token),
-					'Не удалось обновить токен, зайдите в приложение заново.'
+					'Зайдите в приложение заново.'
 				)
 			} catch (error) {
 				onError(error)

@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from 'react-native'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { API } from '../NetSchool/api'
+import { SubjectPerformance } from '../NetSchool/classes'
 import { Mark } from '../components/mark'
 import { ACCENT_COLOR, LANG, STYLES } from '../constants'
 import { useAsync } from '../hooks/async'
@@ -177,35 +178,38 @@ export function SubjectTotals({
 		...new Array(
 			totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
 		).fill({}),
-	]
-	console.log(JSON.stringify(totalsAndSheduledTotals, null, 2))
+	] as (
+		| (Omit<SubjectPerformance['results'][number], 'result'> & {
+				result: 'Нет' | number
+		  })
+		| Record<string, null>
+	)[]
+
+	const maxWeight = totalsAndSheduledTotals.reduce(
+		(prev, cur) => (cur.weight ? Math.max(prev, cur.weight) : prev),
+		0
+	)
 
 	return (
 		<ScrollView>
-			<View
-				style={{
-					padding: 10,
-					flexDirection: 'row',
-					justifyContent: 'space-between',
-					alignContent: 'stretch',
-				}}
-			>
+			<View style={STYLES.stretch}>
 				<Text style={{ fontSize: 20, margin: 5 }}>{totals.subject.name}</Text>
-				<Mark mark={totals.averageMark} style={{ height: 50, width: 60 }} />
+				<Mark
+					mark={totals.averageMark}
+					style={{ height: 50, width: 60 }}
+					textStyle={{ fontSize: 20 }}
+				/>
 			</View>
 			<ScrollView
-				contentContainerStyle={{
-					padding: 10,
-					flexDirection: 'row',
-					justifyContent: 'space-between',
-					alignContent: 'stretch',
-				}}
+				contentContainerStyle={STYLES.stretch}
 				horizontal
+				pagingEnabled
 			>
 				{totalsAndSheduledTotals.map((e, i) => (
 					<Mark
 						mark={e.result}
 						markWeight={e.weight}
+						maxWeight={maxWeight}
 						key={e.assignmentId ?? i.toString()}
 						style={{
 							minHeight: 30,
@@ -215,10 +219,13 @@ export function SubjectTotals({
 					/>
 				))}
 			</ScrollView>
-			<Text style={{ alignSelf: 'flex-end', margin: 7, fontSize: 15 }}>
-				Прошло уроков {totals.classmeetingsStats.passed}/
-				{totals.classmeetingsStats.scheduled}
-			</Text>
+			<View style={STYLES.stretch}>
+				<Text style={{ fontSize: 15 }}>{totals.teachers[0].name}</Text>
+				<Text style={{ fontSize: 15 }}>
+					Прошло уроков {totals.classmeetingsStats.passed}/
+					{totals.classmeetingsStats.scheduled}
+				</Text>
+			</View>
 		</ScrollView>
 	)
 }
