@@ -1,5 +1,5 @@
 import { Falsy, Text, TextStyle } from 'react-native'
-import { ACCENT_COLOR, SECONDARY_COLOR } from '../constants'
+import { ACCENT_COLOR, SECONDARY_COLOR, STYLES } from '../constants'
 import { Button, ButtonProps } from './button'
 
 export function Mark({
@@ -16,13 +16,13 @@ export function Mark({
 	let color: string = SECONDARY_COLOR + Math.floor(5).toString(16)
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
-			color = '#00FF00'
+			color = '#007000'
 		} else if (mark >= 3.6) {
-			color = '#FFD000'
+			color = '#947900'
 		} else if (mark >= 2.6) {
-			color = '#FF8800'
+			color = '#8D4B00'
 		} else if (mark >= 1.6) {
-			color = '#FF0000'
+			color = '#940000'
 		}
 	}
 
@@ -61,6 +61,7 @@ export function Mark({
 			<Text
 				style={{
 					textAlign: 'center',
+					color: STYLES.buttonText.color,
 					...textStyle,
 				}}
 			>
@@ -71,6 +72,7 @@ export function Mark({
 					style={{
 						fontSize: 10,
 						textAlign: 'center',
+						color: STYLES.buttonText.color,
 						...textStyle,
 					}}
 				>

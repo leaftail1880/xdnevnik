@@ -1,8 +1,8 @@
-import { Picker } from '@react-native-picker/picker'
 import * as Notifications from 'expo-notifications'
 import { useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
+import { Dropdown } from '../components/dropdown'
 import { Loading } from '../components/loading'
 import { ACCENT_COLOR, LANG, SECONDARY_COLOR, STYLES } from '../constants'
 import { useAsync } from '../hooks/async'
@@ -75,6 +75,17 @@ export function DiaryScreen(props: {
 
 	if (!API.loggedIn) return <Loading text="Ожидание авторизации{dots}" />
 
+	const values = Date.week.map((day, i) => {
+		return {
+			name: `${LANG.days[i]}${
+				new Date().toYYYYMMDD() === day
+					? ', cегодня'
+					: ' ' + new Date(day).toLocaleDateString([], { dateStyle: 'full' })
+			}`,
+			day: day,
+		}
+	})
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -82,32 +93,24 @@ export function DiaryScreen(props: {
 				alignContent: 'center',
 			}}
 		>
-			<Picker
-				style={{
+			<Dropdown
+				buttonStyle={{
 					alignSelf: 'stretch',
 					backgroundColor: SECONDARY_COLOR,
+					width: '100%',
 					borderRadius: 5,
-					color: STYLES.buttonText.color,
 				}}
-				selectedValue={diaryDay}
-				onValueChange={setDiaryDay}
-			>
-				{Date.week.map((day, i) => {
-					return (
-						<Picker.Item
-							label={`${LANG.days[i]}${
-								new Date().toYYYYMMDD() === day
-									? ', cегодня'
-									: ' ' +
-									  new Date(day).toLocaleDateString([], { dateStyle: 'full' })
-							}`}
-							value={day}
-							key={day}
-							style={day === diaryDay ? { color: ACCENT_COLOR } : {}}
-						/>
-					)
-				})}
-			</Picker>
+				buttonTextStyle={STYLES.buttonText}
+				data={values}
+				buttonTextAfterSelection={i => i.name}
+				renderCustomizedRowChild={i => (
+					<Text style={i.day === diaryDay && { color: ACCENT_COLOR }}>
+						{i.name}
+					</Text>
+				)}
+				defaultValue={values.find(e => e.day === diaryDay)}
+				onSelect={item => setDiaryDay(item.day)}
+			/>
 			{FallbackDiary ||
 				diary.forDay(diaryDay).map(lesson => (
 					<View

@@ -1,9 +1,10 @@
-import { Picker } from '@react-native-picker/picker'
 import * as Application from 'expo-application'
 import * as Updates from 'expo-updates'
 import { Alert, Switch, Text, View } from 'react-native'
+
 import { Student } from '../NetSchool/classes'
 import { Button } from '../components/button'
+import { Dropdown } from '../components/dropdown'
 import {
 	ACCENT_COLOR,
 	BUTTON_TEXT_COLOR,
@@ -34,21 +35,18 @@ export function SettingsScreen(props: {
 			}}
 		>
 			{students[1] || (
-				<Picker
-					style={{ width: 350 }}
-					selectedValue={settings.studentIndex}
-					onValueChange={studentIndex => settings.save({ studentIndex })}
-				>
-					{students[0].map((student, index) => {
-						return (
-							<Picker.Item
-								label={student.name}
-								key={student.name}
-								value={index.toString()}
-							/>
-						)
+				<Dropdown
+					buttonStyle={{ width: '100%', ...STYLES.button }}
+					buttonTextStyle={STYLES.buttonText}
+					dropdownStyle={{ width: '100%', borderRadius: 5 }}
+					data={students[0].map((student, i) => {
+						return { name: student.name, i }
 					})}
-				</Picker>
+					defaultValueByIndex={settings.studentIndex}
+					onSelect={s => settings.save({ studentIndex: s.i })}
+					buttonTextAfterSelection={i => i.name}
+					rowTextForSelection={i => i.name}
+				></Dropdown>
 			)}
 			<View
 				style={{
