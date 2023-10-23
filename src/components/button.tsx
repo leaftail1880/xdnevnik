@@ -16,8 +16,10 @@ export function Button({ children, onPress, style, activeOpacity }: ButtonProps)
 			onPress={async () => {
 				setPressed(true)
 				const result = onPress?.()
-				if (result) await result
-				setTimeout(() => setPressed(false), result ? 0 : 1000)
+				if (result) {
+					await result
+					setPressed(false)
+				} else setTimeout(() => setPressed(false), 1000)
 			}}
 			disabled={presssed}
 			style={style}

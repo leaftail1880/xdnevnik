@@ -16,6 +16,7 @@
 		"@react-navigation/bottom-tabs": "^6.5.8",
 		"@react-navigation/native": "^6.1.7",
 		"@react-navigation/stack": "^6.3.17",
+		"eslint-plugin-react-native": "^4.1.0",
 		"expo": "^49.0.13",
 		"expo-device": "~5.4.0",
 		"expo-notifications": "~0.20.1",
@@ -30,7 +31,8 @@
 		"react-native-select-dropdown": "^3.4.0",
 		"react-native-url-polyfill": "^2.0.0",
 		"react-native-vector-icons": "^10.0.0",
-		"react-native-webview": "13.2.2"
+		"react-native-webview": "13.2.2",
+		"react-native-wheel-color-picker": "^1.2.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.20.0",

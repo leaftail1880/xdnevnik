@@ -33,14 +33,18 @@ interface ReqInit extends RequestInit {
 /**
  * Main error class.
  */
-class NetSchoolError extends Error {}
-/**
- * Internal error class. Used in internal catch blocks. Should never go out from NetSchoolApi class
- */
-class InternalNetSchoolError extends Error {}
+class NetSchoolError extends Error {
+	public cacheGuide = false
+	public constructor(message: string, options?: { cacheGuide: boolean }) {
+		super(message)
+		if (options) {
+			this.cacheGuide = options.cacheGuide
+		}
+	}
+}
 
 /**
- * Main api class
+ * Main api class.
  */
 export class NetSchoolApi {
 	public static async fetchEndpoints() {
@@ -74,38 +78,39 @@ export class NetSchoolApi {
 	}
 	public set cache(value) {
 		// Update all react effects
-		this.changes++
+		this.authorized++
 		this._cache = value
 	}
 
 	/**
 	 * Used to link react state with class props
 	 */
-	public loggedState = {
+	public hookAuth = {
 		getter() {
-			return false
+			return 0
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		setter(_: boolean) {},
+		setter(_: number) {},
 	}
 	/**
 	 * Used to link react state with class props
 	 */
-	public get loggedIn() {
-		return this.loggedState.getter()
+	public get authorized() {
+		return this.hookAuth.getter()
 	}
 	/**
 	 * Used to link react state with class props
 	 */
-	public set loggedIn(v) {
-		this.loggedState.setter(v)
+	public set authorized(v) {
+		this.hookAuth.setter(v)
 	}
-	public changes = 0
 
-	private session = {
-		access_token: '',
-		refresh_token: '',
-		expires: new Date(),
+	private session?: {
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		access_token: string
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		refresh_token: string
+		expires: Date
 	}
 	private origin = ''
 	private base = '/api/mobile'
@@ -120,7 +125,7 @@ export class NetSchoolApi {
 		this.base = url.pathname
 
 		// Mark react effects who depend on endpoint changes
-		if (this.loggedIn) this.changes++
+		if (this.authorized) this.authorized++
 	}
 
 	public async getToken(
@@ -146,8 +151,7 @@ export class NetSchoolApi {
 					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
 				),
 			}
-			this.loggedIn = true
-			this.changes++
+			this.authorized++
 
 			return this.session
 		} else
@@ -156,16 +160,17 @@ export class NetSchoolApi {
 			)
 	}
 
-	public restoreSessionFromMemory(session: NetSchoolApi['session']) {
+	public restoreSessionFromMemory(
+		session: NonNullable<NetSchoolApi['session']>
+	) {
 		session.expires = new Date(session.expires)
 		this.session = session
-		this.changes++
-		this.loggedIn = true
+		this.authorized++
 	}
 
 	public async refreshTokenIfExpired(onError: (e: Error) => void) {
 		if (
-			this.session.access_token &&
+			this.session &&
 			this.session.expires.getTime() - 1000 * 60 < Date.now()
 		) {
 			console.log(
@@ -184,13 +189,8 @@ export class NetSchoolApi {
 	}
 
 	public async logOut() {
-		this.session = {
-			access_token: '',
-			refresh_token: '',
-			expires: new Date(),
-		}
-		this.loggedIn = false
-		this.changes = 0
+		delete this.session
+		this.authorized = 0
 	}
 
 	private isAbsolute(path: string) {
@@ -224,27 +224,35 @@ export class NetSchoolApi {
 			).toString()
 		}
 
-		if (init.auth) {
-			if (!this.session.access_token)
-				throw new NetSchoolError('Запрос до авторизации: ' + url)
-			request.headers['Authorization'] = `Bearer ${this.session.access_token}`
-		}
-
 		try {
+			if (init.auth) {
+				if (!this.session || !this.authorized) {
+					throw new NetSchoolError('Запрос к ' + url + ' до авторизации.', {
+						cacheGuide: true,
+					})
+				} else {
+					request.headers[
+						'Authorization'
+					] = `Bearer ${this.session.access_token}`
+				}
+			}
+
 			const response = await fetch(url, { ...init, ...request })
 
 			if (response.status === 503)
-				throw new InternalNetSchoolError(this.errorReasons.Loading503)
+				throw new NetSchoolError(this.errorReasons[503], {
+					cacheGuide: true,
+				})
 
 			if (!response.ok) {
-				console.error(
-					`NetSchoolFetch failed with status ${response.status} URL: ${url}. Auth: ${init.auth}`
-				)
-				throw new NetSchoolError(
+				const error = new NetSchoolError(
 					`${this.errorReasons[response.status]}\nКод ошибки сервера: ${
 						response.status
-					}`
+					}`,
+					{ cacheGuide: true }
 				)
+				console.error(error + ' Auth ' + !!init.auth)
+				throw error
 			}
 
 			const json = await response.json()
@@ -253,28 +261,25 @@ export class NetSchoolApi {
 
 			return json
 		} catch (error) {
-			if (error?.name !== NetSchoolError.name && this.cache[url]) {
-				console.error(error)
+			if (this.cache[url]) {
+				console.error('using cache for', url, 'error', error)
 				return this.cache[url][1] as T
-			} else {
-				if (
-					error instanceof Error &&
-					error.message === this.errorReasons.Loading503
-				) {
-					throw new NetSchoolError(this.errorReasons.NoCache503)
-				}
-				throw error
-			}
+			} else if (error instanceof NetSchoolError && error.cacheGuide) {
+				throw new NetSchoolError(
+					error.message + ' ' + this.errorReasons.HowToCache
+				)
+			} else throw error
 		}
 	}
 
 	private errorReasons = {
-		401: 'Недостаточно прав или ошибка авторизации',
+		401: 'Недостаточно прав или ошибка авторизации.',
 		404: 'Дневник обновился или указан неправильный путь запроса. Сообщите об ошибке разработчику',
 
-		503: 'Сервер дневника недоступен, технические работы. ',
-		NoCache503: this[503] + 'Данных в кэше не было.',
-		Loading503: this[503] + 'Загрузка данных из кэша...',
+		503: 'Сервер дневника недоступен, технические работы.',
+
+		HowToCache:
+			'Зайдите в приложение и откройте этот экран чтобы кэш стал доступен',
 	}
 
 	private async get<T extends object>(
@@ -388,18 +393,14 @@ export class NetSchoolApi {
 			)
 
 			if (total.termTotals.length < 4) {
-				const oldLength = total.termTotals.length
 				total.termTotals.length = 4
-
-				total.termTotals.fill(
-					{
+				for (const [i, term] of total.termTotals.entries()) {
+					total.termTotals[i] = term ?? {
 						avgMark: null,
 						mark: null,
 						term: { id: 0, name: '0' },
-					},
-					oldLength,
-					4
-				)
+					}
+				}
 			}
 
 			const visitedIds = new Set<number>()

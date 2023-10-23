@@ -8,10 +8,11 @@ export const NOTIFICATION_COLOR = '#8888ff'
 export const BACKGROUND_COLOR = '#fff'
 export const INVISIBLE_COLOR = '#fff0'
 
-export const STYLES = StyleSheet.create({
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: BACKGROUND_COLOR,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -44,42 +45,12 @@ export const STYLES = StyleSheet.create({
 	buttonText: {
 		color: BUTTON_TEXT_COLOR,
 	},
-	invertedScheduleItem: {
-		margin: 15,
-		padding: 15,
-		backgroundColor: BUTTON_TEXT_COLOR,
-		borderRadius: 5,
-		alignSelf: 'flex-start',
-		elevation: 3,
+	settingBase: {
+		padding: 7,
+		borderColor: SECONDARY_COLOR,
+		borderTopWidth: 2,
+		borderBottomWidth: 2,
 	},
-	invertedButtonText: {
-		color: ACCENT_COLOR,
-	},
-	scheduleItem: {
-		margin: 15,
-		padding: 15,
-		backgroundColor: ACCENT_COLOR,
-		borderRadius: 5,
-		minWidth: 250,
-		elevation: 3,
-	},
-	option: {
-		padding: 15,
-		borderBottomWidth: 1.5,
-		borderBottomColor: SECONDARY_COLOR,
-		flexDirection: 'row',
-	},
-	optionText: {
-		fontSize: 18,
-		color: ACCENT_COLOR,
-		flex: 1,
-		justifyContent: 'flex-start',
-	},
-	optionArrow: {
-		color: ACCENT_COLOR,
-		justifyContent: 'flex-end',
-	},
-
 	table: {
 		margin: 0,
 		justifyContent: 'center',
@@ -88,16 +59,14 @@ export const STYLES = StyleSheet.create({
 		padding: 5,
 		width: '100%',
 		elevation: 1,
-		backgroundColor: BACKGROUND_COLOR,
 	},
 	tableRow: {
 		flexDirection: 'row',
 		alignSelf: 'center',
+		width: '100%',
 		padding: 7,
 
-		borderRadius: 3,
-		borderWidth: 3,
-		borderTopWidth: 0,
+		borderBottomWidth: 3,
 		borderColor: ACCENT_COLOR,
 	},
 	tableCell: {

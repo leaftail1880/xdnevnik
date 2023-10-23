@@ -1,17 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Button } from '../components/button'
-import { LANG, RED_ACCENT_COLOR, STYLES } from '../constants'
+import { LANG, RED_ACCENT_COLOR, styles } from '../constants'
+import { Text } from '../components/text'
 
 export function LogoutScreen() {
 	return (
-		<View style={STYLES.container}>
+		<View style={styles.container}>
 			<Button
-				style={{ ...STYLES.button, backgroundColor: RED_ACCENT_COLOR }}
+				style={{ ...styles.button, backgroundColor: RED_ACCENT_COLOR }}
 				onPress={logout}
 			>
-				<Text style={STYLES.buttonText}>{LANG['log_out']}</Text>
+				<Text style={styles.buttonText}>{LANG['log_out']}</Text>
 			</Button>
 			<Text style={{ maxWidth: 300, textAlign: 'center' }}>
 				{LANG['log_out_info']}

@@ -4,8 +4,8 @@ import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Dropdown } from '../components/dropdown'
 import { Loading } from '../components/loading'
-import { ACCENT_COLOR, LANG, SECONDARY_COLOR, STYLES } from '../constants'
-import { useAsync } from '../hooks/async'
+import { ACCENT_COLOR, LANG, SECONDARY_COLOR, styles } from '../constants'
+import { useAPI } from '../hooks/async'
 import { SettingsCtx } from '../hooks/settings'
 
 export function DiaryScreen(props: {
@@ -16,10 +16,11 @@ export function DiaryScreen(props: {
 }) {
 	const { studentId, settings } = props.ctx
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
-	const [diary, FallbackDiary] = useAsync(
-		() => API.diary({ studentId: studentId! }),
-		'дневника',
-		[API.changes, studentId]
+	const { result: diary, fallback: FallbackDiary } = useAPI(
+		API,
+		'diary',
+		{ studentId },
+		'дневника'
 	)
 
 	useEffect(() => {
@@ -73,7 +74,7 @@ export function DiaryScreen(props: {
 		}
 	}, [settings.notifications, diary])
 
-	if (!API.loggedIn) return <Loading text="Ожидание авторизации{dots}" />
+	if (!API.authorized) return <Loading text="Ожидание авторизации{dots}" />
 
 	const values = Date.week.map((day, i) => {
 		return {
@@ -100,7 +101,7 @@ export function DiaryScreen(props: {
 					width: '100%',
 					borderRadius: 5,
 				}}
-				buttonTextStyle={STYLES.buttonText}
+				buttonTextStyle={styles.buttonText}
 				data={values}
 				buttonTextAfterSelection={i => i.name}
 				renderCustomizedRowChild={i => (
@@ -116,13 +117,13 @@ export function DiaryScreen(props: {
 					<View
 						key={lesson.id.toString()}
 						style={{
-							...STYLES.button,
+							...styles.button,
 							alignItems: 'flex-start',
 							marginBottom: 1,
 						}}
 					>
 						<Text
-							style={{ fontWeight: 'bold', ...STYLES.buttonText, fontSize: 15 }}
+							style={{ fontWeight: 'bold', ...styles.buttonText, fontSize: 15 }}
 						>
 							{lesson.subjectName}
 						</Text>
@@ -135,15 +136,15 @@ export function DiaryScreen(props: {
 								minWidth: 350,
 							}}
 						>
-							<Text style={STYLES.buttonText}>
+							<Text style={styles.buttonText}>
 								{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 							</Text>
-							<Text style={STYLES.buttonText}>
+							<Text style={styles.buttonText}>
 								{lesson.roomName ?? 'Кабинет не указан'}
 							</Text>
 						</View>
 						{lesson.lessonTheme && (
-							<Text style={STYLES.buttonText}>{lesson.lessonTheme + '\n'}</Text>
+							<Text style={styles.buttonText}>{lesson.lessonTheme + '\n'}</Text>
 						)}
 					</View>
 				))}

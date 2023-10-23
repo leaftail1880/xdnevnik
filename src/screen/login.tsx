@@ -8,20 +8,21 @@ import { API, NetSchoolApi } from '../NetSchool/api'
 import { ROUTES } from '../NetSchool/routes'
 import { Button } from '../components/button'
 import { Loading } from '../components/loading'
-import { STYLES } from '../constants'
-import { useAsync } from '../hooks/async'
-import { logout } from './logout'
+import { styles } from '../constants'
+import { useAPI } from '../hooks/async'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
-	const [endpoints, EndpointsFallback] = useAsync(
-		() => NetSchoolApi.fetchEndpoints(),
+	const { result: endpoints, fallback: EndpointsFallback } = useAPI(
+		NetSchoolApi,
+		'fetchEndpoints',
+		undefined,
 		'списка регионов'
 	)
 	const [regionName, setRegionName] = useState('')
 
 	useEffect(() => {
-		if (!API.loggedIn) {
+		if (!API.authorized) {
 			;(async function restoreSessionEffect() {
 				const loadedEndpoint = await AsyncStorage.getItem('endpoint')
 				const loadedSession = await AsyncStorage.getItem('session')
@@ -47,12 +48,12 @@ export function LoginScreen() {
 
 	if (!regionName)
 		return (
-			<View style={STYLES.container}>
+			<View style={styles.container}>
 				<ScrollView style={{ margin: 0, padding: 0, minWidth: 350 }}>
 					{endpoints.map((endpoint, index) => (
 						<Button
 							style={{
-								...STYLES.button,
+								...styles.button,
 								margin: 5,
 								padding: 15,
 							}}
@@ -63,7 +64,7 @@ export function LoginScreen() {
 								AsyncStorage.setItem('endpoint', endpoint.url)
 							}}
 						>
-							<Text style={STYLES.buttonText}>{endpoint.name}</Text>
+							<Text style={styles.buttonText}>{endpoint.name}</Text>
 						</Button>
 					))}
 				</ScrollView>
@@ -112,22 +113,22 @@ export function LoginScreen() {
 	)
 }
 
-let skip = 0
-setInterval(() => {
-	if (skip) {
-		skip--
-		return
-	}
-	API.refreshTokenIfExpired(
-		error => (
-			(skip = 9999999),
-			Alert.alert('Не удалось получить новый токен', error.message, [
-				{ text: 'Попробовать позже', onPress: () => (skip = 60 * 10) },
-				{
-					text: 'Выйти и зайти нормально',
-					onPress: logout,
-				},
-			])
-		)
-	)
-}, 1000 * 10)
+// let skip = 0
+// setInterval(() => {
+// 	if (skip) {
+// 		skip--
+// 		return
+// 	}
+// 	API.refreshTokenIfExpired(
+// 		error => (
+// 			(skip = 9999999),
+// 			Alert.alert('Не удалось обновить токен', error.message, [
+// 				{ text: 'Попробовать через 10 минут', onPress: () => (skip = 10) },
+// 				{
+// 					text: 'Выйти и зайти нормально',
+// 					onPress: logout,
+// 				},
+// 			])
+// 		)
+// 	)
+// }, 1000 * 60)

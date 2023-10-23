@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+import { Text } from './text'
 
 interface LoadingProps {
 	/**
@@ -21,7 +22,7 @@ export function Loading(props: LoadingProps) {
 	return (
 		<View>
 			<Text style={{ fontSize: 15, alignSelf: 'center', margin: 20 }}>
-				{(props.text || 'Загрузка').replace(/\{dots\}/g, dots)}
+				{(props.text || 'Загрузка{dots}').replace(/\{dots\}/g, dots)}
 			</Text>
 		</View>
 	)

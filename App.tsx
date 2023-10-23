@@ -1,22 +1,27 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { NavigationContainer } from '@react-navigation/native'
+import {
+	DarkTheme,
+	DefaultTheme,
+	NavigationContainer,
+	Theme,
+} from '@react-navigation/native'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { Alert, Platform } from 'react-native'
+import { Alert, Platform, useColorScheme } from 'react-native'
 import 'react-native-gesture-handler'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import { API } from './src/NetSchool/api'
 import { Student } from './src/NetSchool/classes'
+import { Ionicon } from './src/components/icon'
 import {
 	ACCENT_COLOR,
 	LANG,
 	NOTIFICATION_COLOR,
 	SECONDARY_COLOR,
 } from './src/constants'
-import { AsyncState, useAsync } from './src/hooks/async'
+import { AsyncState, useAPI } from './src/hooks/async'
 import { useSettingProvider } from './src/hooks/settings'
 import { DiaryScreen } from './src/screen/diary'
 import { HomeworkScreen } from './src/screen/homework'
@@ -41,17 +46,18 @@ Notifications.setNotificationHandler({
 const Tab = createBottomTabNavigator()
 
 export default function App() {
-	const [loggedIn, setLoggedIn] = useState(false)
-	API.loggedState = {
+	const [loggedIn, setLoggedIn] = useState(0)
+	API.hookAuth = {
 		setter: setLoggedIn,
 		getter: () => loggedIn,
 	}
 	const settings = useSettingProvider()
 
-	const [students, StudentFallback] = useAsync(
-		() => API.students(),
-		'списка учеников',
-		[API.changes]
+	const { result: students, fallback: StudentFallback } = useAPI(
+		API,
+		'students',
+		undefined,
+		'списка учеников'
 	)
 	const student = students && students[settings.studentIndex]
 	const studentId = student && student.studentId
@@ -98,9 +104,18 @@ export default function App() {
 		}
 	}, [])
 
+	const systemScheme = useColorScheme()
+	let theme: Theme
+	if (typeof settings.theme === 'object') {
+		theme = settings.theme
+	} else {
+		const actual = settings.theme === 'system' ? systemScheme : settings.theme
+		theme = actual === 'light' ? DefaultTheme : DarkTheme
+	}
+
 	return (
-		<NavigationContainer>
-			<StatusBar hidden={false} translucent={true} style="dark" />
+		<NavigationContainer theme={theme}>
+			<StatusBar translucent={true} style={theme.dark ? 'light' : 'dark'} />
 			<Tab.Navigator
 				screenOptions={({ route }) => ({
 					tabBarIcon: ({ focused, color, size }) => {
@@ -113,13 +128,13 @@ export default function App() {
 							[LANG['s_settings']]: 'settings',
 						}[route.name]
 						if (focused) iconName += '-outline'
-						return <Ionicons name={iconName!} size={size} color={color} />
+						return <Ionicon name={iconName!} size={size} color={color} />
 					},
 					tabBarActiveTintColor: ACCENT_COLOR,
 					tabBarInactiveTintColor: SECONDARY_COLOR,
 				})}
 			>
-				{!API.loggedIn && (
+				{!API.authorized && (
 					<Tab.Screen name={LANG['s_log_in']}>
 						{() => <LoginScreen />}
 					</Tab.Screen>
@@ -132,7 +147,9 @@ export default function App() {
 					{() => StudentFallback || <HomeworkScreen ctx={{ studentId }} />}
 				</Tab.Screen>
 				<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
-					{props => <TotalsNavigation ctx={{ studentId }} {...props} />}
+					{props => (
+						<TotalsNavigation ctx={{ studentId, settings }} {...props} />
+					)}
 				</Tab.Screen>
 				<Tab.Screen name={LANG['s_settings']}>
 					{() => (
@@ -145,7 +162,7 @@ export default function App() {
 					)}
 				</Tab.Screen>
 
-				{API.loggedIn && (
+				{!!API.authorized && (
 					<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
 				)}
 			</Tab.Navigator>

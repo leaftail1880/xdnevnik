@@ -194,7 +194,11 @@ export interface SubjectPerformance {
 		count: number
 		fraction: number
 	}[]
-	attendance: []
+	attendance: {
+		classMeetingId: number
+		classMeetingDate: string
+		attendanceMark: string
+	}[]
 }
 
 /**

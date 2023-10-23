@@ -3576,6 +3576,18 @@ eslint-plugin-react-hooks@^4.6.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.6.0.tgz#4c3e697ad95b77e93f8646aaa1630c1ba607edd3"
   integrity sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==
 
+eslint-plugin-react-native-globals@^0.1.1:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-native-globals/-/eslint-plugin-react-native-globals-0.1.2.tgz#ee1348bc2ceb912303ce6bdbd22e2f045ea86ea2"
+  integrity sha512-9aEPf1JEpiTjcFAmmyw8eiIXmcNZOqaZyHO77wgm0/dWfT/oxC1SrIq8ET38pMxHYrcB6Uew+TzUVsBeczF88g==
+
+eslint-plugin-react-native@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-native/-/eslint-plugin-react-native-4.1.0.tgz#5343acd3b2246bc1b857ac38be708f070d18809f"
+  integrity sha512-QLo7rzTBOl43FvVqDdq5Ql9IoElIuTdjrz9SKAXCvULvBoRZ44JGSkx9z4999ZusCsb4rK3gjS8gOGyeYqZv2Q==
+  dependencies:
+    eslint-plugin-react-native-globals "^0.1.1"
+
 eslint-plugin-react@^7.33.2:
   version "7.33.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.33.2.tgz#69ee09443ffc583927eafe86ffebb470ee737608"
@@ -6470,6 +6482,11 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-elevation@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-elevation/-/react-native-elevation-1.0.0.tgz#2a091c688290ac9b08b5842d1a8e8a00fc84233e"
+  integrity sha512-BWIKcEYtzjRV6GpkX0Km5/w2E7fgIcywiQOT7JZTc5NSbv/YI9kpFinB9lRFsOoRVGmiqq/O3VfP/oH2clIiBA==
+
 react-native-gesture-handler@~2.12.0:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.12.1.tgz#f11a99fb95169810c6886fad5efa01a17fd81660"
@@ -6521,6 +6538,13 @@ react-native-webview@13.2.2:
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
+
+react-native-wheel-color-picker@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-wheel-color-picker/-/react-native-wheel-color-picker-1.2.0.tgz#56ba38fc57411edececb0fb6a8f049e91160b015"
+  integrity sha512-j4IcN7so9dZAkXyrPTTaPqCKsjkGBZkd5F7HqLo0OTRB1EZX3Ww5VMKsKjloxv6Omv193wGOhwfG20ec2KnxJQ==
+  dependencies:
+    react-native-elevation "^1.0.0"
 
 react-native@0.72.6:
   version "0.72.6"

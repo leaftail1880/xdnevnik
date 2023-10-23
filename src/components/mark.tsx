@@ -1,18 +1,23 @@
 import { Falsy, Text, TextStyle } from 'react-native'
-import { ACCENT_COLOR, SECONDARY_COLOR, STYLES } from '../constants'
+import { SECONDARY_COLOR, styles } from '../constants'
 import { Button, ButtonProps } from './button'
 
 export function Mark({
-	mark,
+	finalMark,
+	mark: markProp,
 	markWeight,
 	style,
 	textStyle,
+	subTextStyle,
 	...props
 }: ButtonProps & {
+	finalMark?: number | null | string
 	mark: number | null | string
 	markWeight?: { max: number; min: number; current: number } | Falsy
 	textStyle?: TextStyle
+	subTextStyle?: TextStyle
 }) {
+	const mark = finalMark ? Number(finalMark) : markProp
 	let color: string = SECONDARY_COLOR + Math.floor(5).toString(16)
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
@@ -50,10 +55,17 @@ export function Mark({
 							padding: 7,
 							margin: 3,
 							borderRadius: 5,
-							borderColor: ACCENT_COLOR,
 							backgroundColor: color,
 
 							...style,
+
+							...(finalMark
+								? {
+										borderWidth: 5,
+										borderColor: SECONDARY_COLOR,
+										borderCurve: 'circular',
+								  }
+								: {}),
 					  }
 					: style
 			}
@@ -61,7 +73,7 @@ export function Mark({
 			<Text
 				style={{
 					textAlign: 'center',
-					color: STYLES.buttonText.color,
+					color: styles.buttonText.color,
 					...textStyle,
 				}}
 			>
@@ -72,11 +84,23 @@ export function Mark({
 					style={{
 						fontSize: 10,
 						textAlign: 'center',
-						color: STYLES.buttonText.color,
-						...textStyle,
+						color: styles.buttonText.color,
+						...subTextStyle,
 					}}
 				>
 					{markWeight.current}
+				</Text>
+			)}
+			{!!finalMark && (
+				<Text
+					style={{
+						fontSize: 10,
+						textAlign: 'center',
+						color: styles.buttonText.color,
+						...subTextStyle,
+					}}
+				>
+					{markProp}
 				</Text>
 			)}
 		</Button>
