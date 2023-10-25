@@ -15,6 +15,7 @@ module.exports = {
 	rules: {
 		'no-empty': 'warn',
 		'react-native/sort-styles': 'off',
+		'no-console': 'warn',
 		'prefer-const': 'warn',
 		'react-native/no-inline-styles': 'off',
 		'@typescript-eslint/no-unused-vars': 'warn',
@@ -44,7 +45,7 @@ module.exports = {
 
 			{
 				selector: 'variable',
-				format: ['camelCase', 'PascalCase'],
+				format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
 				leadingUnderscore: 'allow',
 				trailingUnderscore: 'allow',
 			},

@@ -1,6 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Theme } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
+import { Student } from '../NetSchool/classes'
+import { Loading } from '../components/loading'
+import { APIState } from './api'
 
 interface Settings {
 	notifications: boolean
@@ -9,16 +12,14 @@ interface Settings {
 	lastNameLast: boolean
 }
 
-export type SettingsCtx = ReturnType<typeof useSettingProvider>
-
 export const DEFAULT_SETTINGS: Settings = {
 	notifications: false,
 	studentIndex: 0,
 	theme: 'system',
-	lastNameLast: true
+	lastNameLast: true,
 }
 
-export function useSettingProvider() {
+export function useSetupSettings() {
 	const [settings, setSettings] = useState(DEFAULT_SETTINGS)
 	useEffect(() => {
 		AsyncStorage.getItem('settings').then(
@@ -35,3 +36,21 @@ export function useSettingProvider() {
 
 	return { ...settings, save }
 }
+
+export type SettingsCtx = ReturnType<typeof useSetupSettings>
+
+export const APP_CTX = createContext<{
+	students: APIState<Student[]>
+	settings: SettingsCtx
+	studentId?: number
+}>({
+	students: {
+		result: undefined,
+		updateDate: undefined,
+		fallback: <Loading key={Date.now()} />,
+	},
+	settings: {
+		...DEFAULT_SETTINGS,
+		save() {},
+	},
+})

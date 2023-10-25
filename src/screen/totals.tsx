@@ -3,33 +3,32 @@ import { Alert, ScrollView, Text, TextStyle, View } from 'react-native'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useTheme } from '@react-navigation/native'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
 import { API } from '../NetSchool/api'
 import { SubjectPerformance } from '../NetSchool/classes'
 import { Loading } from '../components/loading'
 import { Mark } from '../components/mark'
 import { ACCENT_COLOR, LANG, SECONDARY_COLOR, styles } from '../constants'
-import { useAPI } from '../hooks/async'
-import { SettingsCtx } from '../hooks/settings'
+import { useAPI } from '../hooks/api'
+import { APP_CTX } from '../hooks/settings'
 import { DisplayName } from './settings'
 
-const ParamMapObj = {
-	[`${LANG['s_totals']} ` as const]: void 0,
-	[LANG['s_subject_totals']]: {} as {
+const S_SUBJECT_TOTALS = LANG['s_subject_totals']
+const S_TOTALS = LANG['s_totalsN']
+type ParamMap = {
+	[S_TOTALS]: undefined
+	[S_SUBJECT_TOTALS]: {
 		termId: number
 		finalMark: string | number | null
 		subjectId: number
 		studentId: number
-	},
+	}
 }
-type ParamMap = typeof ParamMapObj
-
-type TotalsCtx = { ctx: { studentId?: number; settings: SettingsCtx } }
 
 const Stack = createStackNavigator<ParamMap>()
 
-export function TotalsNavigation(props: TotalsCtx) {
+export function TotalsNavigation(props: {fallbacks: {students: React.ReactNode, auth: React.ReactNode}}) {
 	return (
 		<Stack.Navigator
 		// screenOptions={({ navigation }) => {
@@ -44,21 +43,19 @@ export function TotalsNavigation(props: TotalsCtx) {
 		// 	}
 		// }}
 		>
-			<Stack.Screen name={`${LANG['s_totals']} `}>
-				{nav => <TotalsScreen {...props} {...nav} />}
+			<Stack.Screen name={S_TOTALS}>
+				{nav => props.fallbacks.auth || <TotalsScreen {...nav} />}
 			</Stack.Screen>
-			<Stack.Screen name={LANG['s_subject_totals']}>
-				{nav => <SubjectTotals {...props} {...nav} />}
+			<Stack.Screen name={S_SUBJECT_TOTALS}>
+				{nav => props.fallbacks.auth ||<SubjectTotals {...nav} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	)
 }
 
-export function TotalsScreen(
-	props: TotalsCtx & StackScreenProps<ParamMap, 'Оценки '>
-) {
+export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>) {
 	const theme = useTheme()
-	const { studentId } = props.ctx
+	const { studentId } = useContext(APP_CTX)
 	const { result: education, fallback: FallbackEducation } = useAPI(
 		API,
 		'education',
@@ -91,8 +88,6 @@ export function TotalsScreen(
 		'итоговых оценок'
 	)
 
-	if (!API.authorized) return <Loading text="Ожидание авторизации{dots}" />
-
 	const headerWidth = 50
 	const termTotalWidth =
 		totals &&
@@ -103,7 +98,7 @@ export function TotalsScreen(
 		FallbackSubjects ||
 		FallbackTotals ||
 		totals.length < 1 ? (
-		<Loading />
+		<Loading text="Список оценок пуст" />
 	) : (
 		<ScrollView contentContainerStyle={styles.table}>
 			{/* Table head */}
@@ -182,11 +177,10 @@ type Mark = Partial<
 
 export function SubjectTotals({
 	route,
-	ctx,
-}: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']> & TotalsCtx) {
+}: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
 	const theme = useTheme()
 	const { termId, subjectId, finalMark } = route.params ?? {}
-	const { studentId, settings } = ctx
+	const { studentId, settings } = useContext(APP_CTX)
 	const {
 		result: totals,
 		fallback: FallbackTotals,
@@ -197,10 +191,7 @@ export function SubjectTotals({
 		{ termId, studentId, subjectId },
 		'итогов по предмету'
 	)
-
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
-
-	if (!API.authorized) return <Loading text="Ожидание авторизации{dots}" />
 
 	if (FallbackTotals) return FallbackTotals
 
@@ -280,7 +271,9 @@ export function SubjectTotals({
 							onPress={() => {
 								Alert.alert(
 									e.assignmentTypeName + ' ' + e.result,
-									`Вес: ${e.weight}, Комментарий: ${e.comment}`
+									`Вес: ${e.weight}${
+										e.comment ? `Комментарий: ${e.comment}` : ''
+									}`
 								)
 							}}
 						/>

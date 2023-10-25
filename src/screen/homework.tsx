@@ -1,11 +1,13 @@
+import { useContext } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Loading } from '../components/loading'
 import { INVISIBLE_COLOR, LANG, styles } from '../constants'
-import { useAPI } from '../hooks/async'
+import { useAPI } from '../hooks/api'
+import { APP_CTX } from '../hooks/settings'
 
-export function HomeworkScreen(props: { ctx: { studentId?: number } }) {
-	const { studentId } = props.ctx
+export function HomeworkScreen() {
+	const { studentId } = useContext(APP_CTX)
 	const { result: homework, fallback: HomeworkFallback } = useAPI(
 		API,
 		'homework',
@@ -13,7 +15,6 @@ export function HomeworkScreen(props: { ctx: { studentId?: number } }) {
 		'дз'
 	)
 
-	if (!API.authorized) return <Loading text="Ожидание авторизации{dots}" />
 	if (!studentId)
 		return <Loading text="Ожидание идентификатора ученика{dots}" />
 

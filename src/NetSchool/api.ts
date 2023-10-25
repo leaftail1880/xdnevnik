@@ -1,11 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
+import { LOGGER } from '../constants'
 import {
 	AssignmentForCurrentTerm as Assignment,
 	Diary,
 	Education,
 	Endpoint,
 	RawEndpoints,
+	ReactStateHook,
 	Student,
 	Subject,
 	SubjectPerformance,
@@ -77,41 +79,47 @@ export class NetSchoolApi {
 		return this._cache
 	}
 	public set cache(value) {
-		// Update all react effects
-		this.authorized++
 		this._cache = value
+
+		// Update all react effects
+		this.updateEffects++
 	}
 
 	/**
-	 * Used to link react state with class props
+	 * Used to link react state with class prop
 	 */
-	public hookAuth = {
-		getter() {
-			return 0
-		},
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		setter(_: number) {},
+	public hookReactState([state, setState]: ReturnType<
+		typeof import('react').useState<ReactStateHook>
+	>) {
+		Object.defineProperties(this, {
+			updateEffects: {
+				get() {
+					return state?.updateEffects ?? 0
+				},
+				set(v: number) {
+					setState({ ...state!, updateEffects: v })
+				},
+			},
+			authorized: {
+				set(v: null | true) {
+					setState({ ...state!, authorized: v })
+				},
+				get() {
+					return state?.authorized ?? null
+				},
+			},
+		})
 	}
-	/**
-	 * Used to link react state with class props
-	 */
-	public get authorized() {
-		return this.hookAuth.getter()
-	}
-	/**
-	 * Used to link react state with class props
-	 */
-	public set authorized(v) {
-		this.hookAuth.setter(v)
-	}
+	public authorized: null | true = null
+	public updateEffects = 0
 
-	private session?: {
+	public session: {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		access_token: string
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		refresh_token: string
 		expires: Date
-	}
+	} | null = null
 	private origin = ''
 	private base = '/api/mobile'
 
@@ -125,7 +133,7 @@ export class NetSchoolApi {
 		this.base = url.pathname
 
 		// Mark react effects who depend on endpoint changes
-		if (this.authorized) this.authorized++
+		if (this.authorized) this.updateEffects++
 	}
 
 	public async getToken(
@@ -151,7 +159,7 @@ export class NetSchoolApi {
 					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
 				),
 			}
-			this.authorized++
+			this.authorized = true
 
 			return this.session
 		} else
@@ -165,32 +173,33 @@ export class NetSchoolApi {
 	) {
 		session.expires = new Date(session.expires)
 		this.session = session
-		this.authorized++
+		this.updateEffects++
 	}
 
 	public async refreshTokenIfExpired(onError: (e: Error) => void) {
-		if (
-			this.session &&
-			this.session.expires.getTime() - 1000 * 60 < Date.now()
-		) {
-			console.log(
-				this.session.expires.toLocaleTimeString(),
-				new Date().toLocaleTimeString()
-			)
-			try {
-				await this.getToken(
-					ROUTES.refreshTokenTemplate(this.session.refresh_token),
-					'Зайдите в приложение заново.'
+		if (this.session) {
+			if (this.session.expires.getTime() - 1000 * 60 < Date.now()) {
+				LOGGER.info(
+					this.session.expires.toLocaleTimeString(),
+					new Date().toLocaleTimeString()
 				)
-			} catch (error) {
-				onError(error)
+				try {
+					await this.getToken(
+						ROUTES.refreshTokenTemplate(this.session.refresh_token),
+						'Зайдите в приложение заново.'
+					)
+				} catch (error) {
+					onError(error)
+				}
+			} else {
+				if (!API.authorized) API.authorized = true
 			}
 		}
 	}
 
-	public async logOut() {
-		delete this.session
-		this.authorized = 0
+	public logOut() {
+		this.session = null
+		this.authorized = null
 	}
 
 	private isAbsolute(path: string) {
@@ -251,7 +260,7 @@ export class NetSchoolApi {
 					}`,
 					{ cacheGuide: true }
 				)
-				console.error(error + ' Auth ' + !!init.auth)
+				LOGGER.error(error + ' Auth ' + !!init.auth)
 				throw error
 			}
 
@@ -262,7 +271,11 @@ export class NetSchoolApi {
 			return json
 		} catch (error) {
 			if (this.cache[url]) {
-				console.error('using cache for', url, 'error', error)
+				LOGGER.error(
+					'using cache for',
+					url.replace(this.origin, '') + ', error',
+					error
+				)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(

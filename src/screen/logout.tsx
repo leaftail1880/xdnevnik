@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Button } from '../components/button'
-import { LANG, RED_ACCENT_COLOR, styles } from '../constants'
 import { Text } from '../components/text'
+import { LANG, RED_ACCENT_COLOR, styles } from '../constants'
 
 export function LogoutScreen() {
 	return (

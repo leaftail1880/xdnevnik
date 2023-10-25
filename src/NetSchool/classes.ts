@@ -229,3 +229,7 @@ export interface NSEntity {
 	id: number
 	name: string
 }
+export type ReactStateHook = {
+	authorized: null | true
+	updateEffects: number
+}

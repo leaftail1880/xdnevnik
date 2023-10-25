@@ -1,20 +1,20 @@
 import * as Notifications from 'expo-notifications'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Dropdown } from '../components/dropdown'
-import { Loading } from '../components/loading'
-import { ACCENT_COLOR, LANG, SECONDARY_COLOR, styles } from '../constants'
-import { useAPI } from '../hooks/async'
-import { SettingsCtx } from '../hooks/settings'
+import {
+	ACCENT_COLOR,
+	LANG,
+	LOGGER,
+	SECONDARY_COLOR,
+	styles,
+} from '../constants'
+import { useAPI } from '../hooks/api'
+import { APP_CTX } from '../hooks/settings'
 
-export function DiaryScreen(props: {
-	ctx: {
-		studentId?: number
-		settings: SettingsCtx
-	}
-}) {
-	const { studentId, settings } = props.ctx
+export function DiaryScreen() {
+	const { studentId, settings } = useContext(APP_CTX)
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
 	const { result: diary, fallback: FallbackDiary } = useAPI(
 		API,
@@ -25,7 +25,7 @@ export function DiaryScreen(props: {
 
 	useEffect(() => {
 		if (!settings.notifications) {
-			console.log('notifications are disabled')
+			LOGGER.info('notifications are disabled')
 			Notifications.cancelAllScheduledNotificationsAsync()
 			return
 		}
@@ -74,8 +74,6 @@ export function DiaryScreen(props: {
 		}
 	}, [settings.notifications, diary])
 
-	if (!API.authorized) return <Loading text="Ожидание авторизации{dots}" />
-
 	const values = Date.week.map((day, i) => {
 		return {
 			name: `${LANG.days[i]}${
@@ -101,11 +99,17 @@ export function DiaryScreen(props: {
 					width: '100%',
 					borderRadius: 5,
 				}}
+				dropdownStyle={{ width: '100%', borderRadius: 5, minHeight: 350 }}
 				buttonTextStyle={styles.buttonText}
 				data={values}
 				buttonTextAfterSelection={i => i.name}
 				renderCustomizedRowChild={i => (
-					<Text style={i.day === diaryDay && { color: ACCENT_COLOR }}>
+					<Text
+						style={[
+							i.day === diaryDay ? { color: ACCENT_COLOR } : {},
+							{ textAlign: 'center', fontSize: 15 },
+						]}
+					>
 						{i.name}
 					</Text>
 				)}

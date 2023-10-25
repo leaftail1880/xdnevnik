@@ -13,27 +13,24 @@ import { useEffect, useState } from 'react'
 import { Alert, Platform, useColorScheme } from 'react-native'
 import 'react-native-gesture-handler'
 import { API } from './src/NetSchool/api'
-import { Student } from './src/NetSchool/classes'
+import { ReactStateHook } from './src/NetSchool/classes'
 import { Ionicon } from './src/components/icon'
+import { Loading } from './src/components/loading'
 import {
 	ACCENT_COLOR,
 	LANG,
+	LOGGER,
 	NOTIFICATION_COLOR,
 	SECONDARY_COLOR,
 } from './src/constants'
-import { AsyncState, useAPI } from './src/hooks/async'
-import { useSettingProvider } from './src/hooks/settings'
+import { useAPI } from './src/hooks/api'
+import { APP_CTX, useSetupSettings } from './src/hooks/settings'
 import { DiaryScreen } from './src/screen/diary'
 import { HomeworkScreen } from './src/screen/homework'
 import { LoginScreen } from './src/screen/login'
 import { LogoutScreen } from './src/screen/logout'
 import { SettingsScreen } from './src/screen/settings'
 import { TotalsNavigation } from './src/screen/totals'
-
-console.log(' ')
-console.log(' ')
-console.log('reload')
-console.log(' ')
 
 Notifications.setNotificationHandler({
 	handleNotification: async () => ({
@@ -46,20 +43,11 @@ Notifications.setNotificationHandler({
 const Tab = createBottomTabNavigator()
 
 export default function App() {
-	const [loggedIn, setLoggedIn] = useState(0)
-	API.hookAuth = {
-		setter: setLoggedIn,
-		getter: () => loggedIn,
-	}
-	const settings = useSettingProvider()
+	API.hookReactState(useState<ReactStateHook>())
+	const settings = useSetupSettings()
 
-	const { result: students, fallback: StudentFallback } = useAPI(
-		API,
-		'students',
-		undefined,
-		'списка учеников'
-	)
-	const student = students && students[settings.studentIndex]
+	const students = useAPI(API, 'students', undefined, 'списка учеников')
+	const student = students.result && students.result[settings.studentIndex]
 	const studentId = student && student.studentId
 
 	useEffect(() => {
@@ -96,7 +84,7 @@ export default function App() {
 
 		const responseListener =
 			Notifications.addNotificationResponseReceivedListener(action => {
-				console.log('Notification interact', action)
+				LOGGER.info('Notification interact', action)
 			})
 
 		return () => {
@@ -113,59 +101,73 @@ export default function App() {
 		theme = actual === 'light' ? DefaultTheme : DarkTheme
 	}
 
+	const WaitForAuthorization = !API.session && (
+		<Loading text="Ожидание авторизации{dots}" />
+	)
+
 	return (
-		<NavigationContainer theme={theme}>
-			<StatusBar translucent={true} style={theme.dark ? 'light' : 'dark'} />
-			<Tab.Navigator
-				screenOptions={({ route }) => ({
-					tabBarIcon: ({ focused, color, size }) => {
-						let iconName = {
-							[LANG['s_log_in']]: 'log-in',
-							[LANG['s_log_out']]: 'log-out',
-							[LANG['s_diary']]: 'time',
-							[LANG['s_totals']]: 'school',
-							[LANG['s_homework']]: 'document',
-							[LANG['s_settings']]: 'settings',
-						}[route.name]
-						if (focused) iconName += '-outline'
-						return <Ionicon name={iconName!} size={size} color={color} />
-					},
-					tabBarActiveTintColor: ACCENT_COLOR,
-					tabBarInactiveTintColor: SECONDARY_COLOR,
-				})}
-			>
-				{!API.authorized && (
-					<Tab.Screen name={LANG['s_log_in']}>
-						{() => <LoginScreen />}
+		<APP_CTX.Provider
+			value={{
+				settings,
+				studentId,
+				students,
+			}}
+		>
+			<NavigationContainer theme={theme}>
+				<StatusBar translucent={true} style={theme.dark ? 'light' : 'dark'} />
+				<Tab.Navigator
+					screenOptions={({ route }) => ({
+						tabBarIcon: ({ focused, color, size }) => {
+							let iconName = {
+								[LANG['s_log_in']]: 'log-in',
+								[LANG['s_log_out']]: 'log-out',
+								[LANG['s_diary']]: 'time',
+								[LANG['s_totals']]: 'school',
+								[LANG['s_homework']]: 'document',
+								[LANG['s_settings']]: 'settings',
+							}[route.name]
+							if (focused) iconName += '-outline'
+							return <Ionicon name={iconName!} size={size} color={color} />
+						},
+						tabBarActiveTintColor: ACCENT_COLOR,
+						tabBarInactiveTintColor: SECONDARY_COLOR,
+					})}
+				>
+					{!API.session && (
+						<Tab.Screen name={LANG['s_log_in']}>
+							{() => <LoginScreen />}
+						</Tab.Screen>
+					)}
+
+					<Tab.Screen name={LANG['s_diary']}>
+						{() => WaitForAuthorization || students.fallback || <DiaryScreen />}
 					</Tab.Screen>
-				)}
+					<Tab.Screen name={LANG['s_homework']}>
+						{() =>
+							WaitForAuthorization || students.fallback || <HomeworkScreen />
+						}
+					</Tab.Screen>
+					<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
+						{() => (
+							<TotalsNavigation
+								fallbacks={{
+									auth: WaitForAuthorization,
+									students: students.fallback,
+								}}
+							/>
+						)}
+					</Tab.Screen>
+					<Tab.Screen name={LANG['s_settings']}>
+						{() => <SettingsScreen />}
+					</Tab.Screen>
 
-				<Tab.Screen name={LANG['s_diary']}>
-					{() => <DiaryScreen ctx={{ settings, studentId }} />}
-				</Tab.Screen>
-				<Tab.Screen name={LANG['s_homework']}>
-					{() => StudentFallback || <HomeworkScreen ctx={{ studentId }} />}
-				</Tab.Screen>
-				<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
-					{props => (
-						<TotalsNavigation ctx={{ studentId, settings }} {...props} />
+					{API.session && (
+						<Tab.Screen name={LANG['s_log_out']}>
+							{() => <LogoutScreen />}
+						</Tab.Screen>
 					)}
-				</Tab.Screen>
-				<Tab.Screen name={LANG['s_settings']}>
-					{() => (
-						<SettingsScreen
-							ctx={{
-								students: [students, StudentFallback] as AsyncState<Student[]>,
-								settings,
-							}}
-						/>
-					)}
-				</Tab.Screen>
-
-				{!!API.authorized && (
-					<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
-				)}
-			</Tab.Navigator>
-		</NavigationContainer>
+				</Tab.Navigator>
+			</NavigationContainer>
+		</APP_CTX.Provider>
 	)
 }

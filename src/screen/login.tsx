@@ -8,8 +8,8 @@ import { API, NetSchoolApi } from '../NetSchool/api'
 import { ROUTES } from '../NetSchool/routes'
 import { Button } from '../components/button'
 import { Loading } from '../components/loading'
-import { styles } from '../constants'
-import { useAPI } from '../hooks/async'
+import { LOGGER, styles } from '../constants'
+import { useAPI } from '../hooks/api'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
@@ -17,31 +17,31 @@ export function LoginScreen() {
 		NetSchoolApi,
 		'fetchEndpoints',
 		undefined,
-		'списка регионов'
+		'списка регионов',
+		[]
 	)
 	const [regionName, setRegionName] = useState('')
 
 	useEffect(() => {
-		if (!API.authorized) {
+		if (!API.session) {
 			;(async function restoreSessionEffect() {
 				const loadedEndpoint = await AsyncStorage.getItem('endpoint')
 				const loadedSession = await AsyncStorage.getItem('session')
 				if (loadedSession && loadedEndpoint) {
 					API.setEndpoint(loadedEndpoint)
 					API.restoreSessionFromMemory(JSON.parse(loadedSession))
-
-					await API.getToken(
-						ROUTES.refreshTokenTemplate(
-							JSON.parse(loadedSession).refresh_token
-						),
-						'Зайдите в приложение заново.'
-					)
 				}
-			})().catch(error => {
-				console.error('RESTORE SESSION EFFECT ERROR', error)
+			})()
+		}
+	})
+
+	useEffect(() => {
+		if (!loggingIn && !API.authorized && API.session) {
+			API.refreshTokenIfExpired(error => {
+				LOGGER.error('RESTORE SESSION EFFECT ERROR', error)
 			})
 		}
-	}, [])
+	})
 
 	if (loggingIn) return <Loading text="Вход{dots}" />
 	if (EndpointsFallback) return EndpointsFallback
@@ -79,7 +79,6 @@ export function LoginScreen() {
 			originWhitelist={['https://*', `${ROUTES.mobileAppProtocol}*`]}
 			onShouldStartLoadWithRequest={event => {
 				if (event.url.startsWith(ROUTES.mobileAppProtocol)) {
-					console.log('Catched app url')
 					const pincode = new URL(event.url).searchParams.get('pincode')
 					if (pincode) {
 						;(async () => {
@@ -91,7 +90,7 @@ export function LoginScreen() {
 								await AsyncStorage.setItem('session', JSON.stringify(session))
 								Alert.alert('Успешно!', 'Вы авторизовались.')
 							} catch (e) {
-								console.error(e)
+								LOGGER.error(e)
 								Alert.alert('Не удалось получить токен авторизации', e)
 							} finally {
 								setLoggingIn(false)
@@ -101,7 +100,7 @@ export function LoginScreen() {
 					} else {
 						Alert.alert(
 							'Код не получен!',
-							'Скорее всего, электронный дневник обновился, а XDnevnik еще нет'
+							'Попробуйте закрыть приложение и войти снова. Такое иногда происходит в конце четвертей когда журнал перегружен.'
 						)
 						return false
 					}

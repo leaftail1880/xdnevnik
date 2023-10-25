@@ -4,106 +4,75 @@ import { API } from '../NetSchool/api'
 import { Button } from '../components/button'
 import { Loading } from '../components/loading'
 import { Text } from '../components/text'
-import { RED_ACCENT_COLOR, styles } from '../constants'
+import { LOGGER, RED_ACCENT_COLOR, styles } from '../constants'
 
-export type AsyncState<T> = [T, undefined] | [undefined, React.JSX.Element]
-export function useAsync<T>(
-	fn: () => Promise<T>,
-	name: string,
-	requirements: React.DependencyList = [],
-	defaultValue?: T
-): AsyncState<T> {
-	const [value, setValue] = useState<T | undefined>(defaultValue)
-	const [[errorNum, errorObj], setError] = useState<
-		[number, Error | undefined]
-	>([0, undefined])
-
-	useEffect(() => {
-		;(async function useAsyncEffect() {
-			if (requirements.length && !requirements.every(Boolean)) return
-
-			try {
-				setValue(await fn())
-			} catch (error) {
-				setError([errorNum + 1, error])
-			}
-		})()
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [...requirements, errorNum])
-
-	// Value is present, all okay
-	if (typeof value !== 'undefined' && value) return [value, undefined]
-
-	const element = errorObj ? (
-		<ErrorHandler
-			error={[errorNum, errorObj]}
-			reload={() => {
-				setError([errorNum + 1, undefined])
-			}}
-			name={name}
-		/>
-	) : (
-		<Loading text={`Загрузка ${name}{dots}`} />
-	)
-
-	// No value, return fallback element
-	return [void 0, element]
+/**
+ * A way to select only accepted api methods
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type APIMethod = (arg: Record<string, any>) => Promise<any>
+type FunctionsFromObject<O> = {
+	[Key in keyof O]: O[Key] extends APIMethod ? O[Key] : never
 }
 
 /**
- * Different from Partial<T> is that it requires to define ALL keys
- * but them can be undefined
+ * Return type of the useAPI hook
  */
-type Optional<T> = { [Key in keyof T]: T[Key] | undefined }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ApiCall = (arg: Record<string, any>) => Promise<any>
-type ObjectWithFunctions<T> = {
-	[Key in keyof T]: T[Key] extends ApiCall ? T[Key] : never
-}
-export type ApiState<Result> =
+export type APIState<Result> =
 	| { result: Result; updateDate: string; fallback: undefined }
 	| { result: undefined; updateDate: undefined; fallback: React.JSX.Element }
+
+/**
+ * Different from Partial<T> is that it requires to define ALL keys
+ * but any of them can be undefined
+ */
+type Optional<T> = { [Key in keyof T]: T[Key] | undefined }
+
 export function useAPI<
-	Source extends object,
-	Name extends keyof ObjectWithFunctions<Source>,
-	Fn = ObjectWithFunctions<Source>[Name],
-	Result = Fn extends ApiCall ? Awaited<ReturnType<Fn>> : never
+	APISource extends object,
+	APIMethodName extends keyof FunctionsFromObject<APISource>,
+	Fn = FunctionsFromObject<APISource>[APIMethodName],
+	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never
 >(
-	source: Source,
-	name: Name,
-	params: Fn extends ApiCall ? Optional<Parameters<Fn>[0]> : never,
+	source: APISource,
+	name: APIMethodName,
+	params: Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
 	description: string,
-	additionalDeps: React.DependencyList = [API.authorized]
-): ApiState<Result> {
+	additionalDeps: React.DependencyList = [
+		API.session ? true : null,
+		API.updateEffects,
+	]
+): APIState<FnReturn> {
 	const updateDate = useRef<string>('Не обновлялось')
-	const [value, setValue] = useState<Result | undefined>(undefined)
+	const [value, setValue] = useState<FnReturn | undefined>(undefined)
 	const [[errorNum, errorObj], setError] = useState<
 		[number, Error | undefined]
 	>([0, undefined])
+
+	const deps = Object.values(params ?? {}).concat(additionalDeps)
 
 	useEffect(
 		() => {
 			;(async function useAsyncEffect() {
-				if (
-					Object.values(params ?? {}).some(
-						e => typeof e === 'undefined' && e === null
-					)
+				const hasUndefinedDeps = deps.some(
+					e => typeof e === 'undefined' || e === null
 				)
-					return
+
+				if (hasUndefinedDeps) return
 
 				try {
-					const value = await (source[name] as ApiCall)(params)
+					const value = await (source[name] as APIMethod)(params)
 					updateDate.current = new Date().toLocaleTimeString()
+
 					setValue(value)
 				} catch (error) {
-					setError([errorNum, error])
+					LOGGER.error(name, error)
+					if (!errorObj) setError([errorNum + 1, error])
 				}
 			})()
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		Object.values(params ?? {})
-			.concat(errorNum)
-			.concat(additionalDeps)
+		deps.concat(errorNum)
 	)
 
 	// Value is present, all okay

@@ -1,13 +1,23 @@
 import { StyleSheet } from 'react-native'
+import { logger, mapConsoleTransport } from 'react-native-logs'
+
+type LogLevel = (...args: unknown[]) => void
+export const LOGGER = logger.createLogger({
+	printLevel: false,
+	transport: mapConsoleTransport,
+}) as {
+	debug: LogLevel
+	info: LogLevel
+	warn: LogLevel
+	error: LogLevel
+}
 
 export const ACCENT_COLOR = '#4d914f'
 export const RED_ACCENT_COLOR = '#f88'
 export const SECONDARY_COLOR = '#888'
 export const BUTTON_TEXT_COLOR = '#fff'
 export const NOTIFICATION_COLOR = '#8888ff'
-export const BACKGROUND_COLOR = '#fff'
 export const INVISIBLE_COLOR = '#fff0'
-
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const styles = StyleSheet.create({
@@ -47,9 +57,6 @@ export const styles = StyleSheet.create({
 	},
 	settingBase: {
 		padding: 7,
-		borderColor: SECONDARY_COLOR,
-		borderTopWidth: 2,
-		borderBottomWidth: 2,
 	},
 	table: {
 		margin: 0,
@@ -95,6 +102,7 @@ export const LANG = {
 	s_log_in: 'Вход',
 	s_diary: 'Дневник',
 	s_totals: 'Оценки',
+	s_totalsN: 'Оценки ',
 	s_homework: 'Домашка',
 	s_settings: 'Настройки',
 	s_subject_totals: 'Итоги по предмету',
