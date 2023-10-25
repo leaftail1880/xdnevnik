@@ -40,14 +40,8 @@ jobs:
       - name: 📦 Build
         run: eas build -p android --non-interactive --output release/ --local
 
-      - name: 🏗 List files
-        run: |
-          ls .
-          ls ./release
-          ls ./xdnevnik/release
-
       - name: 🚀 Upload binaries to release
         uses: actions/upload-artifact@v3
         with:
           name: XDnevnik.apk
-          path: xdnevnik/release/
+          path: release/app-release.apk
