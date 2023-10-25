@@ -34,14 +34,20 @@ jobs:
       - name: 📦 Install deps
         run: yarn install
 
+      - name: 📦 Install sharp
+        run: npm add -g sharp-cli
+
       - name: 📦 Build
         run: eas build -p android --non-interactive --output release/ --local
 
+      - name: 🏗 List files
+        run: |
+          ls .
+          ls ./release
+          ls ./xdnevnik/release
+
       - name: 🚀 Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+        uses: actions/upload-artifact@v3
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./xdnevnik/release/app-release.apk
-          asset_name: XDnevnik.apk
-          tag: ${{ github.ref }}
-          overwrite: true
+          name: XDnevnik.apk
+          path: xdnevnik/release/
