@@ -3,7 +3,6 @@
 	"version": "1.0.0",
 	"main": "node_modules/expo/AppEntry.js",
 	"scripts": {
-		"expo": "expo",
 		"start": "expo start",
 		"android": "expo run:android",
 		"ios": "expo run:ios",
@@ -52,3 +51,4 @@
 	},
 	"private": true
 }
+
