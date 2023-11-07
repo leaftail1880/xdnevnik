@@ -2,7 +2,7 @@
   "expo": {
 		"name": "XDnevnik",
 		"slug": "xdnevnik",
-		"version": "1.0.3",
+		"version": "1.0.4",
 		"owner": "leaftail1880",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -46,6 +46,7 @@
 		]
 	}
 }
+
 
 
 

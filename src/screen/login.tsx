@@ -36,6 +36,9 @@ export function LoginScreen() {
 	})
 
 	useEffect(() => {
+		LOGGER.debug(
+			'Logging: ' + !loggingIn && !API.authorized && API.session + ''
+		)
 		if (!loggingIn && !API.authorized && API.session) {
 			API.refreshTokenIfExpired(error => {
 				LOGGER.error('RESTORE SESSION EFFECT ERROR', error)

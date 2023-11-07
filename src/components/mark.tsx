@@ -46,29 +46,22 @@ export function Mark({
 		}
 	}
 
+
 	return (
 		<Button
 			{...props}
-			style={
-				typeof style === 'object' && style !== null
+			style={[
+				{ padding: 7, margin: 3, borderRadius: 5, backgroundColor: color },
+				style,
+				finalMark
 					? {
-							padding: 7,
-							margin: 3,
-							borderRadius: 5,
-							backgroundColor: color,
-
-							...style,
-
-							...(finalMark
-								? {
-										borderWidth: 5,
-										borderColor: SECONDARY_COLOR,
-										borderCurve: 'circular',
-								  }
-								: {}),
+							borderWidth: 5,
+							borderColor: color,
+							borderStyle: 'dotted',
+							borderCurve: 'circular',
 					  }
-					: style
-			}
+					: false,
+			]}
 		>
 			<Text
 				style={{
@@ -77,7 +70,7 @@ export function Mark({
 					...textStyle,
 				}}
 			>
-				{mark}
+				{finalMark ?? markProp}
 			</Text>
 			{markWeight && (
 				<Text

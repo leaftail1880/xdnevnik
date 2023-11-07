@@ -15,8 +15,7 @@ export function HomeworkScreen() {
 		'дз'
 	)
 
-	if (!studentId)
-		return <Loading text="Ожидание идентификатора ученика{dots}" />
+	if (!studentId) return <Loading text="Загрузка номера ученика{dots}" />
 
 	return (
 		HomeworkFallback || (
@@ -27,20 +26,31 @@ export function HomeworkScreen() {
 					backgroundColor: INVISIBLE_COLOR,
 				}}
 			>
-				{homework.map(lesson => (
-					<View
-						style={styles.button}
-						key={lesson.subjectId + lesson.subjectName + lesson.dueDate}
-					>
-						<Text style={{ fontWeight: 'bold', ...styles.buttonText }}>
-							{lesson.subjectName + '\n'}
-						</Text>
-						<Text style={{ fontWeight: 'bold', ...styles.buttonText }}>
-							{LANG.days[new Date(lesson.dueDate).getDayMon()] + '\n'}
-						</Text>
-						<Text style={styles.buttonText}>{lesson.assignmentName}</Text>
-					</View>
-				))}
+				{homework
+					.sort(
+						(a, b) =>
+							new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+					)
+					.map(lesson => (
+						<View
+							style={[styles.button, { alignItems: 'flex-start', margin: 7 }]}
+							key={lesson.subjectId + lesson.subjectName + lesson.dueDate}
+						>
+							<Text style={{ fontWeight: 'bold', ...styles.buttonText }}>
+								{lesson.subjectName + '\n'}
+							</Text>
+							<Text style={{ fontWeight: 'bold', ...styles.buttonText }}>
+								{LANG.days[new Date(lesson.dueDate).getDayMon()]}
+								{', '}
+								{new Date(lesson.dueDate).getDay()}.
+								{new Date(lesson.dueDate).getMonth()}
+								{', '}
+								{new Date(lesson.dueDate).toHHMM()}
+								{'\n'}
+							</Text>
+							<Text style={styles.buttonText}>{lesson.assignmentName}</Text>
+						</View>
+					))}
 			</ScrollView>
 		)
 	)
