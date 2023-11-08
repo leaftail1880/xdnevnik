@@ -35,17 +35,6 @@ export function LoginScreen() {
 		}
 	})
 
-	useEffect(() => {
-		LOGGER.debug(
-			'Logging: ' + !loggingIn && !API.authorized && API.session + ''
-		)
-		if (!loggingIn && !API.authorized && API.session) {
-			API.refreshTokenIfExpired(error => {
-				LOGGER.error('RESTORE SESSION EFFECT ERROR', error)
-			})
-		}
-	})
-
 	if (loggingIn) return <Loading text="Вход{dots}" />
 	if (EndpointsFallback) return EndpointsFallback
 
@@ -103,8 +92,9 @@ export function LoginScreen() {
 					} else {
 						Alert.alert(
 							'Код не получен!',
-							'Попробуйте закрыть приложение и войти снова. Такое иногда происходит в конце четвертей когда журнал перегружен.'
+							'Попробуйте войти снова. Такое иногда происходит в конце четвертей когда журнал перегружен.'
 						)
+						setRegionName('')
 						return false
 					}
 				}

@@ -9,11 +9,12 @@ import {
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Platform, useColorScheme } from 'react-native'
 import 'react-native-gesture-handler'
 import { API } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
+import { ROUTES } from './src/NetSchool/routes'
 import { Ionicon } from './src/components/icon'
 import { Loading } from './src/components/loading'
 import {
@@ -104,6 +105,40 @@ export default function App() {
 	const WaitForAuthorization = !API.session && (
 		<Loading text="Ожидание авторизации{dots}" />
 	)
+
+	const sended = useRef<boolean>()
+	useEffect(() => {
+		if (!API.authorized && API.session) {
+			API.getToken(
+				ROUTES.refreshTokenTemplate(API.session?.refresh_token),
+				'Зайдите в приложение заново или попробуйте позже'
+			).catch(e => {
+				if (!sended.current) {
+					Alert.alert('Ошибка входа', e + '', [
+						{
+							text: 'Выйти и зайти нормально',
+							onPress: () => {
+								API.logOut()
+								sended.current = false
+							},
+						},
+						{
+							text: 'Ок, работать с кэшем',
+							onPress: () => (sended.current = false),
+						},
+						{
+							text: 'Попробовать снова',
+							onPress() {
+								API.updateEffects++
+								sended.current = false
+							},
+						},
+					])
+					sended.current = true
+				}
+			})
+		}
+	})
 
 	return (
 		<APP_CTX.Provider

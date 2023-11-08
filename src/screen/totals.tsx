@@ -98,7 +98,7 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 		FallbackSubjects ||
 		FallbackTotals ||
 		totals.length < 1 ? (
-		<Loading text="Список оценок пуст" />
+		<Loading text="Загрузка из кэша{dots}" />
 	) : (
 		<ScrollView contentContainerStyle={styles.table}>
 			{/* Table head */}

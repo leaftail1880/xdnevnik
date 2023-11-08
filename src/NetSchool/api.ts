@@ -37,10 +37,15 @@ interface ReqInit extends RequestInit {
  */
 class NetSchoolError extends Error {
 	public cacheGuide = false
-	public constructor(message: string, options?: { cacheGuide: boolean }) {
+	public beforeAuth = false
+	public constructor(
+		message: string,
+		options?: { cacheGuide?: boolean; beforeAuth?: boolean }
+	) {
 		super(message)
 		if (options) {
-			this.cacheGuide = options.cacheGuide
+			this.cacheGuide = options.cacheGuide ?? false
+			this.beforeAuth = options.beforeAuth ?? false
 		}
 	}
 }
@@ -177,29 +182,31 @@ export class NetSchoolApi {
 	}
 
 	public async refreshTokenIfExpired(onError: (e: Error) => void) {
-		if (this.session) {
-			if (this.session.expires.getTime() - 1000 * 60 < Date.now()) {
-				LOGGER.info(
-					this.session.expires.toLocaleTimeString(),
-					new Date().toLocaleTimeString()
+		if (!this.session) return
+		if (this.session.expires.getTime() - 1000 * 60 < Date.now()) {
+			LOGGER.info(
+				'Session expires soon, session:',
+				this.session.expires.toLocaleTimeString(),
+				'current time:',
+				new Date().toLocaleTimeString()
+			)
+			try {
+				await this.getToken(
+					ROUTES.refreshTokenTemplate(this.session.refresh_token),
+					'Зайдите в приложение заново.'
 				)
-				try {
-					await this.getToken(
-						ROUTES.refreshTokenTemplate(this.session.refresh_token),
-						'Зайдите в приложение заново.'
-					)
-				} catch (error) {
-					onError(error)
-				}
-			} else {
-				if (!API.authorized) API.authorized = true
+			} catch (error) {
+				onError(error)
 			}
+		} else {
+			if (!API.authorized) API.authorized = true
 		}
 	}
 
-	public logOut() {
+	public async logOut() {
 		this.session = null
 		this.authorized = null
+    await AsyncStorage.multiRemove(['session', 'endpoint'])
 	}
 
 	private isAbsolute(path: string) {
@@ -238,6 +245,7 @@ export class NetSchoolApi {
 				if (!this.session || !this.authorized) {
 					throw new NetSchoolError('Запрос к ' + url + ' до авторизации.', {
 						cacheGuide: true,
+						beforeAuth: true,
 					})
 				} else {
 					request.headers[
@@ -271,11 +279,11 @@ export class NetSchoolApi {
 			return json
 		} catch (error) {
 			if (this.cache[url]) {
-				LOGGER.error(
-					'using cache for',
-					url.replace(this.origin, '') + ', error',
-					error
-				)
+				const errText =
+					error instanceof NetSchoolError && error.beforeAuth
+						? ''
+						: 'error: ' + error
+				LOGGER.info('using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
