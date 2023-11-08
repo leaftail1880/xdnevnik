@@ -38,7 +38,7 @@ jobs:
         run: npm add -g sharp-cli
 
       - name: 📦 Build
-        run: eas build -p android --non-interactive --output release.apk --local
+        run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
       - name: 🏗 List files
         if: true
@@ -46,7 +46,6 @@ jobs:
           ls -a		 
 
       - name: 🚀 Upload binaries to release
-        uses: actions/upload-artifact@v3
+        uses: softprops/action-gh-release@v1
         with:
-          name: XDnevnik.apk
-          path: release.apk
+          files: XDnevnik.apk
