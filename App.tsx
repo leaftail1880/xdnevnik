@@ -4,13 +4,14 @@ import {
 	DarkTheme,
 	DefaultTheme,
 	NavigationContainer,
+	NavigationContainerRef,
 	Theme,
 } from '@react-navigation/native'
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, Platform, useColorScheme } from 'react-native'
+import { Alert, Platform, TouchableOpacity, useColorScheme } from 'react-native'
 import 'react-native-gesture-handler'
 import { API } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
@@ -25,7 +26,7 @@ import {
 	SECONDARY_COLOR,
 } from './src/constants'
 import { useAPI } from './src/hooks/api'
-import { APP_CTX, useSetupSettings } from './src/hooks/settings'
+import { CTX, useSetupSettings } from './src/hooks/settings'
 import { DiaryScreen } from './src/screen/diary'
 import { HomeworkScreen } from './src/screen/homework'
 import { LoginScreen } from './src/screen/login'
@@ -41,7 +42,17 @@ Notifications.setNotificationHandler({
 	}),
 })
 
-const Tab = createBottomTabNavigator()
+type ParamListBase = Record<
+	(typeof LANG)[
+		| 's_log_in'
+		| 's_log_out'
+		| 's_totals'
+		| 's_settings'
+		| 's_homework'
+		| 's_diary'],
+	undefined
+>
+const Tab = createBottomTabNavigator<ParamListBase>()
 
 export default function App() {
 	API.hookReactState(useState<ReactStateHook>())
@@ -106,6 +117,7 @@ export default function App() {
 		<Loading text="Ожидание авторизации{dots}" />
 	)
 
+	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
 	const sended = useRef<boolean>()
 	useEffect(() => {
 		if (!API.authorized && API.session) {
@@ -119,6 +131,8 @@ export default function App() {
 							text: 'Выйти и зайти нормально',
 							onPress: () => {
 								API.logOut()
+								if (navigation.current)
+									navigation.current.navigate(LANG['s_log_in'])
 								sended.current = false
 							},
 						},
@@ -141,14 +155,14 @@ export default function App() {
 	})
 
 	return (
-		<APP_CTX.Provider
+		<CTX.Provider
 			value={{
 				settings,
 				studentId,
 				students,
 			}}
 		>
-			<NavigationContainer theme={theme}>
+			<NavigationContainer theme={theme} ref={navigation}>
 				<StatusBar translucent={true} style={theme.dark ? 'light' : 'dark'} />
 				<Tab.Navigator
 					screenOptions={({ route }) => ({
@@ -166,6 +180,7 @@ export default function App() {
 						},
 						tabBarActiveTintColor: ACCENT_COLOR,
 						tabBarInactiveTintColor: SECONDARY_COLOR,
+						tabBarButton: props => <TouchableOpacity {...props} />,
 					})}
 				>
 					{!API.session && (
@@ -203,6 +218,6 @@ export default function App() {
 					)}
 				</Tab.Navigator>
 			</NavigationContainer>
-		</APP_CTX.Provider>
+		</CTX.Provider>
 	)
 }

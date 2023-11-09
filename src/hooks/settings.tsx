@@ -39,7 +39,7 @@ export function useSetupSettings() {
 
 export type SettingsCtx = ReturnType<typeof useSetupSettings>
 
-export const APP_CTX = createContext<{
+export const CTX = createContext<{
 	students: APIState<Student[]>
 	settings: SettingsCtx
 	studentId?: number

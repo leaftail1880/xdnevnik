@@ -11,10 +11,10 @@ import {
 	styles,
 } from '../constants'
 import { useAPI } from '../hooks/api'
-import { APP_CTX } from '../hooks/settings'
+import { CTX } from '../hooks/settings'
 
 export function DiaryScreen() {
-	const { studentId, settings } = useContext(APP_CTX)
+	const { studentId, settings } = useContext(CTX)
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
 	const { result: diary, fallback: FallbackDiary } = useAPI(
 		API,

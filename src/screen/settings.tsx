@@ -17,10 +17,10 @@ import {
 	SECONDARY_COLOR,
 	styles,
 } from '../constants'
-import { APP_CTX, SettingsCtx } from '../hooks/settings'
+import { CTX, SettingsCtx } from '../hooks/settings'
 
 export function SettingsScreen() {
-	const { settings, students } = useContext(APP_CTX)
+	const { settings, students } = useContext(CTX)
 	const theme = useTheme()
 	const themes = [
 		{ name: 'Системная', i: 'system' as const },

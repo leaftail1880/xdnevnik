@@ -11,7 +11,7 @@ import { Loading } from '../components/loading'
 import { Mark } from '../components/mark'
 import { ACCENT_COLOR, LANG, SECONDARY_COLOR, styles } from '../constants'
 import { useAPI } from '../hooks/api'
-import { APP_CTX } from '../hooks/settings'
+import { CTX } from '../hooks/settings'
 import { DisplayName } from './settings'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
@@ -28,7 +28,9 @@ type ParamMap = {
 
 const Stack = createStackNavigator<ParamMap>()
 
-export function TotalsNavigation(props: {fallbacks: {students: React.ReactNode, auth: React.ReactNode}}) {
+export function TotalsNavigation(props: {
+	fallbacks: { students: React.ReactNode; auth: React.ReactNode }
+}) {
 	return (
 		<Stack.Navigator
 		// screenOptions={({ navigation }) => {
@@ -47,7 +49,7 @@ export function TotalsNavigation(props: {fallbacks: {students: React.ReactNode, 
 				{nav => props.fallbacks.auth || <TotalsScreen {...nav} />}
 			</Stack.Screen>
 			<Stack.Screen name={S_SUBJECT_TOTALS}>
-				{nav => props.fallbacks.auth ||<SubjectTotals {...nav} />}
+				{nav => props.fallbacks.auth || <SubjectTotals {...nav} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	)
@@ -55,7 +57,7 @@ export function TotalsNavigation(props: {fallbacks: {students: React.ReactNode, 
 
 export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>) {
 	const theme = useTheme()
-	const { studentId } = useContext(APP_CTX)
+	const { studentId } = useContext(CTX)
 	const { result: education, fallback: FallbackEducation } = useAPI(
 		API,
 		'education',
@@ -180,7 +182,7 @@ export function SubjectTotals({
 }: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
 	const theme = useTheme()
 	const { termId, subjectId, finalMark } = route.params ?? {}
-	const { studentId, settings } = useContext(APP_CTX)
+	const { studentId, settings } = useContext(CTX)
 	const {
 		result: totals,
 		fallback: FallbackTotals,
