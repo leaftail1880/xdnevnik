@@ -6,10 +6,17 @@ import { useTheme } from '@react-navigation/native'
 import { useContext, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
 import { API } from '../NetSchool/api'
-import { SubjectPerformance } from '../NetSchool/classes'
+import { NSEntity, SubjectPerformance } from '../NetSchool/classes'
+import { Dropdown } from '../components/dropdown'
 import { Loading } from '../components/loading'
 import { Mark } from '../components/mark'
-import { ACCENT_COLOR, LANG, SECONDARY_COLOR, styles } from '../constants'
+import {
+	ACCENT_COLOR,
+	BUTTON_TEXT_COLOR,
+	LANG,
+	SECONDARY_COLOR,
+	styles,
+} from '../constants'
 import { useAPI } from '../hooks/api'
 import { CTX } from '../hooks/settings'
 import { DisplayName } from './settings'
@@ -31,21 +38,38 @@ const Stack = createStackNavigator<ParamMap>()
 export function TotalsNavigation(props: {
 	fallbacks: { students: React.ReactNode; auth: React.ReactNode }
 }) {
+	const theme = useTheme()
+	const textStyle = { fontSize: 15, color: theme.colors.text }
+	const { settings } = useContext(CTX)
+	const TotalsScreen = settings.currentTotalsOnly
+		? TotalsScreenTerm
+		: TotalsScreenTable
 	return (
-		<Stack.Navigator
-		// screenOptions={({ navigation }) => {
-		// 	return {
-		// 		headerLeft(props) {
-		// 			return (
-		// 				<TouchableOpacity onPress={() => navigation.goBack()}>
-		// 					<Ionicons name="chevron-back" {...props} />
-		// 				</TouchableOpacity>
-		// 			)
-		// 		},
-		// 	}
-		// }}
-		>
-			<Stack.Screen name={S_TOTALS}>
+		<Stack.Navigator>
+			<Stack.Screen
+				name={S_TOTALS}
+				options={{
+					headerRight() {
+						return (
+							<View style={styles.stretch}>
+								<Text style={[textStyle, { margin: 10 }]}>Одна четверть</Text>
+								<Switch
+									trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
+									thumbColor={
+										settings.currentTotalsOnly
+											? ACCENT_COLOR
+											: BUTTON_TEXT_COLOR
+									}
+									onValueChange={currentTotalsOnly =>
+										settings.save({ currentTotalsOnly })
+									}
+									value={settings.currentTotalsOnly}
+								/>
+							</View>
+						)
+					},
+				}}
+			>
 				{nav => props.fallbacks.auth || <TotalsScreen {...nav} />}
 			</Stack.Screen>
 			<Stack.Screen name={S_SUBJECT_TOTALS}>
@@ -55,32 +79,28 @@ export function TotalsNavigation(props: {
 	)
 }
 
-export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>) {
+export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки '>) {
 	const theme = useTheme()
 	const { studentId } = useContext(CTX)
-	const { result: education, fallback: FallbackEducation } = useAPI(
+	const education = useAPI(
 		API,
 		'education',
 		{ studentId },
 		'данных об обучении'
 	)
 
-	// TODO Let user to schoose school year
-	const schoolYear = education && education[0].schoolyear
+	// TODO Let user to schoose school year and term
+	const schoolYear = education.result && education.result[0].schoolyear
 	const schoolYearId = schoolYear && schoolYear.id
 
-	const { result: subjects, fallback: FallbackSubjects } = useAPI(
+	const subjects = useAPI(
 		API,
 		'subjects',
 		{ studentId, schoolYearId },
 		'списка предметов'
 	)
 
-	const {
-		result: totals,
-		updateDate,
-		fallback: FallbackTotals,
-	} = useAPI(
+	const totals = useAPI(
 		API,
 		'totals',
 		{
@@ -90,19 +110,46 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 		'итоговых оценок'
 	)
 
+	const terms = totals.result?.[0]?.termTotals.map(e => e.term)
 	const headerWidth = 50
 	const termTotalWidth =
-		totals &&
-		totals[0] &&
-		(`${~~((100 - headerWidth) / totals[0].termTotals.length)}%` as const)
+		totals.result?.[0] &&
+		(`${~~(
+			(100 - headerWidth) /
+			totals.result[0].termTotals.length
+		)}%` as const)
+	const [selectedTerm, setSelectedTerm] = useState<NSEntity>()
 
-	return FallbackEducation ||
-		FallbackSubjects ||
-		FallbackTotals ||
-		totals.length < 1 ? (
+	return education.fallback ||
+		subjects.fallback ||
+		totals.fallback ||
+		totals.result.length < 1 ? (
 		<Loading text="Загрузка из кэша{dots}" />
 	) : (
 		<ScrollView contentContainerStyle={styles.table}>
+			{terms && (
+				<Dropdown
+					data={terms}
+					defaultValue={selectedTerm}
+					onSelect={setSelectedTerm}
+					buttonTextAfterSelection={i => i?.name ?? 'F'}
+					rowTextForSelection={i => i?.name ?? 'F'}
+				/>
+			)}
+			{selectedTerm &&
+				totals.result.map(total => {
+					return (
+						<View key={total.subjectId.toString()}>
+							<Text>
+								{(subjects.result &&
+									subjects.result.find(
+										subject => total.subjectId === subject.id
+									)?.name) ??
+									'Предмет404'}
+							</Text>
+						</View>
+					)
+				})}
 			{/* Table head */}
 			<View style={{ ...styles.tableRow, backgroundColor: ACCENT_COLOR }}>
 				{/* Table first row */}
@@ -112,7 +159,7 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 				</Text>
 
 				{/* Table rows */}
-				{totals[0].termTotals.map((_, i, a) => (
+				{totals.result[0].termTotals.map((_, i, a) => (
 					<Text
 						style={{ width: termTotalWidth, ...styles.buttonText }}
 						key={i.toString()}
@@ -123,7 +170,7 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 			</View>
 
 			{/* Table body */}
-			{totals.map(total => (
+			{totals.result.map(total => (
 				<View
 					style={{ ...styles.tableRow, padding: 0 }}
 					key={total.subjectId.toString()}
@@ -136,8 +183,8 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 						}}
 					>
 						<Text style={{ color: theme.colors.text }}>
-							{(subjects &&
-								subjects.find(subject => total.subjectId === subject.id)
+							{(subjects.result &&
+								subjects.result.find(subject => total.subjectId === subject.id)
 									?.name) ??
 								'Предмет404'}
 						</Text>
@@ -165,7 +212,123 @@ export function TotalsScreen(props: StackScreenProps<ParamMap, 'Оценки '>)
 					))}
 				</View>
 			))}
-			<Text style={{ color: theme.colors.text }}>{updateDate}</Text>
+			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
+		</ScrollView>
+	)
+}
+
+export function TotalsScreenTable(
+	props: StackScreenProps<ParamMap, 'Оценки '>
+) {
+	const theme = useTheme()
+	const { studentId } = useContext(CTX)
+	const education = useAPI(
+		API,
+		'education',
+		{ studentId },
+		'данных об обучении'
+	)
+
+	// TODO Let user to schoose school year and term
+	const schoolYear = education.result && education.result[0].schoolyear
+	const schoolYearId = schoolYear && schoolYear.id
+
+	const subjects = useAPI(
+		API,
+		'subjects',
+		{ studentId, schoolYearId },
+		'списка предметов'
+	)
+
+	const totals = useAPI(
+		API,
+		'totals',
+		{
+			schoolYearId,
+			studentId,
+		},
+		'итоговых оценок'
+	)
+
+	const headerWidth = 50
+	const termTotalWidth =
+		totals.result &&
+		totals.result[0] &&
+		(`${~~(
+			(100 - headerWidth) /
+			totals.result[0].termTotals.length
+		)}%` as const)
+
+	return education.fallback ||
+		subjects.fallback ||
+		totals.fallback ||
+		totals.result.length < 1 ? (
+		<Loading text="Загрузка из кэша{dots}" />
+	) : (
+		<ScrollView contentContainerStyle={styles.table}>
+			{/* Table head */}
+			<View style={{ ...styles.tableRow, backgroundColor: ACCENT_COLOR }}>
+				{/* Table first row */}
+				<Text style={{ ...styles.buttonText, width: `${headerWidth}%` }}>
+					{new Date(schoolYear!.startDate).getFullYear()}/
+					{new Date(schoolYear!.endDate).getFullYear()} Четверти
+				</Text>
+
+				{/* Table rows */}
+				{totals.result[0].termTotals.map((_, i, a) => (
+					<Text
+						style={{ width: termTotalWidth, ...styles.buttonText }}
+						key={i.toString()}
+					>
+						{i + 1}/{a.length}
+					</Text>
+				))}
+			</View>
+
+			{/* Table body */}
+			{totals.result.map(total => (
+				<View
+					style={{ ...styles.tableRow, padding: 0 }}
+					key={total.subjectId.toString()}
+				>
+					{/* Table first row */}
+					<View
+						style={{
+							...styles.tableCell,
+							width: `${headerWidth}%`,
+						}}
+					>
+						<Text style={{ color: theme.colors.text }}>
+							{(subjects.result &&
+								subjects.result.find(subject => total.subjectId === subject.id)
+									?.name) ??
+								'Предмет404'}
+						</Text>
+					</View>
+
+					{/* Table rows */}
+					{total.termTotals.map((term, i) => (
+						<Mark
+							finalMark={term.mark}
+							mark={term.avgMark}
+							style={{
+								...styles.tableCell,
+								width: termTotalWidth,
+							}}
+							onPress={() => {
+								props.navigation.navigate(LANG['s_subject_totals'], {
+									termId: term.term.id,
+									finalMark: term.mark,
+									studentId: studentId!,
+									subjectId: total.subjectId,
+								})
+							}}
+							key={i.toString() + term.avgMark + term.term.name}
+						/>
+					))}
+				</View>
+			))}
+			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
 		</ScrollView>
 	)
 }

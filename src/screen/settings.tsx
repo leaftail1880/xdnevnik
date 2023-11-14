@@ -1,11 +1,8 @@
-import * as Application from 'expo-application'
-import * as Updates from 'expo-updates'
-import { Alert, ScrollView, Switch, View } from 'react-native'
-
 import { useTheme } from '@react-navigation/native'
+import * as Application from 'expo-application'
 import { useContext } from 'react'
+import { ScrollView, Switch, View } from 'react-native'
 import { API } from '../NetSchool/api'
-import { Button } from '../components/button'
 import { Dropdown } from '../components/dropdown'
 import { Loading } from '../components/loading'
 import { Text } from '../components/text'
@@ -18,6 +15,7 @@ import {
 	styles,
 } from '../constants'
 import { CTX, SettingsCtx } from '../hooks/settings'
+import { UpdatesButton } from './update'
 
 export function SettingsScreen() {
 	const { settings, students } = useContext(CTX)
@@ -89,27 +87,7 @@ export function SettingsScreen() {
 				)}
 				rowTextForSelection={i => i.name}
 			/>
-			<Button
-				style={styles.settingBase}
-				onPress={async () => {
-					try {
-						const update = await Updates.checkForUpdateAsync()
-
-						if (update.isAvailable) {
-							Alert.alert('Скачиваем обнову чееек')
-
-							await Updates.fetchUpdateAsync()
-							await Updates.reloadAsync()
-						} else {
-							Alert.alert('Обновлений нема')
-						}
-					} catch (error) {
-						Alert.alert(`Не удалось получить обновление`, '' + error)
-					}
-				}}
-			>
-				<Text>Проверить обновления</Text>
-			</Button>
+			<UpdatesButton />
 			<View style={styles.settingBase}>
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>

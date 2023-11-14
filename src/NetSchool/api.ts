@@ -35,17 +35,23 @@ interface ReqInit extends RequestInit {
 /**
  * Main error class.
  */
-class NetSchoolError extends Error {
+export class NetSchoolError extends Error {
 	public cacheGuide = false
 	public beforeAuth = false
+	public canIgnore = false
 	public constructor(
 		message: string,
-		options?: { cacheGuide?: boolean; beforeAuth?: boolean }
+		options?: {
+			cacheGuide?: boolean
+			beforeAuth?: boolean
+			canIgnore?: boolean
+		}
 	) {
 		super(message)
 		if (options) {
 			this.cacheGuide = options.cacheGuide ?? false
 			this.beforeAuth = options.beforeAuth ?? false
+			this.canIgnore = options.canIgnore ?? false
 		}
 	}
 }
@@ -145,12 +151,14 @@ export class NetSchoolApi {
 		form: Record<string, string>,
 		error400: string = 'Неверные данные для входа'
 	) {
+		LOGGER.debug({ form })
 		const response = await fetch(ROUTES.getToken, {
 			method: 'POST',
 			body: new URLSearchParams(form).toString(),
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		})
 
+		LOGGER.debug({ status: response.status })
 		if (response.status === 400) {
 			throw new NetSchoolError(error400)
 		}
@@ -206,7 +214,7 @@ export class NetSchoolApi {
 	public async logOut() {
 		this.session = null
 		this.authorized = null
-    await AsyncStorage.multiRemove(['session', 'endpoint'])
+		await AsyncStorage.multiRemove(['session', 'endpoint'])
 	}
 
 	private isAbsolute(path: string) {
@@ -243,7 +251,7 @@ export class NetSchoolApi {
 		try {
 			if (init.auth) {
 				if (!this.session || !this.authorized) {
-					throw new NetSchoolError('Запрос к ' + url + ' до авторизации.', {
+					throw new NetSchoolError('Запрос к ' + url, {
 						cacheGuide: true,
 						beforeAuth: true,
 					})
@@ -254,6 +262,7 @@ export class NetSchoolApi {
 				}
 			}
 
+			LOGGER.info('REQ')
 			const response = await fetch(url, { ...init, ...request })
 
 			if (response.status === 503)
@@ -287,7 +296,8 @@ export class NetSchoolApi {
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
-					error.message + ' ' + this.errorReasons.HowToCache
+					this.errorReasons.HowToCache + ' ' + error.message,
+					{ beforeAuth: error.beforeAuth, canIgnore: true }
 				)
 			} else throw error
 		}
@@ -300,7 +310,7 @@ export class NetSchoolApi {
 		503: 'Сервер дневника недоступен, технические работы.',
 
 		HowToCache:
-			'Зайдите в приложение и откройте этот экран чтобы кэш стал доступен',
+			'Зайдите в приложение и откройте этот экран чтобы кэш стал доступен.',
 	}
 
 	private async get<T extends object>(

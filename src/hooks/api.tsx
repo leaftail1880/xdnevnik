@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { API } from '../NetSchool/api'
+import { API, NetSchoolError } from '../NetSchool/api'
 import { Button } from '../components/button'
+import { Ionicon } from '../components/icon'
 import { Loading } from '../components/loading'
 import { Text } from '../components/text'
 import { LOGGER, RED_ACCENT_COLOR, styles } from '../constants'
@@ -66,8 +67,10 @@ export function useAPI<
 
 					setValue(value)
 				} catch (error) {
-					LOGGER.error(name, error)
-					if (!errorObj) setError([errorNum + 1, error])
+					if (!(error instanceof NetSchoolError && error.canIgnore)) {
+						LOGGER.error(name, error)
+					} 
+					if (!errorObj) setError([errorNum, error])
 				}
 			})()
 		},
@@ -107,30 +110,57 @@ interface ErrorHandlerProps {
 }
 
 function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
+	const [more, setMore] = useState<boolean>(false)
 	return (
 		<View
 			style={{
 				...styles.container,
 
 				alignSelf: 'center',
+				margin: 4,
 				maxWidth: 300,
-				maxHeight: 200,
 			}}
 		>
 			<Text style={{ fontSize: 20, color: RED_ACCENT_COLOR }}>
-				Ошибка ({error[0] ? error[0] : ''})
+				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
 			<Text style={{ fontSize: 15 }}>При загрузке {name}</Text>
-			<Text>
-				{error[1].name !== 'Error' ? error[1].name + ': ' : ''}{' '}
-				{error[1].message}
-			</Text>
-			{/* <Text>{error.stack}</Text> */}
+			{error[1] instanceof NetSchoolError && error[1].beforeAuth && (
+				<Text style={{ fontSize: 15 }}>Авторизуйтесь!</Text>
+			)}
+			{more && (
+				<Text>
+					{error[1].name !== 'Error' ? error[1].name + ': ' : ''}{' '}
+					{error[1].message}
+				</Text>
+			)}
+			<Button
+				onPress={() => setMore(!more)}
+				style={[
+					styles.button,
+					{ minHeight: 15, padding: 7, width: '100%', margin: 3 },
+				]}
+			>
+				<Text style={styles.buttonText}>
+					{!more ? 'Подробнее' : 'Свернуть'}
+				</Text>
+			</Button>
 			<Button
 				onPress={reload}
-				style={[styles.button, { maxHeight: 40, padding: 4, width: '100%' }]}
+				style={[
+					styles.button,
+					{ maxHeight: 50, padding: 0, width: '100%', margin: 3 },
+				]}
 			>
-				<Text style={styles.buttonText}>Попробовать снова</Text>
+				<View style={[styles.stretch, { margin: 0, padding: 7 }]}>
+					<Text style={styles.buttonText}>Попробовать снова</Text>
+					<Ionicon
+						name="reload"
+						size={15}
+						color={styles.buttonText.color}
+						style={{ paddingLeft: 7 }}
+					/>
+				</View>
 			</Button>
 		</View>
 	)

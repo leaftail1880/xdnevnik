@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Alert, ScrollView, Text, View } from 'react-native'
 import 'react-native-gesture-handler'
 import { URL } from 'react-native-url-polyfill'
@@ -10,6 +10,7 @@ import { Button } from '../components/button'
 import { Loading } from '../components/loading'
 import { LOGGER, styles } from '../constants'
 import { useAPI } from '../hooks/api'
+import { CTX } from '../hooks/settings'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
@@ -21,6 +22,7 @@ export function LoginScreen() {
 		[]
 	)
 	const [regionName, setRegionName] = useState('')
+	const ctx = useContext(CTX)
 
 	useEffect(() => {
 		if (!API.session) {
@@ -80,10 +82,15 @@ export function LoginScreen() {
 									ROUTES.getTokenTemplate(pincode)
 								)
 								await AsyncStorage.setItem('session', JSON.stringify(session))
-								Alert.alert('Успешно!', 'Вы авторизовались.')
+								ctx.setStatus({
+									content: 'Успешная авторизация!',
+									error: false,
+								})
+								setTimeout(() => ctx.setStatus(undefined), 5000)
 							} catch (e) {
 								LOGGER.error(e)
 								Alert.alert('Не удалось получить токен авторизации', e)
+								setRegionName('')
 							} finally {
 								setLoggingIn(false)
 							}

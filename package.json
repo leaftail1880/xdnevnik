@@ -18,7 +18,9 @@
 		"eslint-plugin-react-native": "^4.1.0",
 		"expo": "^49.0.13",
 		"expo-device": "~5.4.0",
+		"expo-intent-launcher": "^10.7.0",
 		"expo-notifications": "~0.20.1",
+		"expo-sharing": "~11.5.0",
 		"expo-splash-screen": "~0.20.5",
 		"expo-status-bar": "~1.6.0",
 		"expo-updates": "~0.18.17",
@@ -51,3 +53,4 @@
 	},
 	"private": true
 }
+

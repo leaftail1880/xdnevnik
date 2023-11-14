@@ -1,8 +1,8 @@
 {
-  "expo": {
+	"expo": {
 		"name": "XDnevnik",
 		"slug": "xdnevnik",
-		"version": "1.0.4",
+		"version": "0.0.2",
 		"owner": "leaftail1880",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -17,12 +17,11 @@
 			"supportsTablet": true
 		},
 		"android": {
-			"permissions": ["FOREGROUND_SERVICE"],
+			"permissions": ["FOREGROUND_SERVICE", "REQUEST_INSTALL_PACKAGES"],
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
 			},
-			"googleServicesFile": "./google-services.json",
 			"package": "com.leaftail1880.xdnevnik"
 		},
 		"extra": {
@@ -33,19 +32,13 @@
 		"runtimeVersion": {
 			"policy": "appVersion"
 		},
-		"updates": {
-			"url": "https://u.expo.dev/97163afe-5c7e-4856-ba8f-348e00aa7c04"
-		},
-		"plugins": [
-			[
-				"expo-updates",
-				{
-					"username": "leaftail1880"
-				}
-			]
-		]
+		"plugins": []
 	}
 }
+
+
+
+
 
 
 

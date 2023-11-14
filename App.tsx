@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import {
+	BottomTabBar,
+	createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs'
 import {
 	DarkTheme,
 	DefaultTheme,
@@ -11,19 +14,29 @@ import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, Platform, TouchableOpacity, useColorScheme } from 'react-native'
+import {
+	Alert,
+	Platform,
+	TouchableOpacity,
+	View,
+	useColorScheme,
+} from 'react-native'
 import 'react-native-gesture-handler'
 import { API } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
 import { ROUTES } from './src/NetSchool/routes'
+import { Button } from './src/components/button'
 import { Ionicon } from './src/components/icon'
 import { Loading } from './src/components/loading'
+import { Text } from './src/components/text'
 import {
 	ACCENT_COLOR,
 	LANG,
 	LOGGER,
 	NOTIFICATION_COLOR,
+	RED_ACCENT_COLOR,
 	SECONDARY_COLOR,
+	styles,
 } from './src/constants'
 import { useAPI } from './src/hooks/api'
 import { CTX, useSetupSettings } from './src/hooks/settings'
@@ -70,11 +83,10 @@ export default function App() {
 	}, [])
 
 	useEffect(() => {
-		// Notifs
 		;(async function setupNotifications() {
 			if (Platform.OS === 'android')
 				await Notifications.setNotificationChannelAsync('default', {
-					name: 'Default',
+					name: 'Уроки',
 					importance: Notifications.AndroidImportance.MAX,
 					vibrationPattern: [0, 250, 250, 250],
 					lightColor: NOTIFICATION_COLOR,
@@ -118,39 +130,31 @@ export default function App() {
 	)
 
 	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+	const [status, setStatus] = useState<
+		{ content: React.ReactNode; error: boolean } | undefined
+	>()
 	const sended = useRef<boolean>()
 	useEffect(() => {
-		if (!API.authorized && API.session) {
+		if (!API.authorized && API.session?.refresh_token && !sended.current) {
+			sended.current = true
 			API.getToken(
-				ROUTES.refreshTokenTemplate(API.session?.refresh_token),
-				'Зайдите в приложение заново или попробуйте позже'
-			).catch(e => {
-				if (!sended.current) {
-					Alert.alert('Ошибка входа', e + '', [
-						{
-							text: 'Выйти и зайти нормально',
-							onPress: () => {
-								API.logOut()
-								if (navigation.current)
-									navigation.current.navigate(LANG['s_log_in'])
-								sended.current = false
-							},
-						},
-						{
-							text: 'Ок, работать с кэшем',
-							onPress: () => (sended.current = false),
-						},
-						{
-							text: 'Попробовать снова',
-							onPress() {
-								API.updateEffects++
-								sended.current = false
-							},
-						},
-					])
-					sended.current = true
-				}
-			})
+				ROUTES.refreshTokenTemplate(API.session.refresh_token),
+				'Ошибка авторизации, перезайдите'
+			)
+				.then(() => {
+					if (status) {
+						setStatus({ content: 'Вы авторизовались.', error: false })
+						setTimeout(() => setStatus(undefined), 5000)
+					}
+				})
+				.catch(e => {
+					if (
+						e instanceof TypeError &&
+						e.message.includes('Network request failed')
+					)
+						e = 'Нет интернета.'
+					setStatus({ content: (e + '').replace(/^Error: /, ''), error: true })
+				})
 		}
 	})
 
@@ -160,11 +164,45 @@ export default function App() {
 				settings,
 				studentId,
 				students,
+				setStatus
 			}}
 		>
 			<NavigationContainer theme={theme} ref={navigation}>
 				<StatusBar translucent={true} style={theme.dark ? 'light' : 'dark'} />
 				<Tab.Navigator
+					tabBar={props => {
+						return (
+							<View>
+								{status && (
+									<View
+										style={[
+											styles.stretch,
+											{
+												elevation: 3,
+												minHeight: 30,
+												backgroundColor: status.error
+													? RED_ACCENT_COLOR
+													: theme.colors.card,
+											},
+										]}
+									>
+										<Text style={{ fontSize: 15 }}>{status.content}</Text>
+										{status.error && (
+											<Button
+												onPress={() => {
+													sended.current = false
+													API.updateEffects++
+												}}
+											>
+												<Ionicon name="reload" size={15} />
+											</Button>
+										)}
+									</View>
+								)}
+								<BottomTabBar {...props} />
+							</View>
+						)
+					}}
 					screenOptions={({ route }) => ({
 						tabBarIcon: ({ focused, color, size }) => {
 							let iconName = {
@@ -176,11 +214,12 @@ export default function App() {
 								[LANG['s_settings']]: 'settings',
 							}[route.name]
 							if (focused) iconName += '-outline'
-							return <Ionicon name={iconName!} size={size} color={color} />
+							return <Ionicon name={iconName} size={size} color={color} />
 						},
 						tabBarActiveTintColor: ACCENT_COLOR,
 						tabBarInactiveTintColor: SECONDARY_COLOR,
 						tabBarButton: props => <TouchableOpacity {...props} />,
+						tabBarHideOnKeyboard: true,
 					})}
 				>
 					{!API.session && (

@@ -10,6 +10,7 @@ interface Settings {
 	studentIndex: number
 	theme: 'system' | 'dark' | 'light' | Theme
 	lastNameLast: boolean
+	currentTotalsOnly: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -17,6 +18,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	studentIndex: 0,
 	theme: 'system',
 	lastNameLast: true,
+	currentTotalsOnly: true,
 }
 
 export function useSetupSettings() {
@@ -43,6 +45,7 @@ export const CTX = createContext<{
 	students: APIState<Student[]>
 	settings: SettingsCtx
 	studentId?: number
+	setStatus: (status: {content: React.ReactNode, error: boolean} | undefined) => void
 }>({
 	students: {
 		result: undefined,
@@ -53,4 +56,5 @@ export const CTX = createContext<{
 		...DEFAULT_SETTINGS,
 		save() {},
 	},
+	setStatus: () => void 0
 })
