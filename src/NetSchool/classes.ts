@@ -26,7 +26,7 @@ export interface Subject extends NSEntity {
 	federalСurriculum: boolean
 }
 
-export interface AssignmentForCurrentTerm {
+export interface Assignment {
 	classmeetingId: number
 	assignmentId: number
 	assignmentName: string

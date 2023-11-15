@@ -11,6 +11,7 @@ interface Settings {
 	theme: 'system' | 'dark' | 'light' | Theme
 	lastNameLast: boolean
 	currentTotalsOnly: boolean
+	selectedTerm?: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {

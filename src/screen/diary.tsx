@@ -102,6 +102,7 @@ export function DiaryScreen() {
 				dropdownStyle={{ width: '100%', borderRadius: 5, minHeight: 350 }}
 				buttonTextStyle={styles.buttonText}
 				data={values}
+				defaultButtonText="День недели"
 				buttonTextAfterSelection={i => i.name}
 				renderCustomizedRowChild={i => (
 					<Text

@@ -3,7 +3,7 @@ import { Alert, ScrollView, Text, TextStyle, View } from 'react-native'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useTheme } from '@react-navigation/native'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
 import { API } from '../NetSchool/api'
 import { NSEntity, SubjectPerformance } from '../NetSchool/classes'
@@ -81,7 +81,7 @@ export function TotalsNavigation(props: {
 
 export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки '>) {
 	const theme = useTheme()
-	const { studentId } = useContext(CTX)
+	const { studentId, settings } = useContext(CTX)
 	const education = useAPI(
 		API,
 		'education',
@@ -110,108 +110,105 @@ export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки
 		'итоговых оценок'
 	)
 
+	const assignments = useAPI(
+		API,
+		'homework',
+		{ studentId, withoutMarks: false, withExpiredClassAssign: true },
+		'дз'
+	)
+	// LOGGER.debug(
+	// 	assignments.result &&
+	// 		assignments.result.filter(
+	// 			e =>
+	// 				new Date(e.assignmentDate).getTime() < new Date(2023, 10, 1).getTime()
+	// 		)
+	// )
+
 	const terms = totals.result?.[0]?.termTotals.map(e => e.term)
-	const headerWidth = 50
-	const termTotalWidth =
-		totals.result?.[0] &&
-		(`${~~(
-			(100 - headerWidth) /
-			totals.result[0].termTotals.length
-		)}%` as const)
 	const [selectedTerm, setSelectedTerm] = useState<NSEntity>()
+	useEffect(() => {
+		if (terms && !selectedTerm) {
+			if (settings.selectedTerm)
+				setSelectedTerm(terms.find(e => e.id === settings.selectedTerm))
+			else setSelectedTerm(terms[0])
+		}
+	}, [terms, selectedTerm, settings.selectedTerm])
 
 	return education.fallback ||
+		assignments.fallback ||
 		subjects.fallback ||
 		totals.fallback ||
 		totals.result.length < 1 ? (
 		<Loading text="Загрузка из кэша{dots}" />
 	) : (
-		<ScrollView contentContainerStyle={styles.table}>
+		<ScrollView contentContainerStyle={{}}>
 			{terms && (
 				<Dropdown
 					data={terms}
 					defaultValue={selectedTerm}
-					onSelect={setSelectedTerm}
+					onSelect={v => {
+						settings.save({ selectedTerm: v.id })
+						setSelectedTerm(v)
+					}}
+					dropdownStyle={{ alignSelf: 'center' }}
+					defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
 					buttonTextAfterSelection={i => i?.name ?? 'F'}
 					rowTextForSelection={i => i?.name ?? 'F'}
 				/>
 			)}
 			{selectedTerm &&
 				totals.result.map(total => {
+					const term = total.termTotals.find(e => e.term.id === selectedTerm.id)
 					return (
-						<View key={total.subjectId.toString()}>
-							<Text>
+						<View
+							key={total.subjectId.toString()}
+							style={{ margin: 5, width: '100%' }}
+						>
+							<Text
+								style={{
+									alignSelf: 'flex-end',
+									fontSize: 16,
+									margin: 5,
+									marginRight: 5,
+								}}
+							>
 								{(subjects.result &&
 									subjects.result.find(
 										subject => total.subjectId === subject.id
 									)?.name) ??
 									'Предмет404'}
 							</Text>
+							<View style={styles.stretch}>
+								<ScrollView
+									horizontal
+									style={{ maxHeight: 100, margin: 0, minWidth: 100 }}
+								>
+									{assignments.result
+										.filter(e => e.subjectId === total.subjectId)
+										.map(e => (
+											<Mark
+												mark={e.result ?? 'Нет'}
+												markWeight={{
+													max: e.weight,
+													min: e.weight,
+													current: e.weight,
+												}}
+												style={{ height: 50, width: 50 }}
+												key={e.assignmentId}
+											/>
+										))}
+								</ScrollView>
+								{term && (
+									<Mark
+										finalMark={term?.mark}
+										mark={term.avgMark}
+										style={{ height: 50, width: 50 }}
+									/>
+								)}
+							</View>
 						</View>
 					)
 				})}
-			{/* Table head */}
-			<View style={{ ...styles.tableRow, backgroundColor: ACCENT_COLOR }}>
-				{/* Table first row */}
-				<Text style={{ ...styles.buttonText, width: `${headerWidth}%` }}>
-					{new Date(schoolYear!.startDate).getFullYear()}/
-					{new Date(schoolYear!.endDate).getFullYear()} Четверти
-				</Text>
-
-				{/* Table rows */}
-				{totals.result[0].termTotals.map((_, i, a) => (
-					<Text
-						style={{ width: termTotalWidth, ...styles.buttonText }}
-						key={i.toString()}
-					>
-						{i + 1}/{a.length}
-					</Text>
-				))}
-			</View>
-
-			{/* Table body */}
-			{totals.result.map(total => (
-				<View
-					style={{ ...styles.tableRow, padding: 0 }}
-					key={total.subjectId.toString()}
-				>
-					{/* Table first row */}
-					<View
-						style={{
-							...styles.tableCell,
-							width: `${headerWidth}%`,
-						}}
-					>
-						<Text style={{ color: theme.colors.text }}>
-							{(subjects.result &&
-								subjects.result.find(subject => total.subjectId === subject.id)
-									?.name) ??
-								'Предмет404'}
-						</Text>
-					</View>
-
-					{/* Table rows */}
-					{total.termTotals.map((term, i) => (
-						<Mark
-							finalMark={term.mark}
-							mark={term.avgMark}
-							style={{
-								...styles.tableCell,
-								width: termTotalWidth,
-							}}
-							onPress={() => {
-								props.navigation.navigate(LANG['s_subject_totals'], {
-									termId: term.term.id,
-									finalMark: term.mark,
-									studentId: studentId!,
-									subjectId: total.subjectId,
-								})
-							}}
-							key={i.toString() + term.avgMark + term.term.name}
-						/>
-					))}
-				</View>
-			))}
 			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
 		</ScrollView>
 	)

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
 import { LOGGER } from '../constants'
 import {
-	AssignmentForCurrentTerm as Assignment,
+	Assignment,
 	Diary,
 	Education,
 	Endpoint,

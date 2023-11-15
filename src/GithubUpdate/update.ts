@@ -33,11 +33,11 @@ export async function getLatestGithubReleaseUrl(
 	{
 		ifAlreadyLatest = () => Alert.alert('Уже последняя'),
 		ifNoRelease = () => Alert.alert('Не удалось найти релиз'),
-		ifNoAsset = () => Alert.alert('Не удалось найти обновления :('),
+		ifNoAsset = () => Alert.alert('Не удалось найти файл обновления :('),
 	}
 ) {
 	const response = await fetch(
-		'https://github.com/repos/{owner}/{repo}/releases'
+		'https://github.com/repos/leaftail1880/xdnevnik/releases'
 	)
 
 	if (!response.ok) throw new Error(response.status + ' ' + response.statusText)
