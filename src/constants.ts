@@ -14,7 +14,7 @@ export const LOGGER = logger.createLogger({
 
 export const ACCENT_COLOR = '#4d914f'
 export const RED_ACCENT_COLOR = '#f88'
-export const SECONDARY_COLOR = '#888'
+export const SECONDARY_COLOR = '#888888'
 export const BUTTON_TEXT_COLOR = '#fff'
 export const NOTIFICATION_COLOR = '#8888ff'
 export const INVISIBLE_COLOR = '#fff0'

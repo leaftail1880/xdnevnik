@@ -4,6 +4,7 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 // import * as MediaLibrary from 'expo-media-library'
 // import * as Permissions from 'expo-permissions'
 import * as ExpoSharing from 'expo-sharing'
+import { useState } from 'react'
 import { Alert } from 'react-native'
 import { getLatestGithubReleaseUrl } from '../GithubUpdate/update'
 import { Button } from '../components/button'
@@ -17,16 +18,17 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 			return
 		}
 
-		if (Device.osName === 'Android') {
+		if (Device.designName) {
 			const release = await getLatestGithubReleaseUrl('XDnevnik.apk', {})
 			if (!release) return
 			const uri = FileSystem.cacheDirectory + 'update.apk'
 
 			await download(release, uri)
+			const cUri = await FileSystem.getContentUriAsync(uri)
 			await IntentLauncherAndroid.startActivityAsync(
 				'android.intent.action.INSTALL_PACKAGE',
 				{
-					data: uri,
+					data: cUri,
 					flags: 1,
 				}
 			)
@@ -63,22 +65,43 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 			// 	)
 		}
 		LOGGER.info('App installer opened successfully')
+		return true
 	} catch (error) {
+		Alert.alert('Ошибка', error + '')
 		LOGGER.error('Failed to open the app installer', error)
+		return false
 	}
 }
 
 export function UpdatesButton() {
+	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button
-			style={styles.settingBase}
+			style={[styles.settingBase, styles.stretch]}
 			onPress={async () => {
 				try {
 					const result = await openAppInstaller(async (uri, fileUri) => {
-						const downloader = FileSystem.createDownloadResumable(uri, fileUri)
+						const downloader = FileSystem.createDownloadResumable(
+							uri,
+							fileUri,
+							{},
+							p => {
+								setProgress(
+									'Скачивание: ' +
+										(
+											(p.totalBytesWritten / p.totalBytesExpectedToWrite) *
+											100
+										).toFixed(2) +
+										'%'
+								)
+							}
+						)
 
 						const result = await downloader.downloadAsync()
-						if (!result) throw new Error('Failed to download update')
+						if (!result) {
+							Alert.alert('Не удалось сохранить обновление')
+							throw new Error('Failed to download update')
+						}
 						return result
 					})
 
@@ -91,6 +114,7 @@ export function UpdatesButton() {
 			}}
 		>
 			<Text>Проверить обновления</Text>
+			{progress && <Text>{progress}</Text>}
 		</Button>
 	)
 }

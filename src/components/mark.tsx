@@ -1,4 +1,4 @@
-import { Falsy, Text, TextStyle } from 'react-native'
+import { Alert, Falsy, Text, TextStyle } from 'react-native'
 import { SECONDARY_COLOR, styles } from '../constants'
 import { Button, ButtonProps } from './button'
 
@@ -18,7 +18,14 @@ export function Mark({
 	subTextStyle?: TextStyle
 }) {
 	const mark = finalMark ? Number(finalMark) : markProp
-	let color: string = SECONDARY_COLOR + Math.floor(5).toString(16)
+	let color: string =
+		SECONDARY_COLOR + (100).toString(16).toUpperCase().padStart(2, '0')
+	props.onPress ??= () => {
+		Alert.alert(
+			'A',
+			`${mark} ${color} ${typeof mark === 'number' && !isNaN(mark)}`
+		)
+	}
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = '#007000'
@@ -29,7 +36,7 @@ export function Mark({
 		} else if (mark >= 1.6) {
 			color = '#940000'
 		}
-	}
+	} else if (markWeight) color = color.slice(0, 6)
 
 	if (markWeight) {
 		const minAlpha = 100
@@ -45,7 +52,6 @@ export function Mark({
 			color += alpha
 		}
 	}
-
 
 	return (
 		<Button

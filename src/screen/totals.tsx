@@ -79,7 +79,7 @@ export function TotalsNavigation(props: {
 	)
 }
 
-export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки '>) {
+export function TotalsScreenTerm() {
 	const theme = useTheme()
 	const { studentId, settings } = useContext(CTX)
 	const education = useAPI(
@@ -159,6 +159,12 @@ export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки
 			{selectedTerm &&
 				totals.result.map(total => {
 					const term = total.termTotals.find(e => e.term.id === selectedTerm.id)
+					const assignmnetsSubj = assignments.result.filter(
+						e => e.subjectId === total.subjectId
+					)
+					const weights = assignmnetsSubj.map(e => e.weight)
+					const maxWeight = Math.max(...weights)
+					const minWeight = Math.min(...weights)
 					return (
 						<View
 							key={total.subjectId.toString()}
@@ -183,20 +189,18 @@ export function TotalsScreenTerm(props: StackScreenProps<ParamMap, 'Оценки
 									horizontal
 									style={{ maxHeight: 100, margin: 0, minWidth: 100 }}
 								>
-									{assignments.result
-										.filter(e => e.subjectId === total.subjectId)
-										.map(e => (
-											<Mark
-												mark={e.result ?? 'Нет'}
-												markWeight={{
-													max: e.weight,
-													min: e.weight,
-													current: e.weight,
-												}}
-												style={{ height: 50, width: 50 }}
-												key={e.assignmentId}
-											/>
-										))}
+									{assignmnetsSubj.map(e => (
+										<Mark
+											mark={e.result ?? 'Нет'}
+											markWeight={{
+												max: maxWeight,
+												min: minWeight,
+												current: e.weight,
+											}}
+											style={{ height: 50, width: 50 }}
+											key={e.assignmentId}
+										/>
+									))}
 								</ScrollView>
 								{term && (
 									<Mark

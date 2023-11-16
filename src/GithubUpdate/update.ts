@@ -37,7 +37,7 @@ export async function getLatestGithubReleaseUrl(
 	}
 ) {
 	const response = await fetch(
-		'https://github.com/repos/leaftail1880/xdnevnik/releases'
+		'https://api.github.com/repos/leaftail1880/xdnevnik/releases'
 	)
 
 	if (!response.ok) throw new Error(response.status + ' ' + response.statusText)
