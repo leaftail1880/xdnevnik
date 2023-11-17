@@ -4,10 +4,10 @@ import { API } from '../NetSchool/api'
 import { Loading } from '../components/loading'
 import { INVISIBLE_COLOR, LANG, styles } from '../constants'
 import { useAPI } from '../hooks/api'
-import { CTX } from '../hooks/settings'
+import { Ctx } from '../hooks/settings'
 
 export function HomeworkScreen() {
-	const { studentId } = useContext(CTX)
+	const { studentId } = useContext(Ctx)
 	const { result: homework, fallback: HomeworkFallback } = useAPI(
 		API,
 		'homework',

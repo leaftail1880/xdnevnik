@@ -42,11 +42,14 @@ export function useSetupSettings() {
 
 export type SettingsCtx = ReturnType<typeof useSetupSettings>
 
-export const CTX = createContext<{
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Ctx = createContext<{
 	students: APIState<Student[]>
 	settings: SettingsCtx
 	studentId?: number
-	setStatus: (status: {content: React.ReactNode, error: boolean} | undefined) => void
+	setStatus: (
+		status: { content: React.ReactNode; error: boolean } | undefined
+	) => void
 }>({
 	students: {
 		result: undefined,
@@ -57,5 +60,5 @@ export const CTX = createContext<{
 		...DEFAULT_SETTINGS,
 		save() {},
 	},
-	setStatus: () => void 0
+	setStatus: () => void 0,
 })

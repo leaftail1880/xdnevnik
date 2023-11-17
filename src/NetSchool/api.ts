@@ -60,6 +60,24 @@ export class NetSchoolError extends Error {
  * Main api class.
  */
 export class NetSchoolApi {
+	public static noConnection = 'Нет сети.' as const
+	public static stringifyError(
+		e: object
+	): string | (typeof NetSchoolApi)['noConnection'] {
+		let result = ''
+		if (
+			e instanceof TypeError &&
+			e.message.includes('Network request failed')
+		) {
+			result = this.noConnection
+		} else {
+			result = e + ''
+		}
+
+		result = result.replace(/^Error: /, '')
+
+		return result
+	}
 	public static async fetchEndpoints() {
 		const result = await fetch(ROUTES.getEndPointsList)
 			.then<RawEndpoints>(res => res.json())
@@ -189,28 +207,6 @@ export class NetSchoolApi {
 		this.updateEffects++
 	}
 
-	public async refreshTokenIfExpired(onError: (e: Error) => void) {
-		if (!this.session) return
-		if (this.session.expires.getTime() - 1000 * 60 < Date.now()) {
-			LOGGER.info(
-				'Session expires soon, session:',
-				this.session.expires.toLocaleTimeString(),
-				'current time:',
-				new Date().toLocaleTimeString()
-			)
-			try {
-				await this.getToken(
-					ROUTES.refreshTokenTemplate(this.session.refresh_token),
-					'Зайдите в приложение заново.'
-				)
-			} catch (error) {
-				onError(error)
-			}
-		} else {
-			if (!API.authorized) API.authorized = true
-		}
-	}
-
 	public async logOut() {
 		this.session = null
 		this.authorized = null
@@ -250,6 +246,11 @@ export class NetSchoolApi {
 
 		try {
 			if (init.auth) {
+				if (this.session && this.session.expires.getTime() < Date.now()) {
+					// Request update of token
+					this.authorized = null
+				}
+
 				if (!this.session || !this.authorized) {
 					throw new NetSchoolError('Запрос к ' + url, {
 						cacheGuide: true,

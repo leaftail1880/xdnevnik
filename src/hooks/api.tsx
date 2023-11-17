@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { API, NetSchoolError } from '../NetSchool/api'
+import { API, NetSchoolApi, NetSchoolError } from '../NetSchool/api'
 import { Button } from '../components/button'
 import { Ionicon } from '../components/icon'
 import { Loading } from '../components/loading'
@@ -69,7 +69,7 @@ export function useAPI<
 				} catch (error) {
 					if (!(error instanceof NetSchoolError && error.canIgnore)) {
 						LOGGER.error(name, error)
-					} 
+					}
 					if (!errorObj) setError([errorNum, error])
 				}
 			})()
@@ -111,6 +111,7 @@ interface ErrorHandlerProps {
 
 function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 	const [more, setMore] = useState<boolean>(false)
+	const errorString = NetSchoolApi.stringifyError(error[1])
 	return (
 		<View
 			style={{
@@ -128,12 +129,10 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 			{error[1] instanceof NetSchoolError && error[1].beforeAuth && (
 				<Text style={{ fontSize: 15 }}>Авторизуйтесь!</Text>
 			)}
-			{more && (
-				<Text>
-					{error[1].name !== 'Error' ? error[1].name + ': ' : ''}{' '}
-					{error[1].message}
-				</Text>
+			{errorString === NetSchoolApi.noConnection && (
+				<Text style={{ fontSize: 15 }}>Вы не в сети, сетевая ошибка!</Text>
 			)}
+			{more && <Text>{errorString}</Text>}
 			<Button
 				onPress={() => setMore(!more)}
 				style={[

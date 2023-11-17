@@ -18,7 +18,7 @@ import {
 	styles,
 } from '../constants'
 import { useAPI } from '../hooks/api'
-import { CTX } from '../hooks/settings'
+import { Ctx } from '../hooks/settings'
 import { DisplayName } from './settings'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
@@ -35,12 +35,10 @@ type ParamMap = {
 
 const Stack = createStackNavigator<ParamMap>()
 
-export function TotalsNavigation(props: {
-	fallbacks: { students: React.ReactNode; auth: React.ReactNode }
-}) {
+export function TotalsNavigation() {
 	const theme = useTheme()
 	const textStyle = { fontSize: 15, color: theme.colors.text }
-	const { settings } = useContext(CTX)
+	const { settings } = useContext(Ctx)
 	const TotalsScreen = settings.currentTotalsOnly
 		? TotalsScreenTerm
 		: TotalsScreenTable
@@ -51,8 +49,8 @@ export function TotalsNavigation(props: {
 				options={{
 					headerRight() {
 						return (
-							<View style={styles.stretch}>
-								<Text style={[textStyle, { margin: 10 }]}>Одна четверть</Text>
+							<View style={[styles.stretch, { padding: 3 }]}>
+								<Text style={textStyle}>Только одна четверть</Text>
 								<Switch
 									trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
 									thumbColor={
@@ -70,10 +68,10 @@ export function TotalsNavigation(props: {
 					},
 				}}
 			>
-				{nav => props.fallbacks.auth || <TotalsScreen {...nav} />}
+				{nav => <TotalsScreen {...nav} />}
 			</Stack.Screen>
 			<Stack.Screen name={S_SUBJECT_TOTALS}>
-				{nav => props.fallbacks.auth || <SubjectTotals {...nav} />}
+				{nav => <SubjectTotals {...nav} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	)
@@ -81,7 +79,7 @@ export function TotalsNavigation(props: {
 
 export function TotalsScreenTerm() {
 	const theme = useTheme()
-	const { studentId, settings } = useContext(CTX)
+	const { studentId, settings } = useContext(Ctx)
 	const education = useAPI(
 		API,
 		'education',
@@ -141,7 +139,7 @@ export function TotalsScreenTerm() {
 		totals.result.length < 1 ? (
 		<Loading text="Загрузка из кэша{dots}" />
 	) : (
-		<ScrollView contentContainerStyle={{}}>
+		<ScrollView contentContainerStyle={{ alignItems: 'center' }}>
 			{terms && (
 				<Dropdown
 					data={terms}
@@ -151,6 +149,8 @@ export function TotalsScreenTerm() {
 						setSelectedTerm(v)
 					}}
 					dropdownStyle={{ alignSelf: 'center' }}
+					buttonStyle={styles.dropdown}
+					buttonTextStyle={styles.buttonText}
 					defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
 					buttonTextAfterSelection={i => i?.name ?? 'F'}
 					rowTextForSelection={i => i?.name ?? 'F'}
@@ -168,22 +168,32 @@ export function TotalsScreenTerm() {
 					return (
 						<View
 							key={total.subjectId.toString()}
-							style={{ margin: 5, width: '100%' }}
+							style={{ margin: 5, width: '100%', padding: 5 }}
 						>
-							<Text
+							<View
 								style={{
 									alignSelf: 'flex-end',
-									fontSize: 16,
-									margin: 5,
-									marginRight: 5,
+									alignItems: 'flex-end',
+									padding: 5,
+									borderRadius: 5,
+									maxHeight: 40,
+									width: '100%',
+									backgroundColor: ACCENT_COLOR,
 								}}
 							>
-								{(subjects.result &&
-									subjects.result.find(
-										subject => total.subjectId === subject.id
-									)?.name) ??
-									'Предмет404'}
-							</Text>
+								<Text
+									style={{
+										fontSize: 16,
+										fontWeight: 'bold',
+									}}
+								>
+									{(subjects.result &&
+										subjects.result.find(
+											subject => total.subjectId === subject.id
+										)?.name) ??
+										'Предмет404'}
+								</Text>
+							</View>
 							<View style={styles.stretch}>
 								<ScrollView
 									horizontal
@@ -222,7 +232,7 @@ export function TotalsScreenTable(
 	props: StackScreenProps<ParamMap, 'Оценки '>
 ) {
 	const theme = useTheme()
-	const { studentId } = useContext(CTX)
+	const { studentId } = useContext(Ctx)
 	const education = useAPI(
 		API,
 		'education',
@@ -346,7 +356,7 @@ export function SubjectTotals({
 }: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
 	const theme = useTheme()
 	const { termId, subjectId, finalMark } = route.params ?? {}
-	const { studentId, settings } = useContext(CTX)
+	const { studentId, settings } = useContext(Ctx)
 	const {
 		result: totals,
 		fallback: FallbackTotals,

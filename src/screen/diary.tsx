@@ -3,18 +3,12 @@ import { useContext, useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Dropdown } from '../components/dropdown'
-import {
-	ACCENT_COLOR,
-	LANG,
-	LOGGER,
-	SECONDARY_COLOR,
-	styles,
-} from '../constants'
+import { ACCENT_COLOR, LANG, LOGGER, styles } from '../constants'
 import { useAPI } from '../hooks/api'
-import { CTX } from '../hooks/settings'
+import { Ctx } from '../hooks/settings'
 
 export function DiaryScreen() {
-	const { studentId, settings } = useContext(CTX)
+	const { studentId, settings } = useContext(Ctx)
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
 	const { result: diary, fallback: FallbackDiary } = useAPI(
 		API,
@@ -93,12 +87,7 @@ export function DiaryScreen() {
 			}}
 		>
 			<Dropdown
-				buttonStyle={{
-					alignSelf: 'stretch',
-					backgroundColor: SECONDARY_COLOR,
-					width: '100%',
-					borderRadius: 5,
-				}}
+				buttonStyle={styles.dropdown}
 				dropdownStyle={{ width: '100%', borderRadius: 5, minHeight: 350 }}
 				buttonTextStyle={styles.buttonText}
 				data={values}

@@ -10,7 +10,7 @@ import { Button } from '../components/button'
 import { Loading } from '../components/loading'
 import { LOGGER, styles } from '../constants'
 import { useAPI } from '../hooks/api'
-import { CTX } from '../hooks/settings'
+import { Ctx } from '../hooks/settings'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
@@ -22,7 +22,7 @@ export function LoginScreen() {
 		[]
 	)
 	const [regionName, setRegionName] = useState('')
-	const ctx = useContext(CTX)
+	const ctx = useContext(Ctx)
 
 	useEffect(() => {
 		if (!API.session) {

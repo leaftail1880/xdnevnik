@@ -12,6 +12,13 @@ export const LOGGER = logger.createLogger({
 	error: LogLevel
 }
 
+export type Status =
+	| {
+			content: React.ReactNode
+			error: boolean
+	  }
+	| undefined
+
 export const ACCENT_COLOR = '#4d914f'
 export const RED_ACCENT_COLOR = '#f88'
 export const SECONDARY_COLOR = '#888888'
@@ -26,6 +33,11 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+	dropdown: {alignSelf: 'stretch',
+	backgroundColor: SECONDARY_COLOR,
+	width: '100%',
+	borderBottomLeftRadius: 5,
+	borderBottomRightRadius: 5},
 	stretch: {
 		padding: 10,
 		flexDirection: 'row',

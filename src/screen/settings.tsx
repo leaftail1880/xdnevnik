@@ -14,11 +14,11 @@ import {
 	SECONDARY_COLOR,
 	styles,
 } from '../constants'
-import { CTX, SettingsCtx } from '../hooks/settings'
+import { Ctx, SettingsCtx } from '../hooks/settings'
 import { UpdatesButton } from './update'
 
 export function SettingsScreen() {
-	const { settings, students } = useContext(CTX)
+	const { settings, students } = useContext(Ctx)
 	const theme = useTheme()
 	const themes = [
 		{ name: 'Системная', i: 'system' as const },

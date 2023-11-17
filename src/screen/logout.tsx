@@ -5,10 +5,10 @@ import { API } from '../NetSchool/api'
 import { Button } from '../components/button'
 import { Text } from '../components/text'
 import { LANG, RED_ACCENT_COLOR, styles } from '../constants'
-import { CTX } from '../hooks/settings'
+import { Ctx } from '../hooks/settings'
 
 export function LogoutScreen() {
-	const ctx = useContext(CTX)
+	const ctx = useContext(Ctx)
 
 	async function logout() {
 		ctx.setStatus(undefined)

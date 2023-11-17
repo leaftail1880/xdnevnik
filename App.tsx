@@ -22,7 +22,7 @@ import {
 	useColorScheme,
 } from 'react-native'
 import 'react-native-gesture-handler'
-import { API } from './src/NetSchool/api'
+import { API, NetSchoolApi } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
 import { ROUTES } from './src/NetSchool/routes'
 import { Button } from './src/components/button'
@@ -36,10 +36,11 @@ import {
 	NOTIFICATION_COLOR,
 	RED_ACCENT_COLOR,
 	SECONDARY_COLOR,
+	Status,
 	styles,
 } from './src/constants'
 import { useAPI } from './src/hooks/api'
-import { CTX, useSetupSettings } from './src/hooks/settings'
+import { Ctx, useSetupSettings } from './src/hooks/settings'
 import { DiaryScreen } from './src/screen/diary'
 import { HomeworkScreen } from './src/screen/homework'
 import { LoginScreen } from './src/screen/login'
@@ -130,41 +131,46 @@ export default function App() {
 	)
 
 	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
-	const [status, setStatus] = useState<
-		{ content: React.ReactNode; error: boolean } | undefined
-	>()
+
+	const [status, setStatus] = useState<Status>()
 	const sended = useRef<boolean>()
 	useEffect(() => {
-		if (!API.authorized && API.session?.refresh_token && !sended.current) {
-			sended.current = true
-			API.getToken(
-				ROUTES.refreshTokenTemplate(API.session.refresh_token),
-				'Ошибка авторизации, перезайдите'
-			)
-				.then(() => {
-					if (status) {
-						setStatus({ content: 'Вы авторизовались.', error: false })
-						setTimeout(() => setStatus(undefined), 5000)
-					}
-				})
-				.catch(e => {
-					if (
-						e instanceof TypeError &&
-						e.message.includes('Network request failed')
-					)
-						e = 'Нет интернета.'
-					setStatus({ content: (e + '').replace(/^Error: /, ''), error: true })
-				})
-		}
+		// Already authorized
+		if (API.authorized) return
+
+		// Already sent auth req
+		if (sended.current) return
+
+		// Not loaded
+		if (!API.session) return
+
+		// Session is still active
+		if (API.session.expires.getTime() > Date.now()) return
+
+		sended.current = true
+		API.getToken(
+			ROUTES.refreshTokenTemplate(API.session.refresh_token),
+			'Ошибка авторизации, перезайдите'
+		)
+			.then(() => {
+				if (status) {
+					setStatus({ content: 'Вы авторизовались.', error: false })
+					setTimeout(() => setStatus(undefined), 5000)
+				}
+			})
+			.catch(e => {
+				e = NetSchoolApi.stringifyError(e) + ''
+				setStatus({ content: (e + '').replace(/^Error: /, ''), error: true })
+			})
 	})
 
 	return (
-		<CTX.Provider
+		<Ctx.Provider
 			value={{
 				settings,
 				studentId,
 				students,
-				setStatus
+				setStatus,
 			}}
 		>
 			<NavigationContainer theme={theme} ref={navigation}>
@@ -194,7 +200,11 @@ export default function App() {
 													API.updateEffects++
 												}}
 											>
-												<Ionicon name="reload" size={15} />
+												<Ionicon
+													name="reload"
+													size={15}
+													color={theme.colors.text}
+												/>
 											</Button>
 										)}
 									</View>
@@ -237,14 +247,9 @@ export default function App() {
 						}
 					</Tab.Screen>
 					<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
-						{() => (
-							<TotalsNavigation
-								fallbacks={{
-									auth: WaitForAuthorization,
-									students: students.fallback,
-								}}
-							/>
-						)}
+						{() =>
+							WaitForAuthorization || students.fallback || <TotalsNavigation />
+						}
 					</Tab.Screen>
 					<Tab.Screen name={LANG['s_settings']}>
 						{() => <SettingsScreen />}
@@ -257,6 +262,6 @@ export default function App() {
 					)}
 				</Tab.Navigator>
 			</NavigationContainer>
-		</CTX.Provider>
+		</Ctx.Provider>
 	)
 }
