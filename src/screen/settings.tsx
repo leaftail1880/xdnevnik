@@ -46,7 +46,6 @@ export function SettingsScreen() {
 							styles.settingBase,
 						]}
 						buttonTextStyle={{ fontSize: 15, color: theme.colors.text }}
-						dropdownStyle={{ width: '100%', borderRadius: 5 }}
 						data={students.result.map((student, i) => {
 							return { name: DisplayName(student.name, settings), i }
 						})}
@@ -70,7 +69,6 @@ export function SettingsScreen() {
 			</View>
 			<Dropdown
 				data={themes}
-				dropdownStyle={{ width: '100%', borderRadius: 5 }}
 				buttonStyle={[
 					styles.settingBase,
 					styles.stretch,

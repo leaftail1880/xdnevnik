@@ -79,7 +79,8 @@ export function useAPI<
 	)
 
 	// Value is present, all okay
-	if (typeof value !== 'undefined' && value) {
+	if (typeof value !== 'undefined' && value !== null) {
+		LOGGER.debug('Result ' + description, (value + '').slice(0, 50))
 		return {
 			result: value,
 			updateDate: updateDate.current,

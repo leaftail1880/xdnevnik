@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native'
 import * as Notifications from 'expo-notifications'
 import { useContext, useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
@@ -79,6 +80,8 @@ export function DiaryScreen() {
 		}
 	})
 
+	const theme = useTheme()
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -88,7 +91,7 @@ export function DiaryScreen() {
 		>
 			<Dropdown
 				buttonStyle={styles.dropdown}
-				dropdownStyle={{ width: '100%', borderRadius: 5, minHeight: 350 }}
+				dropdownStyle={{ minHeight: 350 }}
 				buttonTextStyle={styles.buttonText}
 				data={values}
 				defaultButtonText="День недели"
@@ -96,7 +99,9 @@ export function DiaryScreen() {
 				renderCustomizedRowChild={i => (
 					<Text
 						style={[
-							i.day === diaryDay ? { color: ACCENT_COLOR } : {},
+							i.day === diaryDay
+								? { color: ACCENT_COLOR }
+								: { color: theme.colors.text },
 							{ textAlign: 'center', fontSize: 15 },
 						]}
 					>

@@ -6,7 +6,13 @@ import { useTheme } from '@react-navigation/native'
 import { useContext, useEffect, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
 import { API } from '../NetSchool/api'
-import { NSEntity, SubjectPerformance } from '../NetSchool/classes'
+import {
+	Education,
+	NSEntity,
+	Subject,
+	SubjectPerformance,
+	Total,
+} from '../NetSchool/classes'
 import { Dropdown } from '../components/dropdown'
 import { Loading } from '../components/loading'
 import { Mark } from '../components/mark'
@@ -17,7 +23,7 @@ import {
 	SECONDARY_COLOR,
 	styles,
 } from '../constants'
-import { useAPI } from '../hooks/api'
+import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 import { DisplayName } from './settings'
 
@@ -33,12 +39,42 @@ type ParamMap = {
 	}
 }
 
+// TODO Memo subj perf
+
 const Stack = createStackNavigator<ParamMap>()
 
 export function TotalsNavigation() {
 	const theme = useTheme()
 	const textStyle = { fontSize: 15, color: theme.colors.text }
-	const { settings } = useContext(Ctx)
+	const { studentId, settings } = useContext(Ctx)
+	const education = useAPI(
+		API,
+		'education',
+		{ studentId },
+		'данных об обучении'
+	)
+
+	// TODO Let user to schoose school year
+	const schoolYear = education.result && education.result[0].schoolyear
+	const schoolYearId = schoolYear && schoolYear.id
+
+	const subjects = useAPI(
+		API,
+		'subjects',
+		{ studentId, schoolYearId },
+		'списка предметов'
+	)
+
+	const totals = useAPI(
+		API,
+		'totals',
+		{
+			schoolYearId,
+			studentId,
+		},
+		'итоговых оценок'
+	)
+
 	const TotalsScreen = settings.currentTotalsOnly
 		? TotalsScreenTerm
 		: TotalsScreenTable
@@ -68,7 +104,12 @@ export function TotalsNavigation() {
 					},
 				}}
 			>
-				{nav => <TotalsScreen {...nav} />}
+				{nav => (
+					<TotalsScreen
+						{...nav}
+						{...{ subjects, totals, education, schoolYear }}
+					/>
+				)}
 			</Stack.Screen>
 			<Stack.Screen name={S_SUBJECT_TOTALS}>
 				{nav => <SubjectTotals {...nav} />}
@@ -77,51 +118,20 @@ export function TotalsNavigation() {
 	)
 }
 
-export function TotalsScreenTerm() {
+type TotalsContext = {
+	education: APIState<Education[]>
+	subjects: APIState<Subject[]>
+	totals: APIState<Total[]>
+	schoolYear: Education['schoolyear'] | undefined
+}
+
+export function TotalsScreenTerm({
+	education,
+	subjects,
+	totals,
+}: TotalsContext) {
 	const theme = useTheme()
-	const { studentId, settings } = useContext(Ctx)
-	const education = useAPI(
-		API,
-		'education',
-		{ studentId },
-		'данных об обучении'
-	)
-
-	// TODO Let user to schoose school year and term
-	const schoolYear = education.result && education.result[0].schoolyear
-	const schoolYearId = schoolYear && schoolYear.id
-
-	const subjects = useAPI(
-		API,
-		'subjects',
-		{ studentId, schoolYearId },
-		'списка предметов'
-	)
-
-	const totals = useAPI(
-		API,
-		'totals',
-		{
-			schoolYearId,
-			studentId,
-		},
-		'итоговых оценок'
-	)
-
-	const assignments = useAPI(
-		API,
-		'homework',
-		{ studentId, withoutMarks: false, withExpiredClassAssign: true },
-		'дз'
-	)
-	// LOGGER.debug(
-	// 	assignments.result &&
-	// 		assignments.result.filter(
-	// 			e =>
-	// 				new Date(e.assignmentDate).getTime() < new Date(2023, 10, 1).getTime()
-	// 		)
-	// )
-
+	const { settings } = useContext(Ctx)
 	const terms = totals.result?.[0]?.termTotals.map(e => e.term)
 	const [selectedTerm, setSelectedTerm] = useState<NSEntity>()
 	useEffect(() => {
@@ -133,7 +143,6 @@ export function TotalsScreenTerm() {
 	}, [terms, selectedTerm, settings.selectedTerm])
 
 	return education.fallback ||
-		assignments.fallback ||
 		subjects.fallback ||
 		totals.fallback ||
 		totals.result.length < 1 ? (
@@ -148,7 +157,7 @@ export function TotalsScreenTerm() {
 						settings.save({ selectedTerm: v.id })
 						setSelectedTerm(v)
 					}}
-					dropdownStyle={{ alignSelf: 'center' }}
+					dropdownStyle={{ alignSelf: 'center', maxWidth: 110 }}
 					buttonStyle={styles.dropdown}
 					buttonTextStyle={styles.buttonText}
 					defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
@@ -157,110 +166,113 @@ export function TotalsScreenTerm() {
 				/>
 			)}
 			{selectedTerm &&
-				totals.result.map(total => {
-					const term = total.termTotals.find(e => e.term.id === selectedTerm.id)
-					const assignmnetsSubj = assignments.result.filter(
-						e => e.subjectId === total.subjectId
-					)
-					const weights = assignmnetsSubj.map(e => e.weight)
-					const maxWeight = Math.max(...weights)
-					const minWeight = Math.min(...weights)
-					return (
-						<View
-							key={total.subjectId.toString()}
-							style={{ margin: 5, width: '100%', padding: 5 }}
-						>
-							<View
-								style={{
-									alignSelf: 'flex-end',
-									alignItems: 'flex-end',
-									padding: 5,
-									borderRadius: 5,
-									maxHeight: 40,
-									width: '100%',
-									backgroundColor: ACCENT_COLOR,
-								}}
-							>
-								<Text
-									style={{
-										fontSize: 16,
-										fontWeight: 'bold',
-									}}
-								>
-									{(subjects.result &&
-										subjects.result.find(
-											subject => total.subjectId === subject.id
-										)?.name) ??
-										'Предмет404'}
-								</Text>
-							</View>
-							<View style={styles.stretch}>
-								<ScrollView
-									horizontal
-									style={{ maxHeight: 100, margin: 0, minWidth: 100 }}
-								>
-									{assignmnetsSubj.map(e => (
-										<Mark
-											mark={e.result ?? 'Нет'}
-											markWeight={{
-												max: maxWeight,
-												min: minWeight,
-												current: e.weight,
-											}}
-											style={{ height: 50, width: 50 }}
-											key={e.assignmentId}
-										/>
-									))}
-								</ScrollView>
-								{term && (
-									<Mark
-										finalMark={term?.mark}
-										mark={term.avgMark}
-										style={{ height: 50, width: 50 }}
-									/>
-								)}
-							</View>
-						</View>
-					)
-				})}
+				totals.result.map(total => (
+					<SubjectPerformanceInline
+						total={total}
+						selectedTerm={selectedTerm}
+						subjects={subjects.result}
+						key={total.subjectId.toString()}
+					/>
+				))}
 			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
 		</ScrollView>
 	)
 }
 
+function SubjectPerformanceInline(props: {
+	total: Total
+	selectedTerm: NSEntity
+	subjects: Subject[]
+}) {
+	const term = props.total.termTotals.find(
+		e => e.term.id === props.selectedTerm.id
+	)
+	const { studentId } = useContext(Ctx)
+	const assignments = useAPI(
+		API,
+		'subjectPerformance',
+		{
+			studentId: studentId!,
+			subjectId: props.total.subjectId,
+			termId: props.selectedTerm.id,
+		},
+		getSubjectName(props.subjects, props.total.subjectId)
+	)
+
+	return (
+		<View style={{ margin: 5, width: '100%', padding: 5 }}>
+			<View
+				style={{
+					alignSelf: 'flex-end',
+					alignItems: 'flex-end',
+					padding: 5,
+					borderRadius: 5,
+					maxHeight: 40,
+					width: '100%',
+					backgroundColor: ACCENT_COLOR,
+				}}
+			>
+				<Text
+					style={{
+						fontSize: 16,
+						fontWeight: 'bold',
+					}}
+				>
+					{getSubjectName(props.subjects, props.total.subjectId)}
+				</Text>
+			</View>
+			<View style={styles.stretch}>
+				{assignments.fallback ||
+					(() => {
+						const weights = assignments.result.results.map(e => e.weight)
+						const maxWeight = Math.max(...weights)
+						const minWeight = Math.min(...weights)
+
+						return (
+							<ScrollView
+								horizontal
+								style={{ maxHeight: 100, margin: 0, minWidth: 100 }}
+							>
+								{assignments.result.results.map(e => (
+									<Mark
+										mark={e.result ?? 'Нет'}
+										markWeight={{
+											max: maxWeight,
+											min: minWeight,
+											current: e.weight,
+										}}
+										style={{ height: 50, width: 50 }}
+										key={e.assignmentId}
+									/>
+								))}
+							</ScrollView>
+						)
+					})()}
+
+				{term && (
+					<Mark
+						finalMark={term?.mark}
+						mark={term.avgMark}
+						style={{ height: 50, width: 50 }}
+					/>
+				)}
+			</View>
+		</View>
+	)
+}
+
+function getSubjectName(subjects: Subject[], subjectId: number) {
+	return (
+		subjects.find(subject => subjectId === subject.id)?.name ?? 'Предмет404'
+	)
+}
+
 export function TotalsScreenTable(
-	props: StackScreenProps<ParamMap, 'Оценки '>
+	props: StackScreenProps<ParamMap, 'Оценки '> & TotalsContext
 ) {
 	const theme = useTheme()
 	const { studentId } = useContext(Ctx)
-	const education = useAPI(
-		API,
-		'education',
-		{ studentId },
-		'данных об обучении'
-	)
-
-	// TODO Let user to schoose school year and term
-	const schoolYear = education.result && education.result[0].schoolyear
-	const schoolYearId = schoolYear && schoolYear.id
-
-	const subjects = useAPI(
-		API,
-		'subjects',
-		{ studentId, schoolYearId },
-		'списка предметов'
-	)
-
-	const totals = useAPI(
-		API,
-		'totals',
-		{
-			schoolYearId,
-			studentId,
-		},
-		'итоговых оценок'
-	)
-
+	const { education, subjects, totals, schoolYear } = props
 	const headerWidth = 50
 	const termTotalWidth =
 		totals.result &&

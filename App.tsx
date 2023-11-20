@@ -145,7 +145,10 @@ export default function App() {
 		if (!API.session) return
 
 		// Session is still active
-		if (API.session.expires.getTime() > Date.now()) return
+		if (API.session.expires.getTime() > Date.now()) {
+			API.authorized = true
+			return
+		}
 
 		sended.current = true
 		API.getToken(
