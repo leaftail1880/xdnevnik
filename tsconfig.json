@@ -8,6 +8,7 @@
       "DOM",
       "ESNext"
     ],
+    "forceConsistentCasingInFileNames":true,
     "moduleResolution": "node",
     "noEmit": true,
     "resolveJsonModule": true,
