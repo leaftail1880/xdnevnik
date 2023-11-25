@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { View } from 'react-native'
 import { API, NetSchoolApi, NetSchoolError } from '../NetSchool/api'
-import { Button } from '../components/button'
-import { Ionicon } from '../components/icon'
-import { Loading } from '../components/loading'
-import { Text } from '../components/text'
-import { LOGGER, RED_ACCENT_COLOR, styles } from '../constants'
+import { Button } from '../components/Button'
+import { Ionicon } from '../components/Icon'
+import { Loading } from '../components/Loading'
+import { Text } from '../components/Text'
+import { LOGGER, styles } from '../constants'
+import { View } from 'react-native-ui-lib'
 
 /**
  * A way to select only accepted api methods
@@ -61,6 +61,8 @@ export function useAPI<
 
 				if (hasUndefinedDeps) return
 
+				LOGGER.debug('Request update for', name)
+
 				try {
 					const value = await (source[name] as APIMethod)(params)
 					updateDate.current = new Date().toLocaleTimeString()
@@ -80,7 +82,6 @@ export function useAPI<
 
 	// Value is present, all okay
 	if (typeof value !== 'undefined' && value !== null) {
-		LOGGER.debug('Result ' + description, (value + '').slice(0, 50))
 		return {
 			result: value,
 			updateDate: updateDate.current,
@@ -123,23 +124,22 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 				maxWidth: 300,
 			}}
 		>
-			<Text style={{ fontSize: 20, color: RED_ACCENT_COLOR }}>
+			<Text red1 text2>
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
-			<Text style={{ fontSize: 15 }}>При загрузке {name}</Text>
+			<Text>При загрузке {name}</Text>
 			{error[1] instanceof NetSchoolError && error[1].beforeAuth && (
-				<Text style={{ fontSize: 15 }}>Авторизуйтесь!</Text>
+				<Text>Авторизуйтесь!</Text>
 			)}
 			{errorString === NetSchoolApi.noConnection && (
-				<Text style={{ fontSize: 15 }}>Вы не в сети, сетевая ошибка!</Text>
+				<Text>Вы не в сети, сетевая ошибка!</Text>
 			)}
 			{more && <Text>{errorString}</Text>}
 			<Button
 				onPress={() => setMore(!more)}
-				style={[
-					styles.button,
-					{ minHeight: 15, padding: 7, width: '100%', margin: 3 },
-				]}
+				padding-7
+				margin-3
+				style={[styles.button, { minHeight: 15, width: '100%' }]}
 			>
 				<Text style={styles.buttonText}>
 					{!more ? 'Подробнее' : 'Свернуть'}
@@ -147,12 +147,11 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 			</Button>
 			<Button
 				onPress={reload}
-				style={[
-					styles.button,
-					{ maxHeight: 50, padding: 0, width: '100%', margin: 3 },
-				]}
+				padding-0
+				margin-3
+				style={[styles.button, { maxHeight: 50, width: '100%' }]}
 			>
-				<View style={[styles.stretch, { margin: 0, padding: 7 }]}>
+				<View margin-0 padding-7 style={styles.stretch}>
 					<Text style={styles.buttonText}>Попробовать снова</Text>
 					<Ionicon
 						name="reload"

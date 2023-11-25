@@ -1,9 +1,10 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
-import { Alert, ScrollView, Text, TextStyle, View } from 'react-native'
+import { Alert, ScrollView, TextStyle, View } from 'react-native'
+import { SubjectName, getSubjectName } from '../components/SubjectName'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useTheme } from '@react-navigation/native'
-import { useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
 import { API } from '../NetSchool/api'
 import {
@@ -13,9 +14,10 @@ import {
 	SubjectPerformance,
 	Total,
 } from '../NetSchool/classes'
-import { Dropdown } from '../components/dropdown'
-import { Loading } from '../components/loading'
-import { Mark } from '../components/mark'
+import { Dropdown } from '../components/Dropdown'
+import { Loading } from '../components/Loading'
+import { Mark } from '../components/Mark'
+import { Text } from '../components/Text'
 import {
 	ACCENT_COLOR,
 	BUTTON_TEXT_COLOR,
@@ -44,8 +46,6 @@ type ParamMap = {
 const Stack = createStackNavigator<ParamMap>()
 
 export function TotalsNavigation() {
-	const theme = useTheme()
-	const textStyle = { fontSize: 15, color: theme.colors.text }
 	const { studentId, settings } = useContext(Ctx)
 	const education = useAPI(
 		API,
@@ -55,7 +55,8 @@ export function TotalsNavigation() {
 	)
 
 	// TODO Let user to schoose school year
-	const schoolYear = education.result && education.result[0].schoolyear
+	const schoolYear =
+		education.result && education.result.find(e => !e.isAddSchool)?.schoolyear
 	const schoolYearId = schoolYear && schoolYear.id
 
 	const subjects = useAPI(
@@ -86,7 +87,7 @@ export function TotalsNavigation() {
 					headerRight() {
 						return (
 							<View style={[styles.stretch, { padding: 3 }]}>
-								<Text style={textStyle}>Только одна четверть</Text>
+								<Text>Только одна четверть</Text>
 								<Switch
 									trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
 									thumbColor={
@@ -142,40 +143,43 @@ export function TotalsScreenTerm({
 		}
 	}, [terms, selectedTerm, settings.selectedTerm])
 
-	return education.fallback ||
+	return (
+		education.fallback ||
 		subjects.fallback ||
-		totals.fallback ||
-		totals.result.length < 1 ? (
-		<Loading text="Загрузка из кэша{dots}" />
-	) : (
-		<ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-			{terms && (
-				<Dropdown
-					data={terms}
-					defaultValue={selectedTerm}
-					onSelect={v => {
-						settings.save({ selectedTerm: v.id })
-						setSelectedTerm(v)
-					}}
-					dropdownStyle={{ alignSelf: 'center', maxWidth: 110 }}
-					buttonStyle={styles.dropdown}
-					buttonTextStyle={styles.buttonText}
-					defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
-					buttonTextAfterSelection={i => i?.name ?? 'F'}
-					rowTextForSelection={i => i?.name ?? 'F'}
-				/>
-			)}
-			{selectedTerm &&
-				totals.result.map(total => (
-					<SubjectPerformanceInline
-						total={total}
-						selectedTerm={selectedTerm}
-						subjects={subjects.result}
-						key={total.subjectId.toString()}
+		totals.fallback || (
+			<ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+				{terms && (
+					<Dropdown
+						data={terms}
+						defaultValue={selectedTerm}
+						onSelect={v => {
+							settings.save({ selectedTerm: v.id })
+							setSelectedTerm(v)
+						}}
+						dropdownStyle={{ alignSelf: 'center', maxWidth: 110 }}
+						buttonStyle={styles.dropdown}
+						buttonTextStyle={styles.buttonText}
+						defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
+						buttonTextAfterSelection={i => i?.name ?? 'F'}
+						rowTextForSelection={i => i?.name ?? 'F'}
 					/>
-				))}
-			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
-		</ScrollView>
+				)}
+				{totals.result.length < 1 ? (
+					<Loading text="Загрузка из кэша{dots}" />
+				) : (
+					selectedTerm &&
+					totals.result.map(total => (
+						<SubjectPerformanceInline
+							total={total}
+							selectedTerm={selectedTerm}
+							subjects={subjects.result}
+							key={total.subjectId.toString()}
+						/>
+					))
+				)}
+				<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
+			</ScrollView>
+		)
 	)
 }
 
@@ -186,17 +190,6 @@ function SubjectPerformanceInline(props: {
 }) {
 	const term = props.total.termTotals.find(
 		e => e.term.id === props.selectedTerm.id
-	)
-	const { studentId } = useContext(Ctx)
-	const assignments = useAPI(
-		API,
-		'subjectPerformance',
-		{
-			studentId: studentId!,
-			subjectId: props.total.subjectId,
-			termId: props.selectedTerm.id,
-		},
-		getSubjectName(props.subjects, props.total.subjectId)
 	)
 
 	return (
@@ -212,42 +205,18 @@ function SubjectPerformanceInline(props: {
 					backgroundColor: ACCENT_COLOR,
 				}}
 			>
-				<Text
+				<SubjectName
+					subjectId={props.total.subjectId}
+					subjects={props.subjects}
 					style={{
 						fontSize: 16,
+						color: styles.buttonText.color,
 						fontWeight: 'bold',
 					}}
-				>
-					{getSubjectName(props.subjects, props.total.subjectId)}
-				</Text>
+				/>
 			</View>
 			<View style={styles.stretch}>
-				{assignments.fallback ||
-					(() => {
-						const weights = assignments.result.results.map(e => e.weight)
-						const maxWeight = Math.max(...weights)
-						const minWeight = Math.min(...weights)
-
-						return (
-							<ScrollView
-								horizontal
-								style={{ maxHeight: 100, margin: 0, minWidth: 100 }}
-							>
-								{assignments.result.results.map(e => (
-									<Mark
-										mark={e.result ?? 'Нет'}
-										markWeight={{
-											max: maxWeight,
-											min: minWeight,
-											current: e.weight,
-										}}
-										style={{ height: 50, width: 50 }}
-										key={e.assignmentId}
-									/>
-								))}
-							</ScrollView>
-						)
-					})()}
+				<SubjectMarksInline {...props} />
 
 				{term && (
 					<Mark
@@ -260,12 +229,58 @@ function SubjectPerformanceInline(props: {
 		</View>
 	)
 }
+const SubjectMarksInline = memo(function SubjectMarksInline(props: {
+	total: Total
+	selectedTerm: NSEntity
+	subjects: Subject[]
+}) {
+	const { studentId, settings } = useContext(Ctx)
 
-function getSubjectName(subjects: Subject[], subjectId: number) {
-	return (
-		subjects.find(subject => subjectId === subject.id)?.name ?? 'Предмет404'
+	const assignments = useAPI(
+		API,
+		'subjectPerformance',
+		{
+			studentId: studentId!,
+			subjectId: props.total.subjectId,
+			termId: props.selectedTerm.id,
+		},
+		getSubjectName({
+			subjects: props.subjects,
+			subjectId: props.total.subjectId,
+			settings,
+		})
 	)
-}
+
+	if (assignments.fallback) return assignments.fallback
+
+	const weights = assignments.result.results.map(e => e.weight)
+	const maxWeight = Math.max(...weights)
+	const minWeight = Math.min(...weights)
+
+	return (
+		<ScrollView
+			horizontal
+			style={{
+				maxHeight: 100,
+				margin: 0,
+				minWidth: 100,
+			}}
+		>
+			{assignments.result.results.map(e => (
+				<Mark
+					mark={e.result ?? 'Нет'}
+					markWeight={{
+						max: maxWeight,
+						min: minWeight,
+						current: e.weight,
+					}}
+					style={{ height: 50, width: 50 }}
+					key={e.assignmentId}
+				/>
+			))}
+		</ScrollView>
+	)
+})
 
 export function TotalsScreenTable(
 	props: StackScreenProps<ParamMap, 'Оценки '> & TotalsContext
@@ -321,12 +336,13 @@ export function TotalsScreenTable(
 							width: `${headerWidth}%`,
 						}}
 					>
-						<Text style={{ color: theme.colors.text }}>
-							{(subjects.result &&
-								subjects.result.find(subject => total.subjectId === subject.id)
-									?.name) ??
-								'Предмет404'}
-						</Text>
+						<SubjectName
+							subjectId={total.subjectId}
+							subjects={props.subjects.result!}
+							style={{
+								color: theme.colors.text,
+							}}
+						/>
 					</View>
 
 					{/* Table rows */}
@@ -401,15 +417,17 @@ export function SubjectTotals({
 		)
 	}
 
-	const noMark: Mark[] = new Array(
-		totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
-	).fill({})
+	let totalsAndSheduledTotals = [...missedMark, ...totals.results].sort(
+		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+	) as Partial<Mark>[]
 
-	const totalsAndSheduledTotals = (
-		[...missedMark, ...totals.results].sort(
-			(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-		) as Mark[]
-	).concat(noMark)
+	if (lessonsWithoutMark) {
+		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
+			new Array(
+				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
+			).fill({})
+		)
+	}
 	const weights = totals.results.map(e => e.weight)
 	const maxWeight = Math.max(...weights)
 	const minWeight = Math.min(...weights)
@@ -453,7 +471,9 @@ export function SubjectTotals({
 							style={{
 								height: 50,
 								width: 50,
-								...(e.result === 'Нет' ? { backgroundColor: '#88888857' } : {}),
+								...(e.result === 'Нет' || typeof e.result === 'undefined'
+									? { backgroundColor: '#88888857' }
+									: {}),
 							}}
 							textStyle={{ fontSize: 17 }}
 							onPress={() => {

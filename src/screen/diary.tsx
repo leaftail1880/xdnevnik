@@ -1,10 +1,13 @@
 import { useTheme } from '@react-navigation/native'
 import * as Notifications from 'expo-notifications'
 import { useContext, useEffect, useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView } from 'react-native'
+import { View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
-import { Dropdown } from '../components/dropdown'
-import { ACCENT_COLOR, LANG, LOGGER, styles } from '../constants'
+import { Dropdown } from '../components/Dropdown'
+import { SubjectName, getSubjectName } from '../components/SubjectName'
+import { Text } from '../components/Text'
+import { LANG, LOGGER, SECONDARY_COLOR, styles } from '../constants'
 import { useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
@@ -45,11 +48,15 @@ export function DiaryScreen() {
 						date.setMinutes(date.getMinutes() - 15)
 					}
 
+					const lessonName = getSubjectName({
+						subjectId: lesson.subjectId,
+						subjectName: lesson.subjectName,
+						settings,
+					})
+
 					Notifications.scheduleNotificationAsync({
 						content: {
-							title: `${lesson.subjectName} | ${
-								lesson.roomName ?? 'Нет кабинета'
-							}`,
+							title: `${lessonName} | ${lesson.roomName ?? 'Нет кабинета'}`,
 							body: `Урок ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
 								period ? 'Перемена ' + period.getMinutes() + ' мин' : ''
 							}`,
@@ -67,7 +74,7 @@ export function DiaryScreen() {
 				}
 			})
 		}
-	}, [settings.notifications, diary])
+	}, [settings.notifications, diary, settings])
 
 	const values = Date.week.map((day, i) => {
 		return {
@@ -98,12 +105,8 @@ export function DiaryScreen() {
 				buttonTextAfterSelection={i => i.name}
 				renderCustomizedRowChild={i => (
 					<Text
-						style={[
-							i.day === diaryDay
-								? { color: ACCENT_COLOR }
-								: { color: theme.colors.text },
-							{ textAlign: 'center', fontSize: 15 },
-						]}
+						{...(i.day === diaryDay && { grey1: true })}
+						style={{ textAlign: 'center' }}
 					>
 						{i.name}
 					</Text>
@@ -111,42 +114,87 @@ export function DiaryScreen() {
 				defaultValue={values.find(e => e.day === diaryDay)}
 				onSelect={item => setDiaryDay(item.day)}
 			/>
-			{FallbackDiary ||
-				diary.forDay(diaryDay).map(lesson => (
-					<View
-						key={lesson.id.toString()}
-						style={{
-							...styles.button,
-							alignItems: 'flex-start',
-							marginBottom: 1,
-						}}
-					>
-						<Text
-							style={{ fontWeight: 'bold', ...styles.buttonText, fontSize: 15 }}
-						>
-							{lesson.subjectName}
-						</Text>
+			<View padding-0 paddingB-10>
+				{FallbackDiary ||
+					diary.forDay(diaryDay).map(lesson => (
 						<View
-							style={{
-								flex: 1,
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-								minWidth: 350,
-							}}
+							key={lesson.id.toString()}
+							style={[
+								styles.button,
+								{
+									margin: 7,
+									alignItems: 'flex-start',
+								},
+							]}
 						>
+							<View
+								flex
+								row
+								spread
+								centerV
+								marginB-7
+								style={{
+									width: '100%',
+								}}
+							>
+								<SubjectName
+									style={[
+										styles.buttonText,
+										{
+											fontWeight: 'bold',
+											marginTop: 0,
+											fontSize: 18,
+										},
+									]}
+									subjectId={lesson.subjectId}
+									subjectName={lesson.subjectName}
+								/>
+
+								<Text
+									style={[
+										styles.buttonText,
+										{
+											fontWeight: 'bold',
+											fontSize: 18,
+											marginTop: 0,
+											margin: 7,
+										},
+									]}
+								>
+									{lesson.roomName ?? 'Нет кабинета'}
+								</Text>
+							</View>
 							<Text style={styles.buttonText}>
 								{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 							</Text>
-							<Text style={styles.buttonText}>
-								{lesson.roomName ?? 'Кабинет не указан'}
-							</Text>
+							{lesson.lessonTheme && (
+								<Text style={styles.buttonText}>
+									{lesson.lessonTheme + '\n'}
+								</Text>
+							)}
+							{diary.isNow(lesson) && (
+								<View
+									style={{
+										backgroundColor: theme.colors.background,
+										borderRadius: 5,
+										padding: 0,
+									}}
+								>
+									<View
+										style={{
+											backgroundColor: SECONDARY_COLOR,
+											width: `${~~(
+												(lesson.end.getDate() - lesson.start.getDate()) /
+												(lesson.end.getDate() - Date.now())
+											)}%`,
+											padding: 0,
+										}}
+									></View>
+								</View>
+							)}
 						</View>
-						{lesson.lessonTheme && (
-							<Text style={styles.buttonText}>{lesson.lessonTheme + '\n'}</Text>
-						)}
-					</View>
-				))}
+					))}
+			</View>
 		</ScrollView>
 	)
 }

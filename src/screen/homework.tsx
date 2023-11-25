@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { API } from '../NetSchool/api'
-import { Loading } from '../components/loading'
+import { Loading } from '../components/Loading'
 import { INVISIBLE_COLOR, LANG, styles } from '../constants'
 import { useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'

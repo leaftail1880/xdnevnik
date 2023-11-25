@@ -33,11 +33,13 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	dropdown: {alignSelf: 'stretch',
-	backgroundColor: SECONDARY_COLOR,
-	width: '100%',
-	borderBottomLeftRadius: 5,
-	borderBottomRightRadius: 5},
+	dropdown: {
+		alignSelf: 'stretch',
+		backgroundColor: SECONDARY_COLOR,
+		width: '100%',
+		borderBottomLeftRadius: 5,
+		borderBottomRightRadius: 5,
+	},
 	stretch: {
 		padding: 10,
 		flexDirection: 'row',
@@ -134,6 +136,7 @@ declare global {
 		toYYYYMMDD(): string
 		toHHMM(): string
 		weekStartDay: number
+		toReadable(): string
 		getDayMon(): number
 	}
 }
@@ -152,6 +155,10 @@ Date.prototype.toHHMM = function (this: Date) {
 		':' +
 		this.getMinutes().toString().padStart(2, '0')
 	)
+}
+
+Date.prototype.toReadable = function (this: Date) {
+  return this.toHHMM() + ' ' + this.toYYYYMMDD()
 }
 
 const dayInMs = 1000 * 60 * 60 * 24

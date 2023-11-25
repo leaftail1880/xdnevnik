@@ -81,6 +81,7 @@ export interface RawLesson {
 class Lesson {
 	public id: number
 	public subjectName: string
+	public subjectId: number
 	public roomName: string
 	public lessonTheme: string
 	public teachers: NSEntity[]
@@ -96,6 +97,7 @@ class Lesson {
 	public constructor(lesson: RawLesson) {
 		this.id = lesson.classmeetingId
 		this.subjectName = lesson.subjectName
+		this.subjectId = lesson.subjectId
 		this.classmetingId = lesson.classmeetingId
 		this.roomName = lesson.roomName
 		this._end = lesson.endTime
@@ -139,7 +141,7 @@ export class Diary {
 	 */
 	public constructor(lessons: RawLesson[]) {
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
-		// TODO Apply custom lesson names, add custom lessons
+		// TODO add custom lessons
 	}
 
 	/**
@@ -151,14 +153,11 @@ export class Diary {
 		return this.lessons.filter(lesson => lesson.day.toYYYYMMDD() === day)
 	}
 
-	/**
-	 * Gets lesson for specified date
-	 * @param date - Date to search for
-	 */
-	public forTime(date: Date) {
-		return this.forDay(date).find(
-			({ start, end }) => date >= start && date < end
-		)
+	public isNow(lesson: Lesson) {
+		const { start, end } = lesson
+		const date = new Date()
+
+		return date >= start && date <= end
 	}
 }
 

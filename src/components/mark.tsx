@@ -1,6 +1,6 @@
-import { Alert, Falsy, Text, TextStyle } from 'react-native'
+import { Falsy, Text, TextStyle } from 'react-native'
 import { styles } from '../constants'
-import { Button, ButtonProps } from './button'
+import { Button, ButtonProps } from './Button'
 
 export function Mark({
 	finalMark,
@@ -19,12 +19,6 @@ export function Mark({
 }) {
 	const mark = finalMark ? Number(finalMark) : markProp
 	let color: string = '#555555' + (markWeight ? '' : 'FF')
-	props.onPress ??= () => {
-		Alert.alert(
-			'A',
-			`${mark} ${color} ${typeof mark === 'number' && !isNaN(mark)}`
-		)
-	}
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = '#007000'

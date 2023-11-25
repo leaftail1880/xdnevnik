@@ -34,18 +34,30 @@ export async function getLatestGithubReleaseUrl(
 		ifAlreadyLatest = () => Alert.alert('Уже последняя'),
 		ifNoRelease = () => Alert.alert('Не удалось найти релиз'),
 		ifNoAsset = () => Alert.alert('Не удалось найти файл обновления :('),
+		ifRatelimit = (max: number, resetOn: number) =>
+			Alert.alert(
+				`Достигнут лимит запросов: 0/${max}`,
+				`Попробуйте снова после ${new Date(resetOn).toReadable()}`
+			),
 	}
 ) {
 	const response = await fetch(
 		'https://api.github.com/repos/leaftail1880/xdnevnik/releases'
 	)
 
-	if (!response.ok) throw new Error(response.status + ' ' + response.statusText)
+	if (!response.ok) {
+		if (Number(response.headers.get('x-ratelimit-remaining')) === 0) {
+			return ifRatelimit(
+				Number(response.headers.get('x-ratelimit-limit')),
+				Number(response.headers.get('x-ratelimit-reset'))
+			)
+		} else throw new Error(response.status + ' ' + response.statusText)
+	}
 
 	const releases: GithubRelease[] = await response.json()
 	const release = releases[0]
 	if (!release) return ifNoRelease()
-	if (release.tag_name === 'v' + Application.nativeApplicationVersion)
+	if (release.tag_name === Application.nativeApplicationVersion)
 		return ifAlreadyLatest()
 	const asset = release.assets.find(e => e.name === filename)
 	if (!asset) return ifNoAsset()

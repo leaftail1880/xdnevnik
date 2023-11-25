@@ -22,13 +22,14 @@ import {
 	useColorScheme,
 } from 'react-native'
 import 'react-native-gesture-handler'
+import { Config } from 'react-native-ui-lib'
 import { API, NetSchoolApi } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
 import { ROUTES } from './src/NetSchool/routes'
-import { Button } from './src/components/button'
-import { Ionicon } from './src/components/icon'
-import { Loading } from './src/components/loading'
-import { Text } from './src/components/text'
+import { Button } from './src/components/Button'
+import { Ionicon } from './src/components/Icon'
+import { Loading } from './src/components/Loading'
+import { Text } from './src/components/Text'
 import {
 	ACCENT_COLOR,
 	LANG,
@@ -126,6 +127,8 @@ export default function App() {
 		theme = actual === 'light' ? DefaultTheme : DarkTheme
 	}
 
+	Config.setConfig({ appScheme: theme.dark ? 'dark' : 'light' })
+
 	const WaitForAuthorization = !API.session && (
 		<Loading text="Ожидание авторизации{dots}" />
 	)
@@ -153,7 +156,7 @@ export default function App() {
 		sended.current = true
 		API.getToken(
 			ROUTES.refreshTokenTemplate(API.session.refresh_token),
-			'Ошибка авторизации, перезайдите'
+			'Ошибка авторизации, перезайдите. Код ошибки 400'
 		)
 			.then(() => {
 				if (status) {

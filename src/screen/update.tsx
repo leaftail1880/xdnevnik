@@ -7,8 +7,8 @@ import * as ExpoSharing from 'expo-sharing'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { getLatestGithubReleaseUrl } from '../GithubUpdate/update'
-import { Button } from '../components/button'
-import { Text } from '../components/text'
+import { Button } from '../components/Button'
+import { Text } from '../components/Text'
 import { LOGGER, styles } from '../constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
@@ -77,9 +77,10 @@ export function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button
-			style={[styles.settingBase, styles.stretch]}
+			style={[styles.settingBase, styles.stretch, { padding: 20, margin: 0 }]}
 			onPress={async () => {
 				try {
+					setProgress('Получение списка версий...')
 					const result = await openAppInstaller(async (uri, fileUri) => {
 						const downloader = FileSystem.createDownloadResumable(
 							uri,

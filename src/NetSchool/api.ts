@@ -167,7 +167,7 @@ export class NetSchoolApi {
 
 	public async getToken(
 		form: Record<string, string>,
-		error400: string = 'Неверные данные для входа'
+		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
 	) {
 		LOGGER.debug({ form })
 		const response = await fetch(ROUTES.getToken, {

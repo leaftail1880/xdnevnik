@@ -3,9 +3,9 @@ import * as Application from 'expo-application'
 import { useContext } from 'react'
 import { ScrollView, Switch, View } from 'react-native'
 import { API } from '../NetSchool/api'
-import { Dropdown } from '../components/dropdown'
-import { Loading } from '../components/loading'
-import { Text } from '../components/text'
+import { Dropdown } from '../components/Dropdown'
+import { Loading } from '../components/Loading'
+import { Text } from '../components/Text'
 import {
 	ACCENT_COLOR,
 	BUTTON_TEXT_COLOR,
@@ -59,7 +59,7 @@ export function SettingsScreen() {
 				<Loading text="Ожидание авторизации{dots}"></Loading>
 			)}
 			<View style={[styles.settingBase, styles.stretch]}>
-				<Text style={[textStyle, { margin: 10 }]}>{LANG['notification']}</Text>
+				<Text style={{ margin: 10 }}>{LANG['notification']}</Text>
 				<Switch
 					trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
 					thumbColor={settings.notifications ? ACCENT_COLOR : BUTTON_TEXT_COLOR}
@@ -79,14 +79,14 @@ export function SettingsScreen() {
 				onSelect={s => settings.save({ theme: s.i })}
 				renderCustomizedButtonChild={i => (
 					<View style={styles.stretch}>
-						<Text style={textStyle}>Тема:</Text>
-						<Text style={textStyle}>{i?.name ?? 'По умолчанию'}</Text>
+						<Text>Тема:</Text>
+						<Text>{i?.name ?? 'По умолчанию'}</Text>
 					</View>
 				)}
 				rowTextForSelection={i => i.name}
 			/>
 			<UpdatesButton />
-			<View style={styles.settingBase}>
+			<View style={[styles.settingBase, { padding: 20 }]}>
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
