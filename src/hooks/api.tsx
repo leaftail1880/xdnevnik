@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { View } from 'react-native-ui-lib'
 import { API, NetSchoolApi, NetSchoolError } from '../NetSchool/api'
 import { Button } from '../components/Button'
 import { Ionicon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Text } from '../components/Text'
 import { LOGGER, styles } from '../constants'
-import { View } from 'react-native-ui-lib'
 
 /**
  * A way to select only accepted api methods
@@ -124,7 +124,7 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 				maxWidth: 300,
 			}}
 		>
-			<Text red1 text2>
+			<Text red100 text6>
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
 			<Text>При загрузке {name}</Text>
@@ -137,9 +137,10 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 			{more && <Text>{errorString}</Text>}
 			<Button
 				onPress={() => setMore(!more)}
-				padding-7
-				margin-3
-				style={[styles.button, { minHeight: 15, width: '100%' }]}
+				style={[
+					styles.button,
+					{ minHeight: 15, width: '100%', margin: 3, padding: 7 },
+				]}
 			>
 				<Text style={styles.buttonText}>
 					{!more ? 'Подробнее' : 'Свернуть'}
@@ -147,11 +148,12 @@ function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 			</Button>
 			<Button
 				onPress={reload}
-				padding-0
-				margin-3
-				style={[styles.button, { maxHeight: 50, width: '100%' }]}
+				style={[
+					styles.button,
+					{ maxHeight: 50, width: '100%', margin: 3, padding: 0 },
+				]}
 			>
-				<View margin-0 padding-7 style={styles.stretch}>
+				<View style={[styles.stretch, { margin: 0, padding: 7 }]}>
 					<Text style={styles.buttonText}>Попробовать снова</Text>
 					<Ionicon
 						name="reload"

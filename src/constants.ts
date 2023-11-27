@@ -128,7 +128,7 @@ export const LANG = {
 
 declare global {
 	interface DateConstructor {
-		week: [string, string, string, string, string, string, string]
+		week(date: Date): [string, string, string, string, string, string, string]
 	}
 	interface Date {
 		weekStart(): Date
@@ -162,8 +162,9 @@ Date.prototype.toReadable = function (this: Date) {
 }
 
 const dayInMs = 1000 * 60 * 60 * 24
-Date.week = new Array(7)
-	.fill('')
-	.map((_, i) =>
-		new Date(Date.now() - (new Date().getDayMon() - i) * dayInMs).toYYYYMMDD()
-	) as typeof Date.week
+Date.week = date =>
+	new Array(7)
+		.fill('')
+		.map((_, i) =>
+			new Date(date.getTime() - (date.getDayMon() - i) * dayInMs).toYYYYMMDD()
+		) as ReturnType<typeof Date.week>

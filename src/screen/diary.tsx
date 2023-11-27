@@ -4,7 +4,9 @@ import { useContext, useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
+import { Assignment } from '../NetSchool/classes'
 import { Dropdown } from '../components/Dropdown'
+import { Mark } from '../components/Mark'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 import { Text } from '../components/Text'
 import { LANG, LOGGER, SECONDARY_COLOR, styles } from '../constants'
@@ -14,11 +16,26 @@ import { Ctx } from '../hooks/settings'
 export function DiaryScreen() {
 	const { studentId, settings } = useContext(Ctx)
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
-	const { result: diary, fallback: FallbackDiary } = useAPI(
+	const [weekDate, setWeekDate] = useState(new Date())
+
+	const weekDays = Date.week(weekDate)
+
+	const diary = useAPI(
 		API,
 		'diary',
-		{ studentId },
+		{
+			studentId,
+			startDate: weekDays[0],
+			endDate: weekDays[6],
+		},
 		'дневника'
+	)
+
+	const homework = useAPI(
+		API,
+		'homework',
+		{ studentId, withExpiredClassAssign: true, withoutMarks: true },
+		'дз'
 	)
 
 	useEffect(() => {
@@ -28,12 +45,12 @@ export function DiaryScreen() {
 			return
 		}
 
-		if (diary) {
+		if (diary.result) {
 			Notifications.cancelAllScheduledNotificationsAsync().then(() => {
-				for (const [i, lesson] of diary.lessons.entries()) {
+				for (const [i, lesson] of diary.result.lessons.entries()) {
 					let period: Date | undefined
 					let date: Date
-					const previous = diary.lessons[i - 1]
+					const previous = diary.result.lessons[i - 1]
 
 					if (
 						previous &&
@@ -76,16 +93,26 @@ export function DiaryScreen() {
 		}
 	}, [settings.notifications, diary, settings])
 
-	const values = Date.week.map((day, i) => {
-		return {
-			name: `${LANG.days[i]}${
-				new Date().toYYYYMMDD() === day
-					? ', cегодня'
-					: ' ' + new Date(day).toLocaleDateString([], { dateStyle: 'full' })
-			}`,
-			day: day,
-		}
-	})
+	const weekBefore = new Date()
+	const weekAfter = new Date()
+
+	weekBefore.setDate(weekBefore.getDate() - 7)
+	weekAfter.setDate(weekAfter.getDate() + 7)
+
+	const values = [
+		{ name: 'Прошлая неделя', day: undefined, week: weekBefore },
+		...Date.week(weekDate).map((day, i) => {
+			return {
+				name: `${LANG.days[i]}${
+					new Date().toYYYYMMDD() === day
+						? ', cегодня'
+						: ' ' + new Date(day).toLocaleDateString([], { dateStyle: 'full' })
+				}`,
+				day: day,
+			}
+		}),
+		{ name: 'Следующая неделя', day: undefined, week: weekAfter },
+	]
 
 	const theme = useTheme()
 
@@ -112,11 +139,14 @@ export function DiaryScreen() {
 					</Text>
 				)}
 				defaultValue={values.find(e => e.day === diaryDay)}
-				onSelect={item => setDiaryDay(item.day)}
+				onSelect={item => {
+					if ('week' in item) setWeekDate(item.week)
+					else setDiaryDay(item.day)
+				}}
 			/>
 			<View padding-0 paddingB-10>
-				{FallbackDiary ||
-					diary.forDay(diaryDay).map(lesson => (
+				{diary.fallback ||
+					diary.result.forDay(diaryDay).map(lesson => (
 						<View
 							key={lesson.id.toString()}
 							style={[
@@ -169,10 +199,16 @@ export function DiaryScreen() {
 							</Text>
 							{lesson.lessonTheme && (
 								<Text style={styles.buttonText}>
-									{lesson.lessonTheme + '\n'}
+									Тема урока: {lesson.lessonTheme + '\n'}
 								</Text>
 							)}
-							{diary.isNow(lesson) && (
+							{homework.fallback || (
+								<Homework
+									homework={homework.result}
+									classmetingId={lesson.classmetingId}
+								/>
+							)}
+							{diary.result.isNow(lesson) && (
 								<View
 									style={{
 										backgroundColor: theme.colors.background,
@@ -196,5 +232,36 @@ export function DiaryScreen() {
 					))}
 			</View>
 		</ScrollView>
+	)
+}
+
+function Homework(props: { homework: Assignment[]; classmetingId: number }) {
+	const assignment = props.homework.find(
+		e => e.classmeetingId === props.classmetingId
+	)
+
+	if (!assignment) return false
+
+	return (
+		<View style={styles.stretch}>
+			{assignment.description && (
+				<Text style={styles.buttonText}>Дз: {assignment.description}</Text>
+			)}
+			{assignment.assignmentTypeName && (
+				<Text style={styles.buttonText}>
+					Тип оценки: {assignment.assignmentTypeName}
+				</Text>
+			)}
+			{assignment.result && (
+				<Mark
+					mark={assignment.result}
+					markWeight={{
+						max: assignment.weight,
+						min: assignment.weight,
+						current: assignment.weight,
+					}}
+				/>
+			)}
+		</View>
 	)
 }
