@@ -1,4 +1,3 @@
-import { useTheme } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
@@ -200,10 +199,10 @@ import {
 	default as LibDropdown,
 	SelectDropdownProps2 as Props,
 } from 'react-native-select-dropdown'
+import { BorderRadiuses, Colors } from 'react-native-ui-lib'
 import { SECONDARY_COLOR } from '../constants'
 
 export function Dropdown<Item = object>(props: Props<Item>) {
-	const theme = useTheme()
 	return (
 		<LibDropdown
 			{...props}
@@ -214,11 +213,22 @@ export function Dropdown<Item = object>(props: Props<Item>) {
 					borderRadius: 10,
 				},
 			]}
+			buttonStyle={[
+				{
+					alignSelf: 'center',
+					width: '100%',
+					backgroundColor: Colors.$backgroundPrimaryMedium,
+					borderBottomLeftRadius: BorderRadiuses.br50,
+					borderBottomRightRadius: BorderRadiuses.br50,
+				},
+				props.buttonStyle,
+			]}
+			buttonTextStyle={[{ color: Colors.$textPrimary }, props.buttonTextStyle]}
 			rowStyle={[
-				{ backgroundColor: SECONDARY_COLOR, borderRadius: 5 },
+				{ backgroundColor: Colors.$backgroundPrimaryMedium, borderRadius: 5 },
 				props.rowStyle,
 			]}
-			rowTextStyle={[{ color: theme.colors.text }, props.rowTextStyle]}
+			rowTextStyle={[{ color: Colors.$textPrimary }, props.rowTextStyle]}
 		/>
 	)
 }

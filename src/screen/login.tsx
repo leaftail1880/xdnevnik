@@ -78,10 +78,8 @@ export function LoginScreen() {
 						;(async () => {
 							setLoggingIn(true)
 							try {
-								const session = await API.getToken(
-									ROUTES.getTokenTemplate(pincode)
-								)
-								await AsyncStorage.setItem('session', JSON.stringify(session))
+								await API.getToken(ROUTES.getTokenTemplate(pincode))
+								
 								ctx.setStatus({
 									content: 'Успешная авторизация!',
 									error: false,

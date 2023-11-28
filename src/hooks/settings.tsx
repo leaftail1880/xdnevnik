@@ -1,17 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Theme } from '@react-navigation/native'
 import { createContext, useEffect, useState } from 'react'
 import { Student } from '../NetSchool/classes'
 import { Loading } from '../components/Loading'
 import { APIState } from './api'
+import { Theme } from '@react-navigation/native'
 
 interface Settings {
 	notifications: boolean
 	studentIndex: number
-	theme: 'system' | 'dark' | 'light' | Theme
+	theme: 'system' | 'dark' | 'light'
+	themeColors?: Theme["colors"]
 	lastNameLast: boolean
 	currentTotalsOnly: boolean
 	selectedTerm?: number
+	markStyle: 'background'|'border',
 	overrides: {
 		/**
 		 * Map containing subjectIds as keys and overrided subjectName as value
@@ -30,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	studentIndex: 0,
 	theme: 'system',
 	lastNameLast: true,
+	markStyle: 'border',
 	currentTotalsOnly: true,
 	overrides: {
 		subjectNames: {},

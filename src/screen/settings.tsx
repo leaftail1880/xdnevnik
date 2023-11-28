@@ -45,7 +45,6 @@ export function SettingsScreen() {
 							{ width: '100%', backgroundColor: INVISIBLE_COLOR },
 							styles.settingBase,
 						]}
-						buttonTextStyle={{ fontSize: 15, color: theme.colors.text }}
 						data={students.result.map((student, i) => {
 							return { name: DisplayName(student.name, settings), i }
 						})}
@@ -53,7 +52,7 @@ export function SettingsScreen() {
 						onSelect={s => settings.save({ studentIndex: s.i })}
 						buttonTextAfterSelection={i => i.name}
 						rowTextForSelection={i => i.name}
-					></Dropdown>
+					/>
 				)
 			) : (
 				<Loading text="Ожидание авторизации{dots}"></Loading>

@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		minWidth: 400,
-		padding: 5,
+		padding: 0,
 		width: '100%',
 		elevation: 1,
 	},
@@ -118,7 +118,6 @@ export const LANG = {
 	s_diary: 'Дневник',
 	s_totals: 'Оценки',
 	s_totalsN: 'Оценки ',
-	s_homework: 'Домашка',
 	s_settings: 'Настройки',
 	s_subject_totals: 'Итоги по предмету',
 	notification: 'Уведомления',
@@ -158,7 +157,7 @@ Date.prototype.toHHMM = function (this: Date) {
 }
 
 Date.prototype.toReadable = function (this: Date) {
-  return this.toHHMM() + ' ' + this.toYYYYMMDD()
+	return this.toHHMM() + ' ' + this.toYYYYMMDD()
 }
 
 const dayInMs = 1000 * 60 * 60 * 24
@@ -168,3 +167,7 @@ Date.week = date =>
 		.map((_, i) =>
 			new Date(date.getTime() - (date.getDayMon() - i) * dayInMs).toYYYYMMDD()
 		) as ReturnType<typeof Date.week>
+
+
+
+

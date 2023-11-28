@@ -169,7 +169,11 @@ export class NetSchoolApi {
 		form: Record<string, string>,
 		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
 	) {
-		LOGGER.debug({ form })
+		LOGGER.debug({
+			expires: this.session?.expires.toReadable(),
+			today: new Date().toReadable(),
+			form,
+		})
 		const response = await fetch(ROUTES.getToken, {
 			method: 'POST',
 			body: new URLSearchParams(form).toString(),
@@ -190,9 +194,9 @@ export class NetSchoolApi {
 					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
 				),
 			}
-			this.authorized = true
+			await AsyncStorage.setItem('session', JSON.stringify(this.session))
 
-			return this.session
+			this.authorized = true
 		} else
 			throw new NetSchoolError(
 				'Запрос токена не удался, код ошибки ' + response.status
@@ -263,7 +267,6 @@ export class NetSchoolApi {
 				}
 			}
 
-			LOGGER.info('REQ')
 			const response = await fetch(url, { ...init, ...request })
 
 			if (response.status === 503)
@@ -278,7 +281,7 @@ export class NetSchoolApi {
 					}`,
 					{ cacheGuide: true }
 				)
-				LOGGER.error(error + ' Auth ' + !!init.auth)
+				LOGGER.error(error + ' Auth: ' + !!init.auth)
 				throw error
 			}
 

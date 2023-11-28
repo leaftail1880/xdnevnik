@@ -1,11 +1,12 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
-import { Alert, ScrollView, TextStyle, View } from 'react-native'
+import { Alert, ScrollView } from 'react-native'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useTheme } from '@react-navigation/native'
 import { memo, useContext, useEffect, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
+import { Colors, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import {
 	Education,
@@ -124,12 +125,13 @@ type TotalsContext = {
 	subjects: APIState<Subject[]>
 	totals: APIState<Total[]>
 	schoolYear: Education['schoolyear'] | undefined
-}
+} & StackScreenProps<ParamMap, typeof S_TOTALS>
 
 export function TotalsScreenTerm({
 	education,
 	subjects,
 	totals,
+	navigation,
 }: TotalsContext) {
 	const theme = useTheme()
 	const { settings } = useContext(Ctx)
@@ -156,9 +158,7 @@ export function TotalsScreenTerm({
 							settings.save({ selectedTerm: v.id })
 							setSelectedTerm(v)
 						}}
-						dropdownStyle={{ alignSelf: 'center', maxWidth: 110 }}
-						buttonStyle={styles.dropdown}
-						buttonTextStyle={styles.buttonText}
+						dropdownStyle={{  maxWidth: 110 }}
 						defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
 						buttonTextAfterSelection={i => i?.name ?? 'F'}
 						rowTextForSelection={i => i?.name ?? 'F'}
@@ -170,6 +170,7 @@ export function TotalsScreenTerm({
 					selectedTerm &&
 					totals.result.map(total => (
 						<SubjectPerformanceInline
+							navigation={navigation}
 							total={total}
 							selectedTerm={selectedTerm}
 							subjects={subjects.result}
@@ -183,23 +184,33 @@ export function TotalsScreenTerm({
 	)
 }
 
-function SubjectPerformanceInline(props: {
+type SubjectInfo = {
 	total: Total
 	selectedTerm: NSEntity
 	subjects: Subject[]
-}) {
+} & Pick<TotalsContext, 'navigation'>
+
+function SubjectPerformanceInline(props: SubjectInfo) {
 	const term = props.total.termTotals.find(
 		e => e.term.id === props.selectedTerm.id
 	)
 
 	return (
-		<View style={{ margin: 5, width: '100%', padding: 5 }}>
+		<View
+			br20
+			margin-s2
+			padding-0
+			style={{
+				width: '98%',
+				backgroundColor: Colors.$backgroundNeutralMedium,
+			}}
+		>
 			<View
+				padding-s1
+				br20
 				style={{
 					alignSelf: 'flex-end',
 					alignItems: 'flex-end',
-					padding: 5,
-					borderRadius: 5,
 					maxHeight: 40,
 					width: '100%',
 					backgroundColor: ACCENT_COLOR,
@@ -215,25 +226,27 @@ function SubjectPerformanceInline(props: {
 					}}
 				/>
 			</View>
-			<View style={styles.stretch}>
-				<SubjectMarksInline {...props} />
+			{term ? (
+				<View style={styles.stretch}>
+					<SubjectMarksInline {...props} term={term} />
 
-				{term && (
 					<Mark
 						finalMark={term?.mark}
 						mark={term.avgMark}
 						style={{ height: 50, width: 50 }}
 					/>
-				)}
-			</View>
+				</View>
+			) : (
+				<Loading />
+			)}
 		</View>
 	)
 }
-const SubjectMarksInline = memo(function SubjectMarksInline(props: {
-	total: Total
-	selectedTerm: NSEntity
-	subjects: Subject[]
-}) {
+const SubjectMarksInline = memo(function SubjectMarksInline(
+	props: SubjectInfo & {
+		term: Total['termTotals'][number]
+	}
+) {
 	const { studentId, settings } = useContext(Ctx)
 
 	const assignments = useAPI(
@@ -276,19 +289,25 @@ const SubjectMarksInline = memo(function SubjectMarksInline(props: {
 					}}
 					style={{ height: 50, width: 50 }}
 					key={e.assignmentId}
+					onPress={() =>
+						props.navigation.navigate(LANG['s_subject_totals'], {
+							termId: props.selectedTerm.id,
+							finalMark: props.term?.mark,
+							studentId: studentId!,
+							subjectId: props.total.subjectId,
+						})
+					}
 				/>
 			))}
 		</ScrollView>
 	)
 })
 
-export function TotalsScreenTable(
-	props: StackScreenProps<ParamMap, 'Оценки '> & TotalsContext
-) {
+export function TotalsScreenTable(props: TotalsContext) {
 	const theme = useTheme()
 	const { studentId } = useContext(Ctx)
 	const { education, subjects, totals, schoolYear } = props
-	const headerWidth = 50
+	const headerWidth = 45
 	const termTotalWidth =
 		totals.result &&
 		totals.result[0] &&
@@ -382,7 +401,6 @@ type Mark = Partial<
 export function SubjectTotals({
 	route,
 }: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
-	const theme = useTheme()
 	const { termId, subjectId, finalMark } = route.params ?? {}
 	const { studentId, settings } = useContext(Ctx)
 	const {
@@ -431,14 +449,20 @@ export function SubjectTotals({
 	const weights = totals.results.map(e => e.weight)
 	const maxWeight = Math.max(...weights)
 	const minWeight = Math.min(...weights)
-	const textStyle: TextStyle = { fontSize: 15, color: theme.colors.text }
 
 	return (
 		<ScrollView>
-			<View style={styles.stretch}>
-				<Text style={{ ...textStyle, fontSize: 20, margin: 5 }}>
-					{totals.subject.name}
-				</Text>
+			<View flex row spread padding-s2 centerV>
+				<SubjectName
+					subjectName={totals.subject.name}
+					subjectId={totals.subject.id}
+					style={{
+						fontSize: 20,
+						fontWeight: 'bold',
+						color: Colors.$textDefault,
+					}}
+					margin-s1
+				/>
 				<Mark
 					finalMark={finalMark}
 					mark={totals.averageMark}
@@ -446,8 +470,8 @@ export function SubjectTotals({
 					textStyle={{ fontSize: 20 }}
 				/>
 			</View>
-			<View style={styles.stretch}>
-				<Text style={{ ...textStyle, flex: 1, flexDirection: 'row' }}>
+			<View flex row spread padding-s2 centerV>
+				<Text flex row>
 					Уроки без оценок
 				</Text>
 				<Switch
@@ -456,7 +480,7 @@ export function SubjectTotals({
 					value={lessonsWithoutMark}
 				/>
 			</View>
-			<View style={{ padding: 3 }}>
+			<View padding-s1 bg-$backgroundNeutralLight br50>
 				{totalsAndSheduledTotals.map((e, i) => (
 					<View key={e.assignmentId ?? i.toString()} style={styles.stretch}>
 						<Mark
@@ -485,28 +509,22 @@ export function SubjectTotals({
 								)
 							}}
 						/>
-						<Text style={textStyle}>{e.assignmentTypeName}</Text>
+						<Text>{e.assignmentTypeName}</Text>
 
-						<Text style={textStyle}>
-							{e.date && new Date(e.date).toLocaleDateString()}
-						</Text>
+						<Text>{e.date && new Date(e.date).toLocaleDateString()}</Text>
 					</View>
 				))}
-				<View style={styles.stretch}>
-					<Text style={textStyle}>
-						{DisplayName(totals.teachers[0].name, settings)}
-					</Text>
-					<Text style={textStyle}>
-						Прошло уроков {totals.classmeetingsStats.passed}/
-						{totals.classmeetingsStats.scheduled}
-					</Text>
-				</View>
-				<View style={styles.stretch}>
-					<Text style={textStyle}>
-						Средний бал класса {totals.classAverageMark}
-					</Text>
-					<Text style={textStyle}>{totalsUpdateDate}</Text>
-				</View>
+			</View>
+			<View flex row spread padding-s2>
+				<Text>{DisplayName(totals.teachers[0].name, settings)}</Text>
+				<Text>
+					Прошло уроков: {totals.classmeetingsStats.passed}/
+					{totals.classmeetingsStats.scheduled}
+				</Text>
+			</View>
+			<View flex row spread padding-s2>
+				<Text>Средний бал класса: {totals.classAverageMark}</Text>
+				<Text>{totalsUpdateDate}</Text>
 			</View>
 		</ScrollView>
 	)

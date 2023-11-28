@@ -1,6 +1,21 @@
-import { Falsy, Text, TextStyle } from 'react-native'
-import { styles } from '../constants'
+import { useContext } from 'react'
+import { Falsy, TextStyle } from 'react-native'
+import { Colors, Text } from 'react-native-ui-lib'
+import { Ctx } from '../hooks/settings'
 import { Button, ButtonProps } from './Button'
+
+const MarkColorsBG = {
+	5: '#007000',
+	4: '#947900',
+	3: '#8D4B00',
+	2: '#940000',
+}
+const MarkColorsText = {
+	5: '#00C500',
+	4: '#C7A200',
+	3: '#C06600',
+	2: '#C00000',
+}
 
 export function Mark({
 	finalMark,
@@ -17,17 +32,22 @@ export function Mark({
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 }) {
+	const { settings } = useContext(Ctx)
+	const bg = settings.markStyle === 'background'
+
+	const colors = bg ? MarkColorsBG : MarkColorsText
+
 	const mark = finalMark ? Number(finalMark) : markProp
 	let color: string = '#555555' + (markWeight ? '' : 'FF')
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
-			color = '#007000'
+			color = colors[5]
 		} else if (mark >= 3.6) {
-			color = '#947900'
+			color = colors[4]
 		} else if (mark >= 2.6) {
-			color = '#8D4B00'
+			color = colors[3]
 		} else if (mark >= 1.6) {
-			color = '#940000'
+			color = colors[2]
 		}
 	}
 
@@ -46,37 +66,39 @@ export function Mark({
 		}
 	}
 
+	const FinalMarkStyle: TextStyle = {
+		borderWidth: 3,
+		borderColor: color,
+		borderStyle: 'dotted',
+		borderCurve: 'circular',
+	}
+
+	const textColor = bg ? Colors.white : color
+
 	return (
 		<Button
 			{...props}
+			margin-s1
+			br20
+			center
 			style={[
-				{ padding: 7, margin: 3, borderRadius: 5, backgroundColor: color },
 				style,
-				finalMark
-					? {
-							borderWidth: 5,
-							borderColor: color,
-							borderStyle: 'dotted',
-							borderCurve: 'circular',
-					  }
-					: false,
+				bg
+					? { backgroundColor: color }
+					: { borderColor: color, borderWidth: 3 },
+				finalMark ? FinalMarkStyle : false,
 			]}
 		>
-			<Text
-				style={{
-					textAlign: 'center',
-					color: styles.buttonText.color,
-					...textStyle,
-				}}
-			>
+			<Text center text60 color={textColor} style={textStyle} margin-0>
 				{finalMark ?? markProp}
 			</Text>
 			{markWeight && (
 				<Text
+					center
+					margin-0
 					style={{
 						fontSize: 10,
-						textAlign: 'center',
-						color: styles.buttonText.color,
+						color: textColor,
 						...subTextStyle,
 					}}
 				>
@@ -85,10 +107,11 @@ export function Mark({
 			)}
 			{!!finalMark && (
 				<Text
+					margin-0
+					center
 					style={{
 						fontSize: 10,
-						textAlign: 'center',
-						color: styles.buttonText.color,
+						color: textColor,
 						...subTextStyle,
 					}}
 				>

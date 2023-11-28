@@ -1,15 +1,15 @@
-import { useTheme } from '@react-navigation/native'
 import * as Notifications from 'expo-notifications'
 import { useContext, useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { View } from 'react-native-ui-lib'
+import { Colors, ProgressBar, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { Assignment } from '../NetSchool/classes'
+import { Button } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
 import { Mark } from '../components/Mark'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 import { Text } from '../components/Text'
-import { LANG, LOGGER, SECONDARY_COLOR, styles } from '../constants'
+import { LANG, LOGGER, styles } from '../constants'
 import { useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
@@ -34,7 +34,7 @@ export function DiaryScreen() {
 	const homework = useAPI(
 		API,
 		'homework',
-		{ studentId, withExpiredClassAssign: true, withoutMarks: true },
+		{ studentId, withExpiredClassAssign: true, withoutMarks: false },
 		'дз'
 	)
 
@@ -100,21 +100,24 @@ export function DiaryScreen() {
 	weekAfter.setDate(weekAfter.getDate() + 7)
 
 	const values = [
-		{ name: 'Прошлая неделя', day: undefined, week: weekBefore },
+		{ name: 'Прошлая неделя', day: Date.week(weekBefore)[0], week: weekBefore },
 		...Date.week(weekDate).map((day, i) => {
+			const today = new Date().toYYYYMMDD() === day
 			return {
 				name: `${LANG.days[i]}${
-					new Date().toYYYYMMDD() === day
-						? ', cегодня'
-						: ' ' + new Date(day).toLocaleDateString([], { dateStyle: 'full' })
+					today ? ', cегодня' : ' ' + new Date(day).toLocaleDateString([])
 				}`,
 				day: day,
+				selected: day === diaryDay,
 			}
 		}),
-		{ name: 'Следующая неделя', day: undefined, week: weekAfter },
+		{
+			name: 'Следующая неделя',
+			day: Date.week(weekAfter)[0],
+			week: weekAfter,
+			selected: false,
+		},
 	]
-
-	const theme = useTheme()
 
 	return (
 		<ScrollView
@@ -124,142 +127,134 @@ export function DiaryScreen() {
 			}}
 		>
 			<Dropdown
-				buttonStyle={styles.dropdown}
-				dropdownStyle={{ minHeight: 350 }}
-				buttonTextStyle={styles.buttonText}
+				dropdownStyle={{ minHeight: 350, borderRadius: 10 }}
 				data={values}
 				defaultButtonText="День недели"
 				buttonTextAfterSelection={i => i.name}
 				renderCustomizedRowChild={i => (
-					<Text
-						{...(i.day === diaryDay && { grey1: true })}
-						style={{ textAlign: 'center' }}
-					>
+					<Text $textDisabled={i.selected} center>
 						{i.name}
 					</Text>
 				)}
 				defaultValue={values.find(e => e.day === diaryDay)}
 				onSelect={item => {
 					if ('week' in item) setWeekDate(item.week)
-					else setDiaryDay(item.day)
+					setDiaryDay(item.day)
 				}}
 			/>
-			<View padding-0 paddingB-10>
+			<View padding-s1>
 				{diary.fallback ||
-					diary.result.forDay(diaryDay).map(lesson => (
-						<View
-							key={lesson.id.toString()}
-							style={[
-								styles.button,
-								{
-									margin: 7,
-									alignItems: 'flex-start',
-								},
-							]}
-						>
+					diary.result.forDay(diaryDay).map(lesson => {
+						return (
 							<View
-								flex
-								row
-								spread
-								centerV
-								marginB-7
-								style={{
-									width: '100%',
-								}}
+								key={lesson.id.toString()}
+								style={[
+									styles.button,
+									{
+										margin: 7,
+										alignItems: 'flex-start',
+									},
+								]}
 							>
-								<SubjectName
-									style={[
-										styles.buttonText,
-										{
-											fontWeight: 'bold',
-											marginTop: 0,
-											fontSize: 18,
-										},
-									]}
-									subjectId={lesson.subjectId}
-									subjectName={lesson.subjectName}
-								/>
-
-								<Text
-									style={[
-										styles.buttonText,
-										{
-											fontWeight: 'bold',
-											fontSize: 18,
-											marginTop: 0,
-											margin: 7,
-										},
-									]}
-								>
-									{lesson.roomName ?? 'Нет кабинета'}
-								</Text>
-							</View>
-							<Text style={styles.buttonText}>
-								{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
-							</Text>
-							{lesson.lessonTheme && (
-								<Text style={styles.buttonText}>
-									Тема урока: {lesson.lessonTheme + '\n'}
-								</Text>
-							)}
-							{homework.fallback || (
-								<Homework
-									homework={homework.result}
-									classmetingId={lesson.classmetingId}
-								/>
-							)}
-							{diary.result.isNow(lesson) && (
 								<View
+									flex
+									row
+									spread
+									centerV
+									marginB-7
 									style={{
-										backgroundColor: theme.colors.background,
-										borderRadius: 5,
-										padding: 0,
+										width: '100%',
 									}}
 								>
-									<View
-										style={{
-											backgroundColor: SECONDARY_COLOR,
-											width: `${~~(
-												(lesson.end.getDate() - lesson.start.getDate()) /
-												(lesson.end.getDate() - Date.now())
-											)}%`,
-											padding: 0,
-										}}
-									></View>
+									<SubjectName
+										style={[
+											styles.buttonText,
+											{
+												fontWeight: 'bold',
+												marginTop: 0,
+												fontSize: 18,
+											},
+										]}
+										subjectId={lesson.subjectId}
+										subjectName={lesson.subjectName}
+									/>
+
+									<Text
+										style={[
+											styles.buttonText,
+											{
+												fontWeight: 'bold',
+												fontSize: 18,
+												marginTop: 0,
+												margin: 7,
+											},
+										]}
+									>
+										{lesson.roomName ?? 'Нет кабинета'}
+									</Text>
 								</View>
-							)}
-						</View>
-					))}
+								<Text style={[styles.buttonText, { fontSize: 17 }]}>
+									{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
+								</Text>
+								{homework.fallback ||
+									homework.result
+										.filter(e => e.classmeetingId === lesson.classmetingId)
+										.map(e => <Homework homework={e} key={e.assignmentId} />)}
+								{lesson.lessonTheme && (
+									<Text style={styles.buttonText}>
+										Тема урока: {lesson.lessonTheme + '\n'}
+									</Text>
+								)}
+
+								{diary.result.isNow(lesson) && (
+									<ProgressBar
+										style={{ width: '100%', height: 20 }}
+										progress={100 - ~~(((lesson.end.getTime() - Date.now()) * 100) /
+										(lesson.end.getTime() - lesson.start.getTime()))}
+										progressColor={Colors.$backgroundNeutralIdle}
+									/>
+								)}
+							</View>
+						)
+					})}
 			</View>
 		</ScrollView>
 	)
 }
 
-function Homework(props: { homework: Assignment[]; classmetingId: number }) {
-	const assignment = props.homework.find(
-		e => e.classmeetingId === props.classmetingId
-	)
-
-	if (!assignment) return false
-
+function Homework(props: { homework: Assignment }) {
+	const assignment = props.homework
+	const [showHw, setShowHw] = useState(false)
 	return (
-		<View style={styles.stretch}>
-			{assignment.description && (
-				<Text style={styles.buttonText}>Дз: {assignment.description}</Text>
-			)}
+		<View flex row spread margin-0 padding-0 centerV>
 			{assignment.assignmentTypeName && (
-				<Text style={styles.buttonText}>
-					Тип оценки: {assignment.assignmentTypeName}
+				<Button
+					onPress={() => setShowHw(!showHw)}
+					style={{
+						borderColor: Colors.$backgroundDefault,
+						borderWidth: 3,
+						width: 30,
+						height: 30,
+					}}
+					centerH
+					centerV
+					br20
+				>
+					<Text style={styles.buttonText} margin-0>
+						{assignment.assignmentTypeAbbr}
+					</Text>
+				</Button>
+			)}
+			{showHw && (
+				<Text style={styles.buttonText} margin-s1>
+					{assignment.assignmentName}
 				</Text>
 			)}
 			{assignment.result && (
 				<Mark
 					mark={assignment.result}
-					markWeight={{
-						max: assignment.weight,
-						min: assignment.weight,
-						current: assignment.weight,
-					}}
+					style={{ width: 30, height: 30, padding: 0 }}
+					textStyle={{ fontSize: 15 }}
 				/>
 			)}
 		</View>
