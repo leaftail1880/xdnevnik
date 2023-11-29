@@ -1,7 +1,7 @@
 import { useTheme } from '@react-navigation/native'
 import * as Application from 'expo-application'
 import { useContext } from 'react'
-import { ScrollView, Switch, View } from 'react-native'
+import { ScrollView, Switch } from 'react-native'
 import { API } from '../NetSchool/api'
 import { Dropdown } from '../components/Dropdown'
 import { Loading } from '../components/Loading'
@@ -16,6 +16,7 @@ import {
 } from '../constants'
 import { Ctx, SettingsCtx } from '../hooks/settings'
 import { UpdatesButton } from './update'
+import { View } from 'react-native-ui-lib'
 
 export function SettingsScreen() {
 	const { settings, students } = useContext(Ctx)
@@ -26,7 +27,7 @@ export function SettingsScreen() {
 		{ name: 'Светлая', i: 'light' as const },
 		{ name: 'Своя', i: 'light' as const },
 	]
-	const textStyle = { fontSize: 15, color: theme.colors.text }
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -57,8 +58,8 @@ export function SettingsScreen() {
 			) : (
 				<Loading text="Ожидание авторизации{dots}"></Loading>
 			)}
-			<View style={[styles.settingBase, styles.stretch]}>
-				<Text style={{ margin: 10 }}>{LANG['notification']}</Text>
+			<View padding-s3 flex row spread>
+				<Text margin-s3>{LANG['notification']}</Text>
 				<Switch
 					trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
 					thumbColor={settings.notifications ? ACCENT_COLOR : BUTTON_TEXT_COLOR}
@@ -73,7 +74,7 @@ export function SettingsScreen() {
 					styles.stretch,
 					{ padding: 0, width: '100%', backgroundColor: INVISIBLE_COLOR },
 				]}
-				buttonTextStyle={textStyle}
+				buttonTextStyle={{ fontSize: 15, color: theme.colors.text }}
 				defaultValueByIndex={themes.findIndex(e => e.i === settings.theme)}
 				onSelect={s => settings.save({ theme: s.i })}
 				renderCustomizedButtonChild={i => (
@@ -85,7 +86,7 @@ export function SettingsScreen() {
 				rowTextForSelection={i => i.name}
 			/>
 			<UpdatesButton />
-			<View style={[styles.settingBase, { padding: 20 }]}>
+			<View padding-s3>
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>

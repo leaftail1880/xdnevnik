@@ -1,12 +1,17 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
-import { Alert, ScrollView } from 'react-native'
+import { Alert, ScrollView, StyleProp, ViewStyle } from 'react-native'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useTheme } from '@react-navigation/native'
 import { memo, useContext, useEffect, useState } from 'react'
 import { Switch } from 'react-native-gesture-handler'
-import { Colors, View } from 'react-native-ui-lib'
+import {
+	Colors,
+	TextField,
+	TouchableOpacityProps,
+	View,
+} from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import {
 	Education,
@@ -15,7 +20,9 @@ import {
 	SubjectPerformance,
 	Total,
 } from '../NetSchool/classes'
+import { Button } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
+import { Ionicon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Mark } from '../components/Mark'
 import { Text } from '../components/Text'
@@ -158,7 +165,7 @@ export function TotalsScreenTerm({
 							settings.save({ selectedTerm: v.id })
 							setSelectedTerm(v)
 						}}
-						dropdownStyle={{  maxWidth: 110 }}
+						dropdownStyle={{ maxWidth: 110 }}
 						defaultButtonText={selectedTerm?.name ?? 'Выбери четверть'}
 						buttonTextAfterSelection={i => i?.name ?? 'F'}
 						rowTextForSelection={i => i?.name ?? 'F'}
@@ -242,66 +249,72 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 		</View>
 	)
 }
-const SubjectMarksInline = memo(function SubjectMarksInline(
-	props: SubjectInfo & {
-		term: Total['termTotals'][number]
-	}
-) {
-	const { studentId, settings } = useContext(Ctx)
+const SubjectMarksInline = memo(
+	function SubjectMarksInline(
+		props: SubjectInfo & {
+			term: Total['termTotals'][number]
+		}
+	) {
+		const { studentId, settings } = useContext(Ctx)
 
-	const assignments = useAPI(
-		API,
-		'subjectPerformance',
-		{
-			studentId: studentId!,
-			subjectId: props.total.subjectId,
-			termId: props.selectedTerm.id,
-		},
-		getSubjectName({
-			subjects: props.subjects,
-			subjectId: props.total.subjectId,
-			settings,
-		})
-	)
+		const assignments = useAPI(
+			API,
+			'subjectPerformance',
+			{
+				studentId: studentId!,
+				subjectId: props.total.subjectId,
+				termId: props.selectedTerm.id,
+			},
+			getSubjectName({
+				subjects: props.subjects,
+				subjectId: props.total.subjectId,
+				settings,
+			})
+		)
 
-	if (assignments.fallback) return assignments.fallback
+		if (assignments.fallback) return assignments.fallback
 
-	const weights = assignments.result.results.map(e => e.weight)
-	const maxWeight = Math.max(...weights)
-	const minWeight = Math.min(...weights)
+		const weights = assignments.result.results.map(e => e.weight)
+		const maxWeight = Math.max(...weights)
+		const minWeight = Math.min(...weights)
 
-	return (
-		<ScrollView
-			horizontal
-			style={{
-				maxHeight: 100,
-				margin: 0,
-				minWidth: 100,
-			}}
-		>
-			{assignments.result.results.map(e => (
-				<Mark
-					mark={e.result ?? 'Нет'}
-					markWeight={{
-						max: maxWeight,
-						min: minWeight,
-						current: e.weight,
-					}}
-					style={{ height: 50, width: 50 }}
-					key={e.assignmentId}
-					onPress={() =>
-						props.navigation.navigate(LANG['s_subject_totals'], {
-							termId: props.selectedTerm.id,
-							finalMark: props.term?.mark,
-							studentId: studentId!,
-							subjectId: props.total.subjectId,
-						})
-					}
-				/>
-			))}
-		</ScrollView>
-	)
-})
+		return (
+			<ScrollView
+				horizontal
+				style={{
+					maxHeight: 100,
+					margin: 0,
+					minWidth: 100,
+				}}
+			>
+				{assignments.result.results.map(e => (
+					<Mark
+						mark={e.result ?? 'Нет'}
+						markWeight={{
+							max: maxWeight,
+							min: minWeight,
+							current: e.weight,
+						}}
+						style={{ height: 50, width: 50 }}
+						key={e.assignmentId}
+						onPress={() =>
+							props.navigation.navigate(LANG['s_subject_totals'], {
+								termId: props.selectedTerm.id,
+								finalMark: props.term?.mark,
+								studentId: studentId!,
+								subjectId: props.total.subjectId,
+							})
+						}
+					/>
+				))}
+			</ScrollView>
+		)
+	},
+	(prev, curr) =>
+		prev.term.term.id === curr.term.term.id &&
+		prev.subjects.length === curr.subjects.length &&
+		prev.total.subjectId === curr.total.subjectId
+)
 
 export function TotalsScreenTable(props: TotalsContext) {
 	const theme = useTheme()
@@ -414,6 +427,7 @@ export function SubjectTotals({
 		'итогов по предмету'
 	)
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
+	const [customMarks, setCustomMarks] = useState<Partial<Mark>[]>([])
 
 	if (FallbackTotals) return FallbackTotals
 
@@ -446,6 +460,22 @@ export function SubjectTotals({
 			).fill({})
 		)
 	}
+
+	let avgMark = totals.averageMark
+
+	if (customMarks.length) {
+		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
+		let totalWeight = 0
+		let totalMark = 0
+
+		for (const mark of totals.results) {
+			totalWeight += mark.weight
+			totalMark += mark.weight * mark.result
+		}
+
+		avgMark = Number((totalMark / totalWeight).toFixed(2))
+	}
+
 	const weights = totals.results.map(e => e.weight)
 	const maxWeight = Math.max(...weights)
 	const minWeight = Math.min(...weights)
@@ -465,7 +495,7 @@ export function SubjectTotals({
 				/>
 				<Mark
 					finalMark={finalMark}
-					mark={totals.averageMark}
+					mark={avgMark}
 					style={{ height: 50, width: 60 }}
 					textStyle={{ fontSize: 20 }}
 				/>
@@ -482,7 +512,7 @@ export function SubjectTotals({
 			</View>
 			<View padding-s1 bg-$backgroundNeutralLight br50>
 				{totalsAndSheduledTotals.map((e, i) => (
-					<View key={e.assignmentId ?? i.toString()} style={styles.stretch}>
+					<View key={e.assignmentId ?? i.toString()} flex row spread padding-s2>
 						<Mark
 							mark={e.result ?? null}
 							markWeight={
@@ -515,6 +545,7 @@ export function SubjectTotals({
 					</View>
 				))}
 			</View>
+			<AddMarkForm setCustomMarks={setCustomMarks} customMarks={customMarks} />
 			<View flex row spread padding-s2>
 				<Text>{DisplayName(totals.teachers[0].name, settings)}</Text>
 				<Text>
@@ -529,3 +560,84 @@ export function SubjectTotals({
 		</ScrollView>
 	)
 }
+function AddMarkForm(props: {
+	setCustomMarks: (p: Partial<Mark>[]) => void
+	customMarks: Partial<Mark>[]
+}) {
+	const [weight, setWeight] = useState('')
+	const [mark, setMark] = useState('')
+	const [addingCustomMark, setAddingCustomMark] = useState(false)
+	const styl: StyleProp<ViewStyle | TouchableOpacityProps> = {
+		backgroundColor: ACCENT_COLOR,
+		alignItems: 'center',
+		borderRadius: 5,
+		elevation: 3,
+	}
+	return (
+		<View padding-s2>
+			<View flex row centerV padding-s2>
+				<Button
+					onPress={() => {
+						if (addingCustomMark) {
+							// Saving
+							props.setCustomMarks(
+								props.customMarks.concat({
+									result: Number(mark),
+									weight: Number(weight),
+									comment: 'Кастомная',
+									assignmentTypeName: 'ВОЗМОЖНАЯ',
+								})
+							)
+						}
+						setAddingCustomMark(!addingCustomMark)
+					}}
+					style={styl}
+				>
+					<View flex row spread centerV>
+						<Ionicon name={addingCustomMark ? 'save-sharp' : 'add'} size={18} />
+						<Text marginR-s1>
+							{addingCustomMark ? 'Сохранить' : 'Добавить оценку'}
+						</Text>
+					</View>
+				</Button>
+				{addingCustomMark && (
+					<Button
+						margin-s2
+						style={styl}
+						onPress={() => {
+							setAddingCustomMark(false)
+						}}
+					>
+						<Ionicon name="arrow-undo" size={16} />
+					</Button>
+				)}
+				{!addingCustomMark && !!props.customMarks.length && (
+					<Button
+						margin-s2
+						style={styl}
+						onPress={() => {
+							props.setCustomMarks([])
+						}}
+					>
+						<Ionicon name="trash" size={18} />
+					</Button>
+				)}
+			</View>
+			{addingCustomMark && (
+				<View padding-s4>
+					<TextField
+						placeholder="Оценка"
+						keyboardType="numeric"
+						onTextInput={e => setMark(e.nativeEvent.text)}
+					/>
+					<TextField
+						placeholder="Вес"
+						keyboardType="numeric"
+						onTextInput={e => setWeight(e.nativeEvent.text)}
+					/>
+				</View>
+			)}
+		</View>
+	)
+}
+

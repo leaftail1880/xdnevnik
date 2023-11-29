@@ -26,7 +26,7 @@ export function LogoutScreen() {
 			>
 				<Text style={styles.buttonText}>{LANG['log_out']}</Text>
 			</Button>
-			<Text style={{ maxWidth: 300, textAlign: 'center' }}>
+			<Text center style={{ maxWidth: 300 }}>
 				{LANG['log_out_info']}
 			</Text>
 		</View>
