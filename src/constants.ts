@@ -1,5 +1,15 @@
-import { StyleSheet } from 'react-native'
+import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import { logger, mapConsoleTransport } from 'react-native-logs'
+import {
+	Colors,
+	ContainerModifiers,
+	Spacings,
+	TextFieldProps,
+	TextProps,
+	ThemeManager,
+} from 'react-native-ui-lib'
+import { dropdownStyle } from './components/Dropdown'
+import { SettingsCtx } from './hooks/settings'
 
 type LogLevel = (...args: unknown[]) => void
 export const LOGGER = logger.createLogger({
@@ -20,58 +30,37 @@ export type Status =
 	| undefined
 
 export const ACCENT_COLOR = '#4d914f'
-export const RED_ACCENT_COLOR = '#f88'
-export const SECONDARY_COLOR = '#888888'
-export const BUTTON_TEXT_COLOR = '#fff'
-export const NOTIFICATION_COLOR = '#8888ff'
-export const INVISIBLE_COLOR = '#fff0'
+
+ThemeManager.setComponentTheme('Text', (props: TextProps) => {
+	return {
+		$textPrimary: true,
+		...props,
+		style: [{ fontSize: 16 }, props.style],
+	} satisfies TextProps
+})
+
+ThemeManager.setComponentTheme('TextField', (props: TextFieldProps) => {
+	return {
+		placeholderTextColor: Colors.rgba(Colors.$backgroundPrimaryHeavy, 0.6),
+		style: [
+			{
+				borderBottomWidth: 3,
+
+				borderBottomColor: Colors.$backgroundPrimaryHeavy,
+			},
+			props.style,
+		],
+	} satisfies TextFieldProps
+})
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	dropdown: {
-		alignSelf: 'stretch',
-		backgroundColor: SECONDARY_COLOR,
-		width: '100%',
-		borderBottomLeftRadius: 5,
-		borderBottomRightRadius: 5,
-	},
 	stretch: {
 		padding: 10,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		alignContent: 'stretch',
-	},
-	textField: {
-		margin: 15,
-		padding: 15,
-		borderColor: ACCENT_COLOR,
-		borderWidth: 3,
-		borderRadius: 5,
-		minWidth: 250,
-	},
-	pressedButton: {
-		backgroundColor: SECONDARY_COLOR,
-	},
-	button: {
-		margin: 15,
-		padding: 15,
-		backgroundColor: ACCENT_COLOR,
-		alignItems: 'center',
-		borderRadius: 5,
-		minWidth: 250,
-		elevation: 3,
-	},
-	buttonText: {
-		color: BUTTON_TEXT_COLOR,
-	},
-	settingBase: {
-		padding: 7,
 	},
 	table: {
 		margin: 0,
@@ -168,6 +157,29 @@ Date.week = date =>
 			new Date(date.getTime() - (date.getDayMon() - i) * dayInMs).toYYYYMMDD()
 		) as ReturnType<typeof Date.week>
 
+export function settingsButton(): {
+	style: StyleProp<ViewStyle>
+} & ContainerModifiers {
+	return {
+		row: true,
+		spread: true,
+		style: [
+			dropdownStyle(),
+			{
+				margin: 0,
+				padding: Spacings.s3,
+				marginBottom: Spacings.s2,
+				minHeight: 40,
+			},
+		],
+	}
+}
 
+export function fullname(name: string, settings: SettingsCtx) {
+	if (settings.lastNameLast) {
+		const parts = name.split(' ')
+		return [parts[1], parts[2], parts[0]].join(' ')
+	} else return name
+}
 
-
+//

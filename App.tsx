@@ -4,6 +4,7 @@ import {
 	createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
 import {
+	DarkTheme,
 	NavigationContainer,
 	NavigationContainerRef,
 	Theme,
@@ -11,21 +12,14 @@ import {
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
 import { TouchableOpacity, View, useColorScheme } from 'react-native'
-import { Colors, Scheme } from 'react-native-ui-lib'
+import { Colors, Scheme, Text } from 'react-native-ui-lib'
 import { API, NetSchoolApi } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
 import { ROUTES } from './src/NetSchool/routes'
 import { Button } from './src/components/Button'
 import { Ionicon } from './src/components/Icon'
 import { Loading } from './src/components/Loading'
-import { Text } from './src/components/Text'
-import {
-	ACCENT_COLOR,
-	LANG,
-	RED_ACCENT_COLOR,
-	Status,
-	styles,
-} from './src/constants'
+import { LANG, Status, styles } from './src/constants'
 import { useAPI } from './src/hooks/api'
 import { Ctx, useSetupSettings } from './src/hooks/settings'
 import { setupNotifications } from './src/notifications'
@@ -35,7 +29,6 @@ import { LogoutScreen } from './src/screen/logout'
 import { SettingsScreen } from './src/screen/settings'
 import { TotalsNavigation } from './src/screen/totals'
 
-Colors.loadDesignTokens({ primaryColor: ACCENT_COLOR })
 type ParamListBase = Record<
 	(typeof LANG)[
 		| 's_log_in'
@@ -67,27 +60,45 @@ export default function App() {
 		[settings.notifications]
 	)
 
+	const [, rerender] = useState(0)
+
+	useEffect(() => {
+		Colors.loadDesignTokens({ primaryColor: settings.accentColor })
+
+		Colors.loadSchemes({
+			light: {
+				$textAccent: '#FFFFFF',
+				$backgroundAccent: settings.accentColor,
+			},
+			dark: {
+				$textAccent: '#FFFFFF',
+				$backgroundAccent: settings.accentColor,
+			},
+		})
+
+		rerender(s => s + 1)
+	}, [settings.accentColor])
+
 	const systemScheme = useColorScheme() ?? 'light'
-	const scheme: 'dark' | 'light' =
-		settings.theme === 'system' ? systemScheme : settings.theme
+	const scheme = settings.theme === 'system' ? systemScheme : settings.theme
 
-	const oldScheme = useRef(scheme)
-	if (oldScheme.current !== scheme) {
+	useEffect(() => {
 		Scheme.setScheme(scheme)
-		oldScheme.current = scheme
-	}
+		rerender(s => s + 1)
+	}, [scheme])
 
-	const theme: Theme = {
-		dark: scheme === 'dark',
-		colors: {
-			background: Colors.$backgroundDefault,
-			border: Colors.$backgroundElevated,
-			card: Colors.$backgroundPrimaryLight,
-			notification: ACCENT_COLOR,
-			primary: ACCENT_COLOR,
-			text: Colors.$textDefault,
-		},
-	}
+	// Same object across renders to prevent flickering
+	const [theme] = useState<Theme>(DarkTheme)
+
+	theme.dark = scheme === 'dark'
+	Object.assign(theme.colors, {
+		background: Colors.$backgroundDefault,
+		border: Colors.$backgroundElevated,
+		card: Colors.$backgroundPrimaryLight,
+		notification: Colors.$iconPrimary,
+		primary: Colors.$iconPrimary,
+		text: Colors.$textDefault,
+	})
 
 	const [status, setStatus] = useState<Status>()
 	const sended = useRef<boolean>()
@@ -138,7 +149,10 @@ export default function App() {
 			}}
 		>
 			<NavigationContainer theme={theme} ref={navigation}>
-				<StatusBar translucent={true} style={scheme} />
+				<StatusBar
+					translucent={true}
+					style={scheme === 'dark' ? 'light' : 'dark'}
+				/>
 				<Tab.Navigator
 					tabBar={props => (
 						<View>
@@ -168,7 +182,7 @@ export default function App() {
 							if (focused) iconName += '-outline'
 							return <Ionicon name={iconName} size={size} color={color} />
 						},
-						tabBarActiveTintColor: ACCENT_COLOR,
+						tabBarActiveTintColor: Colors.$iconPrimary,
 						tabBarInactiveTintColor: Colors.$iconDefault,
 						tabBarButton: props => <TouchableOpacity {...props} />,
 						tabBarHideOnKeyboard: true,
@@ -219,7 +233,9 @@ function StatusBadge({
 				{
 					elevation: 3,
 					minHeight: 30,
-					backgroundColor: status.error ? RED_ACCENT_COLOR : theme.colors.card,
+					backgroundColor: status.error
+						? Colors.$backgroundDangerHeavy
+						: theme.colors.card,
 				},
 			]}
 		>

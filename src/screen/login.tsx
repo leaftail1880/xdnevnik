@@ -1,25 +1,33 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useContext, useEffect, useState } from 'react'
-import { Alert, ScrollView, Text, View } from 'react-native'
-import 'react-native-gesture-handler'
+import { Alert, ScrollView } from 'react-native'
+import { Text, View } from 'react-native-ui-lib'
 import { URL } from 'react-native-url-polyfill'
 import WebView from 'react-native-webview'
 import { API, NetSchoolApi } from '../NetSchool/api'
 import { ROUTES } from '../NetSchool/routes'
 import { Button } from '../components/Button'
 import { Loading } from '../components/Loading'
-import { LOGGER, styles } from '../constants'
+import { LOGGER } from '../constants'
 import { useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
 export function LoginScreen() {
 	const [loggingIn, setLoggingIn] = useState(false)
+	const [loading, setLoading] = useState<undefined | 'loaded'>(undefined)
+	useEffect(() => {
+		setTimeout(() => setLoading('loaded'), 1000)
+	}, [])
+
 	const { result: endpoints, fallback: EndpointsFallback } = useAPI(
 		NetSchoolApi,
 		'fetchEndpoints',
 		undefined,
 		'списка регионов',
-		[]
+
+		// It will not do request to region list on each app
+		// startup for the first second while app is loading
+		[loading]
 	)
 	const [regionName, setRegionName] = useState('')
 	const ctx = useContext(Ctx)
@@ -42,14 +50,17 @@ export function LoginScreen() {
 
 	if (!regionName)
 		return (
-			<View style={styles.container}>
+			<View flex center>
 				<ScrollView style={{ margin: 0, padding: 0, minWidth: 350 }}>
 					{endpoints.map((endpoint, index) => (
 						<Button
+							margin-s2
+							padding-s3
+							br20
+							bg-$backgroundAccent
 							style={{
-								...styles.button,
-								margin: 5,
-								padding: 15,
+								elevation: 3,
+								minWidth: 250,
 							}}
 							key={index.toString()}
 							onPress={() => {
@@ -58,7 +69,9 @@ export function LoginScreen() {
 								AsyncStorage.setItem('endpoint', endpoint.url)
 							}}
 						>
-							<Text style={styles.buttonText}>{endpoint.name}</Text>
+							<Text $textAccent center>
+								{endpoint.name}
+							</Text>
 						</Button>
 					))}
 				</ScrollView>
@@ -79,7 +92,7 @@ export function LoginScreen() {
 							setLoggingIn(true)
 							try {
 								await API.getToken(ROUTES.getTokenTemplate(pincode))
-								
+
 								ctx.setStatus({
 									content: 'Успешная авторизация!',
 									error: false,

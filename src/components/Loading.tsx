@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View } from 'react-native'
-import { Text } from './Text'
+import { Text, TextProps } from 'react-native-ui-lib'
 
 interface LoadingProps {
 	/**
@@ -9,7 +8,7 @@ interface LoadingProps {
 	text?: string
 }
 
-export function Loading(props: LoadingProps) {
+export function Loading(props: LoadingProps & TextProps) {
 	const [dots, setDots] = useState<string>('.')
 	useEffect(() => {
 		const timeout = setTimeout(
@@ -20,10 +19,8 @@ export function Loading(props: LoadingProps) {
 	}, [dots])
 
 	return (
-		<View>
-			<Text margin-20 style={{ alignSelf: 'center' }}>
-				{(props.text || 'Загрузка{dots}').replace(/\{dots\}/g, dots)}
-			</Text>
-		</View>
+		<Text margin-s2 center {...props}>
+			{(props.text || 'Загрузка{dots}').replace(/\{dots\}/g, dots)}
+		</Text>
 	)
 }

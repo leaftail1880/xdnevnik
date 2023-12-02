@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { Falsy, TextStyle } from 'react-native'
-import { Colors, Text } from 'react-native-ui-lib'
+import { BorderRadiuses, Colors, Spacings, Text } from 'react-native-ui-lib'
 import { Ctx } from '../hooks/settings'
-import { Button, ButtonProps } from './Button'
+import { ButtonProps, SmallButton } from './Button'
 
 const MarkColorsBG = {
 	5: '#007000',
@@ -67,7 +67,7 @@ export function Mark({
 	}
 
 	const FinalMarkStyle: TextStyle = {
-		borderWidth: 3,
+		borderWidth: 2,
 		borderColor: color,
 		borderStyle: 'dotted',
 		borderCurve: 'circular',
@@ -76,16 +76,20 @@ export function Mark({
 	const textColor = bg ? Colors.white : color
 
 	return (
-		<Button
-			{...props}
-			margin-s1
-			br20
+		<SmallButton
 			center
+			{...props}
 			style={[
 				style,
+				{
+					elevation: 0,
+					alignContent: 'center',
+					borderRadius: BorderRadiuses.br30,
+					margin: Spacings.s1,
+				},
 				bg
 					? { backgroundColor: color }
-					: { borderColor: color, borderWidth: 3 },
+					: { borderColor: color, borderWidth: 2 },
 				finalMark ? FinalMarkStyle : false,
 			]}
 		>
@@ -118,6 +122,6 @@ export function Mark({
 					{markProp}
 				</Text>
 			)}
-		</Button>
+		</SmallButton>
 	)
 }

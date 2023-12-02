@@ -1,7 +1,8 @@
 import * as Device from 'expo-device'
 import * as Notifications from 'expo-notifications'
 import { Alert, Platform } from 'react-native'
-import { LOGGER, NOTIFICATION_COLOR } from './constants'
+import { Colors } from 'react-native-ui-lib'
+import { LOGGER } from './constants'
 
 export function setupNotifications(enabled: boolean) {
 	;(async function setupNotifications() {
@@ -10,7 +11,7 @@ export function setupNotifications(enabled: boolean) {
 				name: 'Уроки',
 				importance: Notifications.AndroidImportance.MAX,
 				vibrationPattern: [0, 250, 250, 250],
-				lightColor: NOTIFICATION_COLOR,
+				lightColor: Colors.$iconPrimary,
 			})
 
 		if (!enabled) return

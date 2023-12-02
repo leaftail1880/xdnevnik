@@ -4,16 +4,19 @@ import { Student } from '../NetSchool/classes'
 import { Loading } from '../components/Loading'
 import { APIState } from './api'
 import { Theme } from '@react-navigation/native'
+import { RefreshControl } from 'react-native-gesture-handler'
+import { ACCENT_COLOR } from '../constants'
 
 interface Settings {
 	notifications: boolean
 	studentIndex: number
 	theme: 'system' | 'dark' | 'light'
-	themeColors?: Theme["colors"]
+	themeColors?: Theme['colors']
 	lastNameLast: boolean
 	currentTotalsOnly: boolean
 	selectedTerm?: number
-	markStyle: 'background'|'border',
+	markStyle: 'background' | 'border'
+	accentColor: string
 	overrides: {
 		/**
 		 * Map containing subjectIds as keys and overrided subjectName as value
@@ -33,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	theme: 'system',
 	lastNameLast: true,
 	markStyle: 'border',
+	accentColor: ACCENT_COLOR,
 	currentTotalsOnly: true,
 	overrides: {
 		subjectNames: {},
@@ -88,6 +92,8 @@ export const Ctx = createContext<{
 		result: undefined,
 		updateDate: undefined,
 		fallback: <Loading key={Date.now()} />,
+		reload: () => void 0,
+		refreshControl: <RefreshControl refreshing={true} />,
 	},
 	settings: {
 		...DEFAULT_SETTINGS,

@@ -1,13 +1,11 @@
 import { useContext, useState } from 'react'
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
-import { Spacings, TextField, TextProps } from 'react-native-ui-lib'
+import { StyleProp, ViewStyle } from 'react-native'
+import { Colors, Text, TextField, TextProps } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Subject } from '../NetSchool/classes'
 import { styles } from '../constants'
 import { Ctx, SettingsCtx } from '../hooks/settings'
-import { Button } from './Button'
-import { Ionicon } from './Icon'
-import { Text } from './Text'
+import { IconButton } from './Button'
 
 type SubjectNameOptions = {
 	subjectId: number
@@ -37,6 +35,7 @@ export function getSubjectName(props: GetSubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
+	iconsSize: number
 } & SubjectNameOptions &
 	Omit<TextProps, 'textAlign'>
 
@@ -54,13 +53,23 @@ export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
 			) : (
 				<TextField
 					{...props}
+					style={[
+						props.style,
+						{
+							backgroundColor: Colors.rgba(Colors.grey10, 0.1),
+						},
+					]}
 					defaultValue={name}
 					onChangeText={setNewName}
 					placeholder="Тот же, что и в сетевом городе"
 				/>
 			)}
-			<Button
+			<IconButton
 				padding-0
+				marginL-s2
+				icon={isEditing ? 'save-sharp' : 'pencil'}
+				style={props.style}
+				size={props.iconsSize}
 				onPress={() => {
 					if (isEditing) {
 						settings.save({
@@ -73,31 +82,19 @@ export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
 					}
 					setIsEditing(!isEditing)
 				}}
-			>
-				<IconA name={isEditing ? 'save-sharp' : 'pencil'} style={props.style} />
-			</Button>
+			/>
 			{isEditing && (
-				<Button
+				<IconButton
+					marginL-s2
 					onPress={() => {
 						setNewName('')
 						setIsEditing(false)
 					}}
-				>
-					<IconA name="arrow-undo" style={props.style} />
-				</Button>
+					icon="arrow-undo"
+					size={props.iconsSize}
+					style={props.style}
+				/>
 			)}
 		</View>
 	)
-
-	function IconA(props: { name: string; style: StyleProp<TextStyle> }) {
-		return (
-			<Ionicon
-				name={props.name}
-				style={[
-					{ paddingLeft: Spacings.s2, margin: 0, padding: 0 },
-					props.style,
-				]}
-			/>
-		)
-	}
 }

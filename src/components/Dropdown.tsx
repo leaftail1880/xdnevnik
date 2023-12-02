@@ -200,29 +200,18 @@ import {
 	SelectDropdownProps2 as Props,
 } from 'react-native-select-dropdown'
 import { BorderRadiuses, Colors } from 'react-native-ui-lib'
-import { SECONDARY_COLOR } from '../constants'
 
 export function Dropdown<Item = object>(props: Props<Item>) {
 	return (
 		<LibDropdown
 			{...props}
 			dropdownStyle={[
+				{
+					borderRadius: BorderRadiuses.br50,
+				},
 				props.dropdownStyle,
-				{
-					backgroundColor: SECONDARY_COLOR,
-					borderRadius: 10,
-				},
 			]}
-			buttonStyle={[
-				{
-					alignSelf: 'center',
-					width: '100%',
-					backgroundColor: Colors.$backgroundPrimaryMedium,
-					borderBottomLeftRadius: BorderRadiuses.br50,
-					borderBottomRightRadius: BorderRadiuses.br50,
-				},
-				props.buttonStyle,
-			]}
+			buttonStyle={[dropdownStyle(), props.buttonStyle]}
 			buttonTextStyle={[{ color: Colors.$textPrimary }, props.buttonTextStyle]}
 			rowStyle={[
 				{ backgroundColor: Colors.$backgroundPrimaryMedium, borderRadius: 5 },
@@ -232,3 +221,15 @@ export function Dropdown<Item = object>(props: Props<Item>) {
 		/>
 	)
 }
+
+export function dropdownStyle(): StyleProp<ViewStyle> {
+	return {
+		elevation: 10,
+		alignSelf: 'center',
+		width: '100%',
+		backgroundColor: Colors.$backgroundPrimaryMedium,
+		borderBottomLeftRadius: BorderRadiuses.br50,
+		borderBottomRightRadius: BorderRadiuses.br50,
+	}
+}
+

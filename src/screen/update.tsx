@@ -6,10 +6,10 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 import * as ExpoSharing from 'expo-sharing'
 import { useState } from 'react'
 import { Alert } from 'react-native'
+import { Colors, Text } from 'react-native-ui-lib'
 import { getLatestGithubReleaseUrl } from '../GithubUpdate/update'
 import { Button } from '../components/Button'
-import { Text } from '../components/Text'
-import { LOGGER, styles } from '../constants'
+import { LOGGER, settingsButton } from '../constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {
@@ -77,7 +77,7 @@ export function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button
-			style={[styles.settingBase, styles.stretch, { padding: 20, margin: 0 }]}
+			{...settingsButton()}
 			onPress={async () => {
 				try {
 					setProgress('Получение списка версий...')
@@ -114,8 +114,9 @@ export function UpdatesButton() {
 				}
 			}}
 		>
-			<Text>Проверить обновления</Text>
-			{progress && <Text>{progress}</Text>}
+			<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
+				{progress ?? 'Проверить обновления'}
+			</Text>
 		</Button>
 	)
 }

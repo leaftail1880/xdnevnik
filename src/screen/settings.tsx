@@ -1,26 +1,23 @@
-import { useTheme } from '@react-navigation/native'
 import * as Application from 'expo-application'
 import { useContext } from 'react'
-import { ScrollView, Switch } from 'react-native'
+import { ScrollView } from 'react-native'
+import {
+	Colors,
+	Spacings,
+	Switch,
+	Text,
+	View
+} from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
+import { Button } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
 import { Loading } from '../components/Loading'
-import { Text } from '../components/Text'
-import {
-	ACCENT_COLOR,
-	BUTTON_TEXT_COLOR,
-	INVISIBLE_COLOR,
-	LANG,
-	SECONDARY_COLOR,
-	styles,
-} from '../constants'
-import { Ctx, SettingsCtx } from '../hooks/settings'
+import { LANG, fullname, settingsButton } from '../constants'
+import { Ctx } from '../hooks/settings'
 import { UpdatesButton } from './update'
-import { View } from 'react-native-ui-lib'
 
 export function SettingsScreen() {
 	const { settings, students } = useContext(Ctx)
-	const theme = useTheme()
 	const themes = [
 		{ name: 'Системная', i: 'system' as const },
 		{ name: 'Темная', i: 'dark' as const },
@@ -32,9 +29,6 @@ export function SettingsScreen() {
 		<ScrollView
 			contentContainerStyle={{
 				flex: 1,
-				backgroundColor: INVISIBLE_COLOR,
-				width: '100%',
-				minHeight: 400,
 				alignContent: 'flex-start',
 				justifyContent: 'flex-start',
 			}}
@@ -42,12 +36,9 @@ export function SettingsScreen() {
 			{API.session ? (
 				students.fallback || (
 					<Dropdown
-						buttonStyle={[
-							{ width: '100%', backgroundColor: INVISIBLE_COLOR },
-							styles.settingBase,
-						]}
+						buttonStyle={{ marginBottom: Spacings.s2 }}
 						data={students.result.map((student, i) => {
-							return { name: DisplayName(student.name, settings), i }
+							return { name: fullname(student.name, settings), i }
 						})}
 						defaultValueByIndex={settings.studentIndex}
 						onSelect={s => settings.save({ studentIndex: s.i })}
@@ -58,34 +49,33 @@ export function SettingsScreen() {
 			) : (
 				<Loading text="Ожидание авторизации{dots}"></Loading>
 			)}
-			<View padding-s3 flex row spread>
-				<Text margin-s3>{LANG['notification']}</Text>
-				<Switch
-					trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
-					thumbColor={settings.notifications ? ACCENT_COLOR : BUTTON_TEXT_COLOR}
-					onValueChange={notifications => settings.save({ notifications })}
-					value={settings.notifications}
-				/>
-			</View>
 			<Dropdown
 				data={themes}
-				buttonStyle={[
-					styles.settingBase,
-					styles.stretch,
-					{ padding: 0, width: '100%', backgroundColor: INVISIBLE_COLOR },
-				]}
-				buttonTextStyle={{ fontSize: 15, color: theme.colors.text }}
+				buttonStyle={{ marginBottom: Spacings.s2 }}
 				defaultValueByIndex={themes.findIndex(e => e.i === settings.theme)}
 				onSelect={s => settings.save({ theme: s.i })}
-				renderCustomizedButtonChild={i => (
-					<View style={styles.stretch}>
-						<Text>Тема:</Text>
-						<Text>{i?.name ?? 'По умолчанию'}</Text>
-					</View>
-				)}
+				defaultButtonText="Тема"
+				buttonTextAfterSelection={i => 'Тема: ' + (i?.name ?? 'По умолчанию')}
 				rowTextForSelection={i => i.name}
 			/>
+			<Button
+				{...settingsButton()}
+				onPress={() =>
+					settings.save({ notifications: !settings.notifications })
+				}
+			>
+				<View flex row center>
+					<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
+						{LANG['notification']}
+					</Text>
+					<Switch
+						onValueChange={notifications => settings.save({ notifications })}
+						value={settings.notifications}
+					/>
+				</View>
+			</Button>
 			<UpdatesButton />
+
 			<View padding-s3>
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
@@ -93,13 +83,24 @@ export function SettingsScreen() {
 				<Text>Версия сборки: {Application.nativeBuildVersion}</Text>
 				<Text>{LANG['made_by']}</Text>
 			</View>
+			{/* <ScrollView>
+				{Object.entries(Colors)
+					.sort((a, b) => a[0].localeCompare(b[0]))
+					.map(([key, value]) => {
+						if (key.startsWith('$'))
+							return (
+								<View key={key} flex row spread centerV>
+									<Text>{key}</Text>
+									<View key={key} row spread centerV>
+										<Text>{value}</Text>
+										<ColorSwatch color={value} />
+									</View>
+								</View>
+							)
+						else return false
+					})
+					.filter(Boolean)}
+			</ScrollView> */}
 		</ScrollView>
 	)
-}
-
-export function DisplayName(name: string, settings: SettingsCtx) {
-	if (settings.lastNameLast) {
-		const parts = name.split(' ')
-		return [parts[1], parts[2], parts[0]].join(' ')
-	} else return name
 }

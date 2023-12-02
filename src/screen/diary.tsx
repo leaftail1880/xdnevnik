@@ -1,16 +1,15 @@
 import * as Notifications from 'expo-notifications'
 import { useContext, useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { Colors, ProgressBar, View } from 'react-native-ui-lib'
+import { Colors, ProgressBar, Spacings, Text, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
-import { Assignment } from '../NetSchool/classes'
-import { Button } from '../components/Button'
+import { Assignment, Diary } from '../NetSchool/classes'
+import { IconButton, SmallButton } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
 import { Mark } from '../components/Mark'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
-import { Text } from '../components/Text'
-import { LANG, LOGGER, styles } from '../constants'
-import { useAPI } from '../hooks/api'
+import { LANG, LOGGER } from '../constants'
+import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
 export function DiaryScreen() {
@@ -34,7 +33,7 @@ export function DiaryScreen() {
 	const homework = useAPI(
 		API,
 		'homework',
-		{ studentId, withExpiredClassAssign: true, withoutMarks: false },
+		{ studentId, withExpiredClassAssign: true, withoutMarks: true },
 		'дз'
 	)
 
@@ -100,7 +99,12 @@ export function DiaryScreen() {
 	weekAfter.setDate(weekAfter.getDate() + 7)
 
 	const values = [
-		{ name: 'Прошлая неделя', day: Date.week(weekBefore)[0], week: weekBefore },
+		{
+			name: 'Прошлая неделя',
+			day: Date.week(weekBefore)[0],
+			week: weekBefore,
+			selected: false,
+		},
 		...Date.week(weekDate).map((day, i) => {
 			const today = new Date().toYYYYMMDD() === day
 			return {
@@ -120,12 +124,7 @@ export function DiaryScreen() {
 	]
 
 	return (
-		<ScrollView
-			contentContainerStyle={{
-				justifyContent: 'center',
-				alignContent: 'center',
-			}}
-		>
+		<View>
 			<Dropdown
 				dropdownStyle={{ minHeight: 350, borderRadius: 10 }}
 				data={values}
@@ -142,111 +141,183 @@ export function DiaryScreen() {
 					setDiaryDay(item.day)
 				}}
 			/>
-			<View padding-s1>
-				{diary.fallback ||
-					diary.result.forDay(diaryDay).map(lesson => {
-						return (
-							<View
-								key={lesson.id.toString()}
-								style={[
-									styles.button,
-									{
-										margin: 7,
-										alignItems: 'flex-start',
-									},
-								]}
-							>
-								<View
-									flex
-									row
-									spread
-									centerV
-									marginB-7
-									style={{
-										width: '100%',
-									}}
-								>
-									<SubjectName
-										style={[
-											styles.buttonText,
-											{
-												fontWeight: 'bold',
-												marginTop: 0,
-												fontSize: 18,
-											},
-										]}
-										subjectId={lesson.subjectId}
-										subjectName={lesson.subjectName}
-									/>
+			<ScrollView
+				contentContainerStyle={{
+					justifyContent: 'center',
+					alignContent: 'center',
+					paddingBottom: Spacings.s10,
+				}}
+				refreshControl={diary.refreshControl}
+			>
+				<View padding-s1>
+					{diary.fallback ||
+						diary.result
+							.forDay(diaryDay)
+							.map(lesson => (
+								<DiaryDay
+									lesson={lesson}
+									homework={homework}
+									diary={diary.result}
+									key={lesson.id.toString()}
+								/>
+							))}
+				</View>
+				<Text center $textDisabled marginB-s3>
+					{diary.updateDate}
+				</Text>
+			</ScrollView>
+		</View>
+	)
+}
 
-									<Text
-										style={[
-											styles.buttonText,
-											{
-												fontWeight: 'bold',
-												fontSize: 18,
-												marginTop: 0,
-												margin: 7,
-											},
-										]}
-									>
-										{lesson.roomName ?? 'Нет кабинета'}
-									</Text>
-								</View>
-								<Text style={[styles.buttonText, { fontSize: 17 }]}>
-									{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
-								</Text>
-								{homework.fallback ||
-									homework.result
-										.filter(e => e.classmeetingId === lesson.classmetingId)
-										.map(e => <Homework homework={e} key={e.assignmentId} />)}
-								{lesson.lessonTheme && (
-									<Text style={styles.buttonText}>
-										Тема урока: {lesson.lessonTheme + '\n'}
-									</Text>
-								)}
+function DiaryDay({
+	lesson,
+	homework,
+	diary,
+}: {
+	lesson: Diary['lessons'][number]
+	homework: APIState<Assignment[]>
+	diary: Diary
+}) {
+	if (homework.result) {
+		// homework.result.forEach(
+		// 	e => e.subjectName === 'Биология' && LOGGER.debug(e)
+		// )
+		homework.result
+			.filter(
+				e => e.subjectName === 'Биология' //&&
+				// 	e.classmeetingId === lesson.classmetingId) ||
+				// (!e.weight &&
+				// 	new Date(e.assignmentDate).toYYYYMMDD() ===
+				// 		lesson.start.toYYYYMMDD())
+			)
+			.forEach(e => LOGGER.debug(e))
+	}
 
-								{diary.result.isNow(lesson) && (
-									<ProgressBar
-										style={{ width: '100%', height: 20 }}
-										progress={100 - ~~(((lesson.end.getTime() - Date.now()) * 100) /
-										(lesson.end.getTime() - lesson.start.getTime()))}
-										progressColor={Colors.$backgroundNeutralIdle}
-									/>
-								)}
-							</View>
-						)
-					})}
+	return (
+		<View
+			margin-s2
+			padding-s3
+			br20
+			bg-$backgroundAccent
+			style={{
+				alignItems: 'flex-start',
+				elevation: 3,
+				minWidth: 250,
+			}}
+		>
+			<View
+				flex
+				row
+				spread
+				centerV
+				marginB-7
+				style={{
+					width: '100%',
+				}}
+			>
+				<SubjectName
+					iconsSize={18}
+					marginT-0
+					style={{
+						fontWeight: 'bold',
+						fontSize: 18,
+						color: Colors.$textAccent,
+					}}
+					subjectId={lesson.subjectId}
+					subjectName={lesson.subjectName}
+				/>
+
+				<View row spread centerV>
+					<Text
+						margin-s1
+						marginT-0
+						style={{
+							fontWeight: 'bold',
+							fontSize: 18,
+							color: Colors.$textAccent,
+						}}
+					>
+						{lesson.roomName ?? 'Нет кабинета'}
+					</Text>
+					<IconButton
+						iconColor={Colors.$textAccent}
+						icon="pencil"
+						size={18}
+						marginL-s1
+					/>
+				</View>
 			</View>
-		</ScrollView>
+			<Text text50 $textAccent>
+				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
+			</Text>
+
+			{lesson.lessonTheme && (
+				<Text $textAccent>Тема урока: {lesson.lessonTheme + '\n'}</Text>
+			)}
+
+			{homework.fallback ||
+				homework.result
+					.filter(
+						e =>
+							e.classmeetingId === lesson.classmetingId ||
+							(!e.weight &&
+								new Date(e.assignmentDate).toYYYYMMDD() ===
+									lesson.start.toYYYYMMDD())
+					)
+					.map(e => <Homework homework={e} key={e.assignmentId} />)}
+
+			{diary.isNow(lesson) && (
+				<ProgressBar
+					style={{ width: '100%', height: 20 }}
+					progress={
+						100 -
+						~~(
+							((lesson.end.getTime() - Date.now()) * 100) /
+							(lesson.end.getTime() - lesson.start.getTime())
+						)
+					}
+					progressColor={Colors.$backgroundNeutralIdle}
+				/>
+			)}
+		</View>
 	)
 }
 
 function Homework(props: { homework: Assignment }) {
 	const assignment = props.homework
-	const [showHw, setShowHw] = useState(false)
+	const [showHw, setShowHw] = useState(
+		// Do not show long hw by default
+		assignment.assignmentTypeName.length < 20
+	)
 	return (
-		<View flex row spread margin-0 padding-0 centerV>
+		<View
+			flex
+			row
+			spread
+			margin-s1
+			padding-0
+			centerV
+			style={{ maxWidth: '100%' }}
+		>
 			{assignment.assignmentTypeName && (
-				<Button
+				<SmallButton
 					onPress={() => setShowHw(!showHw)}
 					style={{
-						borderColor: Colors.$backgroundDefault,
+						borderColor: Colors.$textAccent,
 						borderWidth: 3,
-						width: 30,
-						height: 30,
 					}}
 					centerH
 					centerV
 					br20
 				>
-					<Text style={styles.buttonText} margin-0>
+					<Text $textAccent margin-s1>
 						{assignment.assignmentTypeAbbr}
 					</Text>
-				</Button>
+				</SmallButton>
 			)}
 			{showHw && (
-				<Text style={styles.buttonText} margin-s1>
+				<Text $textAccent margin-s1>
 					{assignment.assignmentName}
 				</Text>
 			)}

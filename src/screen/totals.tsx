@@ -1,17 +1,10 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
-import { Alert, ScrollView, StyleProp, ViewStyle } from 'react-native'
+import { ScrollView } from 'react-native'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
-import { useTheme } from '@react-navigation/native'
 import { memo, useContext, useEffect, useState } from 'react'
-import { Switch } from 'react-native-gesture-handler'
-import {
-	Colors,
-	TextField,
-	TouchableOpacityProps,
-	View,
-} from 'react-native-ui-lib'
+import { Colors, Switch, Text, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import {
 	Education,
@@ -20,26 +13,17 @@ import {
 	SubjectPerformance,
 	Total,
 } from '../NetSchool/classes'
-import { Button } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
-import { Ionicon } from '../components/Icon'
 import { Loading } from '../components/Loading'
 import { Mark } from '../components/Mark'
-import { Text } from '../components/Text'
-import {
-	ACCENT_COLOR,
-	BUTTON_TEXT_COLOR,
-	LANG,
-	SECONDARY_COLOR,
-	styles,
-} from '../constants'
+import { LANG, styles } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
-import { DisplayName } from './settings'
+import { SubjectTotals } from './subjectTotals'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 const S_TOTALS = LANG['s_totalsN']
-type ParamMap = {
+export type ParamMap = {
 	[S_TOTALS]: undefined
 	[S_SUBJECT_TOTALS]: {
 		termId: number
@@ -94,19 +78,13 @@ export function TotalsNavigation() {
 				options={{
 					headerRight() {
 						return (
-							<View style={[styles.stretch, { padding: 3 }]}>
-								<Text>Только одна четверть</Text>
+							<View flex row spread center padding-s1>
+								<Text marginR-s2>Только одна четверть</Text>
 								<Switch
-									trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
-									thumbColor={
-										settings.currentTotalsOnly
-											? ACCENT_COLOR
-											: BUTTON_TEXT_COLOR
-									}
+									value={settings.currentTotalsOnly}
 									onValueChange={currentTotalsOnly =>
 										settings.save({ currentTotalsOnly })
 									}
-									value={settings.currentTotalsOnly}
 								/>
 							</View>
 						)
@@ -140,7 +118,6 @@ export function TotalsScreenTerm({
 	totals,
 	navigation,
 }: TotalsContext) {
-	const theme = useTheme()
 	const { settings } = useContext(Ctx)
 	const terms = totals.result?.[0]?.termTotals.map(e => e.term)
 	const [selectedTerm, setSelectedTerm] = useState<NSEntity>()
@@ -156,7 +133,10 @@ export function TotalsScreenTerm({
 		education.fallback ||
 		subjects.fallback ||
 		totals.fallback || (
-			<ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+			<ScrollView
+				contentContainerStyle={{ alignItems: 'center' }}
+				refreshControl={totals.refreshControl}
+			>
 				{terms && (
 					<Dropdown
 						data={terms}
@@ -185,7 +165,9 @@ export function TotalsScreenTerm({
 						/>
 					))
 				)}
-				<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
+				<Text $textDisabled center margin-s1>
+					{totals.updateDate}
+				</Text>
 			</ScrollView>
 		)
 	)
@@ -198,9 +180,20 @@ type SubjectInfo = {
 } & Pick<TotalsContext, 'navigation'>
 
 function SubjectPerformanceInline(props: SubjectInfo) {
+	const { studentId, settings } = useContext(Ctx)
 	const term = props.total.termTotals.find(
 		e => e.term.id === props.selectedTerm.id
 	)
+
+	if (!term) return <Loading text="Загрузка четверти{dots}" />
+
+	const openDetails = () =>
+		props.navigation.navigate(LANG['s_subject_totals'], {
+			termId: props.selectedTerm.id,
+			finalMark: term.mark,
+			studentId: studentId!,
+			subjectId: props.total.subjectId,
+		})
 
 	return (
 		<View
@@ -220,26 +213,32 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					alignItems: 'flex-end',
 					maxHeight: 40,
 					width: '100%',
-					backgroundColor: ACCENT_COLOR,
+					backgroundColor: settings.accentColor,
 				}}
 			>
 				<SubjectName
 					subjectId={props.total.subjectId}
 					subjects={props.subjects}
+					iconsSize={16}
 					style={{
 						fontSize: 16,
-						color: styles.buttonText.color,
+						color: Colors.$textDefault,
 						fontWeight: 'bold',
 					}}
 				/>
 			</View>
 			{term ? (
-				<View style={styles.stretch}>
-					<SubjectMarksInline {...props} term={term} />
+				<View flex row spread centerV>
+					<SubjectMarksInline
+						{...props}
+						openDetails={openDetails}
+						term={term}
+					/>
 
 					<Mark
 						finalMark={term?.mark}
 						mark={term.avgMark}
+						onPress={openDetails}
 						style={{ height: 50, width: 50 }}
 					/>
 				</View>
@@ -253,6 +252,7 @@ const SubjectMarksInline = memo(
 	function SubjectMarksInline(
 		props: SubjectInfo & {
 			term: Total['termTotals'][number]
+			openDetails: () => void
 		}
 	) {
 		const { studentId, settings } = useContext(Ctx)
@@ -297,14 +297,7 @@ const SubjectMarksInline = memo(
 						}}
 						style={{ height: 50, width: 50 }}
 						key={e.assignmentId}
-						onPress={() =>
-							props.navigation.navigate(LANG['s_subject_totals'], {
-								termId: props.selectedTerm.id,
-								finalMark: props.term?.mark,
-								studentId: studentId!,
-								subjectId: props.total.subjectId,
-							})
-						}
+						onPress={props.openDetails}
 					/>
 				))}
 			</ScrollView>
@@ -317,7 +310,6 @@ const SubjectMarksInline = memo(
 )
 
 export function TotalsScreenTable(props: TotalsContext) {
-	const theme = useTheme()
 	const { studentId } = useContext(Ctx)
 	const { education, subjects, totals, schoolYear } = props
 	const headerWidth = 45
@@ -337,9 +329,14 @@ export function TotalsScreenTable(props: TotalsContext) {
 	) : (
 		<ScrollView contentContainerStyle={styles.table}>
 			{/* Table head */}
-			<View style={{ ...styles.tableRow, backgroundColor: ACCENT_COLOR }}>
+			<View
+				style={{
+					...styles.tableRow,
+					backgroundColor: Colors.$backgroundPrimaryHeavy,
+				}}
+			>
 				{/* Table first row */}
-				<Text style={{ ...styles.buttonText, width: `${headerWidth}%` }}>
+				<Text $textAccent style={{  width: `${headerWidth}%` }}>
 					{new Date(schoolYear!.startDate).getFullYear()}/
 					{new Date(schoolYear!.endDate).getFullYear()} Четверти
 				</Text>
@@ -347,7 +344,8 @@ export function TotalsScreenTable(props: TotalsContext) {
 				{/* Table rows */}
 				{totals.result[0].termTotals.map((_, i, a) => (
 					<Text
-						style={{ width: termTotalWidth, ...styles.buttonText }}
+					$textAccent
+						style={{ width: termTotalWidth }}
 						key={i.toString()}
 					>
 						{i + 1}/{a.length}
@@ -369,10 +367,11 @@ export function TotalsScreenTable(props: TotalsContext) {
 						}}
 					>
 						<SubjectName
+							iconsSize={16}
 							subjectId={total.subjectId}
 							subjects={props.subjects.result!}
 							style={{
-								color: theme.colors.text,
+								color: Colors.$textDefault,
 							}}
 						/>
 					</View>
@@ -399,245 +398,18 @@ export function TotalsScreenTable(props: TotalsContext) {
 					))}
 				</View>
 			))}
-			<Text style={{ color: theme.colors.text }}>{totals.updateDate}</Text>
+			<Text $textDisabled center margin-s1>
+				{totals.updateDate}
+			</Text>
 		</ScrollView>
 	)
 }
 
-type Mark = Partial<
+export type MarkInfo = Partial<
 	Omit<SubjectPerformance['results'][number], 'result' | 'assignmentId'> & {
 		result: 'Нет' | number | string
 		assignmentId: string | number
 	}
 >
 
-export function SubjectTotals({
-	route,
-}: StackScreenProps<ParamMap, (typeof LANG)['s_subject_totals']>) {
-	const { termId, subjectId, finalMark } = route.params ?? {}
-	const { studentId, settings } = useContext(Ctx)
-	const {
-		result: totals,
-		fallback: FallbackTotals,
-		updateDate: totalsUpdateDate,
-	} = useAPI(
-		API,
-		'subjectPerformance',
-		{ termId, studentId, subjectId },
-		'итогов по предмету'
-	)
-	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
-	const [customMarks, setCustomMarks] = useState<Partial<Mark>[]>([])
-
-	if (FallbackTotals) return FallbackTotals
-
-	let missedMark = (totals.attendance ?? []).map(e => {
-		return {
-			result: e.attendanceMark,
-			assignmentId: e.classMeetingDate + e.attendanceMark,
-			date: e.classMeetingDate,
-		}
-	})
-
-	if (lessonsWithoutMark) {
-		missedMark = missedMark.concat(
-			new Array(
-				totals.classmeetingsStats.passed -
-					totals.results.length -
-					missedMark.length
-			).fill({ result: 'Нет' })
-		)
-	}
-
-	let totalsAndSheduledTotals = [...missedMark, ...totals.results].sort(
-		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-	) as Partial<Mark>[]
-
-	if (lessonsWithoutMark) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
-			new Array(
-				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
-			).fill({})
-		)
-	}
-
-	let avgMark = totals.averageMark
-
-	if (customMarks.length) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
-		let totalWeight = 0
-		let totalMark = 0
-
-		for (const mark of totals.results) {
-			totalWeight += mark.weight
-			totalMark += mark.weight * mark.result
-		}
-
-		avgMark = Number((totalMark / totalWeight).toFixed(2))
-	}
-
-	const weights = totals.results.map(e => e.weight)
-	const maxWeight = Math.max(...weights)
-	const minWeight = Math.min(...weights)
-
-	return (
-		<ScrollView>
-			<View flex row spread padding-s2 centerV>
-				<SubjectName
-					subjectName={totals.subject.name}
-					subjectId={totals.subject.id}
-					style={{
-						fontSize: 20,
-						fontWeight: 'bold',
-						color: Colors.$textDefault,
-					}}
-					margin-s1
-				/>
-				<Mark
-					finalMark={finalMark}
-					mark={avgMark}
-					style={{ height: 50, width: 60 }}
-					textStyle={{ fontSize: 20 }}
-				/>
-			</View>
-			<View flex row spread padding-s2 centerV>
-				<Text flex row>
-					Уроки без оценок
-				</Text>
-				<Switch
-					trackColor={{ false: SECONDARY_COLOR, true: ACCENT_COLOR }}
-					onValueChange={setLessonsWithoutMark}
-					value={lessonsWithoutMark}
-				/>
-			</View>
-			<View padding-s1 bg-$backgroundNeutralLight br50>
-				{totalsAndSheduledTotals.map((e, i) => (
-					<View key={e.assignmentId ?? i.toString()} flex row spread padding-s2>
-						<Mark
-							mark={e.result ?? null}
-							markWeight={
-								typeof e.weight === 'number' && {
-									current: e.weight,
-									max: maxWeight,
-									min: minWeight,
-								}
-							}
-							style={{
-								height: 50,
-								width: 50,
-								...(e.result === 'Нет' || typeof e.result === 'undefined'
-									? { backgroundColor: '#88888857' }
-									: {}),
-							}}
-							textStyle={{ fontSize: 17 }}
-							onPress={() => {
-								Alert.alert(
-									e.assignmentTypeName + ' ' + e.result,
-									`Вес: ${e.weight}${
-										e.comment ? `Комментарий: ${e.comment}` : ''
-									}`
-								)
-							}}
-						/>
-						<Text>{e.assignmentTypeName}</Text>
-
-						<Text>{e.date && new Date(e.date).toLocaleDateString()}</Text>
-					</View>
-				))}
-			</View>
-			<AddMarkForm setCustomMarks={setCustomMarks} customMarks={customMarks} />
-			<View flex row spread padding-s2>
-				<Text>{DisplayName(totals.teachers[0].name, settings)}</Text>
-				<Text>
-					Прошло уроков: {totals.classmeetingsStats.passed}/
-					{totals.classmeetingsStats.scheduled}
-				</Text>
-			</View>
-			<View flex row spread padding-s2>
-				<Text>Средний бал класса: {totals.classAverageMark}</Text>
-				<Text>{totalsUpdateDate}</Text>
-			</View>
-		</ScrollView>
-	)
-}
-function AddMarkForm(props: {
-	setCustomMarks: (p: Partial<Mark>[]) => void
-	customMarks: Partial<Mark>[]
-}) {
-	const [weight, setWeight] = useState('')
-	const [mark, setMark] = useState('')
-	const [addingCustomMark, setAddingCustomMark] = useState(false)
-	const styl: StyleProp<ViewStyle | TouchableOpacityProps> = {
-		backgroundColor: ACCENT_COLOR,
-		alignItems: 'center',
-		borderRadius: 5,
-		elevation: 3,
-	}
-	return (
-		<View padding-s2>
-			<View flex row centerV padding-s2>
-				<Button
-					onPress={() => {
-						if (addingCustomMark) {
-							// Saving
-							props.setCustomMarks(
-								props.customMarks.concat({
-									result: Number(mark),
-									weight: Number(weight),
-									comment: 'Кастомная',
-									assignmentTypeName: 'ВОЗМОЖНАЯ',
-								})
-							)
-						}
-						setAddingCustomMark(!addingCustomMark)
-					}}
-					style={styl}
-				>
-					<View flex row spread centerV>
-						<Ionicon name={addingCustomMark ? 'save-sharp' : 'add'} size={18} />
-						<Text marginR-s1>
-							{addingCustomMark ? 'Сохранить' : 'Добавить оценку'}
-						</Text>
-					</View>
-				</Button>
-				{addingCustomMark && (
-					<Button
-						margin-s2
-						style={styl}
-						onPress={() => {
-							setAddingCustomMark(false)
-						}}
-					>
-						<Ionicon name="arrow-undo" size={16} />
-					</Button>
-				)}
-				{!addingCustomMark && !!props.customMarks.length && (
-					<Button
-						margin-s2
-						style={styl}
-						onPress={() => {
-							props.setCustomMarks([])
-						}}
-					>
-						<Ionicon name="trash" size={18} />
-					</Button>
-				)}
-			</View>
-			{addingCustomMark && (
-				<View padding-s4>
-					<TextField
-						placeholder="Оценка"
-						keyboardType="numeric"
-						onTextInput={e => setMark(e.nativeEvent.text)}
-					/>
-					<TextField
-						placeholder="Вес"
-						keyboardType="numeric"
-						onTextInput={e => setWeight(e.nativeEvent.text)}
-					/>
-				</View>
-			)}
-		</View>
-	)
-}
 

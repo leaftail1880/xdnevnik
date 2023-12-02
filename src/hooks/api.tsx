@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { View } from 'react-native-ui-lib'
-import { API, NetSchoolApi, NetSchoolError } from '../NetSchool/api'
-import { Button } from '../components/Button'
-import { Ionicon } from '../components/Icon'
+import { RefreshControl } from 'react-native'
+import { API, NetSchoolError } from '../NetSchool/api'
+import { ErrorHandler } from '../components/ErrorHandler'
 import { Loading } from '../components/Loading'
-import { Text } from '../components/Text'
-import { LOGGER, styles } from '../constants'
+import { LOGGER } from '../constants'
 
 /**
  * A way to select only accepted api methods
@@ -19,9 +17,10 @@ type FunctionsFromObject<O> = {
 /**
  * Return type of the useAPI hook
  */
-export type APIState<Result> =
+export type APIState<Result> = (
 	| { result: Result; updateDate: string; fallback: undefined }
 	| { result: undefined; updateDate: undefined; fallback: React.JSX.Element }
+) & { reload: () => void; refreshControl: React.JSX.Element }
 
 /**
  * Different from Partial<T> is that it requires to define ALL keys
@@ -46,14 +45,16 @@ export function useAPI<
 ): APIState<FnReturn> {
 	const updateDate = useRef<string>('Не обновлялось')
 	const [value, setValue] = useState<FnReturn | undefined>(undefined)
-	const [[errorNum, errorObj], setError] = useState<
+	const [[updateTimes, errorObj], setError] = useState<
 		[number, Error | undefined]
 	>([0, undefined])
+	const loading = useRef<boolean>(false)
 
 	const deps = Object.values(params ?? {}).concat(additionalDeps)
 
 	useEffect(
 		() => {
+			loading.current = true
 			;(async function useAsyncEffect() {
 				const hasUndefinedDeps = deps.some(
 					e => typeof e === 'undefined' || e === null
@@ -61,23 +62,33 @@ export function useAPI<
 
 				if (hasUndefinedDeps) return
 
-				LOGGER.debug('Request update for', name)
+				// LOGGER.debug('Request update for', name)
 
 				try {
 					const value = await (source[name] as APIMethod)(params)
-					updateDate.current = new Date().toLocaleTimeString()
+					updateDate.current =
+						'Дата обновления: ' + new Date().toLocaleTimeString()
+				loading.current = false
 
 					setValue(value)
 				} catch (error) {
 					if (!(error instanceof NetSchoolError && error.canIgnore)) {
 						LOGGER.error(name, error)
 					}
-					if (!errorObj) setError([errorNum, error])
+					if (!errorObj) setError([updateTimes, error])
 				}
 			})()
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		deps.concat(errorNum)
+		deps.concat(updateTimes)
+	)
+
+	const reload = () => {
+		setError([updateTimes + 1, undefined])
+	}
+
+	const refreshControl = (
+		<RefreshControl onRefresh={reload} refreshing={loading.current} />
 	)
 
 	// Value is present, all okay
@@ -86,15 +97,15 @@ export function useAPI<
 			result: value,
 			updateDate: updateDate.current,
 			fallback: undefined,
+			reload,
+			refreshControl,
 		}
 	}
 
 	const fallback = errorObj ? (
 		<ErrorHandler
-			error={[errorNum, errorObj]}
-			reload={() => {
-				setError([errorNum + 1, undefined])
-			}}
+			error={[updateTimes, errorObj]}
+			reload={reload}
 			name={description}
 		/>
 	) : (
@@ -102,67 +113,13 @@ export function useAPI<
 	)
 
 	// No value, return fallback element
-	return { result: undefined, updateDate: undefined, fallback }
+	return {
+		result: undefined,
+		updateDate: undefined,
+		fallback,
+		reload,
+		refreshControl,
+	}
 }
 
-interface ErrorHandlerProps {
-	error: [number, Error]
-	reload: () => void
-	name: string
-}
 
-function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
-	const [more, setMore] = useState<boolean>(false)
-	const errorString = NetSchoolApi.stringifyError(error[1])
-	return (
-		<View
-			style={{
-				...styles.container,
-
-				alignSelf: 'center',
-				margin: 4,
-				maxWidth: 300,
-			}}
-		>
-			<Text red100 text6>
-				Ошибка{error[0] ? ` (${error[0]})` : ''}
-			</Text>
-			<Text>При загрузке {name}</Text>
-			{error[1] instanceof NetSchoolError && error[1].beforeAuth && (
-				<Text>Авторизуйтесь!</Text>
-			)}
-			{errorString === NetSchoolApi.noConnection && (
-				<Text>Вы не в сети, сетевая ошибка!</Text>
-			)}
-			{more && <Text>{errorString}</Text>}
-			<Button
-				onPress={() => setMore(!more)}
-				style={[
-					styles.button,
-					{ minHeight: 15, width: '100%', margin: 3, padding: 7 },
-				]}
-			>
-				<Text style={styles.buttonText}>
-					{!more ? 'Подробнее' : 'Свернуть'}
-				</Text>
-			</Button>
-			<Button
-				onPress={reload}
-				style={[
-					styles.button,
-					{ maxHeight: 50, width: '100%', margin: 3, padding: 0 },
-				]}
-			>
-				<View style={[styles.stretch, { margin: 0, padding: 7 }]}>
-					<Text style={styles.buttonText}>Попробовать снова</Text>
-					<Ionicon
-						name="reload"
-						size={15}
-						color={styles.buttonText.color}
-						style={{ paddingLeft: 7 }}
-					/>
-				</View>
-			</Button>
-		</View>
-	)
-}
