@@ -32,30 +32,29 @@ export function ErrorHandler({ error, reload, name }: ErrorHandlerProps) {
 				<Text>Вы не в сети, сетевая ошибка!</Text>
 			)}
 			{more && <Text>{errorString}</Text>}
-			<Button
-				onPress={() => setMore(!more)}
-				margin-s1
-				padding-0
-				style={{ minHeight: 15, width: '100%' }}
-			>
-				<Text $textDefault>{!more ? 'Подробнее' : 'Свернуть'}</Text>
-			</Button>
-			<Button
-				onPress={reload}
-				margin-s1
-				padding-0
-				style={{ maxHeight: 50, width: '100%' }}
-			>
-				<View flex row spread center margin-0 padding-s1>
-					<Text $textDefault>Попробовать снова</Text>
-					<Ionicon
-						name="reload"
-						size={15}
-						color={Colors.$textDefault}
-						style={{ paddingLeft: Spacings.s2 }}
-					/>
-				</View>
-			</Button>
+			<View style={{ flex: 0, height: '30%', width: '100%' }}>
+				<Button
+					onPress={() => setMore(!more)}
+					margin-s1
+					padding-0
+					style={{ height: '50%' }}
+				>
+					<View flex center>
+						<Text $textDefault>{!more ? 'Подробнее' : 'Свернуть'}</Text>
+					</View>
+				</Button>
+				<Button onPress={reload} margin-s1 padding-0 style={{ height: '50%' }}>
+					<View flex row spread center margin-s2>
+						<Text $textDefault>Попробовать снова</Text>
+						<Ionicon
+							name="reload"
+							size={18}
+							color={Colors.$textDefault}
+							style={{ paddingLeft: Spacings.s1 }}
+						/>
+					</View>
+				</Button>
+			</View>
 		</View>
 	)
 }

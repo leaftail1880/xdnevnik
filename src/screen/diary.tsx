@@ -4,11 +4,11 @@ import { ScrollView } from 'react-native'
 import { Colors, ProgressBar, Spacings, Text, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { Assignment, Diary } from '../NetSchool/classes'
-import { IconButton, SmallButton } from '../components/Button'
+import { IconButton } from '../components/Button'
+import { DiaryAssignment } from '../components/DiaryAssignment'
 import { Dropdown } from '../components/Dropdown'
-import { Mark } from '../components/Mark'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
-import { LANG, LOGGER } from '../constants'
+import { LANG } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
@@ -32,14 +32,16 @@ export function DiaryScreen() {
 
 	const homework = useAPI(
 		API,
-		'homework',
-		{ studentId, withExpiredClassAssign: true, withoutMarks: true },
-		'дз'
+		'assignments',
+		{
+			studentId,
+			classsmetingsIds: diary.result?.lessons.map(e => e.classmetingId),
+		},
+		'оценок'
 	)
 
 	useEffect(() => {
 		if (!settings.notifications) {
-			LOGGER.info('notifications are disabled')
 			Notifications.cancelAllScheduledNotificationsAsync()
 			return
 		}
@@ -179,21 +181,6 @@ function DiaryDay({
 	homework: APIState<Assignment[]>
 	diary: Diary
 }) {
-	if (homework.result) {
-		// homework.result.forEach(
-		// 	e => e.subjectName === 'Биология' && LOGGER.debug(e)
-		// )
-		homework.result
-			.filter(
-				e => e.subjectName === 'Биология' //&&
-				// 	e.classmeetingId === lesson.classmetingId) ||
-				// (!e.weight &&
-				// 	new Date(e.assignmentDate).toYYYYMMDD() ===
-				// 		lesson.start.toYYYYMMDD())
-			)
-			.forEach(e => LOGGER.debug(e))
-	}
-
 	return (
 		<View
 			margin-s2
@@ -221,6 +208,7 @@ function DiaryDay({
 					marginT-0
 					style={{
 						fontWeight: 'bold',
+						maxWidth: '90%',
 						fontSize: 18,
 						color: Colors.$textAccent,
 					}}
@@ -252,9 +240,9 @@ function DiaryDay({
 				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 			</Text>
 
-			{lesson.lessonTheme && (
+			{/* {lesson.lessonTheme && (
 				<Text $textAccent>Тема урока: {lesson.lessonTheme + '\n'}</Text>
-			)}
+			)} */}
 
 			{homework.fallback ||
 				homework.result
@@ -265,7 +253,7 @@ function DiaryDay({
 								new Date(e.assignmentDate).toYYYYMMDD() ===
 									lesson.start.toYYYYMMDD())
 					)
-					.map(e => <Homework homework={e} key={e.assignmentId} />)}
+					.map(e => <DiaryAssignment assignment={e} key={e.assignmentId} />)}
 
 			{diary.isNow(lesson) && (
 				<ProgressBar
@@ -284,50 +272,4 @@ function DiaryDay({
 	)
 }
 
-function Homework(props: { homework: Assignment }) {
-	const assignment = props.homework
-	const [showHw, setShowHw] = useState(
-		// Do not show long hw by default
-		assignment.assignmentTypeName.length < 20
-	)
-	return (
-		<View
-			flex
-			row
-			spread
-			margin-s1
-			padding-0
-			centerV
-			style={{ maxWidth: '100%' }}
-		>
-			{assignment.assignmentTypeName && (
-				<SmallButton
-					onPress={() => setShowHw(!showHw)}
-					style={{
-						borderColor: Colors.$textAccent,
-						borderWidth: 3,
-					}}
-					centerH
-					centerV
-					br20
-				>
-					<Text $textAccent margin-s1>
-						{assignment.assignmentTypeAbbr}
-					</Text>
-				</SmallButton>
-			)}
-			{showHw && (
-				<Text $textAccent margin-s1>
-					{assignment.assignmentName}
-				</Text>
-			)}
-			{assignment.result && (
-				<Mark
-					mark={assignment.result}
-					style={{ width: 30, height: 30, padding: 0 }}
-					textStyle={{ fontSize: 15 }}
-				/>
-			)}
-		</View>
-	)
-}
+

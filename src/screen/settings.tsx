@@ -1,18 +1,20 @@
 import * as Application from 'expo-application'
 import { useContext } from 'react'
 import { ScrollView } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import {
+	ColorPicker,
 	Colors,
 	Spacings,
 	Switch,
 	Text,
-	View
+	View,
 } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { Button } from '../components/Button'
 import { Dropdown } from '../components/Dropdown'
 import { Loading } from '../components/Loading'
-import { LANG, fullname, settingsButton } from '../constants'
+import { ACCENT_COLOR, LANG, fullname, settingsButton } from '../constants'
 import { Ctx } from '../hooks/settings'
 import { UpdatesButton } from './update'
 
@@ -23,6 +25,11 @@ export function SettingsScreen() {
 		{ name: 'Темная', i: 'dark' as const },
 		{ name: 'Светлая', i: 'light' as const },
 		{ name: 'Своя', i: 'light' as const },
+	]
+
+	const markStyles = [
+		{ name: 'Линия', i: 'border' as const },
+		{ name: 'Фон', i: 'background' as const },
 	]
 
 	return (
@@ -74,7 +81,34 @@ export function SettingsScreen() {
 					/>
 				</View>
 			</Button>
+			<Dropdown
+				data={markStyles}
+				buttonStyle={{ marginBottom: Spacings.s2 }}
+				defaultValueByIndex={markStyles.findIndex(
+					e => e.i === settings.markStyle
+				)}
+				onSelect={s => s.i && settings.save({ markStyle: s.i })}
+				defaultButtonText="Стиль оценок"
+				buttonTextAfterSelection={i =>
+					'Cтиль оценок: ' + (i?.name ?? 'По умолчанию')
+				}
+				rowTextForSelection={i => i.name}
+			/>
 			<UpdatesButton />
+			<GestureHandlerRootView>
+				<Text margin-s2 center>
+					Цвет акцентов:
+				</Text>
+				<ColorPicker
+					colors={[ACCENT_COLOR, '#328585', '#325385', '#925C1F', '#974C1A']}
+					onValueChange={color => {
+						settings.save({
+							accentColor: color === ACCENT_COLOR ? undefined : color,
+						})
+					}}
+					initialColor={settings.accentColor}
+				/>
+			</GestureHandlerRootView>
 
 			<View padding-s3>
 				<Text>Название: {Application.applicationName}</Text>
