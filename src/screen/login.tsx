@@ -52,28 +52,28 @@ export function LoginScreen() {
 		return (
 			<View flex center>
 				<ScrollView style={{ margin: 0, padding: 0, minWidth: 350 }}>
-					{endpoints.map((endpoint, index) => (
-						<Button
-							margin-s2
-							padding-s3
-							br20
-							bg-$backgroundAccent
-							style={{
-								elevation: 3,
-								minWidth: 250,
-							}}
-							key={index.toString()}
-							onPress={() => {
-								setRegionName(endpoint.name)
-								API.setEndpoint(endpoint.url)
-								AsyncStorage.setItem('endpoint', endpoint.url)
-							}}
-						>
-							<Text $textAccent center>
-								{endpoint.name}
-							</Text>
-						</Button>
-					))}
+					{endpoints
+						.sort((a, b) => a.name.localeCompare(b.name))
+						.map((endpoint, index) => (
+							<Button
+								margin-s2
+								br20
+								bg-$backgroundAccent
+								style={{
+									elevation: 3,
+								}}
+								key={index.toString()}
+								onPress={() => {
+									setRegionName(endpoint.name)
+									API.setEndpoint(endpoint.url)
+									AsyncStorage.setItem('endpoint', endpoint.url)
+								}}
+							>
+								<Text $textAccent center margin-s2>
+									{endpoint.name}
+								</Text>
+							</Button>
+						))}
 				</ScrollView>
 			</View>
 		)
