@@ -11,7 +11,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 	)
 	return (
 		<View row spread centerV style={{ width: '100%' }} marginB-s2>
-			<View row center style={{ width: '90%' }} marginH-s1>
+			<View row marginH-s1 style={{ width: '80%' }}>
 				{assignment.assignmentTypeName && (
 					<SmallButton
 						onPress={() => setShowHw(!showHw)}
@@ -37,7 +37,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 				)}
 			</View>
 
-			<View row center style={{ width: '15%' }}>
+			<View row center>
 				<Mark
 					mark={assignment.result ?? 'Нет'}
 					markWeight={{

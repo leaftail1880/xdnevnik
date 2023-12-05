@@ -38,7 +38,7 @@ export function Mark({
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
 	const mark = finalMark ? Number(finalMark) : markProp
-	let color: string = '#555555' + (markWeight ? '' : 'FF')
+	let color: string = '#7A7A7A' + (markWeight ? '' : '55')
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = colors[5]
