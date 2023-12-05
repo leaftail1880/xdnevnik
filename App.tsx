@@ -19,7 +19,7 @@ import { ROUTES } from './src/NetSchool/routes'
 import { Button } from './src/components/Button'
 import { Ionicon } from './src/components/Icon'
 import { Loading } from './src/components/Loading'
-import { LANG, Status, styles } from './src/constants'
+import { LANG, LOGGER, Status, styles } from './src/constants'
 import { useAPI } from './src/hooks/api'
 import { Ctx, useSetupSettings } from './src/hooks/settings'
 import { setupNotifications } from './src/notifications'
@@ -61,7 +61,6 @@ export default function App() {
 	)
 
 	const [, rerender] = useState(0)
-
 	useEffect(() => {
 		Colors.loadDesignTokens({ primaryColor: settings.accentColor })
 
@@ -87,6 +86,11 @@ export default function App() {
 		rerender(s => s + 1)
 	}, [scheme])
 
+	LOGGER.debug({
+		accent: Colors.$backgroundAccent,
+		common: Colors.$textDefault,
+	})
+
 	// Same object across renders to prevent flickering
 	const [theme] = useState<Theme>(DarkTheme)
 
@@ -95,8 +99,8 @@ export default function App() {
 		background: Colors.$backgroundDefault,
 		border: Colors.$backgroundElevated,
 		card: Colors.$backgroundPrimaryLight,
-		notification: Colors.$iconPrimary,
-		primary: Colors.$iconPrimary,
+		notification: Colors.$backgroundAccent,
+		primary: Colors.$backgroundAccent,
 		text: Colors.$textDefault,
 	})
 

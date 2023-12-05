@@ -367,12 +367,12 @@ export class NetSchoolApi {
 
 	public async assignments({
 		studentId,
-		classsmetingsIds,
-	}: StudentId & { classsmetingsIds: number[] }) {
+		classmetingsIds,
+	}: StudentId & { classmetingsIds: number[] }) {
 		return this.get<Assignment[]>(ROUTES.assignments, {
 			params: [
 				['studentId', studentId],
-				...classsmetingsIds.map(e => ['classmeetingId', e] as [string, number]),
+				...classmetingsIds.map(e => ['classmeetingId', e] as [string, number]),
 			],
 		})
 	}

@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { Colors, ProgressBar, Spacings, Text, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
@@ -30,12 +30,18 @@ export function DiaryScreen() {
 		'дневника'
 	)
 
+	const classsmetingsIds = useMemo(
+		() => diary.result?.lessons.map(e => e.classmetingId),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[diary.result?.lessons.map(e => e.classmetingId).join('=')]
+	)
+
 	const homework = useAPI(
 		API,
 		'assignments',
 		{
 			studentId,
-			classsmetingsIds: diary.result?.lessons.map(e => e.classmetingId),
+			classmetingsIds: classsmetingsIds,
 		},
 		'оценок'
 	)
@@ -265,7 +271,7 @@ function DiaryDay({
 							(lesson.end.getTime() - lesson.start.getTime())
 						)
 					}
-					progressColor={Colors.$backgroundNeutralIdle}
+					progressColor={Colors.$textAccent}
 				/>
 			)}
 		</View>
