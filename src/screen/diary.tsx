@@ -8,7 +8,7 @@ import { IconButton } from '../components/Button'
 import { DiaryAssignment } from '../components/DiaryAssignment'
 import { Dropdown } from '../components/Dropdown'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
-import { LANG } from '../constants'
+import { LANG, LOGGER } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
@@ -181,7 +181,6 @@ export function DiaryScreen() {
 function DiaryDay({
 	lesson,
 	homework,
-	diary,
 }: {
 	lesson: Diary['lessons'][number]
 	homework: APIState<Assignment[]>
@@ -196,7 +195,7 @@ function DiaryDay({
 			style={{
 				alignItems: 'flex-start',
 				elevation: 3,
-				minWidth: 250,
+				minWidth: 280,
 			}}
 		>
 			<View
@@ -246,10 +245,6 @@ function DiaryDay({
 				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 			</Text>
 
-			{/* {lesson.lessonTheme && (
-				<Text $textAccent>Тема урока: {lesson.lessonTheme + '\n'}</Text>
-			)} */}
-
 			{homework.fallback ||
 				homework.result
 					.filter(
@@ -261,21 +256,68 @@ function DiaryDay({
 					)
 					.map(e => <DiaryAssignment assignment={e} key={e.assignmentId} />)}
 
-			{diary.isNow(lesson) && (
-				<ProgressBar
-					style={{ width: '100%', height: 20 }}
-					progress={
-						100 -
-						~~(
-							((lesson.end.getTime() - Date.now()) * 100) /
-							(lesson.end.getTime() - lesson.start.getTime())
-						)
-					}
-					progressColor={Colors.$textAccent}
-				/>
-			)}
+			<LessonProgress lesson={lesson} />
 		</View>
 	)
 }
 
+function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
+	const [now, setNow] = useState(Date.now())
+	useEffect(() => {
+		const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
 
+		return () => clearInterval(interval)
+	}, [])
+
+	const start = lesson.start.getTime()
+	const end = lesson.end.getTime()
+
+	LOGGER.debug({ f: now < start, s: now <= end, now, end })
+
+	if (now < start) {
+		// Not started yet
+		const minsBeforeStart = ~~((start - now) / (1000 * 60))
+
+		// Do not show time above 15 mins
+		if (minsBeforeStart < 15) {
+			return <Text>Начнется через {minsBeforeStart} мин</Text>
+		}
+	} else if (now <= end) {
+		// Lesson is going right now
+		const minsBeforeEnd = ~~((end - now) / (1000 * 60))
+		const minsTotal = ~~((end - start) / (1000 * 60))
+
+		return (
+			<View
+				style={{
+					width: '95%',
+				}}
+				row
+				spread
+				centerV
+			>
+				<View
+					style={{
+						width: '80%',
+					}}
+					marginR-s2
+				>
+					<ProgressBar
+						style={{
+							width: '100%',
+							height: 20,
+						}}
+						progress={100 - ~~(((end - now) * 100) / (end - start))}
+						progressColor={Colors.$textAccent}
+					/>
+				</View>
+				<Text>
+					{minsBeforeEnd}/{minsTotal} мин
+				</Text>
+			</View>
+		)
+	} else {
+		// Lesson is ended
+		return <Text $textPrimaryLight>Закончился</Text>
+	}
+}
