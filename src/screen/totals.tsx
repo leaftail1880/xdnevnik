@@ -180,7 +180,7 @@ type SubjectInfo = {
 } & Pick<TotalsContext, 'navigation'>
 
 function SubjectPerformanceInline(props: SubjectInfo) {
-	const { studentId, settings } = useContext(Ctx)
+	const { studentId } = useContext(Ctx)
 	const term = props.total.termTotals.find(
 		e => e.term.id === props.selectedTerm.id
 	)
@@ -213,7 +213,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					alignItems: 'flex-end',
 					maxHeight: 40,
 					width: '100%',
-					backgroundColor: settings.accentColor,
+					backgroundColor: Colors.$backgroundAccent,
 				}}
 			>
 				<SubjectName
@@ -222,7 +222,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					iconsSize={16}
 					style={{
 						fontSize: 16,
-						color: Colors.$textDefault,
+						color: Colors.$textAccent,
 						fontWeight: 'bold',
 					}}
 				/>

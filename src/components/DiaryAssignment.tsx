@@ -31,7 +31,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 					</SmallButton>
 				)}
 				{showHw && (
-					<Text $textAccent margin-s1 style={{ width: '85%' }}>
+					<Text $textAccent margin-s1 style={{ width: '85%' }} selectable>
 						{assignment.assignmentTypeName}: {assignment.assignmentName}
 					</Text>
 				)}
