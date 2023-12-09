@@ -19,7 +19,7 @@ import { Mark } from '../components/Mark'
 import { LANG, styles } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
-import { SubjectTotals } from './subjectTotals'
+import { SubjectTotals, caclulateMarks } from './subjectTotals'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 const S_TOTALS = LANG['s_totalsN']
@@ -228,7 +228,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 				/>
 			</View>
 			{term ? (
-				<View flex row spread centerV>
+				<View flex row centerV style={{ alignItems: 'flex-end' }}>
 					<SubjectMarksInline
 						{...props}
 						openDetails={openDetails}
@@ -274,9 +274,9 @@ const SubjectMarksInline = memo(
 
 		if (assignments.fallback) return assignments.fallback
 
-		const weights = assignments.result.results.map(e => e.weight)
-		const maxWeight = Math.max(...weights)
-		const minWeight = Math.min(...weights)
+		const { totalsAndSheduledTotals, maxWeight, minWeight } = caclulateMarks({
+			totals: assignments.result,
+		})
 
 		return (
 			<ScrollView
@@ -286,15 +286,20 @@ const SubjectMarksInline = memo(
 					margin: 0,
 					minWidth: 100,
 				}}
+				snapToAlignment="end"
 			>
-				{assignments.result.results.map(e => (
+				{totalsAndSheduledTotals.map(e => (
 					<Mark
 						mark={e.result ?? 'Нет'}
-						markWeight={{
-							max: maxWeight,
-							min: minWeight,
-							current: e.weight,
-						}}
+						markWeight={
+							e.weight
+								? {
+										max: maxWeight,
+										min: minWeight,
+										current: e.weight,
+								  }
+								: void 0
+						}
 						style={{ height: 50, width: 50 }}
 						key={e.assignmentId}
 						onPress={props.openDetails}

@@ -52,14 +52,13 @@ export interface Assignment {
 	canAnswer: boolean
 }
 
-export interface RawLesson {
+interface BaseLesson {
 	classmeetingId: number
 	studentId: number
 	assignmentId: number[]
 	order: number
 	scheduleTimeNumber: number
 	scheduleTimeRelay: number
-	day: string
 	subjectName: string
 	subjectId: number
 	subjectGroupId: number
@@ -75,36 +74,45 @@ export interface RawLesson {
 	extraActivity: boolean
 }
 
+interface RawLesson extends BaseLesson {
+	day: string
+}
+
 /**
  * Class representing one lesson
  */
 class Lesson {
-	public id: number
-	public subjectName: string
-	public subjectId: number
-	public roomName: string
-	public lessonTheme: string
-	public teachers: NSEntity[]
 	private _end: string
 	private _start: string
 	private _day: string
-	public classmetingId: number
+	public classmeetingId: number
+	public studentId: number
+	public assignmentId: number[]
+	public order: number
+	public scheduleTimeNumber: number
+	public scheduleTimeRelay: number
+	public subjectName: string
+	public subjectId: number
+	public subjectGroupId: number
+	public teachers: NSEntity[]
+	public lessonTheme: string
+	public roomName: string
+	public attachmentsExists: boolean
+	public resultsExists: boolean
+	public attendance: string | number | null
+	public addEducation: boolean
+	public extraActivity: boolean
 
 	/**
 	 * Creates new lesson
 	 * @param lesson - Raw lesson got from fetch response
 	 */
 	public constructor(lesson: RawLesson) {
-		this.id = lesson.classmeetingId
-		this.subjectName = lesson.subjectName
-		this.subjectId = lesson.subjectId
-		this.classmetingId = lesson.classmeetingId
-		this.roomName = lesson.roomName
-		this._end = lesson.endTime
-		this._start = lesson.startTime
-		this._day = lesson.day
-		this.lessonTheme = lesson.lessonTheme
-		this.teachers = lesson.teachers
+		const { endTime, startTime, day, ...ours } = lesson
+		Object.assign(this, ours)
+		this._end = endTime
+		this._start = startTime
+		this._day = day
 	}
 
 	/**

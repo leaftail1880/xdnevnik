@@ -4,10 +4,13 @@ import { Assignment } from '../NetSchool/classes'
 import { SmallButton } from './Button'
 import { Mark } from './Mark'
 
+// TODO support attachment
+
 export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 	const [showHw, setShowHw] = useState(
 		// Do not show long hw by default
-		assignment.assignmentTypeName.length < 20
+		// assignment.assignmentTypeName.length < 20
+		false
 	)
 	return (
 		<View row spread centerV style={{ width: '100%' }} marginB-s2>
@@ -18,8 +21,8 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 						style={{
 							borderColor: Colors.$textAccent,
 							borderWidth: 2,
-							width: 40,
-							height: 40,
+							width: 45,
+							height: 45,
 						}}
 						centerH
 						centerV
@@ -45,7 +48,11 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 						min: assignment.weight,
 						current: assignment.weight,
 					}}
-					style={{ width: 45, height: 45, padding: 0 }}
+					style={{
+						width: 45,
+						height: 45,
+						padding: 0,
+					}}
 					textStyle={{ fontSize: 16 }}
 					subTextStyle={{ fontSize: 14, alignSelf: 'center' }}
 				/>

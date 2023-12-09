@@ -8,7 +8,7 @@ import { IconButton } from '../components/Button'
 import { DiaryAssignment } from '../components/DiaryAssignment'
 import { Dropdown } from '../components/Dropdown'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
-import { LANG, LOGGER } from '../constants'
+import { LANG } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 
@@ -31,9 +31,9 @@ export function DiaryScreen() {
 	)
 
 	const classsmetingsIds = useMemo(
-		() => diary.result?.lessons.map(e => e.classmetingId),
+		() => diary.result?.lessons.map(e => e.classmeetingId),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[diary.result?.lessons.map(e => e.classmetingId).join('=')]
+		[diary.result?.lessons.map(e => e.classmeetingId).join('=')]
 	)
 
 	const homework = useAPI(
@@ -161,12 +161,13 @@ export function DiaryScreen() {
 					{diary.fallback ||
 						diary.result
 							.forDay(diaryDay)
+							.sort((a, b) => a.order - b.order)
 							.map(lesson => (
 								<DiaryDay
 									lesson={lesson}
 									homework={homework}
 									diary={diary.result}
-									key={lesson.id.toString()}
+									key={lesson.classmeetingId.toString()}
 								/>
 							))}
 				</View>
@@ -241,15 +242,27 @@ function DiaryDay({
 					/>
 				</View>
 			</View>
-			<Text text50 $textAccent>
+			<Text text50 color={Colors.rgba(Colors.$textAccent, 0.7)}>
 				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 			</Text>
+
+			<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
+				{lesson.lessonTheme}
+			</Text>
+
+			{lesson.attachmentsExists && (
+				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					Есть дз ввиде файла
+				</Text>
+			)}
+
+			{/* <Text $textAccent>{lesson}</Text> */}
 
 			{homework.fallback ||
 				homework.result
 					.filter(
 						e =>
-							e.classmeetingId === lesson.classmetingId ||
+							e.classmeetingId === lesson.classmeetingId ||
 							(!e.weight &&
 								new Date(e.assignmentDate).toYYYYMMDD() ===
 									lesson.start.toYYYYMMDD())
@@ -271,8 +284,6 @@ function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
 
 	const start = lesson.start.getTime()
 	const end = lesson.end.getTime()
-
-	LOGGER.debug({ f: now < start, s: now <= end, now, end })
 
 	if (now < start) {
 		// Not started yet
