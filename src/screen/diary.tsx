@@ -250,6 +250,12 @@ function DiaryDay({
 				{lesson.lessonTheme}
 			</Text>
 
+			{lesson.attachmentsExists && (
+				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					Есть дз ввиде файла
+				</Text>
+			)}
+
 			{/* <Text $textAccent>{lesson}</Text> */}
 
 			{homework.fallback ||

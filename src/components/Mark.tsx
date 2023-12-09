@@ -4,6 +4,8 @@ import { Colors, Text } from 'react-native-ui-lib'
 import { Ctx } from '../hooks/settings'
 import { ButtonProps, SmallButton } from './Button'
 
+// TODO support duty
+
 const MarkColorsBG = {
 	5: '#007000',
 	4: '#947900',

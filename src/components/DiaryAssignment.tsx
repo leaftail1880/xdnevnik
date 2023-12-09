@@ -4,6 +4,8 @@ import { Assignment } from '../NetSchool/classes'
 import { SmallButton } from './Button'
 import { Mark } from './Mark'
 
+// TODO support attachment
+
 export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 	const [showHw, setShowHw] = useState(
 		// Do not show long hw by default
