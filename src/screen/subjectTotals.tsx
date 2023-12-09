@@ -10,6 +10,7 @@ import {
 	View,
 } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
+import { SubjectPerformance } from '../NetSchool/classes'
 import {
 	Button,
 	IconButton,
@@ -45,60 +46,8 @@ export function SubjectTotals({
 
 	if (FallbackTotals) return FallbackTotals
 
-	let missedMark = (totals.attendance ?? []).map(e => {
-		return {
-			result: e.attendanceMark,
-			assignmentId: e.classMeetingDate + e.attendanceMark,
-			date: e.classMeetingDate,
-		}
-	})
-
-	if (lessonsWithoutMark) {
-		missedMark = missedMark.concat(
-			new Array(
-				totals.classmeetingsStats.passed -
-					totals.results.length -
-					missedMark.length
-			).fill({ result: 'Нет' })
-		)
-	}
-
-	let totalsAndSheduledTotals = [...missedMark, ...totals.results].sort(
-		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-	) as Partial<MarkInfo>[]
-
-	if (lessonsWithoutMark) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
-			new Array(
-				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
-			).fill({})
-		)
-	}
-
-	let avgMark = totals.averageMark
-
-	if (customMarks.length) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
-		let totalWeight = 0
-		let totalMark = 0
-
-		for (const mark of [
-			...totals.results,
-			...(customMarks as {
-				weight: number
-				result: number
-			}[]),
-		]) {
-			totalWeight += mark.weight
-			totalMark += mark.weight * mark.result
-		}
-
-		avgMark = Number((totalMark / totalWeight).toFixed(2))
-	}
-
-	const weights = totals.results.map(e => e.weight)
-	const maxWeight = Math.max(...weights)
-	const minWeight = Math.min(...weights)
+	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } =
+		caclulateMarks({ totals, lessonsWithoutMark, customMarks })
 
 	return (
 		<ScrollView refreshControl={refreshControl}>
@@ -208,6 +157,73 @@ export function SubjectTotals({
 		</ScrollView>
 	)
 }
+
+export function caclulateMarks({
+	totals,
+	lessonsWithoutMark = false,
+	customMarks = [],
+}: {
+	totals: SubjectPerformance
+	lessonsWithoutMark?: boolean
+	customMarks?: Partial<MarkInfo>[]
+}) {
+	let missedMark = (totals.attendance ?? []).map(e => {
+		return {
+			result: e.attendanceMark,
+			assignmentId: e.classMeetingDate + e.attendanceMark,
+			date: e.classMeetingDate,
+		}
+	})
+
+	if (lessonsWithoutMark) {
+		missedMark = missedMark.concat(
+			new Array(
+				totals.classmeetingsStats.passed -
+					totals.results.length -
+					missedMark.length
+			).fill({ result: 'Нет' })
+		)
+	}
+
+	let totalsAndSheduledTotals = [...missedMark, ...totals.results].sort(
+		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+	) as Partial<MarkInfo>[]
+
+	if (lessonsWithoutMark) {
+		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
+			new Array(
+				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
+			).fill({})
+		)
+	}
+
+	let avgMark = totals.averageMark
+
+	if (customMarks.length) {
+		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
+		let totalWeight = 0
+		let totalMark = 0
+
+		for (const mark of [
+			...totals.results,
+			...(customMarks as {
+				weight: number
+				result: number
+			}[]),
+		]) {
+			totalWeight += mark.weight
+			totalMark += mark.weight * mark.result
+		}
+
+		avgMark = Number((totalMark / totalWeight).toFixed(2))
+	}
+
+	const weights = totals.results.map(e => e.weight)
+	const maxWeight = Math.max(...weights)
+	const minWeight = Math.min(...weights)
+	return { avgMark, totalsAndSheduledTotals, maxWeight, minWeight }
+}
+
 function AddMarkForm(props: {
 	setCustomMarks: (p: Partial<MarkInfo>[]) => void
 	customMarks: Partial<MarkInfo>[]
