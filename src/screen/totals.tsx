@@ -236,6 +236,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					/>
 
 					<Mark
+						duty={false}
 						finalMark={term?.mark}
 						mark={term.avgMark}
 						onPress={openDetails}
@@ -269,6 +270,7 @@ const SubjectMarksInline = memo(
 				subjects: props.subjects,
 				subjectId: props.total.subjectId,
 				settings,
+				studentId: studentId!,
 			})
 		)
 
@@ -290,6 +292,7 @@ const SubjectMarksInline = memo(
 			>
 				{totalsAndSheduledTotals.map(e => (
 					<Mark
+						duty={e.duty ?? false}
 						mark={e.result ?? 'Нет'}
 						markWeight={
 							e.weight
@@ -341,7 +344,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 				}}
 			>
 				{/* Table first row */}
-				<Text $textAccent style={{  width: `${headerWidth}%` }}>
+				<Text $textAccent style={{ width: `${headerWidth}%` }}>
 					{new Date(schoolYear!.startDate).getFullYear()}/
 					{new Date(schoolYear!.endDate).getFullYear()} Четверти
 				</Text>
@@ -349,7 +352,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 				{/* Table rows */}
 				{totals.result[0].termTotals.map((_, i, a) => (
 					<Text
-					$textAccent
+						$textAccent
 						style={{ width: termTotalWidth }}
 						key={i.toString()}
 					>
@@ -384,6 +387,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 					{/* Table rows */}
 					{total.termTotals.map((term, i) => (
 						<Mark
+							duty={false}
 							finalMark={term.mark}
 							mark={term.avgMark}
 							style={{

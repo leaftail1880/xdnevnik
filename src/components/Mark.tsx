@@ -4,8 +4,6 @@ import { Colors, Text } from 'react-native-ui-lib'
 import { Ctx } from '../hooks/settings'
 import { ButtonProps, SmallButton } from './Button'
 
-// TODO support duty
-
 const MarkColorsBG = {
 	5: '#007000',
 	4: '#947900',
@@ -26,18 +24,21 @@ export function Mark({
 	style,
 	textStyle,
 	subTextStyle,
+	duty,
 	...props
 }: ButtonProps & {
 	finalMark?: number | null | string
 	mark: number | null | string
 	markWeight?: { max: number; min: number; current: number } | Falsy
+	duty: boolean
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 }) {
 	const { settings } = useContext(Ctx)
 	const bg = settings.markStyle === 'background'
-
 	const colors = bg ? MarkColorsBG : MarkColorsText
+
+	if (duty) markProp = 2
 
 	const mark = finalMark ? Number(finalMark) : markProp
 	let color: string = '#7A7A7A' + (markWeight ? '' : '55')
@@ -95,7 +96,7 @@ export function Mark({
 			]}
 		>
 			<Text center text60 color={textColor} style={textStyle} margin-0>
-				{finalMark ?? markProp}
+				{duty ? '.' : finalMark ?? markProp}
 			</Text>
 			{markWeight && (
 				<Text

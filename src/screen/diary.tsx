@@ -76,6 +76,7 @@ export function DiaryScreen() {
 						subjectId: lesson.subjectId,
 						subjectName: lesson.subjectName,
 						settings,
+						studentId: studentId!,
 					})
 
 					Notifications.scheduleNotificationAsync({
@@ -98,13 +99,13 @@ export function DiaryScreen() {
 				}
 			})
 		}
-	}, [settings.notifications, diary, settings])
+	}, [settings.notifications, diary, settings, studentId])
 
 	const weekBefore = new Date()
 	const weekAfter = new Date()
 
-	weekBefore.setDate(weekBefore.getDate() - 7)
-	weekAfter.setDate(weekAfter.getDate() + 7)
+	weekBefore.setDate(weekDate.getDate() - 7)
+	weekAfter.setDate(weekDate.getDate() + 7)
 
 	const values = [
 		{
@@ -171,7 +172,7 @@ export function DiaryScreen() {
 								/>
 							))}
 				</View>
-				<Text center $textDisabled marginB-s3>
+				<Text center $textDisabled marginB-20>
 					{diary.updateDate}
 				</Text>
 			</ScrollView>
@@ -190,7 +191,6 @@ function DiaryDay({
 	return (
 		<View
 			margin-s2
-			padding-s3
 			br20
 			bg-$backgroundAccent
 			style={{
@@ -200,18 +200,18 @@ function DiaryDay({
 			}}
 		>
 			<View
-				flex
 				row
 				spread
 				centerV
-				marginB-7
+				padding-s3
+				backgroundColor={Colors.rgba(Colors.$backgroundPrimaryHeavy, 0.4)}
+				br20
 				style={{
 					width: '100%',
 				}}
 			>
 				<SubjectName
 					iconsSize={18}
-					marginT-0
 					style={{
 						fontWeight: 'bold',
 						maxWidth: '90%',
@@ -224,7 +224,6 @@ function DiaryDay({
 
 				<View row spread centerV>
 					<Text
-						margin-s1
 						marginT-0
 						style={{
 							fontWeight: 'bold',
@@ -242,32 +241,45 @@ function DiaryDay({
 					/>
 				</View>
 			</View>
-			<Text text50 color={Colors.rgba(Colors.$textAccent, 0.7)}>
-				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
-			</Text>
-
-			<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
-				{lesson.lessonTheme}
-			</Text>
-
-			{lesson.attachmentsExists && (
-				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
-					Есть дз ввиде файла
+			<View
+				margin-s3
+				style={{
+					width: '100%',
+				}}
+			>
+				<Text text50 color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 				</Text>
-			)}
 
-			{/* <Text $textAccent>{lesson}</Text> */}
+				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					{lesson.lessonTheme}
+				</Text>
 
-			{homework.fallback ||
-				homework.result
-					.filter(
-						e =>
-							e.classmeetingId === lesson.classmeetingId ||
-							(!e.weight &&
-								new Date(e.assignmentDate).toYYYYMMDD() ===
-									lesson.start.toYYYYMMDD())
-					)
-					.map(e => <DiaryAssignment assignment={e} key={e.assignmentId} />)}
+				{lesson.attachmentsExists && (
+					<Text color={Colors.rgba(Colors.$textAccent, 0.7)} marginB-s2>
+						Есть дз ввиде файла
+					</Text>
+				)}
+			</View>
+
+			<View
+				backgroundColor={Colors.rgba(Colors.$backgroundElevated, 0.3)}
+				br30
+				margin-s2
+				padding-s1
+				style={{ width: '96%' }}
+			>
+				{homework.fallback ||
+					homework.result
+						.filter(
+							e =>
+								e.classmeetingId === lesson.classmeetingId ||
+								(!e.weight &&
+									new Date(e.assignmentDate).toYYYYMMDD() ===
+										lesson.start.toYYYYMMDD())
+						)
+						.map(e => <DiaryAssignment assignment={e} key={e.assignmentId} />)}
+			</View>
 
 			<LessonProgress lesson={lesson} />
 		</View>

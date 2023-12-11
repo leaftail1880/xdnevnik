@@ -6,6 +6,7 @@ import { Subject } from '../NetSchool/classes'
 import { styles } from '../constants'
 import { Ctx, SettingsCtx } from '../hooks/settings'
 import { IconButton } from './Button'
+import { Loading } from './Loading'
 
 type SubjectNameOptions = {
 	subjectId: number
@@ -20,10 +21,14 @@ type SubjectNameOptions = {
 
 type GetSubjectNameOptions = {
 	settings: SettingsCtx
+	studentId: number
 } & SubjectNameOptions
 
 export function getSubjectName(props: GetSubjectNameOptions) {
-	const overriden = props.settings.overrides.subjectNames[props.subjectId]
+	const overriden =
+		props.settings.studentOverrides[props.studentId]?.subjectNames[
+			props.subjectId
+		]
 
 	if (overriden) return overriden
 
@@ -40,11 +45,13 @@ type SubjectNameProps = {
 	Omit<TextProps, 'textAlign'>
 
 export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
-	const { settings } = useContext(Ctx)
-	const name = getSubjectName({ ...props, settings })
-
+	const { settings, studentId } = useContext(Ctx)
 	const [isEditing, setIsEditing] = useState(false)
 	const [newName, setNewName] = useState('')
+
+	if (!studentId) return <Loading />
+
+	const name = getSubjectName({ ...props, settings, studentId })
 
 	return (
 		<View style={[styles.stretch, { margin: 0, padding: 0 }, viewStyle]}>
@@ -73,9 +80,12 @@ export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
 				onPress={() => {
 					if (isEditing) {
 						settings.save({
-							overrides: {
-								subjectNames: {
-									[props.subjectId]: newName ? newName : undefined,
+							studentOverrides: {
+								[studentId]: {
+									subjectNames: {
+										[props.subjectId]: newName ? newName : undefined,
+									},
+									subjects: settings.studentOverrides[studentId]?.subjects ?? {}
 								},
 							},
 						})

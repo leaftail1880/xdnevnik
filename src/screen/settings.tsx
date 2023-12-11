@@ -24,7 +24,6 @@ export function SettingsScreen() {
 		{ name: 'Системная', i: 'system' as const },
 		{ name: 'Темная', i: 'dark' as const },
 		{ name: 'Светлая', i: 'light' as const },
-		{ name: 'Своя', i: 'light' as const },
 	]
 
 	const markStyles = [

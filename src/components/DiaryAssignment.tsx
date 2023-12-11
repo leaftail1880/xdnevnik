@@ -10,10 +10,19 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 	const [showHw, setShowHw] = useState(
 		// Do not show long hw by default
 		// assignment.assignmentTypeName.length < 20
-		false
+		true
 	)
 	return (
-		<View row spread centerV style={{ width: '100%' }} marginB-s2>
+		<View
+			row
+			spread
+			centerV
+			style={{ width: '100%' }}
+			marginV-s1
+			backgroundColor={Colors.rgba(Colors.$backgroundPrimaryMedium, 0.1)}
+			paddingV-s1
+			br20
+		>
 			<View row marginH-s1 style={{ width: '80%' }}>
 				{assignment.assignmentTypeName && (
 					<SmallButton
@@ -23,6 +32,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 							borderWidth: 2,
 							width: 45,
 							height: 45,
+							alignSelf: 'center',
 						}}
 						centerH
 						centerV
@@ -34,7 +44,12 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 					</SmallButton>
 				)}
 				{showHw && (
-					<Text $textAccent margin-s1 style={{ width: '85%' }} selectable>
+					<Text
+						$textAccent
+						margin-s2
+						style={{ width: '85%', alignSelf: 'center' }}
+						selectable
+					>
 						{assignment.assignmentTypeName}: {assignment.assignmentName}
 					</Text>
 				)}
@@ -43,6 +58,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 			<View row center>
 				<Mark
 					mark={assignment.result ?? 'Нет'}
+					duty={assignment.duty}
 					markWeight={{
 						max: assignment.weight,
 						min: assignment.weight,
@@ -52,6 +68,7 @@ export function DiaryAssignment({ assignment }: { assignment: Assignment }) {
 						width: 45,
 						height: 45,
 						padding: 0,
+						alignSelf: 'center',
 					}}
 					textStyle={{ fontSize: 16 }}
 					subTextStyle={{ fontSize: 14, alignSelf: 'center' }}
