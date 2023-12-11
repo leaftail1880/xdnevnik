@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Theme } from '@react-navigation/native'
 import { createContext, useEffect, useState } from 'react'
+import { RefreshControl } from 'react-native-gesture-handler'
 import { Student } from '../NetSchool/classes'
 import { Loading } from '../components/Loading'
-import { APIState } from './api'
-import { Theme } from '@react-navigation/native'
-import { RefreshControl } from 'react-native-gesture-handler'
 import { ACCENT_COLOR } from '../constants'
+import { APIState } from './api'
 
 interface Settings {
 	notifications: boolean
@@ -17,13 +17,23 @@ interface Settings {
 	selectedTerm?: number
 	markStyle: 'background' | 'border'
 	accentColor: string
-	overrides: {
-		/**
-		 * Map containing subjectIds as keys and overrided subjectName as value
-		 */
-		subjectNames: Record<string, string | undefined>
-		subjects: Record<string, object>
-	}
+	/**
+	 * Map containing per student overrides
+	 */
+	studentOverrides: Record<
+		string,
+		| {
+				/**
+				 * Map containing subjectIds as keys and overrided subjectName as value
+				 */
+				subjectNames: Record<string, string | undefined>
+				/**
+				 * Map containing new information about
+				 */
+				subjects: Record<string, object>
+		  }
+		| undefined
+	>
 }
 
 type DeepPartial<T> = {
@@ -38,10 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	markStyle: 'border',
 	accentColor: ACCENT_COLOR,
 	currentTotalsOnly: true,
-	overrides: {
-		subjectNames: {},
-		subjects: {},
-	},
+	studentOverrides: {},
 }
 
 export function useSetupSettings() {

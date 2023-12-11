@@ -64,6 +64,7 @@ export function SubjectTotals({
 					margin-s1
 				/>
 				<Mark
+					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
 					style={{ height: 50, width: 60 }}
@@ -92,6 +93,7 @@ export function SubjectTotals({
 							padding-s2
 						>
 							<Mark
+								duty={e.duty ?? false}
 								mark={e.result ?? null}
 								markWeight={
 									typeof e.weight === 'number' && {
