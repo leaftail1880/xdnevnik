@@ -1,9 +1,9 @@
 import * as Notifications from 'expo-notifications'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { Colors, ProgressBar, Spacings, Text, View } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
-import { Assignment, Diary } from '../NetSchool/classes'
+import { Assignment, Attachment, Diary } from '../NetSchool/classes'
 import { IconButton } from '../components/Button'
 import { DiaryAssignment } from '../components/DiaryAssignment'
 import { Dropdown } from '../components/Dropdown'
@@ -30,14 +30,40 @@ export function DiaryScreen() {
 		'дневника'
 	)
 
+	const classmetingsIds = useMemo(
+		() => diary.result?.lessons.map(e => e.classmeetingId),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[diary.result?.lessons.map(e => e.classmeetingId).join('=')]
+	)
+
 	const homework = useAPI(
 		API,
 		'assignments',
 		{
 			studentId,
-			classsmetingsIds: diary.result?.lessons.map(e => e.classmetingId),
+			classmetingsIds,
 		},
 		'оценок'
+	)
+
+	const withAttachments = useMemo(
+		() =>
+			homework.result
+				?.filter(e => e.attachmentsExists)
+				.map(e => e.assignmentId),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[homework.result?.map(e => e.assignmentId).join('=')]
+	)
+
+	const attachments = useAPI(
+		API,
+		'attachments',
+		{
+			studentId,
+			assignmentIds:
+				withAttachments?.length !== 0 ? withAttachments : undefined,
+		},
+		'файлов'
 	)
 
 	useEffect(() => {
@@ -70,6 +96,7 @@ export function DiaryScreen() {
 						subjectId: lesson.subjectId,
 						subjectName: lesson.subjectName,
 						settings,
+						studentId: studentId!,
 					})
 
 					Notifications.scheduleNotificationAsync({
@@ -92,13 +119,13 @@ export function DiaryScreen() {
 				}
 			})
 		}
-	}, [settings.notifications, diary, settings])
+	}, [settings.notifications, diary, settings, studentId])
 
 	const weekBefore = new Date()
 	const weekAfter = new Date()
 
-	weekBefore.setDate(weekBefore.getDate() - 7)
-	weekAfter.setDate(weekAfter.getDate() + 7)
+	weekBefore.setDate(weekDate.getDate() - 7)
+	weekAfter.setDate(weekDate.getDate() + 7)
 
 	const values = [
 		{
@@ -155,16 +182,18 @@ export function DiaryScreen() {
 					{diary.fallback ||
 						diary.result
 							.forDay(diaryDay)
+							.sort((a, b) => a.order - b.order)
 							.map(lesson => (
 								<DiaryDay
+									attachments={attachments}
 									lesson={lesson}
 									homework={homework}
 									diary={diary.result}
-									key={lesson.id.toString()}
+									key={lesson.classmeetingId.toString()}
 								/>
 							))}
 				</View>
-				<Text center $textDisabled marginB-s3>
+				<Text center $textDisabled marginB-20>
 					{diary.updateDate}
 				</Text>
 			</ScrollView>
@@ -175,37 +204,37 @@ export function DiaryScreen() {
 function DiaryDay({
 	lesson,
 	homework,
-	diary,
+	attachments,
 }: {
 	lesson: Diary['lessons'][number]
 	homework: APIState<Assignment[]>
+	attachments: APIState<Attachment[]>
 	diary: Diary
 }) {
 	return (
 		<View
 			margin-s2
-			padding-s3
 			br20
 			bg-$backgroundAccent
 			style={{
 				alignItems: 'flex-start',
 				elevation: 3,
-				minWidth: 250,
+				minWidth: 280,
 			}}
 		>
 			<View
-				flex
 				row
 				spread
 				centerV
-				marginB-7
+				padding-s3
+				backgroundColor={Colors.rgba(Colors.white, 0.2)}
+				br20
 				style={{
 					width: '100%',
 				}}
 			>
 				<SubjectName
 					iconsSize={18}
-					marginT-0
 					style={{
 						fontWeight: 'bold',
 						maxWidth: '90%',
@@ -218,7 +247,6 @@ function DiaryDay({
 
 				<View row spread centerV>
 					<Text
-						margin-s1
 						marginT-0
 						style={{
 							fontWeight: 'bold',
@@ -236,40 +264,110 @@ function DiaryDay({
 					/>
 				</View>
 			</View>
-			<Text text50 $textAccent>
-				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
-			</Text>
+			<View
+				margin-s3
+				style={{
+					width: '100%',
+				}}
+			>
+				<Text text50 color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
+				</Text>
 
-			{/* {lesson.lessonTheme && (
-				<Text $textAccent>Тема урока: {lesson.lessonTheme + '\n'}</Text>
-			)} */}
+				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
+					{lesson.lessonTheme}
+				</Text>
 
-			{homework.fallback ||
-				homework.result
-					.filter(
-						e =>
-							e.classmeetingId === lesson.classmetingId ||
-							(!e.weight &&
-								new Date(e.assignmentDate).toYYYYMMDD() ===
-									lesson.start.toYYYYMMDD())
-					)
-					.map(e => <DiaryAssignment assignment={e} key={e.assignmentId} />)}
+				{lesson.attachmentsExists && (
+					<Text color={Colors.rgba(Colors.$textAccent, 0.7)} marginB-s2>
+						Есть дз ввиде файла
+					</Text>
+				)}
+			</View>
 
-			{diary.isNow(lesson) && (
-				<ProgressBar
-					style={{ width: '100%', height: 20 }}
-					progress={
-						100 -
-						~~(
-							((lesson.end.getTime() - Date.now()) * 100) /
-							(lesson.end.getTime() - lesson.start.getTime())
+			<View
+				backgroundColor={Colors.rgba(Colors.$backgroundElevated, 0.3)}
+				br30
+				margin-s2
+				padding-s1
+				style={{ width: '96%' }}
+			>
+				{homework.fallback ||
+					homework.result
+						.filter(
+							e =>
+								e.classmeetingId === lesson.classmeetingId ||
+								(!e.weight &&
+									new Date(e.assignmentDate).toYYYYMMDD() ===
+										lesson.start.toYYYYMMDD())
 						)
-					}
-					progressColor={Colors.$backgroundNeutralIdle}
-				/>
-			)}
+						.map(e => (
+							<DiaryAssignment
+								assignment={e}
+								attachments={attachments}
+								key={e.assignmentId}
+							/>
+						))}
+			</View>
+
+			<LessonProgress lesson={lesson} />
 		</View>
 	)
 }
 
+function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
+	const now = new Date(2023, 11, 12, 8, 30).getTime()
+	// const [now, setNow] = useState(Date.now())
+	// useEffect(() => {
+	// 	const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
 
+	// 	return () => clearInterval(interval)
+	// }, [])
+
+	const start = lesson.start.getTime()
+	const end = lesson.end.getTime()
+
+	if (now < start) {
+		// Not started yet
+		const minsBeforeStart = ~~((start - now) / (1000 * 60))
+
+		// Do not show time above 15 mins
+		if (minsBeforeStart < 15) {
+			return <Text>Начнется через {minsBeforeStart} мин</Text>
+		}
+	} else if (now <= end) {
+		// Lesson is going right now
+		const minsBeforeEnd = ~~((now - start) / (1000 * 60))
+		const minsTotal = ~~((end - start) / (1000 * 60))
+
+		return (
+			<View row center margin-s2 centerV padding-s1>
+				<View
+					style={{
+						width: '80%',
+					}}
+				>
+					<ProgressBar
+						style={{
+							width: '100%',
+							height: 20,
+							backgroundColor: Colors.rgba(Colors.black, 0.3),
+						}}
+						progress={100 - ~~(((end - now) * 100) / (end - start))}
+						progressColor={Colors.$textAccent}
+					/>
+				</View>
+				<Text $textAccent margin-s1>
+					{minsBeforeEnd}/{minsTotal} мин
+				</Text>
+			</View>
+		)
+	} else {
+		// Lesson is ended
+		return (
+			<Text color={Colors.rgba(Colors.$textAccent, 0.7)} center margin-s2>
+				Закончился
+			</Text>
+		)
+	}
+}

@@ -24,11 +24,15 @@ export function Mark({
 	style,
 	textStyle,
 	subTextStyle,
+	duty,
+	noColor = '#7A7A7A',
 	...props
 }: ButtonProps & {
 	finalMark?: number | null | string
 	mark: number | null | string
 	markWeight?: { max: number; min: number; current: number } | Falsy
+	duty: boolean
+	noColor?: string
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 }) {
@@ -37,8 +41,11 @@ export function Mark({
 
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
+	if (duty) markProp = 2
 	const mark = finalMark ? Number(finalMark) : markProp
-	let color: string = '#555555' + (markWeight ? '' : 'FF')
+	if (duty) markProp = '.'
+
+	let color: string = noColor + (markWeight ? '' : '55')
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = colors[5]

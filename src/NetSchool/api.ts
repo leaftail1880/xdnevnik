@@ -3,6 +3,7 @@ import { URL, URLSearchParams } from 'react-native-url-polyfill'
 import { LOGGER } from '../constants'
 import {
 	Assignment,
+	Attachment,
 	Diary,
 	Education,
 	Endpoint,
@@ -100,7 +101,7 @@ export class NetSchoolApi {
 		return api.origin
 	}
 
-	private _cache: Record<string, [number, object]> = {}
+	private _cache: Record<string, [number, object | undefined | null]> = {}
 	/**
 	 * Cache to store responses to work in offline mode
 	 */
@@ -232,7 +233,14 @@ export class NetSchoolApi {
 			.join('')
 	}
 
-	public async request<T>(url: string, init: ReqInit = {}): Promise<T> {
+	public async request<T extends object | null | undefined>(
+		url: string,
+		init: ReqInit = {},
+		fetchFn: (
+			url: string,
+			init: RequestInit
+		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch
+	): Promise<T> {
 		const request: RequestInit & Required<Pick<RequestInit, 'headers'>> = {
 			headers: {},
 		}
@@ -267,7 +275,7 @@ export class NetSchoolApi {
 				}
 			}
 
-			const response = await fetch(url, { ...init, ...request })
+			const response = await fetchFn(url, { ...init, ...request })
 
 			if (response.status === 503)
 				throw new NetSchoolError(this.errorReasons[503], {
@@ -352,6 +360,18 @@ export class NetSchoolApi {
 				},
 			})
 		)
+	}
+
+	public async attachments({
+		studentId,
+		assignmentIds,
+	}: StudentId & { assignmentIds: number[] }) {
+		return this.get<Attachment[]>(ROUTES.attachments, {
+			params: [
+				['studentId', studentId],
+				...assignmentIds.map(e => ['assignmentId', e] as [string, number]),
+			],
+		})
 	}
 
 	public async assignment({

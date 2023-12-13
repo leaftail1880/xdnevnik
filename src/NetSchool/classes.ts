@@ -232,3 +232,11 @@ export type ReactStateHook = {
 	authorized: null | true
 	updateEffects: number
 }
+
+export interface Attachment {
+	classMeetingId: number
+	assignmentId: number
+	attachmentId: number
+	fileName: string
+	description: null | string
+}
