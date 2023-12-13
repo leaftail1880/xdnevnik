@@ -19,7 +19,7 @@ import { Mark } from '../components/Mark'
 import { LANG, styles } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
-import { SubjectTotals } from './subjectTotals'
+import { SubjectTotals, caclulateMarks } from './subjectTotals'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 const S_TOTALS = LANG['s_totalsN']
@@ -180,7 +180,7 @@ type SubjectInfo = {
 } & Pick<TotalsContext, 'navigation'>
 
 function SubjectPerformanceInline(props: SubjectInfo) {
-	const { studentId, settings } = useContext(Ctx)
+	const { studentId } = useContext(Ctx)
 	const term = props.total.termTotals.find(
 		e => e.term.id === props.selectedTerm.id
 	)
@@ -213,7 +213,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					alignItems: 'flex-end',
 					maxHeight: 40,
 					width: '100%',
-					backgroundColor: settings.accentColor,
+					backgroundColor: Colors.$backgroundAccent,
 				}}
 			>
 				<SubjectName
@@ -222,13 +222,13 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					iconsSize={16}
 					style={{
 						fontSize: 16,
-						color: Colors.$textDefault,
+						color: Colors.$textAccent,
 						fontWeight: 'bold',
 					}}
 				/>
 			</View>
 			{term ? (
-				<View flex row spread centerV>
+				<View flex row centerV style={{ alignItems: 'flex-end' }}>
 					<SubjectMarksInline
 						{...props}
 						openDetails={openDetails}
@@ -236,6 +236,7 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 					/>
 
 					<Mark
+						duty={false}
 						finalMark={term?.mark}
 						mark={term.avgMark}
 						onPress={openDetails}
@@ -269,14 +270,15 @@ const SubjectMarksInline = memo(
 				subjects: props.subjects,
 				subjectId: props.total.subjectId,
 				settings,
+				studentId: studentId!,
 			})
 		)
 
 		if (assignments.fallback) return assignments.fallback
 
-		const weights = assignments.result.results.map(e => e.weight)
-		const maxWeight = Math.max(...weights)
-		const minWeight = Math.min(...weights)
+		const { totalsAndSheduledTotals, maxWeight, minWeight } = caclulateMarks({
+			totals: assignments.result,
+		})
 
 		return (
 			<ScrollView
@@ -286,15 +288,21 @@ const SubjectMarksInline = memo(
 					margin: 0,
 					minWidth: 100,
 				}}
+				snapToAlignment="end"
 			>
-				{assignments.result.results.map(e => (
+				{totalsAndSheduledTotals.map(e => (
 					<Mark
+						duty={e.duty ?? false}
 						mark={e.result ?? 'Нет'}
-						markWeight={{
-							max: maxWeight,
-							min: minWeight,
-							current: e.weight,
-						}}
+						markWeight={
+							e.weight
+								? {
+										max: maxWeight,
+										min: minWeight,
+										current: e.weight,
+								  }
+								: void 0
+						}
 						style={{ height: 50, width: 50 }}
 						key={e.assignmentId}
 						onPress={props.openDetails}
@@ -336,7 +344,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 				}}
 			>
 				{/* Table first row */}
-				<Text $textAccent style={{  width: `${headerWidth}%` }}>
+				<Text $textAccent style={{ width: `${headerWidth}%` }}>
 					{new Date(schoolYear!.startDate).getFullYear()}/
 					{new Date(schoolYear!.endDate).getFullYear()} Четверти
 				</Text>
@@ -344,7 +352,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 				{/* Table rows */}
 				{totals.result[0].termTotals.map((_, i, a) => (
 					<Text
-					$textAccent
+						$textAccent
 						style={{ width: termTotalWidth }}
 						key={i.toString()}
 					>
@@ -379,6 +387,7 @@ export function TotalsScreenTable(props: TotalsContext) {
 					{/* Table rows */}
 					{total.termTotals.map((term, i) => (
 						<Mark
+							duty={false}
 							finalMark={term.mark}
 							mark={term.avgMark}
 							style={{

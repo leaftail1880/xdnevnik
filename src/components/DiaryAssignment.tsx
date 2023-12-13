@@ -4,11 +4,11 @@ import { Assignment, Attachment } from '../NetSchool/classes'
 import { APIState } from '../hooks/api'
 import { Button, SmallButton } from './Button'
 import { Mark } from './Mark'
-import * as FileSystem from 'expo-file-system'
-import * as ExpoSharing from 'expo-sharing'
-import { Alert } from 'react-native'
-import { API } from '../NetSchool/api'
-import { ROUTES } from '../NetSchool/routes'
+// import * as FileSystem from 'expo-file-system'
+// import * as ExpoSharing from 'expo-sharing'
+// import { Alert } from 'react-native'
+// import { API } from '../NetSchool/api'
+// import { ROUTES } from '../NetSchool/routes'
 
 // TODO support attachment
 

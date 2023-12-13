@@ -49,6 +49,7 @@ export function useAPI<
 		[number, Error | undefined]
 	>([0, undefined])
 	const loading = useRef<boolean>(false)
+	const oldDepsS = useRef<object[]>()
 
 	const deps = Object.values(params ?? {}).concat(additionalDeps)
 
@@ -62,13 +63,21 @@ export function useAPI<
 
 				if (hasUndefinedDeps) return
 
-				// LOGGER.debug('Request update for', name)
+				LOGGER.debug(
+					'Request update for',
+					name,
+					oldDepsS.current &&
+						deps.map((e, i) =>
+							oldDepsS.current![i] !== e ? [oldDepsS.current![i], e] : e
+						)
+				)
+				oldDepsS.current = deps
 
 				try {
 					const value = await (source[name] as APIMethod)(params)
 					updateDate.current =
 						'Дата обновления: ' + new Date().toLocaleTimeString()
-				loading.current = false
+					loading.current = false
 
 					setValue(value)
 				} catch (error) {
@@ -121,5 +130,3 @@ export function useAPI<
 		refreshControl,
 	}
 }
-
-

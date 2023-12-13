@@ -316,13 +316,13 @@ function DiaryDay({
 }
 
 function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
-	const now = new Date(2023, 11, 12, 8, 30).getTime()
-	// const [now, setNow] = useState(Date.now())
-	// useEffect(() => {
-	// 	const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
+	// const now = new Date(2023, 11, 12, 8, 30).getTime()
+	const [now, setNow] = useState(Date.now())
+	useEffect(() => {
+		const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
 
-	// 	return () => clearInterval(interval)
-	// }, [])
+		return () => clearInterval(interval)
+	}, [])
 
 	const start = lesson.start.getTime()
 	const end = lesson.end.getTime()
