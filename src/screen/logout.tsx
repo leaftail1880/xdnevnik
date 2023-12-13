@@ -28,7 +28,7 @@ export function LogoutScreen() {
 					minHeight: 50,
 				}}
 			>
-				<Text $textGeneral>{LANG['log_out']}</Text>
+				<Text $textAccent>{LANG['log_out']}</Text>
 			</Button>
 			<Text center style={{ maxWidth: 300 }}>
 				{LANG['log_out_info']}

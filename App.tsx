@@ -16,10 +16,10 @@ import { Colors, Scheme, Text } from 'react-native-ui-lib'
 import { API, NetSchoolApi } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
 import { ROUTES } from './src/NetSchool/routes'
-import { Button } from './src/components/Button'
+import { IconButton } from './src/components/Button'
 import { Ionicon } from './src/components/Icon'
 import { Loading } from './src/components/Loading'
-import { LANG, LOGGER, Status, styles } from './src/constants'
+import { LANG, Status, styles } from './src/constants'
 import { useAPI } from './src/hooks/api'
 import { Ctx, useSetupSettings } from './src/hooks/settings'
 import { setupNotifications } from './src/notifications'
@@ -85,11 +85,6 @@ export default function App() {
 		Scheme.setScheme(scheme)
 		rerender(s => s + 1)
 	}, [scheme])
-
-	LOGGER.debug({
-		accent: Colors.$backgroundAccent,
-		common: Colors.$textDefault,
-	})
 
 	// Same object across renders to prevent flickering
 	const [theme] = useState<Theme>(DarkTheme)
@@ -230,24 +225,23 @@ function StatusBadge({
 	theme: Theme
 	reset: () => void
 }) {
+	const color = status.error ? Colors.$textAccent : Colors.$textDefault
 	return (
 		<View
 			style={[
 				styles.stretch,
 				{
 					elevation: 3,
-					minHeight: 30,
+					minHeight: 40,
 					backgroundColor: status.error
 						? Colors.$backgroundDangerHeavy
 						: theme.colors.card,
 				},
 			]}
 		>
-			<Text style={{ fontSize: 15 }}>{status.content}</Text>
+			<Text style={{ fontSize: 15, color }}>{status.content}</Text>
 			{status.error && (
-				<Button onPress={reset}>
-					<Ionicon name="reload" size={15} color={theme.colors.text} />
-				</Button>
+				<IconButton onPress={reset} icon="reload" iconColor={color} size={18} />
 			)}
 		</View>
 	)

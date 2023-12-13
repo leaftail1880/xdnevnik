@@ -16,7 +16,7 @@ import {
 import { Dropdown } from '../components/Dropdown'
 import { Loading } from '../components/Loading'
 import { Mark } from '../components/Mark'
-import { LANG, styles } from '../constants'
+import { LANG, LOGGER, styles } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 import { SubjectTotals, caclulateMarks } from './subjectTotals'
@@ -129,6 +129,15 @@ export function TotalsScreenTerm({
 		}
 	}, [terms, selectedTerm, settings.selectedTerm])
 
+	const [sort, setSort] = useState(true)
+	if (sort && totals.result && selectedTerm) {
+		LOGGER.debug('AA')
+		totals.result.sort(
+			(a, b) =>
+				getTermSortValue(a, selectedTerm) - getTermSortValue(b, selectedTerm)
+		)
+	}
+
 	return (
 		education.fallback ||
 		subjects.fallback ||
@@ -151,6 +160,10 @@ export function TotalsScreenTerm({
 						rowTextForSelection={i => i?.name ?? 'F'}
 					/>
 				)}
+				<View flex row spread centerH padding-s1>
+					<Text margin-s1>Предметы с плохими оценками в начале</Text>
+					<Switch margin-s1 onValueChange={setSort} value={sort} />
+				</View>
 				{totals.result.length < 1 ? (
 					<Loading text="Загрузка из кэша{dots}" />
 				) : (
@@ -178,6 +191,21 @@ type SubjectInfo = {
 	selectedTerm: NSEntity
 	subjects: Subject[]
 } & Pick<TotalsContext, 'navigation'>
+
+function getTermSortValue(total: Total, selectedTerm: NSEntity) {
+	const term = total.termTotals.find(e => e.term.id === selectedTerm.id)
+	if (!term) return 0
+
+	let avg = term.avgMark ?? 0
+	if (term.mark && !isNaN(Number(term.mark))) {
+		avg = Number(term.mark)
+	}
+
+	// TODO use context for subjectPerformance and sort depending on marks count
+	// const resultCount = term
+
+	return avg
+}
 
 function SubjectPerformanceInline(props: SubjectInfo) {
 	const { studentId } = useContext(Ctx)
