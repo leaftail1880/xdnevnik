@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Colors, Text, View } from 'react-native-ui-lib'
+import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
 import { Assignment, Attachment } from '../NetSchool/classes'
 import { APIState } from '../hooks/api'
 import { Button, SmallButton } from './Button'
@@ -32,11 +32,11 @@ export function DiaryAssignment({
 
 	return (
 		<View
-			style={{ width: '100%' }}
-			marginV-s1
-			backgroundColor={Colors.rgba(Colors.$backgroundPrimaryHeavy, 0.5)}
-			paddingV-s1
+			margin-s2
+			backgroundColor={Colors.$backgroundAccent}
+			padding-s1
 			br20
+			style={{ elevation: 10 }}
 		>
 			<View row spread centerV>
 				<View row marginH-s1 style={{ width: '80%' }}>
@@ -93,11 +93,12 @@ export function DiaryAssignment({
 				</View>
 			</View>
 
-			{(assignment.attachmentsExists && attachments.fallback) ||
-				(attachment &&
-					attachment.map(e => (
-						<AttachmentFile attachment={e} key={e.attachmentId} />
-					)))}
+			{showHw &&
+				((assignment.attachmentsExists && attachments.fallback) ||
+					(attachment &&
+						attachment.map(e => (
+							<AttachmentFile attachment={e} key={e.attachmentId} />
+						))))}
 		</View>
 	)
 }
@@ -105,7 +106,12 @@ export function DiaryAssignment({
 function AttachmentFile({ attachment }: { attachment: Attachment }) {
 	return (
 		<Button
-			margin-s2
+			style={{
+				backgroundColor: Colors.$backgroundPrimaryLight,
+				margin: Spacings.s1,
+				padding: Spacings.s2,
+				elevation: 2,
+			}}
 			onPress={async () => {
 				// const fileUri = FileSystem.cacheDirectory + 'update.apk'
 				// const file = await API.get(ROUTES.getAttachment + '/' + attachment.attachmentId, {

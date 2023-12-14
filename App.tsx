@@ -12,6 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
 import { TouchableOpacity, View, useColorScheme } from 'react-native'
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
 import { Colors, Scheme, Text } from 'react-native-ui-lib'
 import { API, NetSchoolApi } from './src/NetSchool/api'
 import { ReactStateHook } from './src/NetSchool/classes'
@@ -202,7 +203,10 @@ export default function App() {
 						}
 					</Tab.Screen>
 					<Tab.Screen name={LANG['s_settings']}>
-						{() => <SettingsScreen />}
+						{() => {
+							const Render = gestureHandlerRootHOC(SettingsScreen)
+							return <Render />
+						}}
 					</Tab.Screen>
 
 					{API.session && (

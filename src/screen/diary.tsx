@@ -1,7 +1,16 @@
 import * as Notifications from 'expo-notifications'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { Colors, ProgressBar, Spacings, Text, View } from 'react-native-ui-lib'
+import {
+	BorderRadiuses,
+	Colors,
+	Image,
+	ProgressBar,
+	Spacings,
+	Switch,
+	Text,
+	View,
+} from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { Assignment, Attachment, Diary } from '../NetSchool/classes'
 import { IconButton } from '../components/Button'
@@ -16,6 +25,7 @@ export function DiaryScreen() {
 	const { studentId, settings } = useContext(Ctx)
 	const [diaryDay, setDiaryDay] = useState(new Date().toYYYYMMDD())
 	const [weekDate, setWeekDate] = useState(new Date())
+	const [showHomework, setShowHomework] = useState(true)
 
 	const weekDays = Date.week(weekDate)
 
@@ -41,7 +51,7 @@ export function DiaryScreen() {
 		'assignments',
 		{
 			studentId,
-			classmetingsIds,
+			classmetingsIds: showHomework ? classmetingsIds : undefined,
 		},
 		'оценок'
 	)
@@ -51,8 +61,15 @@ export function DiaryScreen() {
 			homework.result
 				?.filter(e => e.attachmentsExists)
 				.map(e => e.assignmentId),
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[homework.result?.map(e => e.assignmentId).join('=')]
+		[
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			homework.result
+				?.filter(e => e.attachmentsExists)
+				.map(e => e.assignmentId)
+				.join('='),
+		]
 	)
 
 	const attachments = useAPI(
@@ -178,20 +195,39 @@ export function DiaryScreen() {
 				}}
 				refreshControl={diary.refreshControl}
 			>
+				<View padding-s1 flex>
+					<View flex row spread padding-s1>
+						<Text margin-s1>Оценки</Text>
+						<Switch
+							margin-s1
+							onValueChange={setShowHomework}
+							value={showHomework}
+						/>
+					</View>
+				</View>
 				<View padding-s1>
 					{diary.fallback ||
-						diary.result
-							.forDay(diaryDay)
-							.sort((a, b) => a.order - b.order)
-							.map(lesson => (
-								<DiaryDay
-									attachments={attachments}
-									lesson={lesson}
-									homework={homework}
-									diary={diary.result}
-									key={lesson.classmeetingId.toString()}
-								/>
-							))}
+						(() => {
+							const day = diary.result.forDay(diaryDay)
+							if (day.length === 0)
+								return (
+									<Text center text30>
+										Уроков нет
+									</Text>
+								)
+							return day
+								.sort((a, b) => a.order - b.order)
+								.map(lesson => (
+									<DiaryDay
+										homeworkEnabled={showHomework}
+										attachments={attachments}
+										lesson={lesson}
+										homework={homework}
+										diary={diary.result}
+										key={lesson.classmeetingId.toString()}
+									/>
+								))
+						})()}
 				</View>
 				<Text center $textDisabled marginB-20>
 					{diary.updateDate}
@@ -205,10 +241,12 @@ function DiaryDay({
 	lesson,
 	homework,
 	attachments,
+	homeworkEnabled,
 }: {
 	lesson: Diary['lessons'][number]
 	homework: APIState<Assignment[]>
 	attachments: APIState<Attachment[]>
+	homeworkEnabled: boolean
 	diary: Diary
 }) {
 	return (
@@ -218,7 +256,7 @@ function DiaryDay({
 			bg-$backgroundAccent
 			style={{
 				alignItems: 'flex-start',
-				elevation: 3,
+				elevation: 15,
 				minWidth: 280,
 			}}
 		>
@@ -227,10 +265,11 @@ function DiaryDay({
 				spread
 				centerV
 				padding-s3
-				backgroundColor={Colors.rgba(Colors.white, 0.2)}
+				backgroundColor={Colors.$backgroundPrimaryLight}
 				br20
 				style={{
 					width: '100%',
+					elevation: 10,
 				}}
 			>
 				<SubjectName
@@ -239,7 +278,7 @@ function DiaryDay({
 						fontWeight: 'bold',
 						maxWidth: '90%',
 						fontSize: 18,
-						color: Colors.$textAccent,
+						color: Colors.$textDefault,
 					}}
 					subjectId={lesson.subjectId}
 					subjectName={lesson.subjectName}
@@ -251,13 +290,13 @@ function DiaryDay({
 						style={{
 							fontWeight: 'bold',
 							fontSize: 18,
-							color: Colors.$textAccent,
+							color: Colors.$textDefault,
 						}}
 					>
 						{lesson.roomName ?? 'Нет кабинета'}
 					</Text>
 					<IconButton
-						iconColor={Colors.$textAccent}
+						iconColor={Colors.$textDefault}
 						icon="pencil"
 						size={18}
 						marginL-s1
@@ -265,7 +304,8 @@ function DiaryDay({
 				</View>
 			</View>
 			<View
-				margin-s3
+				marginV-s1
+				marginH-s3
 				style={{
 					width: '100%',
 				}}
@@ -275,42 +315,72 @@ function DiaryDay({
 				</Text>
 
 				<Text color={Colors.rgba(Colors.$textAccent, 0.7)}>
-					{lesson.lessonTheme}
+					{lesson.lessonTheme ?? 'Тема урока не указана'}
 				</Text>
 
 				{lesson.attachmentsExists && (
-					<Text color={Colors.rgba(Colors.$textAccent, 0.7)} marginB-s2>
-						Есть дз ввиде файла
+					<Text color={Colors.rgba(Colors.$textAccent, 0.5)} marginV-s2>
+						Есть прикрепленные файлы
 					</Text>
 				)}
 			</View>
 
-			<View
-				backgroundColor={Colors.rgba(Colors.$backgroundElevated, 0.3)}
-				br30
-				margin-s2
-				padding-s1
-				style={{ width: '96%' }}
-			>
-				{homework.fallback ||
-					homework.result
-						.filter(
-							e =>
-								e.classmeetingId === lesson.classmeetingId ||
-								(!e.weight &&
-									new Date(e.assignmentDate).toYYYYMMDD() ===
-										lesson.start.toYYYYMMDD())
-						)
-						.map(e => (
-							<DiaryAssignment
-								assignment={e}
-								attachments={attachments}
-								key={e.assignmentId}
-							/>
-						))}
-			</View>
-
 			<LessonProgress lesson={lesson} />
+			{homeworkEnabled && (
+				<View
+					backgroundColor={Colors.rgba(Colors.white, 0.2)}
+					br20
+					style={{ width: '100%' }}
+				>
+					{homework.fallback ||
+						(() => {
+							const ourResults = homework.result.filter(
+								e =>
+									e.classmeetingId === lesson.classmeetingId ||
+									(!e.weight &&
+										new Date(e.assignmentDate).toYYYYMMDD() ===
+											lesson.start.toYYYYMMDD())
+							)
+
+							if (ourResults.length) {
+								return [
+									<CustomFader key={'fader'} />,
+									...ourResults.map(e => (
+										<DiaryAssignment
+											assignment={e}
+											attachments={attachments}
+											key={e.assignmentId}
+										/>
+									)),
+								]
+							}
+						})()}
+				</View>
+			)}
+		</View>
+	)
+}
+
+function CustomFader() {
+	return (
+		<View
+			style={{
+				position: 'absolute',
+				top: 0,
+				width: '100%',
+				height: 50,
+			}}
+		>
+			<Image
+				source={require('react-native-ui-lib/src/components/fader/gradientTop.png')}
+				resizeMode="stretch"
+				style={{
+					width: '100%',
+					height: 50,
+					borderRadius: BorderRadiuses.br20,
+				}}
+				tintColor={Colors.rgba(Colors.$backgroundDark, 0.5)}
+			/>
 		</View>
 	)
 }
@@ -333,7 +403,16 @@ function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
 
 		// Do not show time above 15 mins
 		if (minsBeforeStart < 15) {
-			return <Text>Начнется через {minsBeforeStart} мин</Text>
+			return (
+				<Text
+					color={Colors.rgba(Colors.$textAccent, 0.5)}
+					center
+					marginH-s3
+					marginB-s2
+				>
+					Начнется через {minsBeforeStart} мин
+				</Text>
+			)
 		}
 	} else if (now <= end) {
 		// Lesson is going right now
@@ -341,7 +420,7 @@ function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
 		const minsTotal = ~~((end - start) / (1000 * 60))
 
 		return (
-			<View row center margin-s2 centerV padding-s1>
+			<View row center marginH-s3 paddingH-s2 marginB-s2 centerV>
 				<View
 					style={{
 						width: '80%',
@@ -365,7 +444,12 @@ function LessonProgress({ lesson }: { lesson: Diary['lessons'][number] }) {
 	} else {
 		// Lesson is ended
 		return (
-			<Text color={Colors.rgba(Colors.$textAccent, 0.7)} center margin-s2>
+			<Text
+				color={Colors.rgba(Colors.$textAccent, 0.5)}
+				center
+				marginH-s3
+				marginB-s2
+			>
 				Закончился
 			</Text>
 		)

@@ -1,6 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { useContext, useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
 	Colors,
 	Switch,
@@ -8,6 +9,7 @@ import {
 	TextField,
 	TextFieldProps,
 	View,
+	WheelPicker,
 } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { SubjectPerformance } from '../NetSchool/classes'
@@ -17,10 +19,12 @@ import {
 	IconButtonProps,
 	buttonStyle,
 } from '../components/Button'
+import { dropdownStyle } from '../components/Dropdown'
 import { Ionicon } from '../components/Icon'
+import { Loading } from '../components/Loading'
 import { Mark } from '../components/Mark'
 import { SubjectName } from '../components/SubjectName'
-import { LANG, fullname } from '../constants'
+import { LANG, LOGGER, fullname } from '../constants'
 import { useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
 import type { MarkInfo, ParamMap } from './totals'
@@ -46,12 +50,19 @@ export function SubjectTotals({
 
 	if (FallbackTotals) return FallbackTotals
 
-	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } =
-		caclulateMarks({ totals, lessonsWithoutMark, customMarks })
+	const marks = caclulateMarks({ totals, lessonsWithoutMark, customMarks })
+	if (!marks) return <Loading />
+	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } = marks
 
 	return (
-		<ScrollView refreshControl={refreshControl}>
-			<View flex row spread padding-s2 centerV>
+		<View>
+			<View
+				row
+				spread
+				padding-s2
+				centerV
+				style={[dropdownStyle(), { elevation: 0 }]}
+			>
 				<SubjectName
 					subjectName={totals.subject.name}
 					subjectId={totals.subject.id}
@@ -71,92 +82,94 @@ export function SubjectTotals({
 					textStyle={{ fontSize: 20 }}
 				/>
 			</View>
-			<View flex row spread padding-s2 centerV>
-				<Text flex row>
-					Уроки без оценок
-				</Text>
-				<Switch
-					value={lessonsWithoutMark}
-					onValueChange={setLessonsWithoutMark}
-				/>
-			</View>
-			<View padding-s1 bg-$backgroundNeutralLight br50>
-				{totalsAndSheduledTotals.map((e, i) => {
-					const date = e.classMeetingDate ?? e.date
-					return (
-						<View
-							key={e.assignmentId ?? i.toString()}
-							flex
-							row
-							spread
-							centerV
-							padding-s2
-						>
-							<Mark
-								duty={e.duty ?? false}
-								mark={e.result ?? null}
-								markWeight={
-									typeof e.weight === 'number' && {
-										current: e.weight,
-										max: maxWeight,
-										min: minWeight,
+			<ScrollView refreshControl={refreshControl}>
+				<View flex row center padding-s3>
+					<Text marginR-s2>Уроки без оценок</Text>
+					<Switch
+						value={lessonsWithoutMark}
+						onValueChange={setLessonsWithoutMark}
+					/>
+				</View>
+				<View padding-s1 bg-$backgroundNeutralLight br50>
+					{totalsAndSheduledTotals.map((e, i) => {
+						const date = e.classMeetingDate ?? e.date
+						return (
+							<View
+								key={e.assignmentId ?? i.toString()}
+								flex
+								row
+								spread
+								centerV
+								padding-s2
+							>
+								<Mark
+									duty={e.duty ?? false}
+									mark={e.result ?? null}
+									markWeight={
+										typeof e.weight === 'number' && {
+											current: e.weight,
+											max: maxWeight,
+											min: minWeight,
+										}
 									}
-								}
-								style={{
-									height: 50,
-									width: 50,
-									// ...(e.result === 'Нет' || typeof e.result === 'undefined'
-									// 	? { backgroundColor: '#88888857' }
-									// 	: {}),
-								}}
-								textStyle={{ fontSize: 17 }}
-								onPress={() => {
-									Alert.alert(
-										(e.assignmentTypeName ?? '') +
-											' ' +
-											(e.result ?? 'Оценки нет'),
-										`${e.weight ? `Вес: ${e.weight}` : 'Отсутствие'}${
-											e.comment ? `, Комментарий: ${e.comment}` : ''
-										}${
-											e.date
-												? `, Выставлена: ${new Date(
-														e.date
-												  ).toLocaleDateString()} ${new Date(e.date).toHHMM()}`
-												: ''
-										}`
-									)
-								}}
-							/>
-							<Text>{e.assignmentTypeName}</Text>
+									style={{
+										height: 50,
+										width: 50,
+									}}
+									textStyle={{ fontSize: 17 }}
+									onPress={() => {
+										Alert.alert(
+											(e.assignmentTypeName ?? '') +
+												' ' +
+												(e.result ?? 'Оценки нет'),
+											`${e.weight ? `Вес: ${e.weight}` : 'Отсутствие'}${
+												e.comment ? `, Комментарий: ${e.comment}` : ''
+											}${
+												e.date
+													? `, Выставлена: ${new Date(
+															e.date
+													  ).toLocaleDateString()} ${new Date(
+															e.date
+													  ).toHHMM()}`
+													: ''
+											}`
+										)
+									}}
+								/>
+								<Text>{e.assignmentTypeName}</Text>
 
-							<Text>{date && new Date(date).toLocaleDateString()}</Text>
-						</View>
-					)
-				})}
-			</View>
-			<AddMarkForm setCustomMarks={setCustomMarks} customMarks={customMarks} />
-			<View flex row spread padding-s2>
-				<Text text50BO>
-					Учитель:{' '}
-					<Text text50>{fullname(totals.teachers[0].name, settings)}</Text>
-				</Text>
-			</View>
-			<View flex row spread padding-s2>
-				<Text text50BO>
-					Прошло уроков:{' '}
-					<Text text50>
-						{totals.classmeetingsStats.passed}/
-						{totals.classmeetingsStats.scheduled}
+								<Text>{date && new Date(date).toLocaleDateString()}</Text>
+							</View>
+						)
+					})}
+				</View>
+				<AddMarkForm
+					setCustomMarks={setCustomMarks}
+					customMarks={customMarks}
+				/>
+				<View flex row spread padding-s2>
+					<Text text50BO>
+						Учитель:{' '}
+						<Text text50>{fullname(totals.teachers[0].name, settings)}</Text>
 					</Text>
+				</View>
+				<View flex row spread padding-s2>
+					<Text text50BO>
+						Прошло уроков:{' '}
+						<Text text50>
+							{totals.classmeetingsStats.passed}/
+							{totals.classmeetingsStats.scheduled}
+						</Text>
+					</Text>
+					<Text text50BO>
+						Средний бал класса: <Text text50>{totals.classAverageMark}</Text>
+					</Text>
+				</View>
+				<Text $textDisabled center margin-s2>
+					{totalsUpdateDate}
 				</Text>
-				<Text text50BO>
-					Средний бал класса: <Text text50>{totals.classAverageMark}</Text>
-				</Text>
-			</View>
-			<Text $textDisabled center margin-s2>
-				{totalsUpdateDate}
-			</Text>
-		</ScrollView>
+			</ScrollView>
+		</View>
 	)
 }
 
@@ -164,66 +177,78 @@ export function caclulateMarks({
 	totals,
 	lessonsWithoutMark = false,
 	customMarks = [],
+	missedLessons = true,
 }: {
 	totals: SubjectPerformance
+	missedLessons?: boolean
 	lessonsWithoutMark?: boolean
 	customMarks?: Partial<MarkInfo>[]
 }) {
-	let missedMark = (totals.attendance ?? []).map(e => {
-		return {
-			result: e.attendanceMark,
-			assignmentId: e.classMeetingDate + e.attendanceMark,
-			date: e.classMeetingDate,
-		}
-	})
-
-	if (lessonsWithoutMark) {
-		missedMark = missedMark.concat(
-			new Array(
-				totals.classmeetingsStats.passed -
-					totals.results.length -
-					missedMark.length
-			).fill({ result: 'Нет' })
-		)
-	}
-
-	let totalsAndSheduledTotals = [...missedMark, ...totals.results].sort(
-		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-	) as Partial<MarkInfo>[]
-
-	if (lessonsWithoutMark) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
-			new Array(
-				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
-			).fill({})
-		)
-	}
-
-	let avgMark = totals.averageMark
-
-	if (customMarks.length) {
-		totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
-		let totalWeight = 0
-		let totalMark = 0
-
-		for (const mark of [
-			...totals.results,
-			...(customMarks as {
-				weight: number
-				result: number
-			}[]),
-		]) {
-			totalWeight += mark.weight
-			totalMark += mark.weight * mark.result
+	try {
+		let attendance: MarkInfo[] = []
+		if (missedLessons && totals.attendance) {
+			attendance = attendance.concat(
+				totals.attendance.map(e => {
+					return {
+						result: e.attendanceMark,
+						assignmentId: e.classMeetingDate + e.attendanceMark,
+						date: e.classMeetingDate,
+					}
+				})
+			)
 		}
 
-		avgMark = Number((totalMark / totalWeight).toFixed(2))
-	}
+		if (lessonsWithoutMark) {
+			attendance = attendance.concat(
+				new Array(
+					totals.classmeetingsStats.passed -
+						totals.results.length -
+						attendance.length
+				).fill({ result: 'Нет', assignmentTypeName: 'Урок прошел, оценки нет' })
+			)
+		}
 
-	const weights = totals.results.map(e => e.weight)
-	const maxWeight = Math.max(...weights)
-	const minWeight = Math.min(...weights)
-	return { avgMark, totalsAndSheduledTotals, maxWeight, minWeight }
+		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
+			(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+		) as Partial<MarkInfo>[]
+
+		let avgMark = totals.averageMark
+
+		if (customMarks.length) {
+			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
+			let totalWeight = 0
+			let totalMark = 0
+
+			for (const mark of [
+				...totals.results,
+				...(customMarks as {
+					weight: number
+					result: number
+				}[]),
+			]) {
+				totalWeight += mark.weight
+				totalMark += mark.weight * mark.result
+			}
+
+			avgMark = Number((totalMark / totalWeight).toFixed(2))
+		}
+
+		if (lessonsWithoutMark) {
+			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
+				new Array(
+					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length
+				).fill({})
+			)
+		}
+
+		const weights = totals.results.map(e => e.weight)
+		const maxWeight = Math.max(...weights)
+		const minWeight = Math.min(...weights)
+		return { avgMark, totalsAndSheduledTotals, maxWeight, minWeight }
+	} catch (e) {
+		if (!(e + '').includes('TypeError: Cannot convert null value to object'))
+			LOGGER.error('calcMarks', e)
+	}
 }
 
 function AddMarkForm(props: {
@@ -302,11 +327,20 @@ function AddMarkForm(props: {
 			</View>
 			{addingCustomMark && (
 				<View padding-s4 backgroundColor={Colors.$backgroundPrimaryMedium} br30>
-					<TextField
-						{...textFieldProps}
-						placeholder="Оценка"
-						onChangeText={setMark}
-					/>
+					<View flex row spread>
+						<TextField
+							{...textFieldProps}
+							placeholder="Оценка"
+							onChangeText={setMark}
+						/>
+						<SafeAreaView>
+							<WheelPicker
+								items={new Array(5)
+									.fill({})
+									.map((_, i) => ({ label: i + '', value: i }))}
+							/>
+						</SafeAreaView>
+					</View>
 					<TextField
 						{...textFieldProps}
 						placeholder="Вес"

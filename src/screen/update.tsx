@@ -101,6 +101,7 @@ export function UpdatesButton() {
 						const result = await downloader.downloadAsync()
 						if (!result) {
 							Alert.alert('Не удалось сохранить обновление')
+							setProgress(void 0)
 							throw new Error('Failed to download update')
 						}
 						return result
@@ -108,9 +109,12 @@ export function UpdatesButton() {
 
 					if (typeof result === 'undefined') {
 						Alert.alert('Обновлений нету.')
-					}
+						setProgress(void 0)
+					} else setProgress('Обновление скачано')
 				} catch (error) {
 					Alert.alert(`Не удалось получить обновление`, '' + error)
+					setProgress(void 0)
+
 				}
 			}}
 		>

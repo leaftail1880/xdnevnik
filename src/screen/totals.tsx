@@ -1,10 +1,19 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
-import { ScrollView } from 'react-native'
+import { ScrollView, StyleProp, ViewStyle } from 'react-native'
 import { SubjectName, getSubjectName } from '../components/SubjectName'
 // import { TouchableOpacity } from 'react-native-gesture-handler'
 // import Ionicons from 'react-native-vector-icons/Ionicons'
 import { memo, useContext, useEffect, useState } from 'react'
-import { Colors, Switch, Text, View } from 'react-native-ui-lib'
+import {
+	BorderRadiuses,
+	Colors,
+	Fader,
+	FaderPosition,
+	Spacings,
+	Switch,
+	Text,
+	View,
+} from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import {
 	Education,
@@ -16,10 +25,13 @@ import {
 import { Dropdown } from '../components/Dropdown'
 import { Loading } from '../components/Loading'
 import { Mark } from '../components/Mark'
-import { LANG, LOGGER, styles } from '../constants'
+import { LANG, styles } from '../constants'
 import { APIState, useAPI } from '../hooks/api'
 import { Ctx } from '../hooks/settings'
-import { SubjectTotals, caclulateMarks } from './subjectTotals'
+import {
+	SubjectTotals,
+	caclulateMarks as calculateMarks,
+} from './subjectTotals'
 
 const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 const S_TOTALS = LANG['s_totalsN']
@@ -98,7 +110,12 @@ export function TotalsNavigation() {
 					/>
 				)}
 			</Stack.Screen>
-			<Stack.Screen name={S_SUBJECT_TOTALS}>
+			<Stack.Screen
+				name={S_SUBJECT_TOTALS}
+				options={{
+					headerStyle: { elevation: 0 },
+				}}
+			>
 				{nav => <SubjectTotals {...nav} />}
 			</Stack.Screen>
 		</Stack.Navigator>
@@ -130,8 +147,8 @@ export function TotalsScreenTerm({
 	}, [terms, selectedTerm, settings.selectedTerm])
 
 	const [sort, setSort] = useState(true)
+	const [attendance, setAttendance] = useState(false)
 	if (sort && totals.result && selectedTerm) {
-		LOGGER.debug('AA')
 		totals.result.sort(
 			(a, b) =>
 				getTermSortValue(a, selectedTerm) - getTermSortValue(b, selectedTerm)
@@ -160,9 +177,19 @@ export function TotalsScreenTerm({
 						rowTextForSelection={i => i?.name ?? 'F'}
 					/>
 				)}
-				<View flex row spread centerH padding-s1>
-					<Text margin-s1>Предметы с плохими оценками в начале</Text>
-					<Switch margin-s1 onValueChange={setSort} value={sort} />
+				<View flex style={{ width: '90%' }}>
+					<View flex row spread padding-s1>
+						<Text margin-s1>Вначале плохие оценки</Text>
+						<Switch margin-s1 onValueChange={setSort} value={sort} />
+					</View>
+					<View flex row spread padding-s1>
+						<Text margin-s1>Пропуски</Text>
+						<Switch
+							margin-s1
+							onValueChange={setAttendance}
+							value={attendance}
+						/>
+					</View>
 				</View>
 				{totals.result.length < 1 ? (
 					<Loading text="Загрузка из кэша{dots}" />
@@ -170,6 +197,7 @@ export function TotalsScreenTerm({
 					selectedTerm &&
 					totals.result.map(total => (
 						<SubjectPerformanceInline
+							attendance={attendance}
 							navigation={navigation}
 							total={total}
 							selectedTerm={selectedTerm}
@@ -189,6 +217,7 @@ export function TotalsScreenTerm({
 type SubjectInfo = {
 	total: Total
 	selectedTerm: NSEntity
+	attendance: boolean
 	subjects: Subject[]
 } & Pick<TotalsContext, 'navigation'>
 
@@ -227,10 +256,10 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 		<View
 			br20
 			margin-s2
-			padding-0
 			style={{
+				elevation: 10,
 				width: '98%',
-				backgroundColor: Colors.$backgroundNeutralMedium,
+				backgroundColor: Colors.$backgroundPrimaryMedium,
 			}}
 		>
 			<View
@@ -239,37 +268,65 @@ function SubjectPerformanceInline(props: SubjectInfo) {
 				style={{
 					alignSelf: 'flex-end',
 					alignItems: 'flex-end',
-					maxHeight: 40,
 					width: '100%',
-					backgroundColor: Colors.$backgroundAccent,
+					elevation: 10,
+					backgroundColor: Colors.$backgroundPrimaryLight,
 				}}
 			>
 				<SubjectName
 					subjectId={props.total.subjectId}
 					subjects={props.subjects}
-					iconsSize={16}
+					iconsSize={18}
 					style={{
-						fontSize: 16,
-						color: Colors.$textAccent,
+						fontSize: 18,
+						color: Colors.$textDefault,
 						fontWeight: 'bold',
 					}}
 				/>
 			</View>
 			{term ? (
-				<View flex row centerV style={{ alignItems: 'flex-end' }}>
-					<SubjectMarksInline
-						{...props}
-						openDetails={openDetails}
-						term={term}
-					/>
+				<View flex row style={{ width: '100%' }}>
+					<View flex row style={{ alignItems: 'flex-end' }}>
+						<Fader
+							position={FaderPosition.START}
+							size={30}
+							tintColor={Colors.$backgroundAccent}
+						/>
 
-					<Mark
-						duty={false}
-						finalMark={term?.mark}
-						mark={term.avgMark}
-						onPress={openDetails}
-						style={{ height: 50, width: 50 }}
-					/>
+						<SubjectMarksInline
+							{...props}
+							openDetails={openDetails}
+							term={term}
+						/>
+						<Fader
+							size={30}
+							tintColor={Colors.rgba(Colors.$backgroundAccent, 0.5)}
+						/>
+						<Fader
+							size={15}
+							tintColor={Colors.rgba(Colors.$backgroundAccent, 0.5)}
+						/>
+						<Fader
+							size={7}
+							tintColor={Colors.rgba(Colors.$backgroundAccent, 1)}
+						/>
+					</View>
+					<View
+						row
+						spread
+						backgroundColor={Colors.$backgroundAccent}
+						padding-s1
+						style={{ borderBottomRightRadius: BorderRadiuses.br20 }}
+					>
+						<Mark
+							duty={false}
+							noColor={Colors.$backgroundDefault}
+							finalMark={term?.mark}
+							mark={term.avgMark}
+							onPress={openDetails}
+							style={{ height: 50, width: 50, alignSelf: 'center' }}
+						/>
+					</View>
 				</View>
 			) : (
 				<Loading />
@@ -302,20 +359,48 @@ const SubjectMarksInline = memo(
 			})
 		)
 
-		if (assignments.fallback) return assignments.fallback
+		const viewStyle: StyleProp<ViewStyle> = {
+			height: '100%',
+			margin: 0,
+			width: '100%',
+			alignSelf: 'center',
+			backgroundColor: Colors.$backgroundPrimaryMedium,
+		}
+		const containerStyle: StyleProp<ViewStyle> = {
+			padding: Spacings.s1,
+			alignItems: 'center',
+		}
 
-		const { totalsAndSheduledTotals, maxWeight, minWeight } = caclulateMarks({
+		if (assignments.fallback)
+			return (
+				<View style={[viewStyle, containerStyle]}>{assignments.fallback}</View>
+			)
+
+		const marks = calculateMarks({
 			totals: assignments.result,
+			missedLessons: props.attendance,
 		})
+		if (!marks)
+			return (
+				<View style={[viewStyle, containerStyle]}>
+					<Loading />
+				</View>
+			)
+
+		const { totalsAndSheduledTotals, maxWeight, minWeight } = marks
+
+		if (totalsAndSheduledTotals.length === 0)
+			return (
+				<View centerV style={[viewStyle, containerStyle]}>
+					<Text>Оценок нет</Text>
+				</View>
+			)
 
 		return (
 			<ScrollView
 				horizontal
-				style={{
-					maxHeight: 100,
-					margin: 0,
-					minWidth: 100,
-				}}
+				style={viewStyle}
+				contentContainerStyle={containerStyle}
 				snapToAlignment="end"
 			>
 				{totalsAndSheduledTotals.map(e => (
@@ -342,7 +427,8 @@ const SubjectMarksInline = memo(
 	(prev, curr) =>
 		prev.term.term.id === curr.term.term.id &&
 		prev.subjects.length === curr.subjects.length &&
-		prev.total.subjectId === curr.total.subjectId
+		prev.total.subjectId === curr.total.subjectId &&
+		prev.attendance === curr.attendance
 )
 
 export function TotalsScreenTable(props: TotalsContext) {
@@ -443,10 +529,14 @@ export function TotalsScreenTable(props: TotalsContext) {
 }
 
 export type MarkInfo = Partial<
-	Omit<SubjectPerformance['results'][number], 'result' | 'assignmentId'> & {
-		result: 'Нет' | number | string
-		assignmentId: string | number
-	}
->
+	Omit<
+		SubjectPerformance['results'][number],
+		'result' | 'assignmentId' | 'date'
+	>
+> & {
+	date: string
+	result: 'Нет' | number | string
+	assignmentId: string | number
+}
 
 

@@ -1,7 +1,6 @@
 import * as Application from 'expo-application'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import {
 	ColorPicker,
 	Colors,
@@ -31,6 +30,19 @@ export function SettingsScreen() {
 		{ name: 'Фон', i: 'background' as const },
 	]
 
+	const [accentColors, setAccentColors] = useState([
+		ACCENT_COLOR,
+		'#328585',
+		'#446EAD',
+		'#AD6E25',
+		'#B9421E',
+	])
+	const themeKey = settings.accentColor + settings.theme
+	const onAccentChange = (color: string) => {
+		settings.save({
+			accentColor: color === ACCENT_COLOR ? undefined : color,
+		})
+	}
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -75,6 +87,7 @@ export function SettingsScreen() {
 						{LANG['notification']}
 					</Text>
 					<Switch
+						key={themeKey}
 						onValueChange={notifications => settings.save({ notifications })}
 						value={settings.notifications}
 					/>
@@ -94,27 +107,27 @@ export function SettingsScreen() {
 				rowTextForSelection={i => i.name}
 			/>
 			<UpdatesButton />
-			<GestureHandlerRootView>
-				<Text margin-s2 center>
-					Цвет акцентов:
-				</Text>
-				<ColorPicker
-					colors={[ACCENT_COLOR, '#328585', '#325385', '#925C1F', '#974C1A']}
-					onValueChange={color => {
-						settings.save({
-							accentColor: color === ACCENT_COLOR ? undefined : color,
-						})
-					}}
-					initialColor={settings.accentColor}
-				/>
-			</GestureHandlerRootView>
+			<Text margin-s2 center key={themeKey + 'text'}>
+				Цвет акцентов:
+			</Text>
+			<ColorPicker
+				colors={accentColors}
+				onValueChange={onAccentChange}
+				backgroundColor={Colors.$backgroundDefault}
+				onSubmit={color => {
+					setAccentColors(accentColors.concat(color))
+					onAccentChange(color)
+				}}
+				initialColor={settings.accentColor}
+				key={themeKey}
+			/>
 
 			<View padding-s3>
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
 				<Text>Версия сборки: {Application.nativeBuildVersion}</Text>
-				<Text>{LANG['made_by']}</Text>
+				<Text key={themeKey}>{LANG['made_by']}</Text>
 			</View>
 			{/* <ScrollView>
 				{Object.entries(Colors)
