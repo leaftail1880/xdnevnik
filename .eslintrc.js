@@ -8,18 +8,26 @@ module.exports = {
 		'plugin:react-native/all',
 		'plugin:react-hooks/recommended',
 		'plugin:@typescript-eslint/recommended',
+		'plugin:mobx/recommended',
 		'prettier',
 	],
-	plugins: ['react', 'react-hooks', 'react-native', '@typescript-eslint'],
+	plugins: [
+		'react',
+		'react-hooks',
+		'react-native',
+		'@typescript-eslint',
+		'mobx',
+	],
 	parser: '@typescript-eslint/parser',
 	rules: {
 		'no-empty': 'warn',
-		'react-native/sort-styles': 'off',
 		'no-console': 'warn',
 		'prefer-const': 'warn',
+		'react-native/sort-styles': 'off',
 		'react-native/no-inline-styles': 'off',
+		'mobx/missing-make-observable': 'off',
 		'@typescript-eslint/no-unused-vars': 'warn',
-		'@typescript-eslint/explicit-member-accessibility': 'warn',
+		'@typescript-eslint/explicit-member-accessibility': 'off',
 		'@typescript-eslint/naming-convention': [
 			'warn',
 			{
@@ -52,7 +60,7 @@ module.exports = {
 			{
 				selector: 'variable',
 				modifiers: ['exported', 'const'],
-				format: ['UPPER_CASE'],
+				format: ['UPPER_CASE', 'PascalCase'],
 				leadingUnderscore: 'allow',
 				trailingUnderscore: 'allow',
 			},
@@ -60,6 +68,11 @@ module.exports = {
 			{
 				selector: 'typeLike',
 				format: ['PascalCase'],
+			},
+
+			{
+				selector: 'import',
+				format: null,
 			},
 		],
 	},

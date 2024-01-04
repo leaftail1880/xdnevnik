@@ -1,5 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { configure } from 'mobx'
+import { configurePersistable } from 'mobx-persist-store'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
-import { logger, mapConsoleTransport } from 'react-native-logs'
+import {
+	mapConsoleTransport,
+	logger as reactNativeLogger,
+} from 'react-native-logs'
 import {
 	Colors,
 	ContainerModifiers,
@@ -8,26 +14,33 @@ import {
 	TextProps,
 	ThemeManager,
 } from 'react-native-ui-lib'
-import { dropdownStyle } from './components/Dropdown'
-import { SettingsCtx } from './hooks/settings'
+import { dropdownStyle } from './Components/Dropdown'
 
-type LogLevel = (...args: unknown[]) => void
-export const LOGGER = logger.createLogger({
+configure({
+	enforceActions: 'always',
+	computedRequiresReaction: true,
+	reactionRequiresObservable: true,
+	// observableRequiresReaction: true,
+	// disableErrorBoundaries: true,
+})
+
+configurePersistable({
+	removeOnExpiration: false,
+	storage: AsyncStorage,
+})
+
+type LogFunction = (...args: unknown[]) => void
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const logger = reactNativeLogger.createLogger({
 	printLevel: false,
 	transport: mapConsoleTransport,
 }) as {
-	debug: LogLevel
-	info: LogLevel
-	warn: LogLevel
-	error: LogLevel
+	debug: LogFunction
+	info: LogFunction
+	warn: LogFunction
+	error: LogFunction
 }
-
-export type Status =
-	| {
-			content: React.ReactNode
-			error: boolean
-	  }
-	| undefined
 
 export const ACCENT_COLOR = '#4d914f'
 
@@ -174,12 +187,3 @@ export function settingsButton(): {
 		],
 	}
 }
-
-export function fullname(name: string, settings: SettingsCtx) {
-	if (settings.lastNameLast) {
-		const parts = name.split(' ')
-		return [parts[1], parts[2], parts[0]].join(' ')
-	} else return name
-}
-
-//

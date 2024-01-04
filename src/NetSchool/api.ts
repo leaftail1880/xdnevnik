@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { makeObservable, observable, runInAction } from 'mobx'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
-import { LOGGER } from '../constants'
+import { makeReloadPersistable } from '../Stores/makePersistable'
+import { logger } from '../constants'
 import {
 	Assignment,
 	Attachment,
@@ -8,7 +9,6 @@ import {
 	Education,
 	Endpoint,
 	RawEndpoints,
-	ReactStateHook,
 	Student,
 	Subject,
 	SubjectPerformance,
@@ -61,8 +61,8 @@ export class NetSchoolError extends Error {
  * Main api class.
  */
 export class NetSchoolApi {
-	public static noConnection = 'Нет сети.' as const
-	public static stringifyError(
+	static noConnection = 'Нет сети.' as const
+	static stringifyError(
 		e: object
 	): string | (typeof NetSchoolApi)['noConnection'] {
 		let result = ''
@@ -79,7 +79,7 @@ export class NetSchoolApi {
 
 		return result
 	}
-	public static async fetchEndpoints() {
+	static async fetchEndpoints() {
 		const result = await fetch(ROUTES.getEndPointsList)
 			.then<RawEndpoints>(res => res.json())
 			.then<Endpoint[]>(res =>
@@ -101,76 +101,75 @@ export class NetSchoolApi {
 		return api.origin
 	}
 
-	private _cache: Record<string, [number, object | undefined | null]> = {}
+	constructor() {
+		// eslint-disable-next-line mobx/exhaustive-make-observable
+		makeObservable(this, {
+			cache: observable.struct,
+			authorized: true,
+			reload: true,
+			session: observable.struct,
+			request: true,
+			endpoint: observable,
+			setEndpoint: true,
+		})
+		makeReloadPersistable(this, {
+			name: 'api',
+			properties: [
+				{
+					key: 'endpoint',
+					serialize: e => e,
+					deserialize: e => (this.setEndpoint(e), e),
+				},
+				'cache',
+				{
+					key: 'session',
+					serialize: s => JSON.stringify(s),
+					deserialize(session) {
+						session = JSON.parse(session)
+						if (session) session.expires = new Date(session.expires)
+						return session
+					},
+				},
+			],
+		})
+	}
+
 	/**
 	 * Cache to store responses to work in offline mode
 	 */
-	public get cache() {
-		return this._cache
-	}
-	public set cache(value) {
-		this._cache = value
-
-		// Update all react effects
-		this.updateEffects++
-	}
-
-	/**
-	 * Used to link react state with class prop
-	 */
-	public hookReactState([state, setState]: ReturnType<
-		typeof import('react').useState<ReactStateHook>
-	>) {
-		Object.defineProperties(this, {
-			updateEffects: {
-				get() {
-					return state?.updateEffects ?? 0
-				},
-				set(v: number) {
-					setState({ ...state!, updateEffects: v })
-				},
-			},
-			authorized: {
-				set(v: null | true) {
-					setState({ ...state!, authorized: v })
-				},
-				get() {
-					return state?.authorized ?? null
-				},
-			},
-		})
-	}
-	public authorized: null | true = null
-	public updateEffects = 0
-
-	public session: {
+	cache: Record<string, [number, object | undefined | null]> = {}
+	authorized: null | true = null
+	reload = 0
+	session: {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		access_token: string
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		refresh_token: string
 		expires: Date
 	} | null = null
+
+	endpoint = ''
+	setEndpoint(b: string) {
+		if (!b) return
+		const url = new URL(b)
+		this.endpoint = b
+		this.origin = url.origin
+		this.base = url.pathname
+	}
 	private origin = ''
 	private base = '/api/mobile'
 
-	public constructor(endpoint?: string) {
-		if (endpoint) this.setEndpoint(endpoint)
-	}
-
-	public setEndpoint(endpoint: string) {
-		const url = new URL(endpoint)
-		this.origin = url.origin
-		this.base = url.pathname
-
-		// Mark react effects who depend on endpoint changes
-		if (this.authorized) this.updateEffects++
+	public async logOut() {
+		this.session = null
+		this.authorized = null
+		this.setEndpoint('')
 	}
 
 	public async getToken(
 		form: Record<string, string>,
 		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
 	) {
-		LOGGER.debug({
+		logger.debug({
 			expires: this.session?.expires.toReadable(),
 			today: new Date().toReadable(),
 			form,
@@ -181,41 +180,28 @@ export class NetSchoolApi {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		})
 
-		LOGGER.debug({ status: response.status })
+		logger.debug({ status: response.status })
 		if (response.status === 400) {
 			throw new NetSchoolError(error400)
 		}
 
 		if (response.ok) {
 			const json = await response.json()
-			this.session = {
-				access_token: json.access_token || '',
-				refresh_token: json.refresh_token || '',
-				expires: new Date(
-					Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
-				),
-			}
-			await AsyncStorage.setItem('session', JSON.stringify(this.session))
+			runInAction(() => {
+				this.session = {
+					access_token: json.access_token || '',
+					refresh_token: json.refresh_token || '',
+					expires: new Date(
+						Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
+					),
+				}
 
-			this.authorized = true
+				this.authorized = true
+			})
 		} else
 			throw new NetSchoolError(
 				'Запрос токена не удался, код ошибки ' + response.status
 			)
-	}
-
-	public restoreSessionFromMemory(
-		session: NonNullable<NetSchoolApi['session']>
-	) {
-		session.expires = new Date(session.expires)
-		this.session = session
-		this.updateEffects++
-	}
-
-	public async logOut() {
-		this.session = null
-		this.authorized = null
-		await AsyncStorage.multiRemove(['session', 'endpoint'])
 	}
 
 	private isAbsolute(path: string) {
@@ -233,7 +219,7 @@ export class NetSchoolApi {
 			.join('')
 	}
 
-	public async request<T extends object | null | undefined>(
+	async request<T extends object | null | undefined>(
 		url: string,
 		init: ReqInit = {},
 		fetchFn: (
@@ -259,6 +245,7 @@ export class NetSchoolApi {
 		try {
 			if (init.auth) {
 				if (this.session && this.session.expires.getTime() < Date.now()) {
+					logger.debug('Session expired')
 					// Request update of token
 					this.authorized = null
 				}
@@ -275,6 +262,8 @@ export class NetSchoolApi {
 				}
 			}
 
+			logger.debug('Request to', url)
+
 			const response = await fetchFn(url, { ...init, ...request })
 
 			if (response.status === 503)
@@ -289,13 +278,14 @@ export class NetSchoolApi {
 					}`,
 					{ cacheGuide: true }
 				)
-				LOGGER.error(error + ' Auth: ' + !!init.auth)
+				logger.error(error + ' Auth: ' + !!init.auth)
 				throw error
 			}
 
 			const json = await response.json()
-			this.cache[url] = [Date.now(), json]
-			AsyncStorage.setItem('cache', JSON.stringify(this.cache))
+			runInAction(() => {
+				this.cache[url] = [Date.now(), json]
+			})
 
 			return json
 		} catch (error) {
@@ -304,7 +294,7 @@ export class NetSchoolApi {
 					error instanceof NetSchoolError && error.beforeAuth
 						? ''
 						: 'error: ' + error
-				LOGGER.info('using cache for', url.replace(this.origin, ''), errText)
+				logger.debug('using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
@@ -387,12 +377,12 @@ export class NetSchoolApi {
 
 	public async assignments({
 		studentId,
-		classmetingsIds,
-	}: StudentId & { classmetingsIds: number[] }) {
+		classmeetingsIds,
+	}: StudentId & { classmeetingsIds: number[] }) {
 		return this.get<Assignment[]>(ROUTES.assignments, {
 			params: [
 				['studentId', studentId],
-				...classmetingsIds.map(e => ['classmeetingId', e] as [string, number]),
+				...classmeetingsIds.map(e => ['classmeetingId', e] as [string, number]),
 			],
 		})
 	}

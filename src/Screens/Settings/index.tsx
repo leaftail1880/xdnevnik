@@ -1,5 +1,6 @@
 import * as Application from 'expo-application'
-import { useContext, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { ScrollView } from 'react-native'
 import {
 	ColorPicker,
@@ -9,26 +10,29 @@ import {
 	Text,
 	View,
 } from 'react-native-ui-lib'
-import { API } from '../NetSchool/api'
-import { Button } from '../components/Button'
-import { Dropdown } from '../components/Dropdown'
-import { Loading } from '../components/Loading'
-import { ACCENT_COLOR, LANG, fullname, settingsButton } from '../constants'
-import { Ctx } from '../hooks/settings'
-import { UpdatesButton } from './update'
+import { Button } from '../../Components/Button'
+import { Dropdown } from '../../Components/Dropdown'
+import { Loading } from '../../Components/Loading'
+import { API } from '../../NetSchool/api'
+import { Settings, fullname } from '../../Stores/Settings.store'
+import { StudentsStore } from '../../Stores/StudentsStore'
+import { Theme } from '../../Stores/Theme.store'
+import { ACCENT_COLOR, LANG, settingsButton } from '../../constants'
+import { UpdatesButton } from './Update'
 
-export function SettingsScreen() {
-	const { settings, students } = useContext(Ctx)
-	const themes = [
-		{ name: 'Системная', i: 'system' as const },
-		{ name: 'Темная', i: 'dark' as const },
-		{ name: 'Светлая', i: 'light' as const },
-	]
+const themes = [
+	{ name: 'Системная', i: 'system' as const },
+	{ name: 'Темная', i: 'dark' as const },
+	{ name: 'Светлая', i: 'light' as const },
+]
 
-	const markStyles = [
-		{ name: 'Линия', i: 'border' as const },
-		{ name: 'Фон', i: 'background' as const },
-	]
+const markStyles = [
+	{ name: 'Линия', i: 'border' as const },
+	{ name: 'Фон', i: 'background' as const },
+]
+
+export const SettingsScreen = observer(function SettingsScreen() {
+	const students = StudentsStore.withoutParams()
 
 	const [accentColors, setAccentColors] = useState([
 		ACCENT_COLOR,
@@ -37,12 +41,7 @@ export function SettingsScreen() {
 		'#AD6E25',
 		'#B9421E',
 	])
-	const themeKey = settings.accentColor + settings.theme
-	const onAccentChange = (color: string) => {
-		settings.save({
-			accentColor: color === ACCENT_COLOR ? undefined : color,
-		})
-	}
+	const themeKey = Theme.accentColor + Theme.scheme
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -55,11 +54,12 @@ export function SettingsScreen() {
 				students.fallback || (
 					<Dropdown
 						buttonStyle={{ marginBottom: Spacings.s2 }}
-						data={students.result.map((student, i) => {
-							return { name: fullname(student.name, settings), i }
-						})}
-						defaultValueByIndex={settings.studentIndex}
-						onSelect={s => settings.save({ studentIndex: s.i })}
+						data={students.result.map((student, i) => ({
+							i,
+							name: fullname(student.name),
+						}))}
+						defaultValueByIndex={Settings.studentIndex}
+						onSelect={s => Settings.save({ studentIndex: s.i })}
 						buttonTextAfterSelection={i => i.name}
 						rowTextForSelection={i => i.name}
 					/>
@@ -70,17 +70,17 @@ export function SettingsScreen() {
 			<Dropdown
 				data={themes}
 				buttonStyle={{ marginBottom: Spacings.s2 }}
-				defaultValueByIndex={themes.findIndex(e => e.i === settings.theme)}
-				onSelect={s => settings.save({ theme: s.i })}
+				defaultValueByIndex={themes.findIndex(e => e.i === Theme.scheme)}
+				onSelect={s => Theme.setColorScheme(s.i)}
 				defaultButtonText="Тема"
 				buttonTextAfterSelection={i => 'Тема: ' + (i?.name ?? 'По умолчанию')}
 				rowTextForSelection={i => i.name}
 			/>
 			<Button
 				{...settingsButton()}
-				onPress={() =>
-					settings.save({ notifications: !settings.notifications })
-				}
+				onPress={() => {
+					Settings.save({ notifications: !Settings.notifications })
+				}}
 			>
 				<View flex row center>
 					<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
@@ -88,8 +88,8 @@ export function SettingsScreen() {
 					</Text>
 					<Switch
 						key={themeKey}
-						onValueChange={notifications => settings.save({ notifications })}
-						value={settings.notifications}
+						onValueChange={notifications => Settings.save({ notifications })}
+						value={Settings.notifications}
 					/>
 				</View>
 			</Button>
@@ -97,28 +97,28 @@ export function SettingsScreen() {
 				data={markStyles}
 				buttonStyle={{ marginBottom: Spacings.s2 }}
 				defaultValueByIndex={markStyles.findIndex(
-					e => e.i === settings.markStyle
+					e => e.i === Settings.markStyle
 				)}
-				onSelect={s => s.i && settings.save({ markStyle: s.i })}
+				onSelect={s => s.i && Settings.save({ markStyle: s.i })}
 				defaultButtonText="Стиль оценок"
 				buttonTextAfterSelection={i =>
 					'Cтиль оценок: ' + (i?.name ?? 'По умолчанию')
 				}
 				rowTextForSelection={i => i.name}
 			/>
-			<UpdatesButton />
+			<UpdatesButton key={themeKey + 'updates'} />
 			<Text margin-s2 center key={themeKey + 'text'}>
 				Цвет акцентов:
 			</Text>
 			<ColorPicker
 				colors={accentColors}
-				onValueChange={onAccentChange}
+				onValueChange={accentColor => Theme.setAccentColor(accentColor)}
 				backgroundColor={Colors.$backgroundDefault}
-				onSubmit={color => {
-					setAccentColors(accentColors.concat(color))
-					onAccentChange(color)
+				onSubmit={accentColor => {
+					setAccentColors(accentColors.concat(accentColor))
+					Theme.setAccentColor(accentColor)
 				}}
-				initialColor={settings.accentColor}
+				initialColor={Theme.accentColor}
 				key={themeKey}
 			/>
 
@@ -149,4 +149,4 @@ export function SettingsScreen() {
 			</ScrollView> */}
 		</ScrollView>
 	)
-}
+})

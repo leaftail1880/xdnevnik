@@ -12,7 +12,11 @@ export type ButtonProps = TouchableOpacityProps & {
 	onPress?(props: TouchableOpacityProps): Promise<void> | void
 }
 
-export function SmallButton({ onPress, ...props }: ButtonProps) {
+// eslint-disable-next-line mobx/missing-observer
+export const SmallButton = function SmallButton({
+	onPress,
+	...props
+}: ButtonProps) {
 	const [presssed, setPressed] = useState(false)
 	return (
 		<TouchableOpacity
@@ -30,7 +34,8 @@ export function SmallButton({ onPress, ...props }: ButtonProps) {
 	)
 }
 
-export function Button(props: ButtonProps) {
+// eslint-disable-next-line mobx/missing-observer
+export const Button = function Button(props: ButtonProps) {
 	return <SmallButton center {...props} style={[buttonStyle(), props.style]} />
 }
 
@@ -50,7 +55,8 @@ export type IconButtonProps = ButtonProps & {
 	iconColor?: string
 }
 
-export function IconButton(props: IconButtonProps) {
+// eslint-disable-next-line mobx/missing-observer
+export const IconButton = function IconButton(props: IconButtonProps) {
 	return (
 		<SmallButton center br10 {...props}>
 			<Ionicon
@@ -65,4 +71,3 @@ export function IconButton(props: IconButtonProps) {
 		</SmallButton>
 	)
 }
-

@@ -1,3 +1,5 @@
+import { makeAutoObservable, makeObservable } from 'mobx'
+
 export interface Endpoint {
 	name: string
 	url: string
@@ -81,7 +83,7 @@ interface RawLesson extends BaseLesson {
 /**
  * Class representing one lesson
  */
-class Lesson {
+export class Lesson {
 	private _end: string
 	private _start: string
 	private _day: string
@@ -110,9 +112,12 @@ class Lesson {
 	public constructor(lesson: RawLesson) {
 		const { endTime, startTime, day, ...ours } = lesson
 		Object.assign(this, ours)
+
 		this._end = endTime
 		this._start = startTime
 		this._day = day
+
+		makeAutoObservable(this)
 	}
 
 	/**
@@ -141,13 +146,14 @@ class Lesson {
  * Class representing diary
  */
 export class Diary {
-	public lessons: Lesson[]
+	lessons: Lesson[]
 
 	/**
 	 * Creates new diary
 	 * @param lessons - Raw lessons from fetch response
 	 */
-	public constructor(lessons: RawLesson[]) {
+	constructor(lessons: RawLesson[]) {
+		makeObservable(this, { forDay: true, isNow: false, lessons: false })
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
 		// TODO add custom lessons
 	}
@@ -156,12 +162,12 @@ export class Diary {
 	 * Gets lesson for specified day
 	 * @param day - Day to search for
 	 */
-	public forDay(day: Date | string) {
+	forDay(day: Date | string) {
 		if (day instanceof Date) day = day.toYYYYMMDD()
 		return this.lessons.filter(lesson => lesson.day.toYYYYMMDD() === day)
 	}
 
-	public isNow(lesson: Lesson) {
+	isNow(lesson: Lesson) {
 		const { start, end } = lesson
 		const date = new Date()
 

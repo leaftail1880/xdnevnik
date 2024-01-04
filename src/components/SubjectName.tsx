@@ -1,10 +1,12 @@
-import { useContext, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
 import { Colors, Text, TextField, TextProps } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Subject } from '../NetSchool/classes'
+import { Settings } from '../Stores/Settings.store'
+import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { styles } from '../constants'
-import { Ctx, SettingsCtx } from '../hooks/settings'
 import { IconButton } from './Button'
 import { Loading } from './Loading'
 
@@ -19,16 +21,9 @@ type SubjectNameOptions = {
 	  }
 )
 
-type GetSubjectNameOptions = {
-	settings: SettingsCtx
-	studentId: number
-} & SubjectNameOptions
-
-export function getSubjectName(props: GetSubjectNameOptions) {
+export function getSubjectName(props: SubjectNameOptions) {
 	const overriden =
-		props.settings.studentOverrides[props.studentId]?.subjectNames[
-			props.subjectId
-		]
+		Settings.studentOverrides[XDnevnik.studentId]?.subjectNames[props.subjectId]
 
 	if (overriden) return overriden
 
@@ -44,14 +39,16 @@ type SubjectNameProps = {
 } & SubjectNameOptions &
 	Omit<TextProps, 'textAlign'>
 
-export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
-	const { settings, studentId } = useContext(Ctx)
+export const SubjectName = observer(function SubjectName({
+	viewStyle,
+	...props
+}: SubjectNameProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [newName, setNewName] = useState('')
 
-	if (!studentId) return <Loading />
+	if (!XDnevnik.studentId) return <Loading />
 
-	const name = getSubjectName({ ...props, settings, studentId })
+	const name = getSubjectName(props)
 
 	return (
 		<View style={[styles.stretch, { margin: 0, padding: 0 }, viewStyle]}>
@@ -79,16 +76,13 @@ export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
 				size={props.iconsSize}
 				onPress={() => {
 					if (isEditing) {
-						settings.save({
-							studentOverrides: {
-								[studentId]: {
-									subjectNames: {
-										[props.subjectId]: newName ? newName : undefined,
-									},
-									subjects: settings.studentOverrides[studentId]?.subjects ?? {}
-								},
-							},
-						})
+						Settings.studentOverrides[XDnevnik.studentId] ??= {
+							subjectNames: {},
+							subjects: {},
+						}
+						Settings.studentOverrides[XDnevnik.studentId]!.subjectNames[
+							props.subjectId
+						] = newName ? newName : undefined
 					}
 					setIsEditing(!isEditing)
 				}}
@@ -107,4 +101,4 @@ export function SubjectName({ viewStyle, ...props }: SubjectNameProps) {
 			)}
 		</View>
 	)
-}
+})

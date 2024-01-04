@@ -1,9 +1,10 @@
+import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
-import { Assignment, Attachment } from '../NetSchool/classes'
-import { APIState } from '../hooks/api'
-import { Button, SmallButton } from './Button'
-import { Mark } from './Mark'
+import { Button, SmallButton } from '../../Components/Button'
+import { Mark } from '../../Components/Mark'
+import { Assignment, Attachment } from '../../NetSchool/classes'
+import { AttachmentsStore } from './stores'
 // import * as FileSystem from 'expo-file-system'
 // import * as ExpoSharing from 'expo-sharing'
 // import { Alert } from 'react-native'
@@ -12,18 +13,18 @@ import { Mark } from './Mark'
 
 // TODO support attachment
 
-export function DiaryAssignment({
+export const DiaryAssignment = observer(function DiaryAssignment({
 	assignment,
-	attachments,
 }: {
 	assignment: Assignment
-	attachments: APIState<Attachment[]>
 }) {
 	const [showHw, setShowHw] = useState(
 		// Do not show long hw by default
 		// assignment.assignmentTypeName.length < 20
 		true
 	)
+
+	const attachments = AttachmentsStore.withoutParams()
 
 	const attachment =
 		assignment.attachmentsExists &&
@@ -101,9 +102,13 @@ export function DiaryAssignment({
 						))))}
 		</View>
 	)
-}
+})
 
-function AttachmentFile({ attachment }: { attachment: Attachment }) {
+const AttachmentFile = observer(function AttachmentFile({
+	attachment,
+}: {
+	attachment: Attachment
+}) {
 	return (
 		<Button
 			style={{
@@ -146,5 +151,4 @@ function AttachmentFile({ attachment }: { attachment: Attachment }) {
 			<Text>{attachment.fileName}</Text>
 		</Button>
 	)
-}
-
+})

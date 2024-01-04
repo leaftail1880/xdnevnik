@@ -1,34 +1,36 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
 	BottomTabBar,
 	createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
 import {
-	DarkTheme,
 	NavigationContainer,
 	NavigationContainerRef,
-	Theme,
 } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect, useRef, useState } from 'react'
-import { TouchableOpacity, View, useColorScheme } from 'react-native'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
+import { useRef } from 'react'
+import { TouchableOpacity, View } from 'react-native'
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
-import { Colors, Scheme, Text } from 'react-native-ui-lib'
-import { API, NetSchoolApi } from './src/NetSchool/api'
-import { ReactStateHook } from './src/NetSchool/classes'
-import { ROUTES } from './src/NetSchool/routes'
-import { IconButton } from './src/components/Button'
-import { Ionicon } from './src/components/Icon'
-import { Loading } from './src/components/Loading'
-import { LANG, Status, styles } from './src/constants'
-import { useAPI } from './src/hooks/api'
-import { Ctx, useSetupSettings } from './src/hooks/settings'
-import { setupNotifications } from './src/notifications'
-import { DiaryScreen } from './src/screen/diary'
-import { LoginScreen } from './src/screen/login'
-import { LogoutScreen } from './src/screen/logout'
-import { SettingsScreen } from './src/screen/settings'
-import { TotalsNavigation } from './src/screen/totals'
+import { Colors } from 'react-native-ui-lib'
+import { LANG, logger } from './src/constants'
+
+import { Ionicon } from './src/Components/Icon'
+import { Loading } from './src/Components/Loading'
+import { StatusBadge } from './src/Components/StatusBadge'
+import { API } from './src/NetSchool/api'
+import { DiaryScreen } from './src/Screens/Diary'
+import { LoginScreen } from './src/Screens/Session/login'
+import { LogoutScreen } from './src/Screens/Session/logout'
+import { SettingsScreen } from './src/Screens/Settings'
+import { TotalsNavigation } from './src/Screens/Totals'
+import { StudentsStore } from './src/Stores/StudentsStore'
+import { Theme } from './src/Stores/Theme.store'
+
+if (__DEV__) {
+	// @ts-expect-error We support this
+	import('./ReactotronConfig').then(() => logger.debug('Reactotron Configured'))
+}
 
 type ParamListBase = Record<
 	(typeof LANG)[
@@ -39,214 +41,80 @@ type ParamListBase = Record<
 		| 's_diary'],
 	undefined
 >
-
 const Tab = createBottomTabNavigator<ParamListBase>()
 
-export default function App() {
-	API.hookReactState(useState<ReactStateHook>())
-	const settings = useSetupSettings()
-
-	const students = useAPI(API, 'students', undefined, 'списка учеников')
-	const student = students.result && students.result[settings.studentIndex]
-	const studentId = student && student.studentId
-
-	useEffect(() => {
-		AsyncStorage.getItem('cache').then(
-			cache => cache && (API.cache = JSON.parse(cache))
-		)
-	}, [])
-
-	useEffect(
-		() => setupNotifications(settings.notifications),
-		[settings.notifications]
-	)
-
-	const [, rerender] = useState(0)
-	useEffect(() => {
-		Colors.loadDesignTokens({ primaryColor: settings.accentColor })
-
-		Colors.loadSchemes({
-			light: {
-				$textAccent: '#FFFFFF',
-				$backgroundAccent: settings.accentColor,
-			},
-			dark: {
-				$textAccent: '#FFFFFF',
-				$backgroundAccent: settings.accentColor,
-			},
-		})
-
-		rerender(s => s + 1)
-	}, [settings.accentColor])
-
-	const systemScheme = useColorScheme() ?? 'light'
-	const scheme = settings.theme === 'system' ? systemScheme : settings.theme
-
-	useEffect(() => {
-		Scheme.setScheme(scheme)
-		rerender(s => s + 1)
-	}, [scheme])
-
-	// Same object across renders to prevent flickering
-	const [theme] = useState<Theme>(DarkTheme)
-
-	theme.dark = scheme === 'dark'
-	Object.assign(theme.colors, {
-		background: Colors.$backgroundDefault,
-		border: Colors.$backgroundElevated,
-		card: Colors.$backgroundPrimaryLight,
-		notification: Colors.$backgroundAccent,
-		primary: Colors.$backgroundAccent,
-		text: Colors.$textDefault,
-	})
-
-	const [status, setStatus] = useState<Status>()
-	const sended = useRef<boolean>()
-	useEffect(() => {
-		// Not loaded
-		if (!API.session) return
-
-		// Already authorized
-		if (API.authorized) return
-
-		// Already sent auth req
-		if (sended.current) return
-
-		// Session is still active
-		if (API.session.expires.getTime() > Date.now()) {
-			API.authorized = true
-			return
-		}
-
-		sended.current = true
-		API.getToken(
-			ROUTES.refreshTokenTemplate(API.session.refresh_token),
-			'Ошибка авторизации, перезайдите. Код ошибки 400'
-		)
-			.then(() => {
-				if (status) {
-					setStatus({ content: 'Вы авторизовались.', error: false })
-					setTimeout(() => setStatus(undefined), 5000)
-				}
-			})
-			.catch(e => {
-				setStatus({ content: NetSchoolApi.stringifyError(e), error: true })
-			})
-	})
-
+export default observer(function App() {
+	const students = StudentsStore.withoutParams()
 	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
-	const WaitForAuthorization = !API.session && (
-		<Loading text="Ожидание авторизации{dots}" />
-	)
+	const Fallback =
+		(!API.session && <Loading text="Авторизация{dots}" />) || students.fallback
+
+	const card = Theme.theme.colors.card
+	logger.debug('card', card)
 
 	return (
-		<Ctx.Provider
-			value={{
-				settings,
-				studentId,
-				students,
-				setStatus,
-			}}
-		>
-			<NavigationContainer theme={theme} ref={navigation}>
-				<StatusBar
-					translucent={true}
-					style={scheme === 'dark' ? 'light' : 'dark'}
-				/>
-				<Tab.Navigator
-					tabBar={props => (
-						<View>
-							{status && (
-								<StatusBadge
-									status={status}
-									theme={theme}
-									reset={() => {
-										sended.current = false
-										API.updateEffects++
-									}}
-								/>
-							)}
-							<BottomTabBar {...props} />
-						</View>
-					)}
-					screenOptions={({ route }) => ({
-						tabBarIcon: ({ focused, color, size }) => {
-							let iconName = {
-								[LANG['s_log_in']]: 'log-in',
-								[LANG['s_log_out']]: 'log-out',
-								[LANG['s_diary']]: 'time',
-								[LANG['s_totals']]: 'school',
-								[LANG['s_homework']]: 'document',
-								[LANG['s_settings']]: 'settings',
-							}[route.name]
-							if (focused) iconName += '-outline'
-							return <Ionicon name={iconName} size={size} color={color} />
-						},
-						tabBarActiveTintColor: Colors.$iconPrimary,
-						tabBarInactiveTintColor: Colors.$iconDefault,
-						tabBarButton: props => <TouchableOpacity {...props} />,
-						tabBarHideOnKeyboard: true,
-					})}
+		<NavigationContainer theme={toJS(Theme.theme)} ref={navigation}>
+			<StatusBar
+				translucent={true}
+				style={Theme.scheme === 'dark' ? 'light' : 'dark'}
+			/>
+			<Tab.Navigator
+				tabBar={props => (
+					<View>
+						<StatusBadge />
+						<BottomTabBar {...props} />
+					</View>
+				)}
+				screenOptions={({ route }) => ({
+					tabBarIcon: ({ focused, color, size }) => {
+						let iconName = {
+							[LANG['s_log_in']]: 'log-in',
+							[LANG['s_log_out']]: 'log-out',
+							[LANG['s_diary']]: 'time',
+							[LANG['s_totals']]: 'school',
+							[LANG['s_homework']]: 'document',
+							[LANG['s_settings']]: 'settings',
+						}[route.name]
+						if (focused) iconName += '-outline'
+						return <Ionicon name={iconName} size={size} color={color} />
+					},
+					tabBarActiveTintColor: Colors.$iconPrimary,
+					tabBarInactiveTintColor: Colors.$iconDefault,
+					tabBarButton: props => <TouchableOpacity {...props} />,
+					tabBarHideOnKeyboard: true,
+				})}
+			>
+				{!API.session && (
+					<Tab.Screen name={LANG['s_log_in']}>
+						{() => <LoginScreen />}
+					</Tab.Screen>
+				)}
+
+				<Tab.Screen name={LANG['s_diary']}>
+					{() => Fallback || <DiaryScreen />}
+				</Tab.Screen>
+
+				<Tab.Screen
+					name={LANG['s_totals']}
+					// Show header when component's custom header is not rendered
+					options={{ headerShown: !!Fallback }}
 				>
-					{!API.session && (
-						<Tab.Screen name={LANG['s_log_in']}>
-							{() => <LoginScreen />}
-						</Tab.Screen>
-					)}
+					{() => Fallback || <TotalsNavigation />}
+				</Tab.Screen>
 
-					<Tab.Screen name={LANG['s_diary']}>
-						{() => WaitForAuthorization || students.fallback || <DiaryScreen />}
-					</Tab.Screen>
-					<Tab.Screen name={LANG['s_totals']} options={{ headerShown: false }}>
-						{() =>
-							WaitForAuthorization || students.fallback || <TotalsNavigation />
-						}
-					</Tab.Screen>
-					<Tab.Screen name={LANG['s_settings']}>
-						{() => {
-							const Render = gestureHandlerRootHOC(SettingsScreen)
-							return <Render />
-						}}
-					</Tab.Screen>
+				<Tab.Screen name={LANG['s_settings']}>
+					{() => {
+						const Render = gestureHandlerRootHOC(SettingsScreen)
+						return <Render />
+					}}
+				</Tab.Screen>
 
-					{API.session && (
-						<Tab.Screen name={LANG['s_log_out']}>
-							{() => <LogoutScreen />}
-						</Tab.Screen>
-					)}
-				</Tab.Navigator>
-			</NavigationContainer>
-		</Ctx.Provider>
+				{API.session && (
+					<Tab.Screen name={LANG['s_log_out']}>
+						{() => <LogoutScreen />}
+					</Tab.Screen>
+				)}
+			</Tab.Navigator>
+		</NavigationContainer>
 	)
-}
-
-function StatusBadge({
-	status,
-	theme,
-	reset,
-}: {
-	status: NonNullable<Status>
-	theme: Theme
-	reset: () => void
-}) {
-	const color = status.error ? Colors.$textAccent : Colors.$textDefault
-	return (
-		<View
-			style={[
-				styles.stretch,
-				{
-					elevation: 3,
-					minHeight: 40,
-					backgroundColor: status.error
-						? Colors.$backgroundDangerHeavy
-						: theme.colors.card,
-				},
-			]}
-		>
-			<Text style={{ fontSize: 15, color }}>{status.content}</Text>
-			{status.error && (
-				<IconButton onPress={reset} icon="reload" iconColor={color} size={18} />
-			)}
-		</View>
-	)
-}
+})

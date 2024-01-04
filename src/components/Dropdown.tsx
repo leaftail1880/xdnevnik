@@ -173,6 +173,7 @@ declare module 'react-native-select-dropdown' {
 			  }
 		)
 
+	// eslint-disable-next-line mobx/missing-observer
 	export class Dropdown<Item = object> extends React.Component<
 		SelectDropdownProps2<Item>
 	> {
@@ -201,7 +202,8 @@ import {
 } from 'react-native-select-dropdown'
 import { BorderRadiuses, Colors } from 'react-native-ui-lib'
 
-export function Dropdown<Item = object>(props: Props<Item>) {
+// eslint-disable-next-line mobx/missing-observer
+export const Dropdown = function Dropdown<Item = object>(props: Props<Item>) {
 	return (
 		<LibDropdown
 			{...props}
@@ -232,4 +234,3 @@ export function dropdownStyle(): StyleProp<ViewStyle> {
 		borderBottomRightRadius: BorderRadiuses.br50,
 	}
 }
-

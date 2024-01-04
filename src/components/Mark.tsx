@@ -1,7 +1,7 @@
-import { useContext } from 'react'
+import { observer } from 'mobx-react-lite'
 import { Falsy, TextStyle } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
-import { Ctx } from '../hooks/settings'
+import { Settings } from '../Stores/Settings.store'
 import { ButtonProps, SmallButton } from './Button'
 
 const MarkColorsBG = {
@@ -17,7 +17,7 @@ const MarkColorsText = {
 	2: '#C00000',
 }
 
-export function Mark({
+export const Mark = observer(function Mark({
 	finalMark,
 	mark: markProp,
 	markWeight,
@@ -36,8 +36,7 @@ export function Mark({
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 }) {
-	const { settings } = useContext(Ctx)
-	const bg = settings.markStyle === 'background'
+	const bg = Settings.markStyle === 'background'
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
 	if (duty) markProp = 2
@@ -129,4 +128,4 @@ export function Mark({
 			)}
 		</SmallButton>
 	)
-}
+})

@@ -4,12 +4,13 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 // import * as MediaLibrary from 'expo-media-library'
 // import * as Permissions from 'expo-permissions'
 import * as ExpoSharing from 'expo-sharing'
+import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
-import { getLatestGithubReleaseUrl } from '../GithubUpdate/update'
-import { Button } from '../components/Button'
-import { LOGGER, settingsButton } from '../constants'
+import { Button } from '../../Components/Button'
+import { getLatestGithubReleaseUrl } from '../../GithubUpdate/update'
+import { logger, settingsButton } from '../../constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {
@@ -64,16 +65,16 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 			// 		'XDnevnik всего-лишь скачает один файл в папку Downloads и откроет для Вас проводник чтобы Вы могли обновить XDnevnik и получить новейшие возможности.'
 			// 	)
 		}
-		LOGGER.info('App installer opened successfully')
+		logger.info('App installer opened successfully')
 		return true
 	} catch (error) {
 		Alert.alert('Ошибка', error + '')
-		LOGGER.error('Failed to open the app installer', error)
+		logger.error('Failed to open the app installer', error)
 		return false
 	}
 }
 
-export function UpdatesButton() {
+export const UpdatesButton = observer(function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button
@@ -114,7 +115,6 @@ export function UpdatesButton() {
 				} catch (error) {
 					Alert.alert(`Не удалось получить обновление`, '' + error)
 					setProgress(void 0)
-
 				}
 			}}
 		>
@@ -123,4 +123,4 @@ export function UpdatesButton() {
 			</Text>
 		</Button>
 	)
-}
+})
