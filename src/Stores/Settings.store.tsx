@@ -31,7 +31,9 @@ class SettingsStore {
 		makeAutoObservable(this)
 		makeReloadPersistable(this, {
 			name: 'settings',
-			properties: [Object.keys(this) as unknown as keyof this],
+			properties: Object.keys(this).filter(
+				e => e !== 'save'
+			) as unknown as (keyof this)[],
 		})
 	}
 
@@ -40,7 +42,7 @@ class SettingsStore {
 	}
 }
 
-export const Settings = new SettingsStore()
+export const Settings = new SettingsStore() as Readonly<SettingsStore>
 
 export function fullname(name: string) {
 	if (Settings.lastNameLast) {

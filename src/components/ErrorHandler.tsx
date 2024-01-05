@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
 import { NetSchoolApi, NetSchoolError } from '../NetSchool/api'
@@ -11,7 +10,8 @@ interface ErrorHandlerProps {
 	name: string
 }
 
-export const ErrorHandler = observer(function ErrorHandler({
+// eslint-disable-next-line mobx/missing-observer
+export const ErrorHandler = function ErrorHandler({
 	error,
 	reload,
 	name,
@@ -55,4 +55,4 @@ export const ErrorHandler = observer(function ErrorHandler({
 			</View>
 		</View>
 	)
-})
+}

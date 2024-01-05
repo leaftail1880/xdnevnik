@@ -104,7 +104,7 @@ export class NetSchoolApi {
 	constructor() {
 		// eslint-disable-next-line mobx/exhaustive-make-observable
 		makeObservable(this, {
-			cache: observable.struct,
+			cache: observable,
 			authorized: true,
 			reload: true,
 			session: observable.struct,
@@ -120,12 +120,15 @@ export class NetSchoolApi {
 					serialize: e => e,
 					deserialize: e => (this.setEndpoint(e), e),
 				},
-				'cache',
+				{
+					key: 'cache',
+					serialize: e => e,
+					deserialize: e => e,
+				},
 				{
 					key: 'session',
-					serialize: s => JSON.stringify(s),
+					serialize: s => s,
 					deserialize(session) {
-						session = JSON.parse(session)
 						if (session) session.expires = new Date(session.expires)
 						return session
 					},
@@ -227,7 +230,7 @@ export class NetSchoolApi {
 			init: RequestInit
 		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch
 	): Promise<T> {
-		const request: RequestInit & Required<Pick<RequestInit, 'headers'>> = {
+		const request: RequestInit & { headers: Record<string, string> } = {
 			headers: {},
 		}
 
@@ -272,10 +275,14 @@ export class NetSchoolApi {
 				})
 
 			if (!response.ok) {
+				const status = response.status
+				const reasons = this.errorReasons
 				const error = new NetSchoolError(
-					`${this.errorReasons[response.status]}\nКод ошибки сервера: ${
-						response.status
-					}`,
+					`${
+						status in reasons
+							? reasons[status as keyof typeof reasons]
+							: 'Неизвестная ошибка'
+					}\nКод ошибки сервера: ${status}`,
 					{ cacheGuide: true }
 				)
 				logger.error(error + ' Auth: ' + !!init.auth)
@@ -337,15 +344,15 @@ export class NetSchoolApi {
 		startDate,
 		endDate,
 	}: StudentId & {
-		startDate?: string
-		endDate?: string
+		startDate: string
+		endDate: string
 	}) {
 		return new Diary(
 			await this.get(ROUTES.classmeetings, {
 				params: {
 					studentIds: [studentId],
-					startDate: startDate ?? Date.week[0],
-					endDate: endDate ?? Date.week[6],
+					startDate: startDate,
+					endDate: endDate,
 					extraActivity: null,
 				},
 			})

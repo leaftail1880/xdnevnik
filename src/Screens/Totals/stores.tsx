@@ -1,10 +1,11 @@
-import { API } from '../../NetSchool/api'
-import { APIStore } from '../../Stores/API.store'
+import { createApiMethodStore } from '../../Stores/API.store'
 
-export const EducationStore = new APIStore(
-	API,
+export const EducationStore = createApiMethodStore(
 	'education',
 	'данных об обучении'
 )
-export const SubjectsStore = new APIStore(API, 'subjects', 'списка предметов')
-export const TotalsStore = new APIStore(API, 'totals', 'итоговых оценок')
+export const SubjectsStore = createApiMethodStore(
+	'subjects',
+	'списка предметов'
+)
+export const TotalsStore = createApiMethodStore('totals', 'итоговых оценок')

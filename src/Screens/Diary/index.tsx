@@ -17,24 +17,27 @@ export const DiaryScreen = observer(function DiaryScreen() {
 	const { studentId } = XDnevnik
 	const { showHomework, weekDays, weekDaysOptions, diaryDay } = DiaryStateStore
 
-	const diary = DiaryStore.withParams({
+	DiaryStore.withParams({
 		studentId,
 		startDate: weekDays[0],
 		endDate: weekDays[6],
 	})
 
 	logger.debug(
-		'Дневник fallback ' + !!diary.fallback + ' result ' + !!diary.result
+		'Дневник fallback ' +
+			!!DiaryStore.fallback +
+			' result ' +
+			!!DiaryStore.result
 	)
 
-	const homework = AssignmentsStore.withParams({
+	AssignmentsStore.withParams({
 		studentId,
 		classmeetingsIds: showHomework
-			? diary.result?.lessons.map(e => e.classmeetingId)
+			? DiaryStore.result?.lessons.map(e => e.classmeetingId)
 			: undefined,
 	})
 
-	const withAttachments = homework.result
+	const withAttachments = AssignmentsStore.result
 		?.filter(e => e.attachmentsExists)
 		.map(e => e.assignmentId)
 
@@ -69,28 +72,31 @@ export const DiaryScreen = observer(function DiaryScreen() {
 					alignContent: 'center',
 					paddingBottom: Spacings.s10,
 				}}
-				refreshControl={diary.refreshControl}
+				refreshControl={DiaryStore.refreshControl}
 			>
 				<View padding-s1 flex>
 					<View flex row spread padding-s1>
 						<Text margin-s1>Оценки</Text>
 						<Switch
 							margin-s1
-							onValueChange={v => (DiaryStateStore.showHomework = v)}
+							onValueChange={v =>
+								runInAction(() => (DiaryStateStore.showHomework = v))
+							}
 							value={showHomework}
 						/>
 					</View>
 				</View>
-				<View padding-s1>{diary.fallback || <DiaryDay />}</View>
+				<View padding-s1>{DiaryStore.fallback || <DiaryDay />}</View>
 				<Text center $textDisabled marginB-20>
-					{diary.updateDate}
+					{DiaryStore.updateDate}
 				</Text>
 			</ScrollView>
 		</View>
 	)
 })
+
 const DiaryDay = observer(function DiaryDay() {
-	const { result, fallback } = DiaryStore.withoutParams()
+	const { result, fallback } = DiaryStore
 
 	if (fallback) return fallback
 

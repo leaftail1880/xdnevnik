@@ -1,16 +1,14 @@
 import { makeAutoObservable } from 'mobx'
-import { API } from '../../NetSchool/api'
-import { APIStore } from '../../Stores/API.store'
+import { createApiMethodStore } from '../../Stores/API.store'
 import { makeReloadPersistable } from '../../Stores/makePersistable'
 import { LANG } from '../../constants'
 
-export const DiaryStore = new APIStore(
-	API,
+export const DiaryStore = createApiMethodStore(
 	'diary',
 	'дневника',
 	undefined,
-	undefined
-	// true
+	undefined,
+	true
 )
 export const DiaryStateStore = new (class {
 	constructor() {
@@ -62,9 +60,8 @@ export const DiaryStateStore = new (class {
 	}
 	showHomework = true
 })()
-export const AssignmentsStore = new APIStore(API, 'assignments', 'оценок')
-export const AttachmentsStore = new APIStore(
-	API,
+export const AssignmentsStore = createApiMethodStore('assignments', 'оценок')
+export const AttachmentsStore = createApiMethodStore(
 	'attachments',
 	'файлов',
 	undefined,

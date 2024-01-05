@@ -1,20 +1,18 @@
 {
   "compilerOptions": {
-    "strictNullChecks": true,
-    "allowJs": true,
-    "esModuleInterop": true,
-    "jsx": "react-native",
-    "lib": [
-      "DOM",
-      "ESNext"
-    ],
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "target": "ESNext"
-  },
+		"strictNullChecks": true,
+		"allowJs": true,
+		"esModuleInterop": true,
+		"jsx": "react-native",
+		"lib": ["DOM", "ESNext"],
+		"forceConsistentCasingInFileNames": true,
+		"moduleResolution": "node",
+		"noEmit": true,
+		"noImplicitAny": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"target": "ESNext"
+	},
   "include": [
     "App.tsx",
     "src/*"
@@ -27,3 +25,4 @@
   ],
   "extends": "expo/tsconfig.base"
 }
+

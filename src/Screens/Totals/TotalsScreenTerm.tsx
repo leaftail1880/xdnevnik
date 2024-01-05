@@ -1,4 +1,4 @@
-import { autorun, makeAutoObservable } from 'mobx'
+import { action, autorun, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { ScrollView } from 'react-native'
@@ -11,17 +11,20 @@ import { Settings } from '../../Stores/Settings.store'
 import { SubjectPerformanceInline } from './SubjectPerformanceInline'
 import { EducationStore, SubjectsStore, TotalsStore } from './stores'
 
-const TermStore = makeAutoObservable({
-	selectedTerm: null as null | NSEntity,
-	setSelectedTerm(term: NSEntity | null) {
-		if (!term) return
-		this.selectedTerm = term
-		Settings.selectedTerm = term.id
+const TermStore = makeAutoObservable(
+	{
+		selectedTerm: null as null | NSEntity,
+		setSelectedTerm(term: NSEntity | null) {
+			if (!term) return
+			this.selectedTerm = term
+			Settings.save({ selectedTerm: term.id })
+		},
+		getTerms(totals = TotalsStore) {
+			return totals.result?.[0]?.termTotals.map(e => e.term)
+		},
 	},
-	getTerms(totals = TotalsStore.withoutParams()) {
-		return totals.result?.[0]?.termTotals.map(e => e.term)
-	},
-})
+	{ getTerms: false, setSelectedTerm: action }
+)
 
 autorun(function loadSelectedTerm() {
 	const terms = TermStore.getTerms()
@@ -38,9 +41,9 @@ autorun(function loadSelectedTerm() {
 export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	navigation,
 }: TotalsContext) {
-	const totals = TotalsStore.withoutParams()
-	const subjects = SubjectsStore.withoutParams()
-	const education = EducationStore.withoutParams()
+	const totals = TotalsStore
+	const subjects = SubjectsStore
+	const education = EducationStore
 	const terms = TermStore.getTerms()
 
 	const [sort, setSort] = useState(true)

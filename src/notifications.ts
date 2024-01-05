@@ -47,7 +47,7 @@ autorun(function notificationFromDiary() {
 		return
 	}
 
-	const { result } = DiaryStore.withoutParams()
+	const { result } = DiaryStore
 	if (!result) return
 	const diary = toJS(result)
 

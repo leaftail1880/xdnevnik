@@ -4,7 +4,7 @@ import { StudentsStore } from './StudentsStore'
 
 class XDnevnikStore {
 	get studentId() {
-		const students = StudentsStore.withoutParams()
+		const students = StudentsStore
 		const student = students.result && students.result[Settings.studentIndex]
 		if (student) return student.studentId
 	}
@@ -13,7 +13,7 @@ class XDnevnikStore {
 				content: React.ReactNode
 				error: boolean
 		  }
-		| undefined
+		| undefined = undefined
 
 	constructor() {
 		makeAutoObservable(this, { studentId: false, status: true })

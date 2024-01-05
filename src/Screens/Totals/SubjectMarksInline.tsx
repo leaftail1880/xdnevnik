@@ -3,10 +3,9 @@ import { ScrollView, StyleProp, ViewStyle } from 'react-native'
 import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
-import { API } from '../../NetSchool/api'
 import { Total } from '../../NetSchool/classes'
-import { APIStore } from '../../Stores/API.store'
-import { KeyStore } from '../../Stores/ID.store'
+import { createApiMethodStore } from '../../Stores/API.store'
+import { KeyStore } from '../../Stores/KeyStore'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { calculateMarks } from '../SubjectTotals/calculateMarks'
 import { SubjectInfo } from './TotalsScreenTerm'
@@ -19,7 +18,7 @@ interface StoreID {
 export const SubjectPerformanceStores = new KeyStore(
 	(id: StoreID) => id.studentId + '|' + id.subjectId,
 	(id: StoreID) =>
-		new APIStore(API, 'subjectPerformance', 'итогов по предмету', id)
+		createApiMethodStore('subjectPerformance', 'итогов по предмету', id)
 )
 
 export const SubjectMarksInline = observer(function SubjectMarksInline(
@@ -29,11 +28,12 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 	}
 ) {
 	const { studentId } = XDnevnik
-	const store = SubjectPerformanceStores.use({
+	const assignments = SubjectPerformanceStores.use({
 		studentId,
 		subjectId: props.total.subjectId,
 	})
-	const assignments = store.withParams({
+
+	assignments.withParams({
 		termId: props.selectedTerm.id,
 	})
 

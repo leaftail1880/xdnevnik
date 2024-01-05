@@ -24,7 +24,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 		true
 	)
 
-	const attachments = AttachmentsStore.withoutParams()
+	const attachments = AttachmentsStore
 
 	const attachment =
 		assignment.attachmentsExists &&

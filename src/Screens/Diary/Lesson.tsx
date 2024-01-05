@@ -44,7 +44,7 @@ const DiaryAssignmentList = observer(function DiaryAssignmentList({
 }: {
 	lesson: Lesson
 }) {
-	const assignments = AssignmentsStore.withoutParams()
+	const assignments = AssignmentsStore
 	if (assignments.fallback) return assignments.fallback
 
 	const results = assignments.result.filter(

@@ -4,7 +4,6 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 // import * as MediaLibrary from 'expo-media-library'
 // import * as Permissions from 'expo-permissions'
 import * as ExpoSharing from 'expo-sharing'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
@@ -74,7 +73,8 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	}
 }
 
-export const UpdatesButton = observer(function UpdatesButton() {
+// eslint-disable-next-line mobx/missing-observer
+export const UpdatesButton = function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button
@@ -123,4 +123,4 @@ export const UpdatesButton = observer(function UpdatesButton() {
 			</Text>
 		</Button>
 	)
-})
+}

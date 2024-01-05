@@ -23,7 +23,9 @@ autorun(function autologin() {
 
 	// Session is still active
 	if (API.session.expires.getTime() > Date.now()) {
-		API.authorized = true
+		runInAction(() => {
+			API.authorized = true
+		})
 		return
 	}
 

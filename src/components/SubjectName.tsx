@@ -9,6 +9,7 @@ import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { styles } from '../constants'
 import { IconButton } from './Button'
 import { Loading } from './Loading'
+import { runInAction } from 'mobx'
 
 type SubjectNameOptions = {
 	subjectId: number
@@ -22,8 +23,11 @@ type SubjectNameOptions = {
 )
 
 export function getSubjectName(props: SubjectNameOptions) {
+	const { studentId } = XDnevnik
+	if (!studentId) return 'Загрузка'
+
 	const overriden =
-		Settings.studentOverrides[XDnevnik.studentId]?.subjectNames[props.subjectId]
+		Settings.studentOverrides[studentId]?.subjectNames[props.subjectId]
 
 	if (overriden) return overriden
 
@@ -45,8 +49,9 @@ export const SubjectName = observer(function SubjectName({
 }: SubjectNameProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [newName, setNewName] = useState('')
+	const { studentId } = XDnevnik
 
-	if (!XDnevnik.studentId) return <Loading />
+	if (!studentId) return <Loading />
 
 	const name = getSubjectName(props)
 
@@ -76,13 +81,15 @@ export const SubjectName = observer(function SubjectName({
 				size={props.iconsSize}
 				onPress={() => {
 					if (isEditing) {
-						Settings.studentOverrides[XDnevnik.studentId] ??= {
-							subjectNames: {},
-							subjects: {},
-						}
-						Settings.studentOverrides[XDnevnik.studentId]!.subjectNames[
-							props.subjectId
-						] = newName ? newName : undefined
+						runInAction(() => {
+							Settings.studentOverrides[studentId] ??= {
+								subjectNames: {},
+								subjects: {},
+							}
+							Settings.studentOverrides[studentId]!.subjectNames[
+								props.subjectId
+							] = newName ? newName : undefined
+						})
 					}
 					setIsEditing(!isEditing)
 				}}

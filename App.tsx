@@ -12,9 +12,10 @@ import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
-import { Colors } from 'react-native-ui-lib'
-import { LANG, logger } from './src/constants'
+import { Colors, LoaderScreen } from 'react-native-ui-lib'
+import { LANG } from './src/constants'
 
+import './ReactotronConfig'
 import { Ionicon } from './src/Components/Icon'
 import { Loading } from './src/Components/Loading'
 import { StatusBadge } from './src/Components/StatusBadge'
@@ -26,11 +27,6 @@ import { SettingsScreen } from './src/Screens/Settings'
 import { TotalsNavigation } from './src/Screens/Totals'
 import { StudentsStore } from './src/Stores/StudentsStore'
 import { Theme } from './src/Stores/Theme.store'
-
-if (__DEV__) {
-	// @ts-expect-error We support this
-	import('./ReactotronConfig').then(() => logger.debug('Reactotron Configured'))
-}
 
 type ParamListBase = Record<
 	(typeof LANG)[
@@ -44,13 +40,17 @@ type ParamListBase = Record<
 const Tab = createBottomTabNavigator<ParamListBase>()
 
 export default observer(function App() {
-	const students = StudentsStore.withoutParams()
 	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+
+	if (!Theme.loaded) return <LoaderScreen />
+
+	// Rerender on accent color change
+	// idk why its not subscribing to it be default
+	Theme.accentColor
+
+	const students = StudentsStore
 	const Fallback =
 		(!API.session && <Loading text="Авторизация{dots}" />) || students.fallback
-
-	const card = Theme.theme.colors.card
-	logger.debug('card', card)
 
 	return (
 		<NavigationContainer theme={toJS(Theme.theme)} ref={navigation}>
@@ -72,7 +72,6 @@ export default observer(function App() {
 							[LANG['s_log_out']]: 'log-out',
 							[LANG['s_diary']]: 'time',
 							[LANG['s_totals']]: 'school',
-							[LANG['s_homework']]: 'document',
 							[LANG['s_settings']]: 'settings',
 						}[route.name]
 						if (focused) iconName += '-outline'

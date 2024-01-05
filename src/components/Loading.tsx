@@ -18,7 +18,7 @@ const LoadingStore = new (class {
 
 	constructor() {
 		makeAutoObservable(this)
-		setInterval(() => this.updateDots(), 1000)
+		setInterval(() => this.updateDots(), 500)
 	}
 })()
 

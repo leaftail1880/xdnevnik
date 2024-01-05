@@ -1,6 +1,6 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
 import { Colors, Switch, Text, View } from 'react-native-ui-lib'
 import { dropdownStyle } from '../../Components/Dropdown'
@@ -20,12 +20,11 @@ export const SubjectTotals = observer(function SubjectTotals({
 }: StackScreenProps<ParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
 	const studentId = XDnevnik.studentId
-	const { store, dispose } = SubjectPerformanceStores.get({
+	const performance = SubjectPerformanceStores.use({
 		studentId,
 		subjectId,
 	})
-	useEffect(dispose)
-	const performance = store.withParams({
+	performance.withParams({
 		termId,
 	})
 

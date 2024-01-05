@@ -153,8 +153,8 @@ export class Diary {
 	 * @param lessons - Raw lessons from fetch response
 	 */
 	constructor(lessons: RawLesson[]) {
-		makeObservable(this, { forDay: true, isNow: false, lessons: false })
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
+		makeObservable(this, { forDay: false, isNow: false, lessons: true })
 		// TODO add custom lessons
 	}
 
@@ -188,7 +188,7 @@ export interface SubjectPerformance {
 		passed: number
 		scheduled: number
 	}
-	teachers: NSEntity
+	teachers: NSEntity[]
 	results: {
 		date: string
 		assignmentId: number

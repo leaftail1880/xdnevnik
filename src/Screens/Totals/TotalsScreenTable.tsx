@@ -11,9 +11,9 @@ import { EducationStore, SubjectsStore, TotalsStore } from './stores'
 export const TotalsScreenTable = observer(function TotalsScreenTable(
 	props: TotalsContext
 ) {
-	const totals = TotalsStore.withoutParams()
-	const subjects = SubjectsStore.withoutParams()
-	const education = EducationStore.withoutParams()
+	const totals = TotalsStore
+	const subjects = SubjectsStore
+	const education = EducationStore
 	const { schoolYear } = props
 	const headerWidth = 45
 	const termTotalWidth =

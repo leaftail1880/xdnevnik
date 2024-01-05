@@ -1,4 +1,4 @@
-import { makeObservable } from 'mobx'
+import { action, makeAutoObservable, runInAction } from 'mobx'
 import { useEffect } from 'react'
 
 interface KeyStoreOptions {
@@ -21,12 +21,11 @@ export class KeyStore<ID = object, T = object> {
 		private readonly createStore: (id: ID) => T,
 		{ maxUnusedStores = 3 }: Partial<KeyStoreOptions> = {}
 	) {
-		makeObservable<this, 'stores' | 'options' | 'create'>(this, {
-			create: true,
-			stores: true,
+		makeAutoObservable<this, 'options' | 'create'>(this, {
 			options: false,
-			get: false,
 			use: false,
+			get: false,
+			create: action,
 		})
 		this.options = { maxUnusedStores }
 	}
@@ -34,7 +33,9 @@ export class KeyStore<ID = object, T = object> {
 	get(id: ID): Omit<StoredValue<T>, 'canDispose' | 'sid'> {
 		const sid = this.stringifyId(id)
 		if (this.stores[sid]) {
-			this.stores[sid].canDispose = false
+			runInAction(() => {
+				this.stores[sid].canDispose = false
+			})
 			return this.stores[sid]
 		}
 
@@ -44,8 +45,8 @@ export class KeyStore<ID = object, T = object> {
 	use(id: ID) {
 		const { store, dispose } = this.get(id)
 
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		useEffect(dispose)
+		// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
+		useEffect(dispose, [])
 		return store
 	}
 
@@ -62,7 +63,9 @@ export class KeyStore<ID = object, T = object> {
 			store,
 			canDispose: false,
 			dispose: () => () => {
-				this.stores[sid].canDispose = true
+				runInAction(() => {
+					this.stores[sid].canDispose = true
+				})
 			},
 		})
 	}

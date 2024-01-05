@@ -14,15 +14,16 @@ import { EducationStore, SubjectsStore, TotalsStore } from './stores'
 
 export const TotalsNavigation = observer(function TotalsNavigation() {
 	const { studentId } = XDnevnik
-	const education = EducationStore.withParams({ studentId })
+	EducationStore.withParams({ studentId })
 
 	// TODO Let user to schoose school year
-	const schoolYear = education.result?.find(e => !e.isAddSchool)?.schoolyear
+	const schoolYear = EducationStore.result?.find(
+		e => !e.isAddSchool
+	)?.schoolyear
 	const schoolYearId = schoolYear && schoolYear.id
 
-	const subjects = SubjectsStore.withParams({ studentId, schoolYearId })
-
-	const totals = TotalsStore.withParams({
+	SubjectsStore.withParams({ studentId, schoolYearId })
+	TotalsStore.withParams({
 		schoolYearId,
 		studentId,
 	})
@@ -38,28 +39,25 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 					headerRight() {
 						return (
 							<Observer>
-								{() => (
-									<View flex row spread center padding-s1>
-										<Text marginR-s2>Только одна четверть</Text>
-										<Switch
-											value={Settings.currentTotalsOnly}
-											onValueChange={value =>
-												(Settings.currentTotalsOnly = value)
-											}
-										/>
-									</View>
-								)}
+								{function headerSwitch() {
+									return (
+										<View flex row spread center padding-s1>
+											<Text marginR-s2>Только одна четверть</Text>
+											<Switch
+												value={Settings.currentTotalsOnly}
+												onValueChange={currentTotalsOnly =>
+													Settings.save({ currentTotalsOnly })
+												}
+											/>
+										</View>
+									)
+								}}
 							</Observer>
 						)
 					},
 				}}
 			>
-				{nav => (
-					<TotalsScreen
-						{...nav}
-						{...{ subjects, totals, education, schoolYear }}
-					/>
-				)}
+				{nav => <TotalsScreen {...nav} {...{ schoolYear }} />}
 			</Stack.Screen>
 			<Stack.Screen
 				name={S_SUBJECT_TOTALS}

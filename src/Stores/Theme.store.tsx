@@ -1,5 +1,5 @@
 import { DarkTheme } from '@react-navigation/native'
-import { action, makeAutoObservable, observable } from 'mobx'
+import { action, makeAutoObservable, observable, runInAction } from 'mobx'
 import { Appearance } from 'react-native'
 import { Colors, Scheme } from 'react-native-ui-lib'
 import { ACCENT_COLOR } from '../constants'
@@ -21,6 +21,7 @@ class ThemeStore {
 	theme = DarkTheme
 	scheme: 'light' | 'dark' | 'system' = 'light'
 	accentColor = ACCENT_COLOR
+	loaded = false
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -30,10 +31,17 @@ class ThemeStore {
 		makeReloadPersistable(this, {
 			properties: ['theme', 'scheme', 'accentColor'],
 			name: 'theme',
+		}).then(() => {
+			runInAction(() => {
+				this.setAccentColor(this.accentColor, true)
+				this.setColorScheme(this.scheme, true)
+				this.loaded = true
+			})
 		})
 	}
 
-	setAccentColor(color: string) {
+	setAccentColor(color: string, force = false) {
+		if (color === Colors.$backgroundAccent && !force) return
 		this.accentColor = color
 
 		Colors.loadDesignTokens({ primaryColor: color })
@@ -51,12 +59,15 @@ class ThemeStore {
 		this.updateColors()
 	}
 
-	setColorScheme(scheme: null | undefined | this['scheme']) {
-		if (!scheme || this.scheme === scheme) return
+	setColorScheme(scheme: null | undefined | this['scheme'], force = false) {
+		if (!scheme) return
+		if (!force && this.scheme === scheme) return
 
 		this.scheme = scheme
-		const realScheme: 'light' | 'dark' =
-			scheme === 'system' ? Appearance.getColorScheme() ?? 'light' : scheme
+		const systemScheme = Appearance.getColorScheme() ?? 'light'
+		const realScheme =
+			scheme === 'system' ? systemScheme : (scheme as 'light' | 'dark')
+
 		Scheme.setScheme(realScheme)
 		this.updateColors()
 	}

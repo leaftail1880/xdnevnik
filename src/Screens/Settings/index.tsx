@@ -17,7 +17,7 @@ import { API } from '../../NetSchool/api'
 import { Settings, fullname } from '../../Stores/Settings.store'
 import { StudentsStore } from '../../Stores/StudentsStore'
 import { Theme } from '../../Stores/Theme.store'
-import { ACCENT_COLOR, LANG, settingsButton } from '../../constants'
+import { ACCENT_COLOR, LANG, logger, settingsButton } from '../../constants'
 import { UpdatesButton } from './Update'
 
 const themes = [
@@ -32,8 +32,7 @@ const markStyles = [
 ]
 
 export const SettingsScreen = observer(function SettingsScreen() {
-	const students = StudentsStore.withoutParams()
-
+	const students = StudentsStore
 	const [accentColors, setAccentColors] = useState([
 		ACCENT_COLOR,
 		'#328585',
@@ -41,6 +40,17 @@ export const SettingsScreen = observer(function SettingsScreen() {
 		'#AD6E25',
 		'#B9421E',
 	])
+	const [expires, setSent] = useState(Date.now())
+
+	function setAccentColor(accentColor: string) {
+		if (Date.now() > expires) {
+			Theme.setAccentColor(accentColor)
+			setSent(Date.now() + 5000)
+		} else {
+			logger.debug('SSSS')
+		}
+	}
+
 	const themeKey = Theme.accentColor + Theme.scheme
 	return (
 		<ScrollView
@@ -112,11 +122,11 @@ export const SettingsScreen = observer(function SettingsScreen() {
 			</Text>
 			<ColorPicker
 				colors={accentColors}
-				onValueChange={accentColor => Theme.setAccentColor(accentColor)}
+				onValueChange={accentColor => setAccentColor(accentColor)}
 				backgroundColor={Colors.$backgroundDefault}
 				onSubmit={accentColor => {
 					setAccentColors(accentColors.concat(accentColor))
-					Theme.setAccentColor(accentColor)
+					setAccentColor(accentColor)
 				}}
 				initialColor={Theme.accentColor}
 				key={themeKey}
