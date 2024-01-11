@@ -1,4 +1,4 @@
-import { makeObservable, observable, runInAction } from 'mobx'
+import { action, makeObservable, observable, runInAction } from 'mobx'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
 import { makeReloadPersistable } from '../Stores/makePersistable'
 import { logger } from '../constants'
@@ -110,6 +110,7 @@ export class NetSchoolApi {
 			session: observable.struct,
 			request: true,
 			endpoint: observable,
+			logOut: action,
 			setEndpoint: true,
 		})
 		makeReloadPersistable(this, {

@@ -1,49 +1,78 @@
+import notifee, {
+	AndroidImportance,
+	AuthorizationStatus,
+} from '@notifee/react-native'
 import * as Device from 'expo-device'
-import * as Notifications from 'expo-notifications'
-import { autorun, toJS } from 'mobx'
-import { Alert, Platform } from 'react-native'
+import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
+import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from './Components/SubjectName'
 import { DiaryStore } from './Screens/Diary/stores'
 import { Settings } from './Stores/Settings.store'
 
+const NotificationsStore = makeAutoObservable({
+	channelId: '',
+	notifId: '',
+	/** @type {object} */
+	currentLesson: {},
+})
+
 autorun(async function notificationSetup() {
-	if (Platform.OS === 'android') {
-		// Show notification channels even when they are disabled
-		await Notifications.setNotificationChannelAsync('default', {
-			name: 'Уроки',
-			importance: Notifications.AndroidImportance.MAX,
-			vibrationPattern: [0, 250, 250, 250],
-			lightColor: Colors.$iconPrimary,
-		})
-	}
+	// Show notification channels even when they are disabled
+	const channelId = await notifee.createChannel({
+		id: 'lessons',
+		name: 'Уроки',
+		importance: AndroidImportance.HIGH,
+		lightColor: Colors.$iconPrimary,
+	})
 
 	if (!Settings.notifications) return
 	if (Device.isDevice) {
-		let response = await Notifications.getPermissionsAsync()
+		// Required for iOS
+		// See https://notifee.app/react-native/docs/ios/permissions
+		let response = await notifee.requestPermission()
 
-		if (response.status !== 'granted') {
-			response = await Notifications.requestPermissionsAsync()
+		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+			Alert.alert('Разреши уведомления!')
+			response = await notifee.requestPermission()
 		}
 
-		if (response.status !== 'granted') {
-			Alert.alert('Включи уведомления!')
+		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+			Alert.alert('Уведомления не были разрешены.')
+			Settings.save({ notifications: false })
 			return
 		}
-	} else Alert.alert('Уведомления недоступны вне устройства')
-})
+	} else {
+		Alert.alert('Уведомления недоступны вне устройства')
+		Settings.save({ notifications: false })
+		return
+	}
 
-Notifications.setNotificationHandler({
-	handleNotification: async () => ({
-		shouldShowAlert: true,
-		shouldPlaySound: false,
-		shouldSetBadge: false,
-	}),
+	const notificationId = await notifee.displayNotification({
+		title: 'Урок',
+		body: 'Обновление...',
+		android: {
+			channelId,
+		},
+	})
+
+	runInAction(() => {
+		NotificationsStore.channelId = channelId
+		NotificationsStore.notifId = notificationId
+	})
+
+	return async () => {
+		await notifee.cancelNotification(notificationId)
+		runInAction(() => (NotificationsStore.notifId = ''))
+	}
 })
 
 autorun(function notificationFromDiary() {
-	if (!Settings.notifications) {
-		Notifications.cancelAllScheduledNotificationsAsync()
+	if (
+		!Settings.notifications ||
+		!NotificationsStore.notifId ||
+		!NotificationsStore.channelId
+	) {
 		return
 	}
 
@@ -51,8 +80,10 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
-	Notifications.cancelAllScheduledNotificationsAsync().then(() => {
+	const interval = setInterval(async () => {
 		for (const [i, lesson] of diary.lessons.entries()) {
+			if (Date.now() > lesson.end.getTime()) continue
+
 			let period: Date | undefined
 			let date: Date
 			const previous = diary.lessons[i - 1]
@@ -63,30 +94,39 @@ autorun(function notificationFromDiary() {
 				period = new Date(lesson.start.getTime() - previous.end.getTime())
 			} else {
 				date = lesson.start
-				// Send by 5 mins before lesson
+				// Send by 15 mins before lesson
 				date.setMinutes(date.getMinutes() - 15)
 			}
+
+			if (Date.now() > date.getTime()) continue
+
+			if (NotificationsStore.currentLesson === lesson) continue
+
+			runInAction(() => {
+				NotificationsStore.currentLesson = lesson
+			})
 
 			const lessonName = getSubjectName({
 				subjectId: lesson.subjectId,
 				subjectName: lesson.subjectName,
 			})
 
-			Notifications.scheduleNotificationAsync({
-				content: {
-					title: `${lessonName} | ${lesson.roomName ?? 'Нет кабинета'}`,
-					body: `Урок ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
-						period ? 'Перемена ' + period.getMinutes() + ' мин' : ''
-					}`,
-					sound: false,
-				},
-				trigger: {
-					repeats: true,
-					weekday: date.getDay() + 1,
-					hour: date.getHours(),
-					minute: date.getMinutes(),
+			await notifee.displayNotification({
+				id: NotificationsStore.notifId,
+				title: `${lessonName} | ${lesson.roomName ?? 'Нет кабинета'}`,
+				body: `Урок ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
+					period ? 'Перемена ' + period.getMinutes() + ' мин' : ''
+				}`,
+				android: {
+					channelId: NotificationsStore.channelId,
 				},
 			})
+
+			break
 		}
-	})
+	}, 1000)
+
+	return () => {
+		clearInterval(interval)
+	}
 })

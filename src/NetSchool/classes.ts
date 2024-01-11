@@ -1,4 +1,4 @@
-import { makeAutoObservable, makeObservable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 
 export interface Endpoint {
 	name: string
@@ -154,7 +154,7 @@ export class Diary {
 	 */
 	constructor(lessons: RawLesson[]) {
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
-		makeObservable(this, { forDay: false, isNow: false, lessons: true })
+		makeAutoObservable(this, { forDay: false, isNow: false, lessons: true })
 		// TODO add custom lessons
 	}
 

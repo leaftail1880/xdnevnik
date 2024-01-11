@@ -3,30 +3,29 @@
     "version": ">= 5.1.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
-      },
-      "channel": "development"
-    },
-    "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
-      },
-      "channel": "preview"
-    },
-    "production": {
-      "android": {
-        "buildType": "apk"
-      },
-      "channel": "production"
-    }
-  },
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"channel": "development",
+			"env": {
+				"APP_VARIANT": "development"
+			}
+		},
+		"preview": {
+			"distribution": "internal",
+			"android": {
+				"buildType": "apk",
+				"gradleCommand": ":app:assembleRelease"
+			},
+			"channel": "preview"
+		},
+		"production": {
+			"android": {
+				"buildType": "apk"
+			},
+			"channel": "production"
+		}
+	},
   "submit": {
     "production": {}
   }

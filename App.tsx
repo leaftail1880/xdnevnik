@@ -6,6 +6,7 @@ import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
+import 'expo-dev-client'
 import { StatusBar } from 'expo-status-bar'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -13,9 +14,6 @@ import { useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
 import { Colors, LoaderScreen } from 'react-native-ui-lib'
-import { LANG } from './src/constants'
-
-import './ReactotronConfig'
 import { Ionicon } from './src/Components/Icon'
 import { Loading } from './src/Components/Loading'
 import { StatusBadge } from './src/Components/StatusBadge'
@@ -27,6 +25,11 @@ import { SettingsScreen } from './src/Screens/Settings'
 import { TotalsNavigation } from './src/Screens/Totals'
 import { StudentsStore } from './src/Stores/StudentsStore'
 import { Theme } from './src/Stores/Theme.store'
+import { LANG } from './src/constants'
+
+if (__DEV__) {
+	import('./ReactotronConfig')
+}
 
 type ParamListBase = Record<
 	(typeof LANG)[

@@ -7,6 +7,7 @@
 		"lib": ["DOM", "ESNext"],
 		"forceConsistentCasingInFileNames": true,
 		"moduleResolution": "node",
+		"module": "ESNext",
 		"noEmit": true,
 		"noImplicitAny": true,
 		"resolveJsonModule": true,
@@ -25,4 +26,5 @@
   ],
   "extends": "expo/tsconfig.base"
 }
+
 

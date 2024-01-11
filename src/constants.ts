@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { configure } from 'mobx'
 import { configurePersistable } from 'mobx-persist-store'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
@@ -6,6 +5,7 @@ import {
 	mapConsoleTransport,
 	logger as reactNativeLogger,
 } from 'react-native-logs'
+import { MMKV } from 'react-native-mmkv'
 import {
 	Colors,
 	ContainerModifiers,
@@ -24,9 +24,15 @@ configure({
 	// disableErrorBoundaries: true,
 })
 
+const storage = new MMKV()
+
 configurePersistable({
 	removeOnExpiration: false,
-	storage: AsyncStorage,
+	storage: {
+		setItem: (key, data) => storage.set(key, data),
+		getItem: key => storage.getString(key)!,
+		removeItem: key => storage.delete(key),
+	},
 })
 
 type LogFunction = (...args: unknown[]) => void
