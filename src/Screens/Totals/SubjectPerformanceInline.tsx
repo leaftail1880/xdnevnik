@@ -1,11 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import {
-	BorderRadiuses,
-	Colors,
-	Fader,
-	FaderPosition,
-	View,
-} from 'react-native-ui-lib'
+import { Colors, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
@@ -63,18 +57,18 @@ export const SubjectPerformanceInline = observer(
 				{term ? (
 					<View flex row style={{ width: '100%' }}>
 						<View flex row style={{ alignItems: 'flex-end' }}>
-							<Fader
+							{/* <Fader
 								position={FaderPosition.START}
 								size={30}
 								tintColor={Colors.$backgroundAccent}
-							/>
+							/> */}
 
 							<SubjectMarksInline
 								{...props}
 								openDetails={openDetails}
 								term={term}
 							/>
-							<Fader
+							{/* <Fader
 								size={30}
 								tintColor={Colors.rgba(Colors.$backgroundAccent, 0.5)}
 							/>
@@ -85,14 +79,14 @@ export const SubjectPerformanceInline = observer(
 							<Fader
 								size={7}
 								tintColor={Colors.rgba(Colors.$backgroundAccent, 1)}
-							/>
+							/> */}
 						</View>
 						<View
 							row
 							spread
-							backgroundColor={Colors.$backgroundAccent}
+							backgroundColor={Colors.$backgroundPrimaryLight}
 							padding-s1
-							style={{ borderBottomRightRadius: BorderRadiuses.br20 }}
+							br20
 						>
 							<Mark
 								duty={false}

@@ -7,8 +7,8 @@ export const DiaryStore = createApiMethodStore(
 	'diary',
 	'дневника',
 	undefined,
-	undefined,
-	true
+	undefined
+	// true
 )
 export const DiaryStateStore = new (class {
 	constructor() {

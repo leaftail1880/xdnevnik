@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-undef
-const IS_DEV = process.env.APP_VARIANT === 'development'
+const IS_DEV = process.env.DEV === 'development'
 
 export default {
 	expo: {
-		name: 'XDnevnik',
+		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
 		version: '0.11.7',
 		owner: 'leaftail1880',
@@ -43,4 +43,5 @@ export default {
 		plugins: ['expo-dev-client', 'expo-updates'],
 	},
 }
+
 

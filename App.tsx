@@ -26,10 +26,7 @@ import { TotalsNavigation } from './src/Screens/Totals'
 import { StudentsStore } from './src/Stores/StudentsStore'
 import { Theme } from './src/Stores/Theme.store'
 import { LANG } from './src/constants'
-
-if (__DEV__) {
-	import('./ReactotronConfig')
-}
+import './src/notifications'
 
 type ParamListBase = Record<
 	(typeof LANG)[

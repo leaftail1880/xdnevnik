@@ -3,7 +3,7 @@ import notifee, {
 	AuthorizationStatus,
 } from '@notifee/react-native'
 import * as Device from 'expo-device'
-import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
+import { autorun, makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from './Components/SubjectName'
@@ -13,61 +13,73 @@ import { Settings } from './Stores/Settings.store'
 const NotificationsStore = makeAutoObservable({
 	channelId: '',
 	notifId: '',
-	/** @type {object} */
-	currentLesson: {},
+	currentLesson: '',
 })
 
-autorun(async function notificationSetup() {
-	// Show notification channels even when they are disabled
-	const channelId = await notifee.createChannel({
-		id: 'lessons',
-		name: 'Уроки',
-		importance: AndroidImportance.HIGH,
-		lightColor: Colors.$iconPrimary,
-	})
+reaction(
+	() => Settings.notifications,
+	async function notificationSetup(enabled) {
+		// Show notification channels even when they are disabled
+		const channelId = await notifee.createChannel({
+			id: 'lessons',
+			name: 'Уроки',
+			importance: AndroidImportance.HIGH,
+			lightColor: Colors.$iconPrimary,
+		})
 
-	if (!Settings.notifications) return
-	if (Device.isDevice) {
-		// Required for iOS
-		// See https://notifee.app/react-native/docs/ios/permissions
-		let response = await notifee.requestPermission()
-
-		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-			Alert.alert('Разреши уведомления!')
-			response = await notifee.requestPermission()
+		if (!enabled) {
+			if (NotificationsStore.notifId) {
+				await notifee.cancelNotification(NotificationsStore.notifId)
+				runInAction(() => (NotificationsStore.notifId = ''))
+			}
+			return
 		}
+		if (Device.isDevice) {
+			// Required for iOS
+			// See https://notifee.app/react-native/docs/ios/permissions
+			let response = await notifee.requestPermission()
 
-		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-			Alert.alert('Уведомления не были разрешены.')
+			if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+				Alert.alert('Разреши уведомления!')
+				response = await notifee.requestPermission()
+			}
+
+			if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+				Alert.alert('Уведомления не были разрешены.')
+				Settings.save({ notifications: false })
+				return
+			}
+		} else {
+			Alert.alert('Уведомления недоступны вне устройства')
 			Settings.save({ notifications: false })
 			return
 		}
-	} else {
-		Alert.alert('Уведомления недоступны вне устройства')
-		Settings.save({ notifications: false })
-		return
+
+		const notifs = (await notifee.getDisplayedNotifications()).find(
+			e => e.notification.android?.channelId === channelId
+		)
+
+		const notificationId = notifs?.id
+			? notifs.id
+			: await notifee.displayNotification({
+					title: 'Урок',
+					body: 'Обновление...',
+					android: {
+						channelId,
+					},
+			  })
+
+		runInAction(() => {
+			NotificationsStore.channelId = channelId
+			NotificationsStore.notifId = notificationId
+		})
 	}
+)
 
-	const notificationId = await notifee.displayNotification({
-		title: 'Урок',
-		body: 'Обновление...',
-		android: {
-			channelId,
-		},
-	})
-
-	runInAction(() => {
-		NotificationsStore.channelId = channelId
-		NotificationsStore.notifId = notificationId
-	})
-
-	return async () => {
-		await notifee.cancelNotification(notificationId)
-		runInAction(() => (NotificationsStore.notifId = ''))
-	}
-})
+let interval: ReturnType<typeof setInterval>
 
 autorun(function notificationFromDiary() {
+	if (interval) clearInterval(interval)
 	if (
 		!Settings.notifications ||
 		!NotificationsStore.notifId ||
@@ -80,9 +92,14 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
-	const interval = setInterval(async () => {
+	interval = setInterval(async () => {
+		const date = new Date()
+		date.setHours(8, 41)
+		const now = date.getTime()
+
 		for (const [i, lesson] of diary.lessons.entries()) {
-			if (Date.now() > lesson.end.getTime()) continue
+			if (!lesson.end || !lesson.start) continue
+			if (now > lesson.end.getTime()) continue
 
 			let period: Date | undefined
 			let date: Date
@@ -90,20 +107,21 @@ autorun(function notificationFromDiary() {
 
 			if (previous && lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD()) {
 				// If previous lesson in the same day, send notification in the end of it
-				date = previous.end
+				date = new Date(previous.end)
+				date.setMinutes(date.getMinutes() + 1)
 				period = new Date(lesson.start.getTime() - previous.end.getTime())
 			} else {
-				date = lesson.start
+				date = new Date(lesson.start)
 				// Send by 15 mins before lesson
 				date.setMinutes(date.getMinutes() - 15)
 			}
 
-			if (Date.now() > date.getTime()) continue
+			if (now < date.getTime()) continue
 
-			if (NotificationsStore.currentLesson === lesson) continue
-
+			const uuid = lesson.classmeetingId + '' + lesson.subjectId
+			if (NotificationsStore.currentLesson === uuid) continue
 			runInAction(() => {
-				NotificationsStore.currentLesson = lesson
+				NotificationsStore.currentLesson = uuid
 			})
 
 			const lessonName = getSubjectName({
@@ -125,8 +143,4 @@ autorun(function notificationFromDiary() {
 			break
 		}
 	}, 1000)
-
-	return () => {
-		clearInterval(interval)
-	}
 })

@@ -15,6 +15,7 @@ import type { ParamMap, S_SUBJECT_TOTALS } from '../Totals/navigation'
 import { AddMarkForm } from './AddMarkForm'
 import { calculateMarks } from './calculateMarks'
 
+// TODO Move custom marks to store
 export const SubjectTotals = observer(function SubjectTotals({
 	route,
 }: StackScreenProps<ParamMap, typeof S_SUBJECT_TOTALS>) {
@@ -96,21 +97,19 @@ export const SubjectTotals = observer(function SubjectTotals({
 					setCustomMarks={setCustomMarks}
 					customMarks={customMarks}
 				/>
-				<View flex row spread padding-s2>
-					<Text text50BO>
+				<View padding-s2>
+					<Text>
 						Учитель:{' '}
 						<Text text50>{fullname(performance.result.teachers[0].name)}</Text>
 					</Text>
-				</View>
-				<View flex row spread padding-s2>
-					<Text text50BO>
+					<Text>
 						Прошло уроков:{' '}
 						<Text text50>
 							{performance.result.classmeetingsStats.passed}/
 							{performance.result.classmeetingsStats.scheduled}
 						</Text>
 					</Text>
-					<Text text50BO>
+					<Text>
 						Средний бал класса:{' '}
 						<Text text50>{performance.result.classAverageMark}</Text>
 					</Text>
@@ -118,6 +117,9 @@ export const SubjectTotals = observer(function SubjectTotals({
 				<Text $textDisabled center margin-s2>
 					{performance.updateDate}
 				</Text>
+				<View margin-s10>
+					<Text>-</Text>
+				</View>
 			</ScrollView>
 		</View>
 	)

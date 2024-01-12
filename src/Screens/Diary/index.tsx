@@ -4,7 +4,6 @@ import { ScrollView } from 'react-native'
 import { Spacings, Switch, Text, View } from 'react-native-ui-lib'
 import { Dropdown } from '../../Components/Dropdown'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
-import { logger } from '../../constants'
 import { DiaryLesson } from './Lesson'
 import {
 	AssignmentsStore,
@@ -22,13 +21,6 @@ export const DiaryScreen = observer(function DiaryScreen() {
 		startDate: weekDays[0],
 		endDate: weekDays[6],
 	})
-
-	logger.debug(
-		'Дневник fallback ' +
-			!!DiaryStore.fallback +
-			' result ' +
-			!!DiaryStore.result
-	)
 
 	AssignmentsStore.withParams({
 		studentId,

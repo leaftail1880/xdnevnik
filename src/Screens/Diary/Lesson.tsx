@@ -67,7 +67,7 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 			spread
 			centerV
 			padding-s3
-			backgroundColor={Colors.$backgroundPrimaryLight}
+			backgroundColor={Colors.$backgroundPrimaryMedium}
 			br20
 			style={{
 				width: '100%',
@@ -78,9 +78,11 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 				iconsSize={18}
 				style={{
 					fontWeight: 'bold',
-					maxWidth: '90%',
 					fontSize: 18,
 					color: Colors.$textDefault,
+				}}
+				viewStyle={{
+					maxWidth: '70%',
 				}}
 				subjectId={lesson.subjectId}
 				subjectName={lesson.subjectName}
@@ -95,7 +97,7 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 						color: Colors.$textDefault,
 					}}
 				>
-					{lesson.roomName ?? 'Нет кабинета'}
+					{lesson.roomName ?? '?'}
 				</Text>
 				<IconButton
 					iconColor={Colors.$textDefault}
@@ -113,7 +115,7 @@ const MiddleRow = observer(function MiddleRow({ lesson }: { lesson: Lesson }) {
 			marginV-s1
 			marginH-s3
 			style={{
-				width: '100%',
+				width: '98%',
 			}}
 		>
 			<Text text50 color={Colors.rgba(Colors.$textAccent, 0.7)}>

@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import { ReadonlyDate } from '../lib'
 
 export interface Endpoint {
 	name: string
@@ -84,61 +85,49 @@ interface RawLesson extends BaseLesson {
  * Class representing one lesson
  */
 export class Lesson {
-	private _end: string
-	private _start: string
-	private _day: string
-	public classmeetingId: number
-	public studentId: number
-	public assignmentId: number[]
-	public order: number
-	public scheduleTimeNumber: number
-	public scheduleTimeRelay: number
-	public subjectName: string
-	public subjectId: number
-	public subjectGroupId: number
-	public teachers: NSEntity[]
-	public lessonTheme: string
-	public roomName: string
-	public attachmentsExists: boolean
-	public resultsExists: boolean
-	public attendance: string | number | null
-	public addEducation: boolean
-	public extraActivity: boolean
+	classmeetingId: number
+	studentId: number
+	assignmentId: number[]
+	order: number
+	scheduleTimeNumber: number
+	scheduleTimeRelay: number
+	subjectName: string
+	subjectId: number
+	subjectGroupId: number
+	teachers: NSEntity[]
+	lessonTheme: string
+	roomName: string
+	attachmentsExists: boolean
+	resultsExists: boolean
+	attendance: string | number | null
+	addEducation: boolean
+	extraActivity: boolean
+	end: ReadonlyDate
+	start: ReadonlyDate
+	day: ReadonlyDate
 
 	/**
 	 * Creates new lesson
 	 * @param lesson - Raw lesson got from fetch response
 	 */
-	public constructor(lesson: RawLesson) {
+	constructor(lesson: RawLesson) {
 		const { endTime, startTime, day, ...ours } = lesson
 		Object.assign(this, ours)
 
-		this._end = endTime
-		this._start = startTime
-		this._day = day
+		/**
+		 * Start date of the lesson
+		 */
+		this.start = new Date(startTime)
+		/**
+		 * End date of the lesson
+		 */
+		this.end = new Date(endTime)
+		/**
+		 * Day date of the lesson
+		 */
+		this.day = new Date(day)
 
 		makeAutoObservable(this)
-	}
-
-	/**
-	 * End date of the lesson
-	 */
-	public get end() {
-		return new Date(this._end)
-	}
-
-	/**
-	 * Start date of the lesson
-	 */
-	public get start() {
-		return new Date(this._start)
-	}
-
-	/**
-	 * Day date of the lesson
-	 */
-	public get day() {
-		return new Date(this._day)
 	}
 }
 

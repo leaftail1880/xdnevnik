@@ -8,14 +8,13 @@
 			"distribution": "internal",
 			"channel": "development",
 			"env": {
-				"APP_VARIANT": "development"
+				"DEV": "development"
 			}
 		},
 		"preview": {
 			"distribution": "internal",
 			"android": {
-				"buildType": "apk",
-				"gradleCommand": ":app:assembleRelease"
+				"buildType": "apk"
 			},
 			"channel": "preview"
 		},
