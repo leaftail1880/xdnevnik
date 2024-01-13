@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
+import { StudentsStore } from './API.stores'
 import { Settings } from './Settings.store'
-import { StudentsStore } from './StudentsStore'
 
 class XDnevnikStore {
 	get studentId() {

@@ -3,9 +3,10 @@ import { Colors, Text, View } from 'react-native-ui-lib'
 import { IconButton } from '../../Components/Button'
 import { SubjectName } from '../../Components/SubjectName'
 import { Diary, Lesson } from '../../NetSchool/classes'
+import { AssignmentsStore } from '../../Stores/API.stores'
 import { DiaryAssignment } from './Assignment'
 import { LessonProgress } from './Progress'
-import { AssignmentsStore, DiaryStateStore } from './stores'
+import { DiaryStateStore } from './StateStore'
 
 export const DiaryLesson = observer(function DiaryLesson({
 	lesson,

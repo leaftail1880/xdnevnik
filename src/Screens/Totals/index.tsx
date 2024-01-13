@@ -4,13 +4,17 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { Observer, observer } from 'mobx-react-lite'
 import { Switch, Text, View } from 'react-native-ui-lib'
 import { Education, SubjectPerformance } from '../../NetSchool/classes'
+import {
+	EducationStore,
+	SubjectsStore,
+	TotalsStore,
+} from '../../Stores/API.stores'
 import { Settings } from '../../Stores/Settings.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { SubjectTotals } from '../SubjectTotals/index'
 import { TotalsScreenTable } from './TotalsScreenTable'
 import { TotalsScreenTerm } from './TotalsScreenTerm'
 import { ParamMap, S_SUBJECT_TOTALS, S_TOTALS, Stack } from './navigation'
-import { EducationStore, SubjectsStore, TotalsStore } from './stores'
 
 export const TotalsNavigation = observer(function TotalsNavigation() {
 	const { studentId } = XDnevnik

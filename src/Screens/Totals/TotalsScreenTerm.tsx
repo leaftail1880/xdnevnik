@@ -7,9 +7,13 @@ import { TotalsContext } from '.'
 import { Dropdown } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { NSEntity, Subject, Total } from '../../NetSchool/classes'
+import {
+	EducationStore,
+	SubjectsStore,
+	TotalsStore,
+} from '../../Stores/API.stores'
 import { Settings } from '../../Stores/Settings.store'
 import { SubjectPerformanceInline } from './SubjectPerformanceInline'
-import { EducationStore, SubjectsStore, TotalsStore } from './stores'
 
 const TermStore = makeAutoObservable(
 	{

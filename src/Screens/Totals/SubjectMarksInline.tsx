@@ -4,22 +4,10 @@ import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { Total } from '../../NetSchool/classes'
-import { createApiMethodStore } from '../../Stores/API.store'
-import { KeyStore } from '../../Stores/KeyStore'
+import { SubjectPerformanceStores } from '../../Stores/API.stores'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { calculateMarks } from '../SubjectTotals/calculateMarks'
 import { SubjectInfo } from './TotalsScreenTerm'
-
-interface StoreID {
-	studentId?: number
-	subjectId: number
-}
-
-export const SubjectPerformanceStores = new KeyStore(
-	(id: StoreID) => id.studentId + '|' + id.subjectId,
-	(id: StoreID) =>
-		createApiMethodStore('subjectPerformance', 'итогов по предмету', id)
-)
 
 export const SubjectMarksInline = observer(function SubjectMarksInline(
 	props: SubjectInfo & {
