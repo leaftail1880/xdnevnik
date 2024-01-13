@@ -40,9 +40,12 @@ export default {
 		runtimeVersion: {
 			policy: 'appVersion',
 		},
-		plugins: ['expo-dev-client', 'expo-updates'],
+		plugins: [IS_DEV ? 'expo-dev-client' : '', 'expo-updates'].filter(Boolean),
 	},
 }
+
+
+
 
 
 
