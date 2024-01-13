@@ -1,90 +1,87 @@
 import notifee, {
 	AndroidImportance,
+	AndroidVisibility,
 	AuthorizationStatus,
 } from '@notifee/react-native'
 import * as Device from 'expo-device'
-import { autorun, makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
+import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from './Components/SubjectName'
-import { DiaryStore } from './Screens/Diary/stores'
+import { Lesson, LessonState } from './NetSchool/classes'
+import { DiaryStore } from './Stores/API.stores'
 import { Settings } from './Stores/Settings.store'
 
-const NotificationsStore = makeAutoObservable({
-	channelId: '',
-	notifId: '',
-	currentLesson: '',
+const Notification = new (class {
+	constructor() {
+		makeAutoObservable(this)
+	}
+
+	channelId = ''
+	id: undefined | string = undefined
+	currentLesson: undefined | string = undefined;
+
+	*remove(id = Notification.id) {
+		if (!id) return
+		yield notifee.cancelNotification(id)
+		if (Notification.id) Notification.id = undefined
+	}
+})()
+
+autorun(() => {
+	const enabled = Settings.notifications
+	notificationSetup(enabled)
 })
 
-reaction(
-	() => Settings.notifications,
-	async function notificationSetup(enabled) {
-		// Show notification channels even when they are disabled
-		const channelId = await notifee.createChannel({
-			id: 'lessons',
-			name: 'Уроки',
-			importance: AndroidImportance.HIGH,
-			lightColor: Colors.$iconPrimary,
-		})
+async function notificationSetup(enabled: boolean) {
+	// Show notification channels even when they are disabled
+	const channelId = await notifee.createChannel({
+		id: 'lessons',
+		name: 'Уроки',
+		importance: AndroidImportance.HIGH,
+		visibility: AndroidVisibility.PUBLIC,
+		lightColor: Colors.$iconPrimary,
+		description: 'Уведомления об текущих уроках',
+	})
 
-		if (!enabled) {
-			if (NotificationsStore.notifId) {
-				await notifee.cancelNotification(NotificationsStore.notifId)
-				runInAction(() => (NotificationsStore.notifId = ''))
-			}
-			return
+	const oldNotification = (await notifee.getDisplayedNotifications()).find(
+		e => e.notification.android?.channelId === channelId
+	)
+
+	if (!enabled)
+		return Notification.remove(Notification.id || oldNotification?.id)
+
+	if (Device.isDevice) {
+		// Required for iOS
+		// See https://notifee.app/react-native/docs/ios/permissions
+		let response = await notifee.requestPermission()
+
+		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+			Alert.alert('Разреши уведомления!')
+			response = await notifee.requestPermission()
 		}
-		if (Device.isDevice) {
-			// Required for iOS
-			// See https://notifee.app/react-native/docs/ios/permissions
-			let response = await notifee.requestPermission()
 
-			if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-				Alert.alert('Разреши уведомления!')
-				response = await notifee.requestPermission()
-			}
-
-			if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-				Alert.alert('Уведомления не были разрешены.')
-				Settings.save({ notifications: false })
-				return
-			}
-		} else {
-			Alert.alert('Уведомления недоступны вне устройства')
+		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
+			Alert.alert('Уведомления не были разрешены.')
 			Settings.save({ notifications: false })
 			return
 		}
-
-		const notifs = (await notifee.getDisplayedNotifications()).find(
-			e => e.notification.android?.channelId === channelId
-		)
-
-		const notificationId = notifs?.id
-			? notifs.id
-			: await notifee.displayNotification({
-					title: 'Урок',
-					body: 'Обновление...',
-					android: {
-						channelId,
-					},
-			  })
-
-		runInAction(() => {
-			NotificationsStore.channelId = channelId
-			NotificationsStore.notifId = notificationId
-		})
+	} else {
+		Alert.alert('Уведомления недоступны вне устройства')
+		Settings.save({ notifications: false })
+		return
 	}
-)
 
+	runInAction(() => {
+		Notification.channelId = channelId
+		if (oldNotification?.id) Notification.id = oldNotification.id
+	})
+}
 let interval: ReturnType<typeof setInterval>
 
 autorun(function notificationFromDiary() {
 	if (interval) clearInterval(interval)
-	if (
-		!Settings.notifications ||
-		!NotificationsStore.notifId ||
-		!NotificationsStore.channelId
-	) {
+	if (!Settings.notifications || !Notification.channelId) {
 		return
 	}
 
@@ -93,9 +90,10 @@ autorun(function notificationFromDiary() {
 	const diary = toJS(result)
 
 	interval = setInterval(async () => {
-		const date = new Date()
-		date.setHours(8, 41)
-		const now = date.getTime()
+		// const date = new Date()
+		// date.setHours(8, 41)
+		// const now = date.getTime()
+		const now = Date.now()
 
 		for (const [i, lesson] of diary.lessons.entries()) {
 			if (!lesson.end || !lesson.start) continue
@@ -105,42 +103,82 @@ autorun(function notificationFromDiary() {
 			let date: Date
 			const previous = diary.lessons[i - 1]
 
-			if (previous && lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD()) {
-				// If previous lesson in the same day, send notification in the end of it
-				date = new Date(previous.end)
+			// If previous lesson is in the same day, send notification in the end of it
+			if (
+				previous &&
+				lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
+				// Only when delay between lessons is less then 15
+				(lesson.start.getTime() - previous.end.getTime()) / (60 * 1000) < 15
+			) {
+				date = new Date(previous.end.getTime())
 				date.setMinutes(date.getMinutes() + 1)
 				period = new Date(lesson.start.getTime() - previous.end.getTime())
 			} else {
-				date = new Date(lesson.start)
 				// Send by 15 mins before lesson
+				// TODO Support custom beforeLessonNotifTime
+				date = new Date(lesson.start.getTime())
 				date.setMinutes(date.getMinutes() - 15)
 			}
 
 			if (now < date.getTime()) continue
 
 			const uuid = lesson.classmeetingId + '' + lesson.subjectId
-			if (NotificationsStore.currentLesson === uuid) continue
-			runInAction(() => {
-				NotificationsStore.currentLesson = uuid
-			})
-
 			const lessonName = getSubjectName({
 				subjectId: lesson.subjectId,
 				subjectName: lesson.subjectName,
 			})
 
-			await notifee.displayNotification({
-				id: NotificationsStore.notifId,
-				title: `${lessonName} | ${lesson.roomName ?? 'Нет кабинета'}`,
-				body: `Урок ${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. ${
-					period ? 'Перемена ' + period.getMinutes() + ' мин' : ''
-				}`,
+			const { state, beforeEnd, beforeStart, progress, total } =
+				Lesson.prototype.minutes.call(lesson, now) as ReturnType<
+					Lesson['minutes']
+				>
+
+			let title = ''
+			title += lessonName
+			title += ' | '
+			title += lesson.roomName ?? 'Нет кабинета'
+
+			let body = ''
+
+			body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
+			if (state === LessonState.notStarted) {
+				if (period) body += `Перемена ${period.getMinutes()} мин.`
+				body += `До начала ${beforeStart} мин`
+			} else if (state === LessonState.going) {
+				body += `${beforeEnd}/${total} мин`
+			}
+
+			const id = await notifee.displayNotification({
+				...(Notification.id ? { id: Notification.id } : {}),
+				title,
+				body,
 				android: {
-					channelId: NotificationsStore.channelId,
+					channelId: Notification.channelId,
+					ongoing: true,
+
+					// only alert when lesson notification
+					onlyAlertOnce: Notification.currentLesson === uuid,
+
+					progress:
+						state === LessonState.going
+							? {
+									current: progress,
+									max: 100,
+							  }
+							: void 0,
 				},
+				ios: {},
 			})
 
-			break
+			runInAction(() => {
+				Notification.id = id
+				Notification.currentLesson = uuid
+			})
+
+			return
 		}
-	}, 1000)
+
+		// Nothing to show
+		Notification.remove()
+	}, 3000)
 })

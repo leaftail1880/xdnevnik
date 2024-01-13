@@ -127,8 +127,40 @@ export class Lesson {
 		 */
 		this.day = new Date(day)
 
-		makeAutoObservable(this)
+		makeAutoObservable(this, { minutes: false })
 	}
+
+	minutes(now = Date.now()) {
+		const start = this.start.getTime()
+		const end = this.end.getTime()
+		const toMin = (n: number) => Math.ceil(n / (1000 * 60))
+
+		const beforeStart = toMin(start - now)
+		const beforeEnd = toMin(now - start)
+		const total = toMin(end - start)
+		const progress = 100 - Math.ceil(((end - now) * 100) / (end - start))
+
+		return {
+			start,
+			end,
+			total,
+			beforeEnd,
+			beforeStart,
+			progress,
+			state:
+				now < start
+					? LessonState.notStarted
+					: now <= end
+					? LessonState.going
+					: LessonState.ended,
+		}
+	}
+}
+
+export enum LessonState {
+	notStarted,
+	going,
+	ended,
 }
 
 /**

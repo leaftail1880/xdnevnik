@@ -8,7 +8,7 @@ declare global {
 export {}
 
 export type ReadonlyDate = Readonly<
-	OmitStrict<
+	Omit<
 		Date,
 		| 'setTime'
 		| 'setMilliseconds'

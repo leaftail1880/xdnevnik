@@ -1,15 +1,7 @@
 import { makeAutoObservable } from 'mobx'
-import { createApiMethodStore } from '../../Stores/API.store'
 import { makeReloadPersistable } from '../../Stores/makePersistable'
 import { LANG } from '../../constants'
 
-export const DiaryStore = createApiMethodStore(
-	'diary',
-	'дневника',
-	undefined,
-	undefined
-	// true
-)
 export const DiaryStateStore = new (class {
 	constructor() {
 		makeAutoObservable<this, 'weekOffset'>(this, { weekOffset: false })
@@ -60,11 +52,3 @@ export const DiaryStateStore = new (class {
 	}
 	showHomework = true
 })()
-export const AssignmentsStore = createApiMethodStore('assignments', 'оценок')
-export const AttachmentsStore = createApiMethodStore(
-	'attachments',
-	'файлов',
-	undefined,
-	undefined
-	// true
-)

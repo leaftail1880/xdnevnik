@@ -266,7 +266,7 @@ export class NetSchoolApi {
 				}
 			}
 
-			logger.debug('Request to', url)
+			// logger.debug('Request to', url)
 
 			const response = await fetchFn(url, { ...init, ...request })
 

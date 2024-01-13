@@ -3,14 +3,14 @@ import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { Spacings, Switch, Text, View } from 'react-native-ui-lib'
 import { Dropdown } from '../../Components/Dropdown'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
-import { DiaryLesson } from './Lesson'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
-	DiaryStateStore,
 	DiaryStore,
-} from './stores'
+} from '../../Stores/API.stores'
+import { XDnevnik } from '../../Stores/Xdnevnik.store'
+import { DiaryLesson } from './Lesson'
+import { DiaryStateStore } from './StateStore'
 
 export const DiaryScreen = observer(function DiaryScreen() {
 	const { studentId } = XDnevnik

@@ -1,14 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { Colors, ProgressBar, Text, View } from 'react-native-ui-lib'
-import { Lesson } from '../../NetSchool/classes'
+import { Lesson, LessonState } from '../../NetSchool/classes'
 
 export const LessonProgress = observer(function LessonProgress({
 	lesson,
 }: {
 	lesson: Lesson
 }) {
-	// const now = new Date(2023, 11, 12, 8, 30).getTime()
 	const [now, setNow] = useState(Date.now())
 	useEffect(() => {
 		const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
@@ -16,15 +15,11 @@ export const LessonProgress = observer(function LessonProgress({
 		return () => clearInterval(interval)
 	}, [])
 
-	const start = lesson.start.getTime()
-	const end = lesson.end.getTime()
+	const { total, beforeStart, beforeEnd, progress, state } = lesson.minutes(now)
 
-	if (now < start) {
-		// Not started yet
-		const minsBeforeStart = ~~((start - now) / (1000 * 60))
-
+	if (state === LessonState.notStarted) {
 		// Do not show time above 15 mins
-		if (minsBeforeStart < 15) {
+		if (beforeStart < 15) {
 			return (
 				<Text
 					color={Colors.rgba(Colors.$textAccent, 0.5)}
@@ -32,15 +27,11 @@ export const LessonProgress = observer(function LessonProgress({
 					marginH-s3
 					marginB-s2
 				>
-					Начнется через {minsBeforeStart} мин
+					Начнется через {beforeStart} мин
 				</Text>
 			)
 		}
-	} else if (now <= end) {
-		// Lesson is going right now
-		const minsBeforeEnd = ~~((now - start) / (1000 * 60))
-		const minsTotal = ~~((end - start) / (1000 * 60))
-
+	} else if (state === LessonState.going) {
 		return (
 			<View row center marginH-s3 paddingH-s2 marginB-s2 centerV>
 				<View
@@ -54,12 +45,12 @@ export const LessonProgress = observer(function LessonProgress({
 							height: 20,
 							backgroundColor: Colors.rgba(Colors.black, 0.3),
 						}}
-						progress={100 - ~~(((end - now) * 100) / (end - start))}
+						progress={progress}
 						progressColor={Colors.$textAccent}
 					/>
 				</View>
 				<Text $textAccent margin-s1>
-					{minsBeforeEnd}/{minsTotal} мин
+					{beforeEnd}/{total} мин
 				</Text>
 			</View>
 		)
