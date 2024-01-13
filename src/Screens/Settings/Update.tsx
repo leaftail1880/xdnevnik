@@ -7,7 +7,7 @@ import * as ExpoSharing from 'expo-sharing'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
-import { Button } from '../../Componentss/Button'
+import { Button } from '../../Components/Button'
 import { getLatestGithubReleaseUrl } from '../../GithubUpdate/update'
 import { logger, settingsButton } from '../../constants'
 

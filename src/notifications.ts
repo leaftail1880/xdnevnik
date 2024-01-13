@@ -6,7 +6,7 @@ import * as Device from 'expo-device'
 import { autorun, makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
-import { getSubjectName } from './Componentss/SubjectName'
+import { getSubjectName } from './Components/SubjectName'
 import { DiaryStore } from './Screens/Diary/stores'
 import { Settings } from './Stores/Settings.store'
 

@@ -1,6 +1,6 @@
 import { Colors, Text } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
-import { Button } from '../../Componentss/Button'
+import { Button } from '../../Components/Button'
 import { API } from '../../NetSchool/api'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { LANG } from '../../constants'
