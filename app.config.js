@@ -5,7 +5,7 @@ export default {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.11.8',
+		version: '0.12.0',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -43,6 +43,7 @@ export default {
 		plugins: ['expo-dev-client', 'expo-updates'],
 	},
 }
+
 
 
 
