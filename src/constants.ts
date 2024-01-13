@@ -14,7 +14,7 @@ import {
 	TextProps,
 	ThemeManager,
 } from 'react-native-ui-lib'
-import { dropdownStyle } from './Components/Dropdown'
+import { dropdownStyle } from './Componentss/Dropdown'
 
 configure({
 	enforceActions: 'always',

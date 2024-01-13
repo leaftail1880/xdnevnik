@@ -7,8 +7,8 @@ import {
 	toJS,
 } from 'mobx'
 import { RefreshControl } from 'react-native'
-import { ErrorHandler } from '../Components/ErrorHandler'
-import { Loading } from '../Components/Loading'
+import { ErrorHandler } from '../Componentss/ErrorHandler'
+import { Loading } from '../Componentss/Loading'
 import { API, API as NSApi, NetSchoolError } from '../NetSchool/api'
 import { logger } from '../constants'
 
