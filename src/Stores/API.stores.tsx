@@ -25,6 +25,6 @@ export const SubjectPerformanceStores = new KeyStore(
 )
 
 interface StoreID {
-	studentId?: number
+	studentId: number | undefined
 	subjectId: number
 }

@@ -30,12 +30,16 @@ export class KeyStore<ID = object, T = object> {
 		this.options = { maxUnusedStores }
 	}
 
-	get(id: ID): Omit<StoredValue<T>, 'canDispose' | 'sid'> {
+	get(
+		id: ID,
+		setCanDispose = true
+	): Omit<StoredValue<T>, 'canDispose' | 'sid'> {
 		const sid = this.stringifyId(id)
 		if (this.stores[sid]) {
-			runInAction(() => {
-				this.stores[sid].canDispose = false
-			})
+			if (setCanDispose)
+				runInAction(() => {
+					this.stores[sid].canDispose = false
+				})
 			return this.stores[sid]
 		}
 
