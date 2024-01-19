@@ -34,6 +34,9 @@ jobs:
       - name: 📦 Install deps
         run: yarn install
 
+      - name: 📦 Install sharp cli for image processing
+        run: npm add -g sharp-cli
+
       - name: 📦 Build
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
