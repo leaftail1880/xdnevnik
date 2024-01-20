@@ -103,6 +103,16 @@ export const SettingsScreen = observer(function SettingsScreen() {
 					/>
 				</View>
 			</Button>
+			<Button
+				{...settingsButton()}
+				onPress={() => {
+					throw new Error('From sentry!')
+				}}
+			>
+				<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
+					Проверить Sentry
+				</Text>
+			</Button>
 			<Dropdown
 				data={markStyles}
 				buttonStyle={{ marginBottom: Spacings.s2 }}

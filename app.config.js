@@ -40,7 +40,17 @@ export default {
 		runtimeVersion: {
 			policy: 'appVersion',
 		},
-		plugins: ['expo-dev-client', 'expo-updates'].filter(Boolean),
+		plugins: [
+			'expo-dev-client',
+			'expo-updates',
+			[
+				'@sentry/react-native/expo',
+				{
+					organization: 'leaftail1880',
+					project: 'xdnevnik',
+				},
+			],
+		].filter(Boolean),
 	},
 }
 

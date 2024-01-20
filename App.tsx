@@ -1,3 +1,5 @@
+import './src/sentry'
+
 import {
 	BottomTabBar,
 	createBottomTabNavigator,
@@ -6,6 +8,7 @@ import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
+import Sentry from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -38,81 +41,84 @@ type ParamListBase = Record<
 >
 const Tab = createBottomTabNavigator<ParamListBase>()
 
-export default observer(function App() {
-	const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+export default Sentry.wrap(
+	observer(function App() {
+		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
 
-	if (!Theme.loaded) return <LoaderScreen />
+		if (!Theme.loaded) return <LoaderScreen />
 
-	// Rerender on accent color change
-	// idk why its not subscribing to it be default
-	Theme.accentColor
+		// Rerender on accent color change
+		// idk why its not subscribing to it be default
+		Theme.accentColor
 
-	const students = StudentsStore
-	const Fallback =
-		(!API.session && <Loading text="Авторизация{dots}" />) || students.fallback
+		const students = StudentsStore
+		const Fallback =
+			(!API.session && <Loading text="Авторизация{dots}" />) ||
+			students.fallback
 
-	return (
-		<NavigationContainer theme={toJS(Theme.theme)} ref={navigation}>
-			<StatusBar
-				translucent={true}
-				style={Theme.scheme === 'dark' ? 'light' : 'dark'}
-			/>
-			<Tab.Navigator
-				tabBar={props => (
-					<View>
-						<StatusBadge />
-						<BottomTabBar {...props} />
-					</View>
-				)}
-				screenOptions={({ route }) => ({
-					tabBarIcon: ({ focused, color, size }) => {
-						let iconName = {
-							[LANG['s_log_in']]: 'log-in',
-							[LANG['s_log_out']]: 'log-out',
-							[LANG['s_diary']]: 'time',
-							[LANG['s_totals']]: 'school',
-							[LANG['s_settings']]: 'settings',
-						}[route.name]
-						if (focused) iconName += '-outline'
-						return <Ionicon name={iconName} size={size} color={color} />
-					},
-					tabBarActiveTintColor: Colors.$iconPrimary,
-					tabBarInactiveTintColor: Colors.$iconDefault,
-					tabBarButton: props => <TouchableOpacity {...props} />,
-					tabBarHideOnKeyboard: true,
-				})}
-			>
-				{!API.session && (
-					<Tab.Screen name={LANG['s_log_in']}>
-						{() => <LoginScreen />}
-					</Tab.Screen>
-				)}
-
-				<Tab.Screen name={LANG['s_diary']}>
-					{() => Fallback || <DiaryScreen />}
-				</Tab.Screen>
-
-				<Tab.Screen
-					name={LANG['s_totals']}
-					// Show header when component's custom header is not rendered
-					options={{ headerShown: !!Fallback }}
+		return (
+			<NavigationContainer theme={toJS(Theme.theme)} ref={navigation}>
+				<StatusBar
+					translucent={true}
+					style={Theme.scheme === 'dark' ? 'light' : 'dark'}
+				/>
+				<Tab.Navigator
+					tabBar={props => (
+						<View>
+							<StatusBadge />
+							<BottomTabBar {...props} />
+						</View>
+					)}
+					screenOptions={({ route }) => ({
+						tabBarIcon: ({ focused, color, size }) => {
+							let iconName = {
+								[LANG['s_log_in']]: 'log-in',
+								[LANG['s_log_out']]: 'log-out',
+								[LANG['s_diary']]: 'time',
+								[LANG['s_totals']]: 'school',
+								[LANG['s_settings']]: 'settings',
+							}[route.name]
+							if (focused) iconName += '-outline'
+							return <Ionicon name={iconName} size={size} color={color} />
+						},
+						tabBarActiveTintColor: Colors.$iconPrimary,
+						tabBarInactiveTintColor: Colors.$iconDefault,
+						tabBarButton: props => <TouchableOpacity {...props} />,
+						tabBarHideOnKeyboard: true,
+					})}
 				>
-					{() => Fallback || <TotalsNavigation />}
-				</Tab.Screen>
+					{!API.session && (
+						<Tab.Screen name={LANG['s_log_in']}>
+							{() => <LoginScreen />}
+						</Tab.Screen>
+					)}
 
-				<Tab.Screen name={LANG['s_settings']}>
-					{() => {
-						const Render = gestureHandlerRootHOC(SettingsScreen)
-						return <Render />
-					}}
-				</Tab.Screen>
-
-				{API.session && (
-					<Tab.Screen name={LANG['s_log_out']}>
-						{() => <LogoutScreen />}
+					<Tab.Screen name={LANG['s_diary']}>
+						{() => Fallback || <DiaryScreen />}
 					</Tab.Screen>
-				)}
-			</Tab.Navigator>
-		</NavigationContainer>
-	)
-})
+
+					<Tab.Screen
+						name={LANG['s_totals']}
+						// Show header when component's custom header is not rendered
+						options={{ headerShown: !!Fallback }}
+					>
+						{() => Fallback || <TotalsNavigation />}
+					</Tab.Screen>
+
+					<Tab.Screen name={LANG['s_settings']}>
+						{() => {
+							const Render = gestureHandlerRootHOC(SettingsScreen)
+							return <Render />
+						}}
+					</Tab.Screen>
+
+					{API.session && (
+						<Tab.Screen name={LANG['s_log_out']}>
+							{() => <LogoutScreen />}
+						</Tab.Screen>
+					)}
+				</Tab.Navigator>
+			</NavigationContainer>
+		)
+	})
+)

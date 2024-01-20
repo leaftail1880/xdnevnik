@@ -5,10 +5,12 @@ export const makeReloadPersistable: typeof makePersistable = (
 	object,
 	options
 ) => {
-	for (const [key, store] of PersistStoreMap.entries()) {
-		if (store.storageName === options.name) {
-			store.stopPersisting()
-			PersistStoreMap.delete(key)
+	if (__DEV__) {
+		for (const [key, store] of PersistStoreMap.entries()) {
+			if (store.storageName === options.name) {
+				store.stopPersisting()
+				PersistStoreMap.delete(key)
+			}
 		}
 	}
 	return makePersistable(object, options)

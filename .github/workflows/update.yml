@@ -4,8 +4,8 @@ on:
     branches:
       - update
     paths:
-      - '**.ts'
-      - '**.tsx'
+      - 'src/**.ts'
+      - 'src/**.tsx'
 
 jobs:
   update:
@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: 🏗 Check for EXPO_TOKEN
         run: |
+          if [ -z "${{ secrets.SENTRY_TOKEN }}" ]; then
+            echo "You must provide an SENTRY_TOKEN secret linked to this project's Sentry account. Learn more: https://docs.expo.dev/guides/using-sentry/#sign-up-for-a-sentry-account-and-create-a-project"
+          fi
           if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
             echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
             exit 1
@@ -39,3 +42,6 @@ jobs:
 
       - name: 🚀 Publish update
         run: eas update --auto --non-interactive
+
+      - name: Upload Sentry sourcemaps
+        run: npx sentry-expo-upload-sourcemaps dist
