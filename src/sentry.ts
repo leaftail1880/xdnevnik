@@ -1,5 +1,5 @@
 import Sentry from '@sentry/react-native'
-import updates from 'expo-updates'
+import * as updates from 'expo-updates'
 
 const manifest = updates.manifest
 const metadata =

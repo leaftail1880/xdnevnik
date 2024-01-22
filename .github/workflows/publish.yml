@@ -57,7 +57,7 @@ jobs:
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
-      - name: 🏗 List files
+      - name: 🏗 List files 
         if: true
         run: |
           ls -a		 

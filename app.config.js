@@ -1,7 +1,22 @@
+// @ts-check
+
+import withBuildProperties from 'expo-build-properties'
+import { withGradleProperties } from 'expo/config-plugins'
+
 // eslint-disable-next-line no-undef
 const IS_DEV = process.env.DEV === 'development'
 
-export default {
+/** @type {[string, any]} */
+const sentryPlugin = [
+	'@sentry/react-native/expo',
+	{
+		organization: 'leaftail1880',
+		project: 'xdnevnik',
+	},
+]
+
+/** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
+const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
@@ -43,13 +58,8 @@ export default {
 		plugins: [
 			'expo-dev-client',
 			'expo-updates',
-			[
-				'@sentry/react-native/expo',
-				{
-					organization: 'leaftail1880',
-					project: 'xdnevnik',
-				},
-			],
+			sentryPlugin,
+			'expo-build-properties',
 		].filter(Boolean),
 
 		updates: {
@@ -58,9 +68,33 @@ export default {
 	},
 }
 
+Config.expo = withBuildProperties(Config.expo, {
+	android: {
+		enableProguardInReleaseBuilds: true,
+		enableShrinkResourcesInReleaseBuilds: true,
+	},
+})
 
+Config.expo = withGradleProperties(Config.expo, config => {
+	config.modResults.push(
+		{
+			type: 'property',
+			key: 'reactNativeArchitectures',
+			value: 'armeabi-v7a,arm64-v8a', //,x86,x86_64
+		},
+		{
+			type: 'property',
+			key: 'org.gradle.jvmargs',
+			value: '-Xmx3096m -XX:MaxMetaspaceSize=512m',
+		},
+		{
+			type: 'property',
+			key: 'gradle',
+			value: 'build -x lint -x lintVitalRelease',
+		}
+	)
 
+	return config
+})
 
-
-
-
+export default Config
