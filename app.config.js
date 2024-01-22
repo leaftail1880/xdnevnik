@@ -68,12 +68,12 @@ const Config = {
 	},
 }
 
-Config.expo = withBuildProperties(Config.expo, {
-	android: {
-		enableProguardInReleaseBuilds: true,
-		enableShrinkResourcesInReleaseBuilds: true,
-	},
-})
+// Config.expo = withBuildProperties(Config.expo, {
+	// android: {
+		// enableProguardInReleaseBuilds: true,
+		// enableShrinkResourcesInReleaseBuilds: true,
+	// },
+// })
 
 Config.expo = withGradleProperties(Config.expo, config => {
 	config.modResults.push(
