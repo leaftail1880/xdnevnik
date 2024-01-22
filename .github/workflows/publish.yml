@@ -8,6 +8,8 @@ jobs:
   update:
     name: EAS Release APK Publish
     runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
       - name: 🏗 Check for EXPO_TOKEN and SENTRY_TOKEN
         run: |
@@ -51,6 +53,9 @@ jobs:
 
       - name: 📦 Build
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
+        
+      - name: 📦 Build dev client
+        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
       - name: 🏗 List files
         if: true
@@ -60,4 +65,6 @@ jobs:
       - name: 🚀 Upload binaries to release
         uses: softprops/action-gh-release@v1
         with:
-          files: XDnevnik.apk
+          files: |
+            XDnevnik.apk
+            XDnevnik Dev Client.apk

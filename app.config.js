@@ -51,6 +51,10 @@ export default {
 				},
 			],
 		].filter(Boolean),
+
+		updates: {
+			url: 'https://u.expo.dev/97163afe-5c7e-4856-ba8f-348e00aa7c04',
+		},
 	},
 }
 
