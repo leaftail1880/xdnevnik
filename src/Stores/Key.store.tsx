@@ -13,7 +13,7 @@ interface StoredValue<T> {
 }
 
 export class KeyStore<ID = object, T = object> {
-	private stores: Record<string, StoredValue<T>> = {}
+	stores: Record<string, StoredValue<T>> = {}
 	private readonly options: KeyStoreOptions
 
 	constructor(

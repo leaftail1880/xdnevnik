@@ -1,4 +1,4 @@
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import * as updates from 'expo-updates'
 
 const manifest = updates.manifest

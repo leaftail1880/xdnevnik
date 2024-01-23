@@ -3,13 +3,15 @@ import notifee, {
 	AndroidVisibility,
 	AuthorizationStatus,
 } from '@notifee/react-native'
+import * as BackgroundFetch from 'expo-background-fetch'
 import * as Device from 'expo-device'
+import * as TaskManager from 'expo-task-manager'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from './Components/SubjectName'
 import { Lesson, LessonState } from './NetSchool/classes'
-import { DiaryStore } from './Stores/API.stores'
+import { DiaryStore, SubjectPerformanceStores } from './Stores/API.stores'
 import { Settings } from './Stores/Settings.store'
 
 const Notification = new (class {
@@ -92,110 +94,37 @@ async function notificationSetup(enabled: boolean) {
 // TODO Move all code into task manager
 
 let newMarksCheckInterval: ReturnType<typeof setInterval>
+let fetchMarksInterval: ReturnType<typeof setInterval>
 
-autorun(function notificationFromDiary() {
-	if (newMarksCheckInterval) clearInterval(newMarksCheckInterval)
-	if (!Settings.notifications || !Notification.marksChannelId) {
-		return
-	}
+function runInBackground(taskId: string, fn: () => void) {
+	TaskManager.defineTask(taskId, () => {
+		fn()
 
-	const { result } = DiaryStore
-	if (!result) return
-	const diary = toJS(result)
+		return BackgroundFetch.BackgroundFetchResult.NewData
+	})
 
-	currentLessonInterval = setInterval(async () => {
-		// const date = new Date()
-		// date.setHours(8, 41)
-		// const now = date.getTime()
-		const now = Date.now()
+	BackgroundFetch.registerTaskAsync(taskId)
+}
 
-		for (const [i, lesson] of diary.lessons.entries()) {
-			if (!lesson.end || !lesson.start) continue
-			if (now > lesson.end.getTime()) continue
-
-			let period: Date | undefined
-			let date: Date
-			const previous = diary.lessons[i - 1]
-
-			// If previous lesson is in the same day, send notification in the end of it
-			if (
-				previous &&
-				lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
-				// Only when delay between lessons is less then 15
-				(lesson.start.getTime() - previous.end.getTime()) / (60 * 1000) < 15
-			) {
-				date = new Date(previous.end.getTime())
-				date.setMinutes(date.getMinutes() + 1)
-				period = new Date(lesson.start.getTime() - previous.end.getTime())
-			} else {
-				// Send by 15 mins before lesson
-				// TODO Support custom beforeLessonNotifTime
-				date = new Date(lesson.start.getTime())
-				date.setMinutes(date.getMinutes() - 15)
-			}
-
-			if (now < date.getTime()) continue
-
-			const uuid = lesson.classmeetingId + '' + lesson.subjectId
-			const lessonName = getSubjectName({
-				subjectId: lesson.subjectId,
-				subjectName: lesson.subjectName,
-			})
-
-			const { state, beforeEnd, beforeStart, progress, total } =
-				Lesson.prototype.minutes.call(lesson, now) as ReturnType<
-					Lesson['minutes']
-				>
-
-			let title = ''
-			title += lessonName
-			title += ' | '
-			title += lesson.roomName ?? 'Нет кабинета'
-
-			let body = ''
-
-			body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
-			if (state === LessonState.notStarted) {
-				if (period) body += `Перемена ${period.getMinutes()} мин.`
-				body += `До начала ${beforeStart} мин`
-			} else if (state === LessonState.going) {
-				body += `${beforeEnd}/${total} мин`
-			}
-
-			const id = await notifee.displayNotification({
-				...(Notification.id ? { id: Notification.id } : {}),
-				title,
-				body,
-				android: {
-					channelId: Notification.lessonChannelId,
-					ongoing: true,
-
-					// only alert when lesson notification
-					onlyAlertOnce: Notification.currentLesson === uuid,
-
-					progress:
-						state === LessonState.going
-							? {
-									current: progress,
-									max: 100,
-							  }
-							: void 0,
-				},
-				ios: {},
-			})
-
-			runInAction(() => {
-				Notification.id = id
-				Notification.currentLesson = uuid
-			})
-
+runInBackground('fetchMarks', () => {
+	autorun(function fetchMarks() {
+		if (fetchMarksInterval) clearInterval(fetchMarksInterval)
+		if (!Settings.notifications || !Notification.marksChannelId) {
 			return
 		}
 
-		// Nothing to show
-		Notification.remove()
-	}, 3000)
+		const stores = Object.entries(SubjectPerformanceStores.stores)
+		if (!stores.length) return
+
+		fetchMarksInterval = setInterval(async () => {
+			for (const store of stores) {
+				store[1].store.reload()
+			}
+		}, 60000)
+	})
 })
+
+
 let currentLessonInterval: ReturnType<typeof setInterval>
 
 autorun(function notificationFromDiary() {

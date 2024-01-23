@@ -1,6 +1,6 @@
 // @ts-check
 
-import withBuildProperties from 'expo-build-properties'
+// import withBuildProperties from 'expo-build-properties'
 import { withGradleProperties } from 'expo/config-plugins'
 
 // eslint-disable-next-line no-undef
@@ -36,6 +36,9 @@ const Config = {
 			bundleIdentifier: IS_DEV
 				? 'com.leaftail1880.xdnevnik.dev'
 				: 'com.leaftail1880.xdnevnik',
+			infoPlist: {
+				UIBackgroundModes: ['lesson-notifications'],
+			},
 		},
 		android: {
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],

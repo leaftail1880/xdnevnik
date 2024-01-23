@@ -17,6 +17,7 @@
 		"@sentry/react-native": "^5.16.0",
 		"expo": "^50.0.2",
 		"expo-application": "~5.8.3",
+		"expo-background-fetch": "~11.8.0",
 		"expo-dev-client": "~3.3.6",
 		"expo-device": "~5.9.3",
 		"expo-intent-launcher": "~10.11.0",
