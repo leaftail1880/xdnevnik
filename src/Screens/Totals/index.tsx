@@ -49,7 +49,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 											<Text marginR-s2>Только одна четверть</Text>
 											<Switch
 												value={Settings.currentTotalsOnly}
-												onValueChange={currentTotalsOnly =>
+												onValueChange={(currentTotalsOnly: boolean) =>
 													Settings.save({ currentTotalsOnly })
 												}
 											/>

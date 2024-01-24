@@ -110,7 +110,9 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 						<Text margin-s1>Сначала плохие оценки</Text>
 						<Switch
 							margin-s1
-							onValueChange={a => runInAction(() => (TermStore.sort = a))}
+							onValueChange={(a: boolean) =>
+								runInAction(() => (TermStore.sort = a))
+							}
 							value={TermStore.sort}
 						/>
 					</View>

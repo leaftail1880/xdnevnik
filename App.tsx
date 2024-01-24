@@ -8,7 +8,7 @@ import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'

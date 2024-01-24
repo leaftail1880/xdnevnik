@@ -12,6 +12,7 @@ import { Lesson, LessonState } from './NetSchool/classes'
 import { DiaryStore, SubjectPerformanceStores } from './Stores/API.stores'
 import { Settings } from './Stores/Settings.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
+import { APIStore, createApiMethodStore } from './Stores/API.store'
 
 const Notification = new (class {
 	constructor() {
@@ -90,6 +91,7 @@ async function notificationSetup(enabled: boolean) {
 	})
 }
 
+const marksStore = createApiMethodStore('homework', 'домашка', {})
 let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function fetchMarks() {
@@ -98,33 +100,36 @@ autorun(function fetchMarks() {
 		return
 	}
 
-	const stores = Object.entries(SubjectPerformanceStores.stores)
-	if (!stores.length) return
-
 	// TODO Maybe use performance
 	fetchMarksInterval = setBackgroundInterval(async () => {
-		for (const store of stores) {
-			store[1].store.reload()
-		}
+		marksStore.reload()
 	}, 60000)
 })
+
+const marksValueStore = new (class {
+	constructor() {
+		makeAutoObservable(this)
+	}
+})()
 
 autorun(function newMarksCheck() {
 	if (!Settings.notifications || !Notification.marksChannelId) {
 		return
 	}
 
-	const stores = Object.entries(SubjectPerformanceStores.stores)
-	if (!stores.length) return
+	if (!marksStore.result) return
 
-	for (const store of stores) {
-		const performance = store[1].store
-		if (!performance.result) continue
-		const lastMark = performance.result.results.at(-1)
-		if (!lastMark) continue
+	// const stores = Object.entries(SubjectPerformanceStores.stores)
+	// if (!stores.length) return
 
-		// TODO Check for new marks
-	}
+	// for (const store of stores) {
+	// 	const performance = store[1].store
+	// 	if (!performance.result) continue
+	// 	const lastMark = performance.result.results.at(-1)
+	// 	if (!lastMark) continue
+
+	// 	// TODO Check for new marks
+	// }
 })
 
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>

@@ -98,7 +98,9 @@ export const SettingsScreen = observer(function SettingsScreen() {
 					</Text>
 					<Switch
 						key={themeKey}
-						onValueChange={notifications => Settings.save({ notifications })}
+						onValueChange={(notifications: boolean) =>
+							Settings.save({ notifications })
+						}
 						value={Settings.notifications}
 					/>
 				</View>
@@ -132,9 +134,9 @@ export const SettingsScreen = observer(function SettingsScreen() {
 			</Text>
 			<ColorPicker
 				colors={accentColors}
-				onValueChange={accentColor => setAccentColor(accentColor)}
+				onValueChange={(accentColor: string) => setAccentColor(accentColor)}
 				backgroundColor={Colors.$backgroundDefault}
-				onSubmit={accentColor => {
+				onSubmit={(accentColor: string) => {
 					setAccentColors(accentColors.concat(accentColor))
 					setAccentColor(accentColor)
 				}}

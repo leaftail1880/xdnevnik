@@ -46,7 +46,8 @@ export function createApiMethodStore<
 	APIMethodName extends keyof FunctionsFromObject<typeof API>,
 	Fn = FunctionsFromObject<typeof API>[APIMethodName],
 	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
-	DefaultParams extends object = object
+	FnParams = Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
+	DefaultParams extends Partial<FnParams> = object
 >(
 	method: APIMethodName,
 	name: string,
@@ -58,6 +59,7 @@ export function createApiMethodStore<
 		API,
 		method,
 		name,
+		// @ts-expect-error Uh huh
 		defaultParams,
 		additionalDeps,
 		debug
@@ -72,7 +74,7 @@ export class APIStore<
 	Fn = FunctionsFromObject<APISource>[APIMethodName],
 	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
 	FnParams = Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
-	DefaultParams extends object = object
+	DefaultParams extends Partial<FnParams> = object
 > {
 	log(...data: unknown[]) {
 		if (this.debug)

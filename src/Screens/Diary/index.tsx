@@ -71,7 +71,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 						<Text margin-s1>Оценки</Text>
 						<Switch
 							margin-s1
-							onValueChange={v =>
+							onValueChange={(v: boolean) =>
 								runInAction(() => (DiaryStateStore.showHomework = v))
 							}
 							value={showHomework}
