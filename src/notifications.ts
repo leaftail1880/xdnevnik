@@ -3,9 +3,7 @@ import notifee, {
 	AndroidVisibility,
 	AuthorizationStatus,
 } from '@notifee/react-native'
-import * as BackgroundFetch from 'expo-background-fetch'
 import * as Device from 'expo-device'
-import * as TaskManager from 'expo-task-manager'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
@@ -13,6 +11,7 @@ import { getSubjectName } from './Components/SubjectName'
 import { Lesson, LessonState } from './NetSchool/classes'
 import { DiaryStore, SubjectPerformanceStores } from './Stores/API.stores'
 import { Settings } from './Stores/Settings.store'
+import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
 const Notification = new (class {
 	constructor() {
@@ -91,44 +90,47 @@ async function notificationSetup(enabled: boolean) {
 	})
 }
 
-// TODO Move all code into task manager
+let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
-let newMarksCheckInterval: ReturnType<typeof setInterval>
-let fetchMarksInterval: ReturnType<typeof setInterval>
+autorun(function fetchMarks() {
+	if (fetchMarksInterval) clearBackgroundInterval(fetchMarksInterval)
+	if (!Settings.notifications || !Notification.marksChannelId) {
+		return
+	}
 
-function runInBackground(taskId: string, fn: () => void) {
-	TaskManager.defineTask(taskId, () => {
-		fn()
+	const stores = Object.entries(SubjectPerformanceStores.stores)
+	if (!stores.length) return
 
-		return BackgroundFetch.BackgroundFetchResult.NewData
-	})
-
-	BackgroundFetch.registerTaskAsync(taskId)
-}
-
-runInBackground('fetchMarks', () => {
-	autorun(function fetchMarks() {
-		if (fetchMarksInterval) clearInterval(fetchMarksInterval)
-		if (!Settings.notifications || !Notification.marksChannelId) {
-			return
+	// TODO Maybe use performance
+	fetchMarksInterval = setBackgroundInterval(async () => {
+		for (const store of stores) {
+			store[1].store.reload()
 		}
-
-		const stores = Object.entries(SubjectPerformanceStores.stores)
-		if (!stores.length) return
-
-		fetchMarksInterval = setInterval(async () => {
-			for (const store of stores) {
-				store[1].store.reload()
-			}
-		}, 60000)
-	})
+	}, 60000)
 })
 
+autorun(function newMarksCheck() {
+	if (!Settings.notifications || !Notification.marksChannelId) {
+		return
+	}
 
-let currentLessonInterval: ReturnType<typeof setInterval>
+	const stores = Object.entries(SubjectPerformanceStores.stores)
+	if (!stores.length) return
+
+	for (const store of stores) {
+		const performance = store[1].store
+		if (!performance.result) continue
+		const lastMark = performance.result.results.at(-1)
+		if (!lastMark) continue
+
+		// TODO Check for new marks
+	}
+})
+
+let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function notificationFromDiary() {
-	if (currentLessonInterval) clearInterval(currentLessonInterval)
+	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
 	if (!Settings.notifications || !Notification.lessonChannelId) {
 		return
 	}
@@ -137,7 +139,7 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
-	currentLessonInterval = setInterval(async () => {
+	currentLessonInterval = setBackgroundInterval(async () => {
 		// const date = new Date()
 		// date.setHours(8, 41)
 		// const now = date.getTime()
@@ -230,3 +232,5 @@ autorun(function notificationFromDiary() {
 		Notification.remove()
 	}, 3000)
 })
+
+
