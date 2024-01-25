@@ -103,6 +103,7 @@ autorun(function fetchMarks() {
 	fetchMarksInterval = setBackgroundInterval(async () => {
 		marksStore.reload()
 	}, 60000)
+	//
 })
 
 const marksValueStore = new (class {
