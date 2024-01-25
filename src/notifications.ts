@@ -9,10 +9,10 @@ import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from './Components/SubjectName'
 import { Lesson, LessonState } from './NetSchool/classes'
-import { DiaryStore, SubjectPerformanceStores } from './Stores/API.stores'
+import { createApiMethodStore } from './Stores/API.store'
+import { DiaryStore } from './Stores/API.stores'
 import { Settings } from './Stores/Settings.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
-import { APIStore, createApiMethodStore } from './Stores/API.store'
 
 const Notification = new (class {
 	constructor() {
@@ -100,13 +100,13 @@ autorun(function fetchMarks() {
 		return
 	}
 
-	// TODO Maybe use performance
 	fetchMarksInterval = setBackgroundInterval(async () => {
 		marksStore.reload()
 	}, 60000)
 })
 
 const marksValueStore = new (class {
+	notified = new Set<string>()
 	constructor() {
 		makeAutoObservable(this)
 	}
@@ -119,17 +119,17 @@ autorun(function newMarksCheck() {
 
 	if (!marksStore.result) return
 
-	// const stores = Object.entries(SubjectPerformanceStores.stores)
-	// if (!stores.length) return
-
-	// for (const store of stores) {
-	// 	const performance = store[1].store
-	// 	if (!performance.result) continue
-	// 	const lastMark = performance.result.results.at(-1)
-	// 	if (!lastMark) continue
-
-	// 	// TODO Check for new marks
-	// }
+	for (const assignment of marksStore.result.filter(
+		e => typeof e.result === 'number'
+	)) {
+		if (!marksValueStore.notified.has(assignment.assignmentId + '')) {
+			marksValueStore.notified.add(assignment.assignmentId + '')
+			notifee.displayNotification({
+				title: `${assignment.result} - ${getSubjectName(assignment)}`,
+				subtitle: `Веc: ${assignment.weight}, ${assignment.assignmentTypeName}`,
+			})
+		}
+	}
 })
 
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
