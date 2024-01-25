@@ -76,7 +76,7 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 			}}
 		>
 			<SubjectName
-				iconsSize={18}
+				iconsSize={24}
 				style={{
 					fontWeight: 'bold',
 					fontSize: 18,
@@ -103,7 +103,7 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 				<IconButton
 					iconColor={Colors.$textDefault}
 					icon="pencil"
-					size={18}
+					size={25}
 					marginL-s1
 				/>
 			</View>
