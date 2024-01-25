@@ -1,3 +1,4 @@
+// @ts-check
 /* eslint-disable */
 const { getSentryExpoConfig } = require('@sentry/react-native/metro')
 
