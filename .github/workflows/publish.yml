@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: 🏗 Check for EXPO_TOKEN and SENTRY_TOKEN
         run: |
-          if [ -z "${{ secrets.SENTRY_TOKEN }}" ]; then
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ]; then
             echo "You must provide an SENTRY_TOKEN secret linked to this project's Sentry account. Learn more: https://docs.expo.dev/guides/using-sentry/#sign-up-for-a-sentry-account-and-create-a-project"
           fi
           if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
@@ -45,26 +45,24 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📦 Install deps
+      - name: 📦 Install dependencies
         run: yarn install
 
       - name: 📦 Install sharp cli for image processing
         run: npm add -g sharp-cli
 
-      - name: 📦 Build
+      - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
-        
-      - name: 📦 Build dev client
-        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
-      - name: 🏗 List files 
-        if: true
-        run: |
-          ls -a		 
-
-      - name: 🚀 Upload binaries to release
+      - name: 🚀 Upload main apk
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            XDnevnik.apk
-            XDnevnik Dev Client.apk
+          files: XDnevnik.apk
+            
+      - name: 📦 Build dev client
+        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local 
+
+      - name: 🚀 Upload dev client
+        uses: softprops/action-gh-release@v1
+        with:
+          files: XDnevnik Dev Client.apk

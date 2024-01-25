@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: 🏗 Check for EXPO_TOKEN
         run: |
-          if [ -z "${{ secrets.SENTRY_TOKEN }}" ]; then
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ]; then
             echo "You must provide an SENTRY_TOKEN secret linked to this project's Sentry account. Learn more: https://docs.expo.dev/guides/using-sentry/#sign-up-for-a-sentry-account-and-create-a-project"
           fi
           if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
@@ -50,8 +50,8 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🚀 Publish update
+      - name: 🚀 Create update
         run: eas update --auto --non-interactive
 
-      - name: Upload Sentry sourcemaps
+      - name: 🚀 Upload Sentry sourcemaps
         run: npx sentry-expo-upload-sourcemaps dist
