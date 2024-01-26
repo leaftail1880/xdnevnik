@@ -1,15 +1,15 @@
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
 import { Colors, Text, TextField, TextProps } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Subject } from '../NetSchool/classes'
+import { styles } from '../Setup/constants'
 import { Settings } from '../Stores/Settings.store'
 import { XDnevnik } from '../Stores/Xdnevnik.store'
-import { styles } from '../constants'
 import { IconButton } from './Button'
 import { Loading } from './Loading'
-import { runInAction } from 'mobx'
 
 type SubjectNameOptions = {
 	subjectId: number

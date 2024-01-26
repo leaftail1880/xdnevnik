@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import { LANG } from '../../constants'
+import { LANG } from '../../Setup/constants'
 
 export const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 export const S_TOTALS = LANG['s_totalsN']

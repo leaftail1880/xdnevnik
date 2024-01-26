@@ -10,7 +10,7 @@ import { RefreshControl } from 'react-native'
 import { ErrorHandler } from '../Components/ErrorHandler'
 import { Loading } from '../Components/Loading'
 import { API, API as NSApi, NetSchoolError } from '../NetSchool/api'
-import { logger } from '../constants'
+import { logger } from '../Setup/constants'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type APIMethod = (arg: Record<string, any>) => Promise<any>

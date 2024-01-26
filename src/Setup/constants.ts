@@ -14,7 +14,7 @@ import {
 	TextProps,
 	ThemeManager,
 } from 'react-native-ui-lib'
-import { dropdownStyle } from './Components/Dropdown'
+import { dropdownStyle } from '../Components/Dropdown'
 
 configure({
 	enforceActions: 'always',
@@ -132,49 +132,6 @@ export const LANG = {
 	notification_disable: 'Выключить уведомления',
 	notification_enable: 'Включить уведомления',
 } as const
-
-declare global {
-	interface DateConstructor {
-		week(date: Date): [string, string, string, string, string, string, string]
-	}
-	interface Date {
-		weekStart(): Date
-		weekEnd(): Date
-		toYYYYMMDD(): string
-		toHHMM(): string
-		weekStartDay: number
-		toReadable(): string
-		getDayMon(): number
-	}
-}
-Date.prototype.getDayMon = function (this: Date) {
-	return [6, 0, 1, 2, 3, 4, 5][this.getDay()]
-}
-Date.prototype.toYYYYMMDD = function (this: Date) {
-	return this.toLocaleDateString([], { dateStyle: 'medium' })
-		.split('.')
-		.reverse()
-		.join('-')
-}
-Date.prototype.toHHMM = function (this: Date) {
-	return (
-		this.getHours().toString().padStart(2, '0') +
-		':' +
-		this.getMinutes().toString().padStart(2, '0')
-	)
-}
-
-Date.prototype.toReadable = function (this: Date) {
-	return this.toHHMM() + ' ' + this.toYYYYMMDD()
-}
-
-const dayInMs = 1000 * 60 * 60 * 24
-Date.week = date =>
-	new Array(7)
-		.fill('')
-		.map((_, i) =>
-			new Date(date.getTime() - (date.getDayMon() - i) * dayInMs).toYYYYMMDD()
-		) as ReturnType<typeof Date.week>
 
 export function settingsButton(): {
 	style: StyleProp<ViewStyle>

@@ -9,7 +9,7 @@ import { Alert } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
 import { Button } from '../../Components/Button'
 import { getLatestGithubReleaseUrl } from '../../GithubUpdate/update'
-import { logger, settingsButton } from '../../constants'
+import { logger, settingsButton } from '../../Setup/constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {

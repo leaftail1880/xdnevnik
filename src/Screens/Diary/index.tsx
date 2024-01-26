@@ -8,6 +8,7 @@ import {
 	AttachmentsStore,
 	DiaryStore,
 } from '../../Stores/API.stores'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { DiaryLesson } from './Lesson'
 import { DiaryStateStore } from './StateStore'
@@ -15,11 +16,12 @@ import { DiaryStateStore } from './StateStore'
 export const DiaryScreen = observer(function DiaryScreen() {
 	const { studentId } = XDnevnik
 	const { showHomework, weekDays, weekDaysOptions, diaryDay } = DiaryStateStore
+	const themeKey = Theme.accentColor + Theme.scheme
 
 	DiaryStore.withParams({
 		studentId,
-		startDate: weekDays[0],
-		endDate: weekDays[6],
+		startDate: weekDays[0].toNetSchool(),
+		endDate: weekDays[6].toNetSchool(),
 	})
 
 	AssignmentsStore.withParams({
@@ -39,7 +41,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 	})
 
 	return (
-		<View>
+		<View key={themeKey}>
 			<Dropdown
 				dropdownStyle={{ minHeight: 350, borderRadius: 10 }}
 				data={weekDaysOptions}

@@ -31,6 +31,6 @@ Sentry.init({
 	dsn: 'https://9f602cf540f26a8de9d5d708df4558b3@o4506601427369984.ingest.sentry.io/4506601430122496',
 	// Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
 	// We recommend adjusting this value in production.
-	tracesSampleRate: 1.0,
-	debug: __DEV__,
+	tracesSampleRate: 0.9,
+	// debug: __DEV__,
 })

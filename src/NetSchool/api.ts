@@ -1,7 +1,7 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
+import { logger } from '../Setup/constants'
 import { makeReloadPersistable } from '../Stores/makePersistable'
-import { logger } from '../constants'
 import {
 	Assignment,
 	Attachment,

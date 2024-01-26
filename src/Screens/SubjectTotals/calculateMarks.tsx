@@ -1,5 +1,5 @@
 import { SubjectPerformance } from '../../NetSchool/classes'
-import { logger } from '../../constants'
+import { logger } from '../../Setup/constants'
 import type { MarkInfo } from '../Totals'
 
 export function calculateMarks({

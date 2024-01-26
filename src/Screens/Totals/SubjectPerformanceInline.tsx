@@ -3,7 +3,7 @@ import { Colors, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
-import { LANG } from '../../constants'
+import { LANG } from '../../Setup/constants'
 import { SubjectMarksInline } from './SubjectMarksInline'
 import { SubjectInfo } from './TotalsScreenTerm'
 
