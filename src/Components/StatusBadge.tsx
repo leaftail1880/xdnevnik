@@ -3,9 +3,9 @@ import { View } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
 import { API } from '../NetSchool/api'
 import { AUTOLOGIN } from '../Screens/Session/autologin'
+import { styles } from '../Setup/constants'
 import { Theme } from '../Stores/Theme.store'
 import { XDnevnik } from '../Stores/Xdnevnik.store'
-import { styles } from '../constants'
 import { IconButton } from './Button'
 
 export const StatusBadge = observer(function StatusBadge() {

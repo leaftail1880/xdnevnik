@@ -14,10 +14,15 @@ import { Button } from '../../Components/Button'
 import { Dropdown } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
+import {
+	ACCENT_COLOR,
+	LANG,
+	logger,
+	settingsButton,
+} from '../../Setup/constants'
 import { StudentsStore } from '../../Stores/API.stores'
 import { Settings, fullname } from '../../Stores/Settings.store'
 import { Theme } from '../../Stores/Theme.store'
-import { ACCENT_COLOR, LANG, logger, settingsButton } from '../../constants'
 import { UpdatesButton } from './Update'
 
 const themes = [

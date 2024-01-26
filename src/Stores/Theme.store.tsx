@@ -2,7 +2,7 @@ import { DarkTheme } from '@react-navigation/native'
 import { action, makeAutoObservable, observable, runInAction } from 'mobx'
 import { Appearance } from 'react-native'
 import { Colors, Scheme } from 'react-native-ui-lib'
-import { ACCENT_COLOR } from '../constants'
+import { ACCENT_COLOR } from '../Setup/constants'
 import { makeReloadPersistable } from './makePersistable'
 
 // spy(event => {

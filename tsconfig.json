@@ -1,5 +1,5 @@
 {
-  "compilerOptions": {
+	"compilerOptions": {
 		"strictNullChecks": true,
 		"allowJs": true,
 		"esModuleInterop": false,
@@ -14,17 +14,19 @@
 		"skipLibCheck": true,
 		"target": "ESNext"
 	},
-  "include": [
-    "App.tsx",
-    "src/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "babel.config.js",
-    "metro.config.js",
-    "jest.config.js"
-  ],
-  "extends": "expo/tsconfig.base"
+	"include": [
+		"App.tsx",
+		"src/*",
+		"src/Setup/date.ts",
+		"src/Setup/constants.ts"
+, "src/Setup/timers.ts", "src/Setup/sentry.ts", "src/Setup/notifications.ts"	],
+	"exclude": [
+		"node_modules",
+		"babel.config.js",
+		"metro.config.js",
+		"jest.config.js"
+	],
+	"extends": "expo/tsconfig.base"
 }
 
 

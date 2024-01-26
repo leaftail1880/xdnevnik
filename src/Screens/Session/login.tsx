@@ -9,9 +9,9 @@ import { Button } from '../../Components/Button'
 import { Loading } from '../../Components/Loading'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
+import { logger } from '../../Setup/constants'
 import { APIStore } from '../../Stores/API.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
-import { logger } from '../../constants'
 
 const LoginStore = new (class {
 	constructor() {

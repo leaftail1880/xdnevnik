@@ -46,6 +46,7 @@ const Config = {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: '#ffffff',
 			},
+
 			package: IS_DEV
 				? 'com.leaftail1880.xdnevnik.dev'
 				: 'com.leaftail1880.xdnevnik',

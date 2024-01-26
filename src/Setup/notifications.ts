@@ -7,11 +7,11 @@ import * as Device from 'expo-device'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { Colors } from 'react-native-ui-lib'
-import { getSubjectName } from './Components/SubjectName'
-import { Lesson, LessonState } from './NetSchool/classes'
-import { createApiMethodStore } from './Stores/API.store'
-import { DiaryStore } from './Stores/API.stores'
-import { Settings } from './Stores/Settings.store'
+import { getSubjectName } from '../Components/SubjectName'
+import { Lesson, LessonState } from '../NetSchool/classes'
+import { createApiMethodStore } from '../Stores/API.store'
+import { DiaryStore } from '../Stores/API.stores'
+import { Settings } from '../Stores/Settings.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
 const Notification = new (class {
@@ -66,15 +66,9 @@ async function notificationSetup(enabled: boolean) {
 	if (Device.isDevice) {
 		// Required for iOS
 		// See https://notifee.app/react-native/docs/ios/permissions
-		let response = await notifee.requestPermission()
+		const { authorizationStatus } = await notifee.requestPermission()
 
-		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-			Alert.alert('Разреши уведомления!')
-			response = await notifee.requestPermission()
-		}
-
-		if (response.authorizationStatus === AuthorizationStatus.DENIED) {
-			Alert.alert('Уведомления не были разрешены.')
+		if (authorizationStatus === AuthorizationStatus.DENIED) {
 			Settings.save({ notifications: false })
 			return
 		}
@@ -237,5 +231,3 @@ autorun(function notificationFromDiary() {
 		Notification.remove()
 	}, 3000)
 })
-
-

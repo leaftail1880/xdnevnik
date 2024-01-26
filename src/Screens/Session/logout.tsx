@@ -2,8 +2,8 @@ import { Colors, Text } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Button } from '../../Components/Button'
 import { API } from '../../NetSchool/api'
+import { LANG } from '../../Setup/constants'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
-import { LANG } from '../../constants'
 
 // eslint-disable-next-line mobx/missing-observer
 export const LogoutScreen = function LogoutScreen() {

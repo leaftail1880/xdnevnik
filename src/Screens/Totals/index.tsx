@@ -10,6 +10,7 @@ import {
 	TotalsStore,
 } from '../../Stores/API.stores'
 import { Settings } from '../../Stores/Settings.store'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { SubjectTotals } from '../SubjectTotals/index'
 import { TotalsScreenTable } from './TotalsScreenTable'
@@ -19,6 +20,7 @@ import { ParamMap, S_SUBJECT_TOTALS, S_TOTALS, Stack } from './navigation'
 export const TotalsNavigation = observer(function TotalsNavigation() {
 	const { studentId } = XDnevnik
 	EducationStore.withParams({ studentId })
+	const themeKey = Theme.accentColor + Theme.scheme
 
 	// TODO Let user to schoose school year
 	const schoolYear = EducationStore.result?.find(
@@ -38,6 +40,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 	return (
 		<Stack.Navigator>
 			<Stack.Screen
+				key={themeKey}
 				name={S_TOTALS}
 				options={{
 					headerRight() {
@@ -64,6 +67,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 				{nav => <TotalsScreen {...nav} {...{ schoolYear }} />}
 			</Stack.Screen>
 			<Stack.Screen
+				key={themeKey + '2'}
 				name={S_SUBJECT_TOTALS}
 				options={{
 					headerStyle: { elevation: 0 },
