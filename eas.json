@@ -20,14 +20,16 @@
 				"gradleCommand": ":app:assembleRelease"
 			}
 		},
+		"production-ios": {
+			"channel": "production",
+			"ios": {},
+			"distribution": "internal"
+		},
 		"production": {
 			"channel": "production",
 			"android": {
 				"buildType": "apk",
 				"gradleCommand": ":app:assembleRelease"
-			},
-			"ios": {
-				"withoutCredentials": true
 			}
 		}
 	},

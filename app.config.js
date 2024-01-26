@@ -1,10 +1,8 @@
 // @ts-check
-
-// import withBuildProperties from 'expo-build-properties'
 import { withGradleProperties } from 'expo/config-plugins'
 
 // eslint-disable-next-line no-undef
-const IS_DEV = process.env.DEV === 'development'
+const IS_DEV = !!process.env.DEV
 
 /** @type {[string, any]} */
 const sentryPlugin = [
@@ -73,10 +71,10 @@ const Config = {
 }
 
 // Config.expo = withBuildProperties(Config.expo, {
-	// android: {
-		// enableProguardInReleaseBuilds: true,
-		// enableShrinkResourcesInReleaseBuilds: true,
-	// },
+// android: {
+// enableProguardInReleaseBuilds: true,
+// enableShrinkResourcesInReleaseBuilds: true,
+// },
 // })
 
 Config.expo = withGradleProperties(Config.expo, config => {
