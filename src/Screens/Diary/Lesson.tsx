@@ -4,8 +4,9 @@ import { IconButton } from '../../Components/Button'
 import { SubjectName } from '../../Components/SubjectName'
 import { Diary, Lesson } from '../../NetSchool/classes'
 import { AssignmentsStore } from '../../Stores/API.stores'
+import { Theme } from '../../Stores/Theme.store'
 import { DiaryAssignment } from './Assignment'
-import { LessonProgress } from './Progress'
+import { LessonProgress, LessonProgressStore } from './Progress'
 import { DiaryStateStore } from './StateStore'
 
 export const DiaryLesson = observer(function DiaryLesson({
@@ -18,25 +19,25 @@ export const DiaryLesson = observer(function DiaryLesson({
 		<View
 			margin-s2
 			br20
-			bg-$backgroundAccent
-			style={{
-				alignItems: 'flex-start',
-				elevation: 15,
-				minWidth: 280,
-			}}
+			backgroundColor={Theme.theme.dark ? 'white' : 'black'}
+			// Display white frame only when lesson is going
+			padding-s2={LessonProgressStore.currentLesson === lesson.classmeetingId}
 		>
-			<TopRow lesson={lesson} />
-			<MiddleRow lesson={lesson} />
-			<LessonProgress lesson={lesson} />
-			{showHomework && (
-				<View
-					backgroundColor={Colors.rgba(Colors.white, 0.2)}
-					br20
-					style={{ width: '100%' }}
-				>
-					<DiaryAssignmentList lesson={lesson} />
-				</View>
-			)}
+			<View
+				bg-$backgroundAccent
+				br20
+				style={{
+					alignItems: 'flex-start',
+
+					elevation: 15,
+					minWidth: 280,
+				}}
+			>
+				<TopRow lesson={lesson} />
+				<MiddleRow lesson={lesson} />
+				<LessonProgress lesson={lesson} />
+				{showHomework && <DiaryAssignmentList lesson={lesson} />}
+			</View>
 		</View>
 	)
 })

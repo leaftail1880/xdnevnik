@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Colors, View } from 'react-native-ui-lib'
+import { Colors, Spacings, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
@@ -29,57 +29,34 @@ export const SubjectPerformanceInline = observer(
 				style={{
 					elevation: 10,
 					width: '98%',
-					backgroundColor: Colors.$backgroundPrimaryMedium,
+					backgroundColor: Colors.$backgroundPrimaryLight,
 				}}
 			>
-				<View
-					padding-s1
-					br20
+				<SubjectName
+					subjectId={props.total.subjectId}
+					subjects={props.subjects}
+					iconsSize={18}
+					flex
 					style={{
-						alignSelf: 'flex-end',
-						alignItems: 'flex-end',
-						width: '100%',
-						elevation: 10,
-						backgroundColor: Colors.$backgroundPrimaryLight,
+						maxWidth: '90%',
+
+						fontSize: 18,
+						color: Colors.$textDefault,
+						fontWeight: 'bold',
 					}}
-				>
-					<SubjectName
-						subjectId={props.total.subjectId}
-						subjects={props.subjects}
-						iconsSize={18}
-						style={{
-							fontSize: 18,
-							color: Colors.$textDefault,
-							fontWeight: 'bold',
-						}}
-					/>
-				</View>
+					viewStyle={{
+						padding: Spacings.s2,
+						paddingTop: Spacings.s1,
+					}}
+				/>
 				{term ? (
 					<View flex row style={{ width: '100%' }}>
 						<View flex row style={{ alignItems: 'flex-end' }}>
-							{/* <Fader
-								position={FaderPosition.START}
-								size={30}
-								tintColor={Colors.$backgroundAccent}
-							/> */}
-
 							<SubjectMarksInline
 								{...props}
 								openDetails={openDetails}
 								term={term}
 							/>
-							{/* <Fader
-								size={30}
-								tintColor={Colors.rgba(Colors.$backgroundAccent, 0.5)}
-							/>
-							<Fader
-								size={15}
-								tintColor={Colors.rgba(Colors.$backgroundAccent, 0.5)}
-							/>
-							<Fader
-								size={7}
-								tintColor={Colors.rgba(Colors.$backgroundAccent, 1)}
-							/> */}
 						</View>
 						<View
 							row

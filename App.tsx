@@ -1,5 +1,5 @@
-import './src/Setup/sentry'
 import './src/Setup/date'
+import './src/Setup/sentry'
 
 import {
 	BottomTabBar,
@@ -27,9 +27,9 @@ import { LogoutScreen } from './src/Screens/Session/logout'
 import { SettingsScreen } from './src/Screens/Settings'
 import { TotalsNavigation } from './src/Screens/Totals'
 import { LANG } from './src/Setup/constants'
+import './src/Setup/notifications'
 import { StudentsStore } from './src/Stores/API.stores'
 import { Theme } from './src/Stores/Theme.store'
-import './src/Setup/notifications'
 
 type ParamListBase = Record<
 	(typeof LANG)[

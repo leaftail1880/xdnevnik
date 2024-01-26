@@ -33,7 +33,8 @@ export async function getLatestGithubReleaseUrl(
 	{
 		ifAlreadyLatest = () => Alert.alert('Уже последняя'),
 		ifNoRelease = () => Alert.alert('Не удалось найти релиз'),
-		ifNoAsset = () => Alert.alert('Обновление еще собирается, попробуйте через пару минут!'),
+		ifNoAsset = () =>
+			Alert.alert('Обновление еще собирается, попробуйте через пару минут!'),
 		ifRatelimit = (max: number, resetOn: number) =>
 			Alert.alert(
 				`Достигнут лимит запросов: 0/${max}`,
@@ -51,17 +52,18 @@ export async function getLatestGithubReleaseUrl(
 				Number(response.headers.get('x-ratelimit-limit')),
 				Number(response.headers.get('x-ratelimit-reset'))
 			)
-		} else Error(`Ошибка при запросе: ${response.status} ${response.statusText}`)
+		} else
+			Error(`Ошибка при запросе: ${response.status} ${response.statusText}`)
 	}
 
 	const releases: GithubRelease[] = await response.json()
 	const release = releases[0]
 	if (!release) return ifNoRelease()
-	
+
 	if (release.tag_name === Application.nativeApplicationVersion)
 		return ifAlreadyLatest()
-	
-		const asset = release.assets.find(e => e.name === filename)
+
+	const asset = release.assets.find(e => e.name === filename)
 	if (!asset) return ifNoAsset()
 
 	return asset?.browser_download_url

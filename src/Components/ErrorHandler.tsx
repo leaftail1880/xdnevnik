@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
 import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
 import { NetSchoolApi, NetSchoolError } from '../NetSchool/api'
@@ -51,6 +52,15 @@ export const ErrorHandler = function ErrorHandler({
 						color={Colors.$textDefault}
 						style={{ paddingLeft: Spacings.s1 }}
 					/>
+				</Button>
+				<Button
+					onPress={() => {
+						Sentry.captureException(error)
+					}}
+					margin-s1
+					padding-s2
+				>
+					<Text $textDefault>{'Отправить отчет об ошибке разработчику'}</Text>
 				</Button>
 			</View>
 		</View>

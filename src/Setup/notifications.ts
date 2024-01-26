@@ -12,6 +12,7 @@ import { Lesson, LessonState } from '../NetSchool/classes'
 import { createApiMethodStore } from '../Stores/API.store'
 import { DiaryStore } from '../Stores/API.stores'
 import { Settings } from '../Stores/Settings.store'
+import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
 const Notification = new (class {
@@ -85,7 +86,13 @@ async function notificationSetup(enabled: boolean) {
 	})
 }
 
-const marksStore = createApiMethodStore('homework', 'домашка', {})
+const marksStore = createApiMethodStore(
+	'homework',
+	'домашка',
+	undefined,
+	undefined
+)
+
 let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function fetchMarks() {
@@ -95,6 +102,11 @@ autorun(function fetchMarks() {
 	}
 
 	fetchMarksInterval = setBackgroundInterval(async () => {
+		marksStore.withParams({
+			studentId: XDnevnik.studentId,
+			withExpiredClassAssign: true,
+			withoutMarks: false,
+		})
 		marksStore.reload()
 	}, 60000)
 	//
@@ -118,7 +130,9 @@ autorun(function newMarksCheck() {
 		e => typeof e.result === 'number'
 	)) {
 		if (!marksValueStore.notified.has(assignment.assignmentId + '')) {
-			marksValueStore.notified.add(assignment.assignmentId + '')
+			runInAction(() => {
+				marksValueStore.notified.add(assignment.assignmentId + '')
+			})
 			notifee.displayNotification({
 				title: `${assignment.result} - ${getSubjectName(assignment)}`,
 				subtitle: `Веc: ${assignment.weight}, ${assignment.assignmentTypeName}`,

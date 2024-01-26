@@ -48,7 +48,7 @@ const TermStore = new (class {
 				},
 				false
 			)
-			if (store.result) avg += store.result?.results.length / 10000
+			if (store.result?.results) avg += store.result?.results.length / 10000
 			return avg
 		}
 	}
@@ -116,7 +116,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 						/>
 					</View>
 				</View>
-				{totals.result.length < 1 ? (
+				{totals.result === null || totals.result.length < 1 ? (
 					<Loading text="Загрузка из кэша{dots}" />
 				) : (
 					TermStore.totalsResult &&
@@ -134,6 +134,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				<Text $textDisabled center margin-s1>
 					{totals.updateDate}
 				</Text>
+				<View padding-s7></View>
 			</ScrollView>
 		)
 	)

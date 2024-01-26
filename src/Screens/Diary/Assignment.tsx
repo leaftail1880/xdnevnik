@@ -20,8 +20,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 }) {
 	const [showHw, setShowHw] = useState(
 		// Do not show long hw by default
-		// assignment.assignmentTypeName.length < 20
-		true
+		assignment.assignmentName.length < 40
 	)
 
 	const attachments = AttachmentsStore
@@ -33,44 +32,41 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 
 	return (
 		<View
-			margin-s2
-			backgroundColor={Colors.$backgroundAccent}
+			margin-s1
+			backgroundColor={Colors.rgba(Colors.$backgroundPrimaryLight, 0.2)}
 			padding-s1
 			br20
-			style={{ elevation: 10 }}
 		>
-			<View row spread centerV>
-				<View row marginH-s1 style={{ width: '80%' }}>
-					{assignment.assignmentTypeName && (
-						<SmallButton
-							onPress={() => setShowHw(!showHw)}
-							style={{
-								borderColor: Colors.$textAccent,
-								borderWidth: 2,
-								width: 45,
-								height: 45,
-								alignSelf: 'center',
-							}}
-							centerH
-							centerV
-							br20
-						>
-							<Text $textAccent margin-s1>
-								{assignment.assignmentTypeAbbr}
-							</Text>
-						</SmallButton>
-					)}
-					{showHw && (
-						<Text
-							$textAccent
-							margin-s2
-							style={{ width: '85%', alignSelf: 'center' }}
-							selectable
-						>
-							{assignment.assignmentTypeName}: {assignment.assignmentName}
+			<View row spread centerV style={{ width: '100%' }}>
+				{assignment.assignmentTypeName && (
+					<SmallButton
+						onPress={() => setShowHw(!showHw)}
+						style={{
+							backgroundColor: Colors.rgba(Colors.$textAccent, 0.2),
+							width: 45,
+							height: 45,
+							alignSelf: 'center',
+						}}
+						centerH
+						centerV
+						br20
+					>
+						<Text $textAccent margin-s1>
+							{assignment.assignmentTypeAbbr}
 						</Text>
-					)}
-				</View>
+					</SmallButton>
+				)}
+
+				<Text
+					$textAccent
+					margin-s2
+					style={{ alignSelf: 'center', width: '60%' }}
+					selectable
+				>
+					{showHw
+						? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
+						: '...'}
+				</Text>
 
 				<View row center>
 					<Mark
@@ -85,7 +81,6 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 						style={{
 							width: 45,
 							height: 45,
-							padding: 0,
 							alignSelf: 'center',
 						}}
 						textStyle={{ fontSize: 16 }}

@@ -14,12 +14,7 @@ import { Button } from '../../Components/Button'
 import { Dropdown } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
-import {
-	ACCENT_COLOR,
-	LANG,
-	logger,
-	settingsButton,
-} from '../../Setup/constants'
+import { ACCENT_COLOR, LANG, l, settingsButton } from '../../Setup/constants'
 import { StudentsStore } from '../../Stores/API.stores'
 import { Settings, fullname } from '../../Stores/Settings.store'
 import { Theme } from '../../Stores/Theme.store'
@@ -52,7 +47,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
 			Theme.setAccentColor(accentColor)
 			setSent(Date.now() + 5000)
 		} else {
-			logger.debug('SSSS')
+			l.debug('SSSS')
 		}
 	}
 
