@@ -1,4 +1,4 @@
-import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
+import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { ScrollView } from 'react-native'
@@ -19,17 +19,11 @@ import { SubjectPerformanceInline } from './SubjectPerformanceInline'
 
 const TermStore = new (class {
 	sort = true
-	selectedTerm: null | NSEntity = null
-	setSelectedTerm(term: NSEntity | null) {
-		if (!term) return
-		this.selectedTerm = term
-		Settings.save({ selectedTerm: term.id })
-	}
 	getTerms(totals = TotalsStore) {
 		return totals.result?.[0]?.termTotals.map(e => e.term)
 	}
 	get totalsResult() {
-		const selectedTerm = this.selectedTerm
+		const selectedTerm = Settings.currentTerm
 		if (!TotalsStore.result || !selectedTerm) return
 
 		return TotalsStore.result
@@ -59,19 +53,18 @@ const TermStore = new (class {
 		}
 	}
 	constructor() {
-		makeAutoObservable(this, { getTerms: false, setSelectedTerm: action })
+		makeAutoObservable(this, { getTerms: false })
 	}
 })()
 
 autorun(function loadSelectedTerm() {
-	const terms = TermStore.getTerms()
+	if (!TotalsStore.result) return
 
-	if (terms && !TermStore.selectedTerm) {
-		if (Settings.selectedTerm)
-			TermStore.setSelectedTerm(
-				terms.find(e => e.id === Settings.selectedTerm) ?? terms[0]
-			)
-		else TermStore.setSelectedTerm(terms[0])
+	const terms = TermStore.getTerms()
+	if (terms && Settings.currentTerm) {
+		if (!terms.find(e => e.id === Settings.currentTerm?.id)) {
+			Settings.save({ currentTerm: terms[0] })
+		}
 	}
 })
 
@@ -95,12 +88,10 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				{terms && (
 					<Dropdown
 						data={terms}
-						defaultValue={TermStore.selectedTerm}
-						onSelect={v => TermStore.setSelectedTerm(v)}
+						defaultValue={Settings.currentTerm}
+						onSelect={v => Settings.save({ currentTerm: v })}
 						dropdownStyle={{ maxWidth: 110 }}
-						defaultButtonText={
-							TermStore.selectedTerm?.name ?? 'Выбери четверть'
-						}
+						defaultButtonText={Settings.currentTerm?.name ?? 'Выбери четверть'}
 						buttonTextAfterSelection={i => i?.name ?? 'F'}
 						rowTextForSelection={i => i?.name ?? 'F'}
 					/>
@@ -134,7 +125,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 							attendance={attendance}
 							navigation={navigation}
 							total={total}
-							selectedTerm={TermStore.selectedTerm!}
+							selectedTerm={Settings.currentTerm!}
 							subjects={subjects.result}
 							key={total.subjectId.toString()}
 						/>

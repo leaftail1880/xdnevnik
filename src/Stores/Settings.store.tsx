@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { makeReloadPersistable } from './makePersistable'
+import { NSEntity } from '../NetSchool/classes'
 
 class SettingsStore {
 	notifications = true
@@ -7,7 +8,7 @@ class SettingsStore {
 
 	lastNameLast = true
 	currentTotalsOnly = true
-	selectedTerm?: number
+	currentTerm?: NSEntity
 	markStyle: 'background' | 'border' = 'border'
 	/**
 	 * Map containing per student overrides

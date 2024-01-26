@@ -109,7 +109,6 @@ export const UpdatesButton = function UpdatesButton() {
 					})
 
 					if (typeof result === 'undefined') {
-						Alert.alert('Обновлений нету.')
 						setProgress(void 0)
 					} else setProgress('Обновление скачано')
 				} catch (error) {
