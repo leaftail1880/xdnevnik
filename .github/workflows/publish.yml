@@ -1,13 +1,33 @@
 name: publish
-on: 
+on:
   push:
-    tags:
-      '*'
+    tags: '*'
+  workflow_dispatch:
 
 jobs:
-  update:
-    name: EAS Release APK Publish
+  ensure_tokens:
+    name: Ensuring TOKENS
     runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            echo "Access tokens: https://expo.dev/accounts/[account]/settings/access-tokens"
+            exit 1
+          fi
+      - name: 🏗 Check for SENTRY_AUTH_TOKEN
+        run: |
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ]; then
+            echo "You must provide an SENTRY_TOKEN secret linked to this project's Sentry account. Learn more: https://docs.expo.dev/guides/using-sentry/#sign-up-for-a-sentry-account-and-create-a-project"
+            exit 1
+          fi
+        
+          
+  android:
+    name: EAS Build APK
+    runs-on: ubuntu-latest
+    needs: [ensure_tokens]
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
@@ -21,7 +41,6 @@ jobs:
             echo "Access tokens: https://expo.dev/accounts/[account]/settings/access-tokens"
             exit 1
           fi
-          
 
       - name: 🏗 Checkout repository
         uses: actions/checkout@v3
@@ -58,11 +77,46 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: XDnevnik.apk
-            
+
       - name: 📦 Build dev client
-        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local 
+        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
       - name: 🚀 Upload dev client
         uses: softprops/action-gh-release@v1
         with:
           files: XDnevnik Dev Client.apk
+  ios:
+    name: EAS Build IOS
+    runs-on: macos-latest
+    needs: [ensure_tokens]
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: yarn install
+
+      - name: 📦 Install sharp cli for image processing
+        run: npm add -g sharp-cli
+
+      - name: 📦 Build ipa
+        run: eas build -p ios --non-interactive --output XDnevnik.ipa --local
+
+      - name: 🚀 Upload ipa
+        uses: softprops/action-gh-release@v1
+        with:
+          files: XDnevnik.ipa

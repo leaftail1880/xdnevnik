@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**.ts'
       - 'src/**.tsx'
+  workflow_dispatch:
 
 jobs:
   update:

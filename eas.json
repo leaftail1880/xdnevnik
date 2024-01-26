@@ -3,27 +3,32 @@
 		"version": ">= 7.0.0"
 	},
   "build": {
+		"base": {},
 		"development": {
+			"channel": "development",
 			"developmentClient": true,
 			"distribution": "internal",
-			"channel": "development",
 			"env": {
-				"DEV": "development"
+				"DEV": "true"
 			}
 		},
 		"preview": {
+			"channel": "preview",
 			"distribution": "internal",
 			"android": {
-				"buildType": "apk"
-			},
-			"channel": "preview"
+				"buildType": "apk",
+				"gradleCommand": ":app:assembleRelease"
+			}
 		},
 		"production": {
+			"channel": "production",
 			"android": {
 				"buildType": "apk",
 				"gradleCommand": ":app:assembleRelease"
 			},
-			"channel": "production"
+			"ios": {
+				"withoutCredentials": true
+			}
 		}
 	},
   "submit": {
