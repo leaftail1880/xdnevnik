@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
-import { logger } from '../Setup/constants'
+import { l } from '../Setup/constants'
 import { makeReloadPersistable } from '../Stores/makePersistable'
 import {
 	Assignment,
@@ -173,7 +173,7 @@ export class NetSchoolApi {
 		form: Record<string, string>,
 		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
 	) {
-		logger.debug({
+		l.debug({
 			expires: this.session?.expires.toReadable(),
 			today: new Date().toReadable(),
 			form,
@@ -184,7 +184,7 @@ export class NetSchoolApi {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		})
 
-		logger.debug({ status: response.status })
+		l.debug({ status: response.status })
 		if (response.status === 400) {
 			throw new NetSchoolError(error400)
 		}
@@ -249,7 +249,7 @@ export class NetSchoolApi {
 		try {
 			if (init.auth) {
 				if (this.session && this.session.expires.getTime() < Date.now()) {
-					logger.debug('Session expired')
+					l.debug('Session expired')
 					// Request update of token
 					this.authorized = null
 				}
@@ -286,7 +286,7 @@ export class NetSchoolApi {
 					}\nКод ошибки сервера: ${status}`,
 					{ cacheGuide: true }
 				)
-				logger.error(error + ' Auth: ' + !!init.auth)
+				l.error(error, 'URL:', url, 'Request:', init)
 				throw error
 			}
 
@@ -302,7 +302,7 @@ export class NetSchoolApi {
 					error instanceof NetSchoolError && error.beforeAuth
 						? ''
 						: 'error: ' + error
-				logger.debug('using cache for', url.replace(this.origin, ''), errText)
+				l.debug('Using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
@@ -317,6 +317,7 @@ export class NetSchoolApi {
 		401: 'Недостаточно прав или ошибка авторизации.',
 		404: 'Дневник обновился или указан неправильный путь запроса. Сообщите об ошибке разработчику',
 
+		500: 'Ошибка на стороне сервера дневника. Возможно, неправильный запрос',
 		503: 'Сервер дневника недоступен, технические работы.',
 
 		HowToCache:
@@ -433,33 +434,34 @@ export class NetSchoolApi {
 	}
 
 	public async totals({ studentId, schoolYearId }: StudentAndYear) {
-		return (
-			await this.get<Total[]>(ROUTES.totals, {
-				params: {
-					studentId,
-					schoolYearId,
-				},
-			})
-		).map(total => {
-			total.termTotals = total.termTotals.sort(
-				(a, b) => parseInt(a.term.name) - parseInt(b.term.name)
-			)
+		const totals: Total[] = await this.get<Total[]>(ROUTES.totals, {
+			params: {
+				studentId,
+				schoolYearId,
+			},
+		})
+		return totals.map(total => {
+			runInAction(() => {
+				total.termTotals = total.termTotals.sort(
+					(a, b) => parseInt(a.term.name) - parseInt(b.term.name)
+				)
 
-			if (total.termTotals.length < 4) {
-				total.termTotals.length = 4
-				for (const [i, term] of total.termTotals.entries()) {
-					total.termTotals[i] = term ?? {
-						avgMark: null,
-						mark: null,
-						term: { id: 0, name: '0' },
+				if (total.termTotals.length < 4) {
+					total.termTotals.length = 4
+					for (const [i, term] of total.termTotals.entries()) {
+						total.termTotals[i] = term ?? {
+							avgMark: null,
+							mark: null,
+							term: { id: 0, name: '0' },
+						}
 					}
 				}
-			}
 
-			const visitedIds = new Set<number>()
-			total.yearTotals = total.yearTotals.filter(e =>
-				visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id)
-			)
+				const visitedIds = new Set<number>()
+				total.yearTotals = total.yearTotals.filter(e =>
+					visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id)
+				)
+			})
 
 			return total
 		})

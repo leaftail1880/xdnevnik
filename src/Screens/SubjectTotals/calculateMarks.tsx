@@ -1,5 +1,5 @@
 import { SubjectPerformance } from '../../NetSchool/classes'
-import { logger } from '../../Setup/constants'
+import { l } from '../../Setup/constants'
 import type { MarkInfo } from '../Totals'
 
 export function calculateMarks({
@@ -76,6 +76,6 @@ export function calculateMarks({
 		return { avgMark, totalsAndSheduledTotals, maxWeight, minWeight }
 	} catch (e) {
 		if (!(e + '').includes('TypeError: Cannot convert null value to object'))
-			logger.error('calcMarks', e)
+			l.error('calcMarks', e)
 	}
 }

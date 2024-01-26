@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { StyleProp, ViewStyle } from 'react-native'
+import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 import { Colors, Text, TextField, TextProps } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Subject } from '../NetSchool/classes'
@@ -41,7 +41,9 @@ type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
 	iconsSize: number
 } & SubjectNameOptions &
-	Omit<TextProps, 'textAlign'>
+	Omit<TextProps, 'textAlign' | 'style'> & {
+		style: Omit<TextStyle, 'color'> & { color: ColorValue }
+	}
 
 export const SubjectName = observer(function SubjectName({
 	viewStyle,
@@ -73,39 +75,43 @@ export const SubjectName = observer(function SubjectName({
 					placeholder="Тот же, что и в сетевом городе"
 				/>
 			)}
-			<IconButton
-				padding-0
-				marginL-s2
-				icon={isEditing ? 'save-sharp' : 'pencil'}
-				style={props.style}
-				size={props.iconsSize}
-				onPress={() => {
-					if (isEditing) {
-						runInAction(() => {
-							Settings.studentOverrides[studentId] ??= {
-								subjectNames: {},
-								subjects: {},
-							}
-							Settings.studentOverrides[studentId]!.subjectNames[
-								props.subjectId
-							] = newName ? newName : undefined
-						})
-					}
-					setIsEditing(!isEditing)
-				}}
-			/>
-			{isEditing && (
+
+			<View row marginR-s3>
 				<IconButton
 					marginL-s2
-					onPress={() => {
-						setNewName('')
-						setIsEditing(false)
-					}}
-					icon="arrow-undo"
-					size={props.iconsSize}
+					padding-0
+					icon={isEditing ? 'save-sharp' : 'pencil'}
 					style={props.style}
+					size={props.iconsSize}
+					onPress={() => {
+						if (isEditing) {
+							runInAction(() => {
+								Settings.studentOverrides[studentId] ??= {
+									subjectNames: {},
+									subjects: {},
+								}
+								Settings.studentOverrides[studentId]!.subjectNames[
+									props.subjectId
+								] = newName ? newName : undefined
+							})
+						}
+						setIsEditing(!isEditing)
+					}}
 				/>
-			)}
+				{isEditing && (
+					<IconButton
+						marginL-s1
+						padding-0
+						onPress={() => {
+							setNewName('')
+							setIsEditing(false)
+						}}
+						icon="arrow-undo"
+						size={props.iconsSize}
+						style={props.style}
+					/>
+				)}
+			</View>
 		</View>
 	)
 })

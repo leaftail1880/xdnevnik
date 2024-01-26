@@ -10,6 +10,7 @@
 		"module": "ESNext",
 		"noEmit": true,
 		"noImplicitAny": true,
+		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"target": "ESNext"

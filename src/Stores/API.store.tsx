@@ -10,7 +10,7 @@ import { RefreshControl } from 'react-native'
 import { ErrorHandler } from '../Components/ErrorHandler'
 import { Loading } from '../Components/Loading'
 import { API, API as NSApi, NetSchoolError } from '../NetSchool/api'
-import { logger } from '../Setup/constants'
+import { l } from '../Setup/constants'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type APIMethod = (arg: Record<string, any>) => Promise<any>
@@ -46,8 +46,7 @@ export function createApiMethodStore<
 	APIMethodName extends keyof FunctionsFromObject<typeof API>,
 	Fn = FunctionsFromObject<typeof API>[APIMethodName],
 	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
-	FnParams = Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
-	DefaultParams extends Partial<FnParams> = object
+	DefaultParams = Record<string, never>
 >(
 	method: APIMethodName,
 	name: string,
@@ -59,7 +58,6 @@ export function createApiMethodStore<
 		API,
 		method,
 		name,
-		// @ts-expect-error Uh huh
 		defaultParams,
 		additionalDeps,
 		debug
@@ -74,11 +72,10 @@ export class APIStore<
 	Fn = FunctionsFromObject<APISource>[APIMethodName],
 	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
 	FnParams = Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
-	DefaultParams extends Partial<FnParams> = object
+	DefaultParams = Record<string, never>
 > {
 	log(...data: unknown[]) {
-		if (this.debug)
-			logger.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
+		if (this.debug) l.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
 	}
 	constructor(
 		// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -94,7 +91,7 @@ export class APIStore<
 		public debug = false
 	) {
 		// Initial run
-		logger.debug('API store created для ' + this.name)
+		this.log('API store created')
 
 		makeAutoObservable<
 			this,
@@ -136,8 +133,7 @@ export class APIStore<
 		const store = this
 
 		// Reload on reload request
-		autorun(function apiStoreReload(r) {
-			if (store.debug) r.trace(false)
+		autorun(function apiStoreReload() {
 			store.update(toJS(store.params))
 		})
 
@@ -149,6 +145,7 @@ export class APIStore<
 
 	private reload() {
 		this.log('RELOADING ДЛЯ ' + this.name)
+		if (!this.params) return
 		this.reloadTimes++
 		this.update(this.params)
 	}
@@ -200,12 +197,17 @@ export class APIStore<
 	}
 
 	private *update(params: FnParams | undefined) {
-		this.log('Request update')
+		this.log(
+			'Request update, params:',
+			params,
+			'default params:',
+			this.defaultParams
+		)
 
 		// Something wrong with types
 		const request = this.API[this.method]
 		if (typeof request !== 'function') {
-			logger.warn(
+			l.warn(
 				'Method ' +
 					(typeof this.method === 'symbol'
 						? 'Symbol::' + this.method.description
@@ -242,7 +244,7 @@ export class APIStore<
 			const canIgnore = error instanceof NetSchoolError && error.canIgnore
 
 			if (!canIgnore) {
-				logger.error(
+				l.error(
 					'Failed to update для',
 					this.name,
 					error instanceof Error ? error.stack : error

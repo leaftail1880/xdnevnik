@@ -1,20 +1,13 @@
 import { makeAutoObservable } from 'mobx'
-import { LANG, logger } from '../../Setup/constants'
+import { LANG, l } from '../../Setup/constants'
 import { makeReloadPersistable } from '../../Stores/makePersistable'
 
-logger.debug('Creating diary state store')
+l.debug('Creating diary state store')
 
 export const DiaryStateStore = new (class {
 	constructor() {
 		makeAutoObservable<this, 'weekOffset'>(this, { weekOffset: false })
 		makeReloadPersistable(this, { name: 'diary', properties: ['showHomework'] })
-		logger.debug(
-			'WeekDate:',
-			this.weekDate,
-			'toYYYYMMDD',
-			this.weekDate.toYYYYMMDD(),
-			'weekDays'
-		)
 	}
 
 	diaryDay = new Date().toYYYYMMDD()

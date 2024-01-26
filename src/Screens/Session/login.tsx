@@ -9,7 +9,7 @@ import { Button } from '../../Components/Button'
 import { Loading } from '../../Components/Loading'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
-import { logger } from '../../Setup/constants'
+import { l } from '../../Setup/constants'
 import { APIStore } from '../../Stores/API.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 
@@ -132,7 +132,7 @@ export const LoginScreen = observer(function LoginScreen() {
 										5000
 									)
 								} catch (e) {
-									logger.error(e)
+									l.error(e)
 									Alert.alert('Не удалось получить токен авторизации', e)
 									runInAction(() => (LoginStore.loggingIn = true))
 								} finally {

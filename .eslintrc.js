@@ -17,14 +17,26 @@ module.exports = {
 		'react-native',
 		'@typescript-eslint',
 		'mobx',
+		'import',
 	],
 	parser: '@typescript-eslint/parser',
+	settings: {
+		react: { version: 'detect' },
+	},
 	rules: {
 		'no-empty': 'warn',
 		'no-console': 'warn',
 		'prefer-const': 'warn',
 		'react-native/sort-styles': 'off',
 		'react-native/no-inline-styles': 'off',
+		
+		// Disabling allowSyntheticalDefaultExport in tsconfig will cause
+		// untyped components
+		// but when its enabled its easy to shoot your foot by using
+		// import x from 'expo-updates'
+		// bc x will be undefined in the runtime. So we need to manually
+		// warn developer using eslint plugin.
+		'import/default': 'error',
 		'mobx/missing-make-observable': 'off',
 		'@typescript-eslint/no-unused-vars': 'warn',
 		'@typescript-eslint/explicit-member-accessibility': 'off',

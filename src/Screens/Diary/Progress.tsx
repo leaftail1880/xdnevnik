@@ -1,21 +1,35 @@
+import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Colors, ProgressBar, Text, View } from 'react-native-ui-lib'
 import { Lesson, LessonState } from '../../NetSchool/classes'
+
+export const LessonProgressStore = new (class {
+	now = Date.now()
+	currentLesson = 0
+	constructor() {
+		makeAutoObservable(this)
+		setInterval(() => runInAction(() => (this.now = Date.now())), 1000 * 3)
+	}
+})()
 
 export const LessonProgress = observer(function LessonProgress({
 	lesson,
 }: {
 	lesson: Lesson
 }) {
-	const [now, setNow] = useState(Date.now())
+	const { total, beforeStart, beforeEnd, progress, state } = useMemo(
+		() => lesson.minutes(LessonProgressStore.now),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[lesson, LessonProgressStore.now]
+	)
+
 	useEffect(() => {
-		const interval = setInterval(() => setNow(Date.now()), 1000 * 3)
-
-		return () => clearInterval(interval)
-	}, [])
-
-	const { total, beforeStart, beforeEnd, progress, state } = lesson.minutes(now)
+		if (state === LessonState.ended)
+			runInAction(
+				() => (LessonProgressStore.currentLesson = lesson.classmeetingId)
+			)
+	}, [state, lesson.classmeetingId])
 
 	if (state === LessonState.notStarted) {
 		// Do not show time above 15 mins

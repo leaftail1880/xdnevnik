@@ -4,6 +4,7 @@ import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import {
 	mapConsoleTransport,
 	logger as reactNativeLogger,
+	sentryTransport,
 } from 'react-native-logs'
 import { MMKV } from 'react-native-mmkv'
 import {
@@ -38,9 +39,9 @@ configurePersistable({
 type LogFunction = (...args: unknown[]) => void
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const logger = reactNativeLogger.createLogger({
+export const l = reactNativeLogger.createLogger({
 	printLevel: false,
-	transport: mapConsoleTransport,
+	transport: __DEV__ ? mapConsoleTransport : sentryTransport,
 }) as {
 	debug: LogFunction
 	info: LogFunction

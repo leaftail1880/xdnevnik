@@ -1,11 +1,6 @@
 import { createApiMethodStore } from './API.store'
 import { KeyStore } from './Key.store'
 
-export const StudentsStore = createApiMethodStore(
-	'students',
-	'списка учеников',
-	{}
-)
 export const EducationStore = createApiMethodStore(
 	'education',
 	'данных об обучении'
@@ -28,3 +23,10 @@ interface StoreID {
 	studentId: number | undefined
 	subjectId: number
 }
+
+export const StudentsStore = createApiMethodStore(
+	'students',
+	'списка учеников',
+	{}
+)
+
