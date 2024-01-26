@@ -51,7 +51,7 @@ jobs:
         run: yarn install
 
       - name: 🚀 Create update
-        run: eas update --auto --non-interactive
+        run: eas update --auto --non-interactive --channel production
 
       - name: 🚀 Upload Sentry sourcemaps
         run: npx sentry-expo-upload-sourcemaps dist
