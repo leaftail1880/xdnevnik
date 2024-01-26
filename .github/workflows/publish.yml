@@ -85,38 +85,38 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: XDnevnik Dev Client.apk
-  ios:
-    name: EAS Build IOS
-    runs-on: macos-latest
-    needs: [ensure_tokens]
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-    steps:
-      - name: 🏗 Checkout repository
-        uses: actions/checkout@v3
+  # ios:
+  #   name: EAS Build IOS
+  #   runs-on: macos-latest
+  #   needs: [ensure_tokens]
+  #   env:
+  #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  #   steps:
+  #     - name: 🏗 Checkout repository
+  #       uses: actions/checkout@v3
 
-      - name: 🏗 Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-          cache: yarn
+  #     - name: 🏗 Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18.x
+  #         cache: yarn
 
-      - name: 🏗 Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+  #     - name: 🏗 Setup EAS
+  #       uses: expo/expo-github-action@v8
+  #       with:
+  #         eas-version: latest
+  #         token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📦 Install dependencies
-        run: yarn install
+  #     - name: 📦 Install dependencies
+  #       run: yarn install
 
-      - name: 📦 Install sharp cli for image processing
-        run: npm add -g sharp-cli
+  #     - name: 📦 Install sharp cli for image processing
+  #       run: npm add -g sharp-cli
 
-      - name: 📦 Build ipa
-        run: eas build -p ios --non-interactive --output XDnevnik.ipa --local
+  #     - name: 📦 Build ipa
+  #       run: eas build -p ios --non-interactive --output XDnevnik.ipa --local
 
-      - name: 🚀 Upload ipa
-        uses: softprops/action-gh-release@v1
-        with:
-          files: XDnevnik.ipa
+  #     - name: 🚀 Upload ipa
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: XDnevnik.ipa
