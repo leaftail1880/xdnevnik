@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
 import { Colors, Switch, Text, View } from 'react-native-ui-lib'
-import { dropdownStyle } from '../../Components/Dropdown'
+import { dropdownButtonStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
@@ -54,7 +54,7 @@ export const SubjectTotals = observer(function SubjectTotals({
 				spread
 				padding-s2
 				centerV
-				style={[dropdownStyle(), { elevation: 0 }]}
+				style={[dropdownButtonStyle(), { elevation: 0 }]}
 			>
 				<SubjectName
 					subjectName={performance.result.subject.name}

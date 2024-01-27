@@ -1,26 +1,24 @@
 {
 	"compilerOptions": {
-		"strictNullChecks": true,
-		"allowJs": true,
-		"esModuleInterop": false,
 		"jsx": "react-native",
 		"lib": ["DOM", "ESNext"],
-		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "node",
+		"target": "ESNext",
 		"module": "ESNext",
+		"moduleResolution": "node",
+
+		"allowJs": true,
+		"forceConsistentCasingInFileNames": true,
 		"noEmit": true,
-		"noImplicitAny": true,
-		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"target": "ESNext"
+
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+
+		"esModuleInterop": false,
+		"allowSyntheticDefaultImports": true,
+		"skipLibCheck": true
 	},
-	"include": [
-		"App.tsx",
-		"src/*",
-		"src/Setup/date.ts",
-		"src/Setup/constants.ts"
-, "src/Setup/timers.ts", "src/Setup/sentry.ts", "src/Setup/notifications.ts"	],
+	"include": ["App.tsx", "src/*"],
 	"exclude": [
 		"node_modules",
 		"babel.config.js",
@@ -29,5 +27,3 @@
 	],
 	"extends": "expo/tsconfig.base"
 }
-
-

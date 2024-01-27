@@ -1,6 +1,8 @@
 import './src/Setup/date'
 import './src/Setup/sentry'
 
+import { LANG } from './src/Setup/constants'
+
 import {
 	BottomTabBar,
 	createBottomTabNavigator,
@@ -24,9 +26,8 @@ import { API } from './src/NetSchool/api'
 import { DiaryScreen } from './src/Screens/Diary'
 import { LoginScreen } from './src/Screens/Session/login'
 import { LogoutScreen } from './src/Screens/Session/logout'
-import { SettingsScreen } from './src/Screens/Settings'
+import { SettingsScreen } from './src/Screens/Settings/index'
 import { TotalsNavigation } from './src/Screens/Totals'
-import { LANG } from './src/Setup/constants'
 import './src/Setup/notifications'
 import { StudentsStore } from './src/Stores/API.stores'
 import { Theme } from './src/Stores/Theme.store'
@@ -106,7 +107,10 @@ export default Sentry.wrap(
 						{() => Fallback || <TotalsNavigation />}
 					</Tab.Screen>
 
-					<Tab.Screen name={LANG['s_settings']}>
+					<Tab.Screen
+						name={LANG['s_settings']}
+						options={{ headerShown: false }}
+					>
 						{() => {
 							const Render = gestureHandlerRootHOC(SettingsScreen)
 							return <Render />

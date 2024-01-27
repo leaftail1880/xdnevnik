@@ -1,8 +1,6 @@
 import { makeAutoObservable } from 'mobx'
-import { LANG, l } from '../../Setup/constants'
+import { LANG } from '../../Setup/constants'
 import { makeReloadPersistable } from '../../Stores/makePersistable'
-
-l.debug('Creating diary state store')
 
 export const DiaryStateStore = new (class {
 	constructor() {

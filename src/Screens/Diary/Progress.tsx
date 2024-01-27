@@ -25,10 +25,13 @@ export const LessonProgress = observer(function LessonProgress({
 	)
 
 	useEffect(() => {
-		if (state === LessonState.ended)
+		if (state === LessonState.going)
 			runInAction(
 				() => (LessonProgressStore.currentLesson = lesson.classmeetingId)
 			)
+		else if (LessonProgressStore.currentLesson === lesson.classmeetingId) {
+			runInAction(() => (LessonProgressStore.currentLesson = 0))
+		}
 	}, [state, lesson.classmeetingId])
 
 	if (state === LessonState.notStarted) {
