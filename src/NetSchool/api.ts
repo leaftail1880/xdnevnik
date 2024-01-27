@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { URL, URLSearchParams } from 'react-native-url-polyfill'
-import { l } from '../Setup/constants'
+import { Logger } from '../Setup/constants'
 import { makeReloadPersistable } from '../Stores/makePersistable'
 import {
 	Assignment,
@@ -173,7 +173,7 @@ export class NetSchoolApi {
 		form: Record<string, string>,
 		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
 	) {
-		l.debug({
+		Logger.debug({
 			expires: this.session?.expires.toReadable(),
 			today: new Date().toReadable(),
 			form,
@@ -184,7 +184,7 @@ export class NetSchoolApi {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		})
 
-		l.debug({ status: response.status })
+		Logger.debug({ status: response.status })
 		if (response.status === 400) {
 			throw new NetSchoolError(error400)
 		}
@@ -249,7 +249,7 @@ export class NetSchoolApi {
 		try {
 			if (init.auth) {
 				if (this.session && this.session.expires.getTime() < Date.now()) {
-					l.debug('Session expired')
+					Logger.debug('Session expired')
 					// Request update of token
 					this.authorized = null
 				}
@@ -286,7 +286,7 @@ export class NetSchoolApi {
 					}\nКод ошибки сервера: ${status}`,
 					{ cacheGuide: true }
 				)
-				l.error(error, 'URL:', url, 'Request:', init)
+				Logger.error(error, 'URL:', url, 'Request:', init)
 				throw error
 			}
 
@@ -302,7 +302,7 @@ export class NetSchoolApi {
 					error instanceof NetSchoolError && error.beforeAuth
 						? ''
 						: 'error: ' + error
-				l.debug('Using cache for', url.replace(this.origin, ''), errText)
+				Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(

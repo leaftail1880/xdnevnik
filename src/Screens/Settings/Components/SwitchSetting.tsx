@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Switch } from 'react-native-ui-lib'
-import { l } from '../../../Setup/constants'
+import { Logger } from '../../../Setup/constants'
 import { Settings } from '../../../Stores/Settings.store'
 import { SettingsText } from './Base'
 import { SettingsButton, SettingsButtonProps } from './SettingsButton'
@@ -21,7 +21,7 @@ export const SwitchSetting = observer(function SwitchSetting(
 ) {
 	const setting = 'setting' in props && props.setting
 	if (typeof setting === 'boolean') {
-		l.warn(`SwutchSetting.setting type cannot be boolean!`)
+		Logger.warn(`SwutchSetting.setting type cannot be boolean!`)
 		return false
 	}
 	return (

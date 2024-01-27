@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ColorPicker, Colors } from 'react-native-ui-lib'
-import { ACCENT_COLOR, l } from '../../../Setup/constants'
+import { ACCENT_COLOR, Logger } from '../../../Setup/constants'
 import { Theme } from '../../../Stores/Theme.store'
 import { makeReloadPersistable } from '../../../Stores/makePersistable'
 
@@ -20,7 +20,7 @@ const AccentColorPickerState = new (class {
 			Theme.setAccentColor(accentColor)
 			this.expires = Date.now() + 5000
 		} else {
-			l.debug('Timeout!')
+			Logger.debug('Timeout!')
 		}
 	}
 	onSubmit(accentColor: string) {

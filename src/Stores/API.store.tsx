@@ -10,7 +10,7 @@ import { RefreshControl } from 'react-native'
 import { ErrorHandler } from '../Components/ErrorHandler'
 import { Loading } from '../Components/Loading'
 import { API, API as NSApi, NetSchoolError } from '../NetSchool/api'
-import { l } from '../Setup/constants'
+import { Logger } from '../Setup/constants'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type APIMethod = (arg: Record<string, any>) => Promise<any>
@@ -73,7 +73,8 @@ export class APIStore<
 	DefaultParams = Record<string, never>
 > {
 	log(...data: unknown[]) {
-		if (this.debug) l.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
+		if (this.debug)
+			Logger.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
 	}
 	constructor(
 		// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -205,7 +206,7 @@ export class APIStore<
 		// Something wrong with types
 		const request = this.API[this.method]
 		if (typeof request !== 'function') {
-			l.warn(
+			Logger.warn(
 				'Method ' +
 					(typeof this.method === 'symbol'
 						? 'Symbol::' + this.method.description
@@ -242,7 +243,7 @@ export class APIStore<
 			const canIgnore = error instanceof NetSchoolError && error.canIgnore
 
 			if (!canIgnore) {
-				l.error(
+				Logger.error(
 					'Failed to update для',
 					this.name,
 					error instanceof Error ? error.stack : error

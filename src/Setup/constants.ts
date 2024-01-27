@@ -1,30 +1,26 @@
-import { configure } from 'mobx'
+import { configure as configureMobx } from 'mobx'
 import { configurePersistable } from 'mobx-persist-store'
-import { LogBox, StyleProp, StyleSheet, ViewStyle } from 'react-native'
-import {
-	mapConsoleTransport,
-	logger as reactNativeLogger,
-	sentryTransport,
-} from 'react-native-logs'
+import { LogBox, StyleSheet } from 'react-native'
+import { logger, mapConsoleTransport } from 'react-native-logs'
 import { MMKV } from 'react-native-mmkv'
 import {
 	Colors,
-	ContainerModifiers,
-	Spacings,
 	TextFieldProps,
 	TextProps,
 	ThemeManager,
 } from 'react-native-ui-lib'
-import { dropdownButtonStyle } from '../Components/Dropdown'
 
-LogBox.ignoreLogs(['new NativeEventEmitter'])
+export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
+	printLevel: false,
+	transport: mapConsoleTransport,
+})
 
-configure({
+LogBox.ignoreLogs([/new NativeEventEmitter/])
+
+configureMobx({
 	enforceActions: 'always',
 	computedRequiresReaction: true,
 	reactionRequiresObservable: true,
-	// observableRequiresReaction: true,
-	// disableErrorBoundaries: true,
 })
 
 const storage = new MMKV()
@@ -38,20 +34,7 @@ configurePersistable({
 	},
 })
 
-type LogFunction = (...args: unknown[]) => void
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const l = reactNativeLogger.createLogger({
-	printLevel: false,
-	transport: __DEV__ ? mapConsoleTransport : sentryTransport,
-}) as {
-	debug: LogFunction
-	info: LogFunction
-	warn: LogFunction
-	error: LogFunction
-}
-
-export const ACCENT_COLOR = '#4d914f'
+export const ACCENT_COLOR = '#578059'
 
 ThemeManager.setComponentTheme('Text', (props: TextProps) => {
 	return {
@@ -132,24 +115,4 @@ export const LANG = {
 	s_settings: 'Настройки',
 	s_subject_totals: 'Итоги по предмету',
 	notification: 'Уведомления',
-	notification_disable: 'Выключить уведомления',
-	notification_enable: 'Включить уведомления',
 } as const
-
-export function settingsButton(): {
-	style: StyleProp<ViewStyle>
-} & ContainerModifiers {
-	return {
-		row: true,
-		spread: true,
-		style: [
-			dropdownButtonStyle(),
-			{
-				margin: 0,
-				padding: Spacings.s3,
-				marginBottom: Spacings.s2,
-				minHeight: 40,
-			},
-		],
-	}
-}

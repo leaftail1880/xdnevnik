@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
 import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
-import { l } from '../../../../Setup/constants'
+import { Logger } from '../../../../Setup/constants'
 import { SettingsButton } from '../../Components/SettingsButton'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
@@ -64,11 +64,11 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 			// 		'XDnevnik всего-лишь скачает один файл в папку Downloads и откроет для Вас проводник чтобы Вы могли обновить XDnevnik и получить новейшие возможности.'
 			// 	)
 		}
-		l.info('App installer opened successfully')
+		Logger.info('App installer opened successfully')
 		return true
 	} catch (error) {
 		Alert.alert('Ошибка', error + '')
-		l.error('Failed to open the app installer', error)
+		Logger.error('Failed to open the app installer', error)
 		return false
 	}
 }
