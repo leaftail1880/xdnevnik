@@ -2,9 +2,10 @@ import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { ScrollView } from 'react-native'
-import { Switch, Text, View } from 'react-native-ui-lib'
+import SelectDropdown from 'react-native-select-dropdown'
+import { Colors, Switch, Text, View } from 'react-native-ui-lib'
 import { TotalsContext } from '.'
-import { Dropdown } from '../../Components/Dropdown'
+import { dropdownButtonStyle, dropdownStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { NSEntity, Subject, Total } from '../../NetSchool/classes'
 import {
@@ -86,11 +87,16 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				refreshControl={totals.refreshControl}
 			>
 				{terms && (
-					<Dropdown
+					<SelectDropdown
 						data={terms}
 						defaultValue={Settings.currentTerm}
 						onSelect={v => Settings.save({ currentTerm: v })}
-						dropdownStyle={{ maxWidth: 110 }}
+						buttonStyle={dropdownButtonStyle()}
+						buttonTextStyle={{ color: Colors.$textAccent }}
+						dropdownStyle={[
+							dropdownStyle(),
+							{ maxWidth: 110, alignSelf: 'center' },
+						]}
 						defaultButtonText={Settings.currentTerm?.name ?? 'Выбери четверть'}
 						buttonTextAfterSelection={i => i?.name ?? 'F'}
 						rowTextForSelection={i => i?.name ?? 'F'}

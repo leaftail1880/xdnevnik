@@ -1,8 +1,9 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
-import { Spacings, Switch, Text, View } from 'react-native-ui-lib'
-import { Dropdown } from '../../Components/Dropdown'
+import SelectDropdown from 'react-native-select-dropdown'
+import { Colors, Spacings, Switch, Text, View } from 'react-native-ui-lib'
+import { dropdownButtonStyle, dropdownStyle } from '../../Components/Dropdown'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
@@ -42,8 +43,13 @@ export const DiaryScreen = observer(function DiaryScreen() {
 
 	return (
 		<View key={themeKey}>
-			<Dropdown
-				dropdownStyle={{ minHeight: 350, borderRadius: 10 }}
+			<SelectDropdown
+				buttonStyle={dropdownButtonStyle()}
+				buttonTextStyle={{ color: Colors.$textAccent }}
+				dropdownStyle={{
+					...dropdownStyle(),
+					minHeight: 350,
+				}}
 				data={weekDaysOptions}
 				defaultButtonText="День недели"
 				buttonTextAfterSelection={i => i.name}

@@ -22,6 +22,9 @@ class ThemeStore {
 	scheme: 'light' | 'dark' | 'system' = 'light'
 	accentColor = ACCENT_COLOR
 	loaded = false
+	get key() {
+		return this.accentColor + this.theme
+	}
 
 	constructor() {
 		makeAutoObservable(this, {

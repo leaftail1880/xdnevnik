@@ -3,6 +3,13 @@ declare global {
 		string,
 		string | object | number | symbol | boolean | undefined
 	>
+
+	/**
+	 * A way to select only accepted type from object
+	 */
+	export type FilterObject<O extends object, V> = {
+		[Key in keyof O as O[Key] extends V ? Key : never]: O[Key]
+	}
 }
 
 export {}

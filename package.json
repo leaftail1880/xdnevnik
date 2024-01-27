@@ -3,17 +3,15 @@
 	"version": "1.0.0",
 	"main": "node_modules/expo/AppEntry.js",
 	"scripts": {
-		"start": "expo start --dev-client",
-		"android": "expo run:android",
-		"ios": "expo run:ios",
+		"start": "yarn expo start --dev-client",
 		"build-dev-client": "eas build -p android --profile development",
 		"build": "eas build -p android"
 	},
 	"dependencies": {
 		"@notifee/react-native": "^7.8.2",
-		"@react-navigation/bottom-tabs": "^6.5.8",
-		"@react-navigation/native": "^6.1.7",
-		"@react-navigation/stack": "^6.3.17",
+		"@react-navigation/bottom-tabs": "^6.5.11",
+		"@react-navigation/native": "^6.1.9",
+		"@react-navigation/stack": "^6.3.20",
 		"@sentry/react-native": "5.17.0",
 		"expo": "~50.0.3",
 		"expo-application": "~5.8.3",
@@ -31,38 +29,39 @@
 		"react": "18.2.0",
 		"react-native": "0.73.2",
 		"react-native-background-timer": "^2.4.1",
-		"react-native-gesture-handler": "~2.14.0",
+		"react-native-gesture-handler": "~2.14.1",
 		"react-native-logs": "^5.0.1",
 		"react-native-mmkv": "^2.11.0",
-		"react-native-reanimated": "~3.6.0",
+		"react-native-reanimated": "~3.6.2",
 		"react-native-safe-area-context": "4.8.2",
 		"react-native-screens": "~3.29.0",
-		"react-native-select-dropdown": "^3.4.0",
+		"react-native-select-dropdown": "patch:react-native-select-dropdown@patch%3Areact-native-select-dropdown@patch%253Areact-native-select-dropdown@npm%25253A3.4.0%2523~/.yarn/patches/react-native-select-dropdown-npm-3.4.0-3567283796.patch%253A%253Aversion=3.4.0&hash=ea6684%23~/.yarn/patches/react-native-select-dropdown-patch-108765e425.patch%3A%3Aversion=3.4.0&hash=cb9e21#~/.yarn/patches/react-native-select-dropdown-patch-744b8d9ea4.patch",
 		"react-native-ui-lib": "^7.15.0",
 		"react-native-url-polyfill": "^2.0.0",
-		"react-native-vector-icons": "^10.0.0",
+		"react-native-vector-icons": "^10.0.3",
 		"react-native-webview": "13.6.4"
 	},
 	"devDependencies": {
-		"eslint-plugin-import": "^2.29.1",
-		"@babel/core": "^7.20.0",
+		"@babel/core": "^7.23.9",
 		"@types/lodash": "^4.14.202",
-		"@types/react": "~18.2.14",
+		"@types/react": "~18.2.48",
 		"@types/react-native-background-timer": "^2.0.2",
-		"@types/react-native-vector-icons": "^6.4.14",
-		"@typescript-eslint/eslint-plugin": "^6.4.0",
-		"@typescript-eslint/parser": "^6.7.5",
-		"eslint": "^8.0.1",
-		"eslint-config-prettier": "^9.0.0",
+		"@types/react-native-vector-icons": "^6.4.18",
+		"@typescript-eslint/eslint-plugin": "^6.19.1",
+		"@typescript-eslint/parser": "^6.19.1",
+		"eslint": "^8.56.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-import": "^2.29.1",
 		"eslint-plugin-mobx": "^0.0.9",
 		"eslint-plugin-react": "^7.33.2",
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"eslint-plugin-react-native": "^4.1.0",
 		"expo-build-properties": "~0.11.0",
-		"typescript": "5.x"
+		"typescript": "^5.3.3"
 	},
+	"private": true,
+	"packageManager": "yarn@4.0.2",
 	"resolutions": {
-		"react-native/**/@babel/preset-env": "^7.23.3"
-	},
-	"private": true
+		"@react-native-community/cli-server-api@npm:12.3.0": "patch:@react-native-community/cli-server-api@npm%3A12.3.0#~/.yarn/patches/@react-native-community-cli-server-api-npm-12.3.0-7465574591.patch"
+	}
 }

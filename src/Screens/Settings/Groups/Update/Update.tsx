@@ -5,11 +5,11 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 // import * as Permissions from 'expo-permissions'
 import * as ExpoSharing from 'expo-sharing'
 import { useState } from 'react'
-import { Alert } from 'react-native'
+import { Alert, ScrollView } from 'react-native'
 import { Colors, Text } from 'react-native-ui-lib'
-import { Button } from '../../Components/Button'
-import { getLatestGithubReleaseUrl } from '../../GithubUpdate/update'
-import { l, settingsButton } from '../../Setup/constants'
+import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
+import { l } from '../../../../Setup/constants'
+import { SettingsButton } from '../../Components/SettingsButton'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {
@@ -77,8 +77,7 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 export const UpdatesButton = function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
-		<Button
-			{...settingsButton()}
+		<SettingsButton
 			onPress={async () => {
 				try {
 					setProgress('Получение списка версий...')
@@ -120,6 +119,19 @@ export const UpdatesButton = function UpdatesButton() {
 			<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
 				{progress ?? 'Проверить обновления'}
 			</Text>
-		</Button>
+		</SettingsButton>
+	)
+}
+
+// eslint-disable-next-line mobx/missing-observer
+export const UpdatesScreen = function UpdatesScreen() {
+	return (
+		<ScrollView
+			contentContainerStyle={{
+				flex: 1,
+				alignContent: 'flex-start',
+				justifyContent: 'flex-start',
+			}}
+		></ScrollView>
 	)
 }

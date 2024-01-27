@@ -1,0 +1,13 @@
+diff --git a/build/statusPageMiddleware.js b/build/statusPageMiddleware.js
+index 56a3c576cfbba5c83e9a83a364994c6d3b0f910a..2a711da85a912958e0ba84b7ea3774e91406a15c 100644
+--- a/build/statusPageMiddleware.js
++++ b/build/statusPageMiddleware.js
+@@ -16,7 +16,7 @@ exports.default = statusPageMiddleware;
+  * running on 8081 and not another program / service.
+  */
+ function statusPageMiddleware(_req, res) {
+-  res.setHeader('X-React-Native-Project-Root', process.cwd());
++  res.setHeader('X-React-Native-Project-Root', ' C:/Users/User/Documents/xdnevnik');
+   res.end('packager-status:running');
+ }
+ 

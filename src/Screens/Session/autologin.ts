@@ -1,15 +1,9 @@
-import { autorun, makeAutoObservable, runInAction } from 'mobx'
+import { autorun, runInAction } from 'mobx'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 
-export const AUTOLOGIN = new (class {
-	requestSent = false
-
-	constructor() {
-		makeAutoObservable(this)
-	}
-})()
+let requestSent = false
 
 autorun(function autologin() {
 	// Not loaded
@@ -19,7 +13,7 @@ autorun(function autologin() {
 	if (API.authorized) return
 
 	// Already sent auth req
-	if (AUTOLOGIN.requestSent) return
+	if (requestSent) return
 
 	// Session is still active
 	if (API.session.expires.getTime() > Date.now()) {
@@ -29,7 +23,7 @@ autorun(function autologin() {
 		return
 	}
 
-	runInAction(() => (AUTOLOGIN.requestSent = true))
+	requestSent = true
 	API.getToken(
 		ROUTES.refreshTokenTemplate(API.session.refresh_token),
 		'Ошибка при авторизации, перезайдите.'
@@ -42,7 +36,7 @@ autorun(function autologin() {
 				setTimeout(
 					() =>
 						runInAction(() => {
-							AUTOLOGIN.requestSent = false
+							requestSent = false
 							XDnevnik.status = undefined
 						}),
 					5000
@@ -51,7 +45,7 @@ autorun(function autologin() {
 		})
 		.catch(e => {
 			runInAction(() => {
-				AUTOLOGIN.requestSent = false
+				requestSent = false
 				XDnevnik.status = {
 					content: NetSchoolApi.stringifyError(e),
 					error: true,

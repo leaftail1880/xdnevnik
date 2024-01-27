@@ -1,6 +1,6 @@
 import { configure } from 'mobx'
 import { configurePersistable } from 'mobx-persist-store'
-import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import { LogBox, StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import {
 	mapConsoleTransport,
 	logger as reactNativeLogger,
@@ -15,7 +15,9 @@ import {
 	TextProps,
 	ThemeManager,
 } from 'react-native-ui-lib'
-import { dropdownStyle } from '../Components/Dropdown'
+import { dropdownButtonStyle } from '../Components/Dropdown'
+
+LogBox.ignoreLogs(['new NativeEventEmitter'])
 
 configure({
 	enforceActions: 'always',
@@ -141,7 +143,7 @@ export function settingsButton(): {
 		row: true,
 		spread: true,
 		style: [
-			dropdownStyle(),
+			dropdownButtonStyle(),
 			{
 				margin: 0,
 				padding: Spacings.s3,

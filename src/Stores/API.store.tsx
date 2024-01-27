@@ -18,9 +18,7 @@ type APIMethod = (arg: Record<string, any>) => Promise<any>
 /**
  * A way to select only accepted api methods
  */
-type FunctionsFromObject<O> = {
-	[Key in keyof O]: O[Key] extends APIMethod ? O[Key] : never
-}
+type FunctionsFromObject<O extends object> = FilterObject<O, APIMethod>
 
 /**
  * Return type of the useAPI hook
@@ -126,7 +124,7 @@ export class APIStore<
 				method: false,
 				API: false,
 			},
-			{ autoBind: true }
+			{ autoBind: true, name: this.name }
 		)
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
