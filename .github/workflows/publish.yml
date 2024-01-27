@@ -41,14 +41,14 @@ jobs:
           distribution: 'temurin'
           architecture: x64
 
+      - name: Enable corepack
+        run: corepack enable
+  
       - name: 🏗 Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: yarn
-
-      - name: 🏗 Enable corepack
-        run: corepack enable
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
