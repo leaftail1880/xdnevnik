@@ -12,6 +12,7 @@ import { DropdownSettingsButton } from '../Components/DropdownSettingsButton'
 import { SwitchSetting } from '../Components/SwitchSetting'
 import { AccentColorPicker } from './AccentColorPicker'
 import { UpdatesButton } from './Update/Update'
+import * as updates from 'expo-updates'
 
 const themes = [
 	{ name: 'Системная', i: 'system' as const },
@@ -77,7 +78,7 @@ export const MainSettings = observer(function MainSettings() {
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
-				<Text>Версия сборки: {Application.nativeBuildVersion}</Text>
+				<Text>Версия сборки: {updates.updateId}</Text>
 				<Text key={Theme.key}>{LANG['made_by']}</Text>
 			</View>
 			{/* <ScrollView>
