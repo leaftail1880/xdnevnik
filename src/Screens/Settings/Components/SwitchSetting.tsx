@@ -24,16 +24,22 @@ export const SwitchSetting = observer(function SwitchSetting(
 		Logger.warn(`SwutchSetting.setting type cannot be boolean!`)
 		return false
 	}
+	const onChange = (v: boolean): void => {
+		if (setting) {
+			Settings.save({ [setting]: v })
+			// @ts-expect-error Look at check above
+		} else props.onChange(v)
+	}
 	return (
-		<SettingsButton {...props}>
+		<SettingsButton
+			{...props}
+			br10
+			onPress={() => onChange(!Settings[setting])}
+		>
 			<SettingsText>{props.label}</SettingsText>
 			<Switch
 				value={'setting' in props ? Settings[setting] : props.value}
-				onValueChange={v => {
-					if ('setting' in props) {
-						Settings.save({ [setting]: v })
-					} else props.onChange(v)
-				}}
+				onValueChange={onChange}
 			/>
 		</SettingsButton>
 	)

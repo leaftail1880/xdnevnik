@@ -5,7 +5,8 @@
 	"scripts": {
 		"start": "yarn expo start --dev-client",
 		"build-dev-client": "eas build -p android --profile development",
-		"build": "eas build -p android"
+		"build": "eas build -p android",
+		"update": "eas update --channel production --auto"
 	},
 	"dependencies": {
 		"@notifee/react-native": "^7.8.2",

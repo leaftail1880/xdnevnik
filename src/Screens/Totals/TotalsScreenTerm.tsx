@@ -15,6 +15,7 @@ import {
 	TotalsStore,
 } from '../../Stores/API.stores'
 import { Settings } from '../../Stores/Settings.store'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { SubjectPerformanceInline } from './SubjectPerformanceInline'
 
@@ -72,6 +73,7 @@ autorun(function loadSelectedTerm() {
 export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	navigation,
 }: TotalsContext) {
+	Theme.key
 	const totals = TotalsStore
 	const subjects = SubjectsStore
 	const education = EducationStore
@@ -92,7 +94,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 						defaultValue={Settings.currentTerm}
 						onSelect={v => Settings.save({ currentTerm: v })}
 						buttonStyle={dropdownButtonStyle()}
-						buttonTextStyle={{ color: Colors.$textAccent }}
+						buttonTextStyle={{ color: Colors.$textPrimary }}
 						dropdownStyle={[
 							dropdownStyle(),
 							{ maxWidth: 110, alignSelf: 'center' },
@@ -104,21 +106,27 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				)}
 				<View flex style={{ width: '90%' }}>
 					<View flex row spread padding-s1>
-						<Text margin-s1>Сначала плохие оценки</Text>
+						<Text margin-s1 key={Theme.key}>
+							Сначала плохие оценки
+						</Text>
 						<Switch
 							margin-s1
 							onValueChange={(a: boolean) =>
 								runInAction(() => (TermStore.sort = a))
 							}
 							value={TermStore.sort}
+							key={Theme.key + 's'}
 						/>
 					</View>
 					<View flex row spread padding-s1>
-						<Text margin-s1>Пропуски</Text>
+						<Text margin-s1 key={Theme.key}>
+							Пропуски
+						</Text>
 						<Switch
 							margin-s1
 							onValueChange={setAttendance}
 							value={attendance}
+							key={Theme.key + 's'}
 						/>
 					</View>
 				</View>

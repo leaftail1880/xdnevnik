@@ -78,6 +78,7 @@ export const UpdatesButton = function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<SettingsButton
+			br10
 			onPress={async () => {
 				try {
 					setProgress('Получение списка версий...')

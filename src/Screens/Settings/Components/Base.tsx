@@ -1,17 +1,10 @@
 import { Falsy, ViewStyle } from 'react-native'
-import {
-	BorderRadiuses,
-	Colors,
-	Spacings,
-	Text,
-	TextProps,
-} from 'react-native-ui-lib'
+import { Colors, Spacings, Text, TextProps } from 'react-native-ui-lib'
 
 export function settingsButtonStyle(): ViewStyle {
 	return {
 		width: '100%',
 		backgroundColor: Colors.rgba(Colors.$backgroundPrimaryMedium, 0.5),
-		borderRadius: BorderRadiuses.br40,
 		padding: Spacings.s3,
 		marginBottom: Spacings.s1,
 	}

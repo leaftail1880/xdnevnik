@@ -49,12 +49,15 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 								{function headerSwitch() {
 									return (
 										<View flex row spread center padding-s1>
-											<Text marginR-s2>Только одна четверть</Text>
+											<Text marginR-s2 key={Theme.key}>
+												Только одна четверть
+											</Text>
 											<Switch
 												value={Settings.currentTotalsOnly}
 												onValueChange={(currentTotalsOnly: boolean) =>
 													Settings.save({ currentTotalsOnly })
 												}
+												key={Theme.key + 's'}
 											/>
 										</View>
 									)

@@ -45,7 +45,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 		<View key={themeKey}>
 			<SelectDropdown
 				buttonStyle={dropdownButtonStyle()}
-				buttonTextStyle={{ color: Colors.$textAccent }}
+				buttonTextStyle={{ color: Colors.$textPrimary }}
 				dropdownStyle={{
 					...dropdownStyle(),
 					minHeight: 350,

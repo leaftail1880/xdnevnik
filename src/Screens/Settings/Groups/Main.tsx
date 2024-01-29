@@ -1,4 +1,5 @@
 import * as Application from 'expo-application'
+import * as updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
@@ -12,7 +13,6 @@ import { DropdownSettingsButton } from '../Components/DropdownSettingsButton'
 import { SwitchSetting } from '../Components/SwitchSetting'
 import { AccentColorPicker } from './AccentColorPicker'
 import { UpdatesButton } from './Update/Update'
-import * as updates from 'expo-updates'
 
 const themes = [
 	{ name: 'Системная', i: 'system' as const },
@@ -35,6 +35,7 @@ export const MainSettings = observer(function MainSettings() {
 				justifyContent: 'flex-start',
 			}}
 		>
+			<View margin-s1></View>
 			{API.session ? (
 				students.fallback || (
 					<DropdownSettingsButton
@@ -59,7 +60,11 @@ export const MainSettings = observer(function MainSettings() {
 				onSelect={s => Theme.setColorScheme(s.i)}
 				selectionText={i => i?.name}
 			/>
-			<SwitchSetting label={'Уведомления'} setting="notifications" />
+			<SwitchSetting
+				label={'Уведомления'}
+				setting="notifications"
+				key={Theme.key}
+			/>
 			<DropdownSettingsButton
 				data={markStyles}
 				defaultValueByIndex={markStyles.findIndex(

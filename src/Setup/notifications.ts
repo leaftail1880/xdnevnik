@@ -206,10 +206,10 @@ autorun(function notificationFromDiary() {
 
 			body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 			if (state === LessonState.notStarted) {
+				body += `До начала ${beforeStart} мин `
 				if (period) body += `Перемена ${period.getMinutes()} мин.`
-				body += `До начала ${beforeStart} мин`
 			} else if (state === LessonState.going) {
-				body += `${beforeEnd}/${total} мин`
+				body += `Прошло ${beforeEnd}/${total} мин`
 			}
 
 			const id = await notifee.displayNotification({

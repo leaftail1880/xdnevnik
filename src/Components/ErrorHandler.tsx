@@ -19,6 +19,7 @@ export const ErrorHandler = function ErrorHandler({
 }: ErrorHandlerProps) {
 	const [more, setMore] = useState<boolean>(false)
 	const errorString = NetSchoolApi.stringifyError(error[1])
+	const needAuth = error[1] instanceof NetSchoolError && error[1].beforeAuth
 	return (
 		<View
 			flex
@@ -33,9 +34,7 @@ export const ErrorHandler = function ErrorHandler({
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
 			<Text>При загрузке {name}</Text>
-			{error[1] instanceof NetSchoolError && error[1].beforeAuth && (
-				<Text>Авторизуйтесь!</Text>
-			)}
+			{needAuth && <Text>Авторизуйтесь!</Text>}
 			{errorString === NetSchoolApi.noConnection && (
 				<Text>Вы не в сети, сетевая ошибка!</Text>
 			)}
@@ -53,15 +52,17 @@ export const ErrorHandler = function ErrorHandler({
 						style={{ paddingLeft: Spacings.s1 }}
 					/>
 				</Button>
-				<Button
-					onPress={() => {
-						Sentry.captureException(error)
-					}}
-					margin-s1
-					padding-s2
-				>
-					<Text $textDefault>{'Отправить отчет об ошибке разработчику'}</Text>
-				</Button>
+				{!needAuth && (
+					<Button
+						onPress={() => {
+							Sentry.captureException(error)
+						}}
+						margin-s1
+						padding-s2
+					>
+						<Text $textDefault>{'Отправить отчет об ошибке разработчику'}</Text>
+					</Button>
+				)}
 			</View>
 		</View>
 	)

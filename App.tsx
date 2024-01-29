@@ -17,7 +17,6 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { TouchableOpacity, View } from 'react-native'
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
 import { Colors, LoaderScreen } from 'react-native-ui-lib'
 import { Ionicon } from './src/Components/Icon'
 import { Loading } from './src/Components/Loading'
@@ -111,10 +110,11 @@ export default Sentry.wrap(
 						name={LANG['s_settings']}
 						options={{ headerShown: false }}
 					>
-						{() => {
+						{/* {() => {
 							const Render = gestureHandlerRootHOC(SettingsScreen)
 							return <Render />
-						}}
+						}} */}
+						{() => <SettingsScreen />}
 					</Tab.Screen>
 
 					{API.session && (

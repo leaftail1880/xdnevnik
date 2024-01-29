@@ -5,6 +5,7 @@ import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { Total } from '../../NetSchool/classes'
 import { SubjectPerformanceStores } from '../../Stores/API.stores'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { calculateMarks } from '../SubjectTotals/calculateMarks'
 import { SubjectInfo } from './TotalsScreenTerm'
@@ -58,7 +59,7 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 	if (totalsAndSheduledTotals.length === 0)
 		return (
 			<View centerV style={[viewStyle, containerStyle]}>
-				<Text>Оценок нет</Text>
+				<Text key={Theme.key}>Оценок нет</Text>
 			</View>
 		)
 
