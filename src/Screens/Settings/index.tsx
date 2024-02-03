@@ -4,13 +4,17 @@ import { Theme } from '../../Stores/Theme.store'
 import { MainSettings } from './Groups/Main'
 import { UpdatesScreen } from './Groups/Update/Update'
 
-type Routes = Record<'update' | 'main', undefined>
-
-export const SettingsNavigation = createStackNavigator<Routes>()
-const titles: Record<keyof Routes, string> = {
+const titles = {
 	main: 'Настройки ',
 	update: 'Обновления',
+  privacy: "Политика конфиденциальности",
+  terms: ""
+
 }
+
+type Routes = Record<keyof typeof titles, undefined>
+export const SettingsNavigation = createStackNavigator<Routes>()
+
 export const SettingsScreen = observer(function SettingsScreen() {
 	Theme.key
 	return (
