@@ -7,6 +7,7 @@ export function settingsButtonStyle(): ViewStyle {
 		backgroundColor: Colors.rgba(Colors.$backgroundPrimaryMedium, 0.5),
 		padding: Spacings.s3,
 		marginBottom: Spacings.s1,
+		borderRadius: 0,
 	}
 }
 

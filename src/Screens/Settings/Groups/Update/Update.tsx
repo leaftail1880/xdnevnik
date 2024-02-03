@@ -6,9 +6,9 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 import * as ExpoSharing from 'expo-sharing'
 import { useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
-import { Colors, Text } from 'react-native-ui-lib'
 import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
 import { Logger } from '../../../../Setup/constants'
+import { SettingsText } from '../../Components/Base'
 import { SettingsButton } from '../../Components/SettingsButton'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
@@ -117,9 +117,9 @@ export const UpdatesButton = function UpdatesButton() {
 				}
 			}}
 		>
-			<Text style={{ fontSize: 18, color: Colors.$textPrimary }} marginR-s2>
+			<SettingsText marginR-s2>
 				{progress ?? 'Проверить обновления'}
-			</Text>
+			</SettingsText>
 		</SettingsButton>
 	)
 }
@@ -133,6 +133,8 @@ export const UpdatesScreen = function UpdatesScreen() {
 				alignContent: 'flex-start',
 				justifyContent: 'flex-start',
 			}}
-		></ScrollView>
+		>
+			<UpdatesButton></UpdatesButton>
+		</ScrollView>
 	)
 }
