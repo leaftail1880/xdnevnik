@@ -2,7 +2,6 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { View } from 'react-native-ui-lib'
-import { SETTINGS_ROUTES, SettingsRoutes } from '..'
 import { Loading } from '../../../Components/Loading'
 import { API } from '../../../NetSchool/api'
 import { StudentsStore } from '../../../Stores/API.stores'
@@ -12,6 +11,7 @@ import { SettingsText } from '../Components/Base'
 import { DropdownSettingsButton } from '../Components/DropdownSettingsButton'
 import { SettingsButton } from '../Components/SettingsButton'
 import { SwitchSetting } from '../Components/SwitchSetting'
+import { SETTINGS_ROUTES, SettingsRoutes } from '../SettingsNavigation'
 
 export const MainSettings = observer(function MainSettings(
 	props: StackScreenProps<SettingsRoutes>
@@ -55,10 +55,10 @@ export const MainSettings = observer(function MainSettings(
 			<SettingsButton onPress={() => props.navigation.navigate('colors')}>
 				<SettingsText>{'' || SETTINGS_ROUTES.colors}</SettingsText>
 			</SettingsButton>
-			{/* <SettingsButton onPress={() => props.navigation.navigate('privacy')}>
+			<SettingsButton onPress={() => props.navigation.navigate('privacy')}>
 				<SettingsText>{'' || SETTINGS_ROUTES.privacy}</SettingsText>
 			</SettingsButton>
-			<SettingsButton onPress={() => props.navigation.navigate('terms')}>
+			{/* <SettingsButton onPress={() => props.navigation.navigate('terms')}>
 				<SettingsText>{'' || SETTINGS_ROUTES.terms}</SettingsText>
 			</SettingsButton> */}
 			<SettingsButton onPress={() => props.navigation.navigate('about')}>

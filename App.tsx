@@ -28,6 +28,7 @@ import { LogoutScreen } from './src/Screens/Session/logout'
 import { SettingsScreen } from './src/Screens/Settings/index'
 import { TotalsNavigation } from './src/Screens/Totals'
 import './src/Setup/notifications'
+import { SENTRY_ROUTING } from './src/Setup/sentry'
 import { StudentsStore } from './src/Stores/API.stores'
 import { Theme } from './src/Stores/Theme.store'
 
@@ -58,7 +59,13 @@ export default Sentry.wrap(
 			students.fallback
 
 		return (
-			<NavigationContainer theme={toJS(Theme.theme)} ref={navigation}>
+			<NavigationContainer
+				theme={toJS(Theme.theme)}
+				ref={navigation}
+				onReady={() => {
+					SENTRY_ROUTING.registerNavigationContainer(navigation)
+				}}
+			>
 				<StatusBar
 					translucent={true}
 					style={Theme.scheme === 'dark' ? 'light' : 'dark'}

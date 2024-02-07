@@ -1,7 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
-import { Button, SmallButton } from '../../Components/Button'
+import {
+	Colors,
+	Spacings,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native-ui-lib'
+import { Button } from '../../Components/Button'
 import { Mark } from '../../Components/Mark'
 import { Assignment, Attachment } from '../../NetSchool/classes'
 import { AttachmentsStore } from '../../Stores/API.stores'
@@ -39,7 +45,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 		>
 			<View row spread centerV style={{ width: '100%' }}>
 				{assignment.assignmentTypeName && (
-					<SmallButton
+					<TouchableOpacity
 						onPress={() => setShowHw(!showHw)}
 						style={{
 							backgroundColor: Colors.rgba(Colors.$textAccent, 0.2),
@@ -54,7 +60,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 						<Text $textAccent margin-s1>
 							{assignment.assignmentTypeAbbr}
 						</Text>
-					</SmallButton>
+					</TouchableOpacity>
 				)}
 
 				<Text

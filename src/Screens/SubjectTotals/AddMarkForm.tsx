@@ -1,13 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+// import { SafeAreaView } from 'react-native-safe-area-context'
 import {
 	Colors,
 	Text,
 	TextField,
 	TextFieldProps,
 	View,
-	WheelPicker,
 } from 'react-native-ui-lib'
 import {
 	Button,
@@ -100,13 +99,13 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 							placeholder="Оценка"
 							onChangeText={setMark}
 						/>
-						<SafeAreaView>
+						{/* <SafeAreaView>
 							<WheelPicker
 								items={new Array(5)
 									.fill({})
 									.map((_, i) => ({ label: i + '', value: i }))}
 							/>
-						</SafeAreaView>
+						</SafeAreaView> */}
 					</View>
 					<TextField
 						{...textFieldProps}

@@ -15,7 +15,7 @@ export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
 	transport: mapConsoleTransport,
 })
 
-LogBox.ignoreLogs([/new NativeEventEmitter/])
+LogBox.ignoreLogs([/new NativeEventEmitter/g])
 
 configureMobx({
 	enforceActions: 'always',

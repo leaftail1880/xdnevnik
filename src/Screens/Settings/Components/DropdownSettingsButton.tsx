@@ -21,6 +21,7 @@ export const DropdownSettingsButton = function DropdownSettingsButton<
 		if (typeof value === 'string') return value
 		return 'Выберите...'
 	}
+
 	return (
 		<SelectDropdown
 			buttonStyle={settingsButtonStyle()}

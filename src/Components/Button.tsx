@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
 	BorderRadiuses,
 	Colors,
@@ -8,35 +7,11 @@ import {
 import TouchableOpacity from 'react-native-ui-lib/touchableOpacity'
 import { Ionicon } from './Icon'
 
-export type ButtonProps = TouchableOpacityProps & {
-	onPress?(props: TouchableOpacityProps): Promise<void> | void
-}
-
 // eslint-disable-next-line mobx/missing-observer
-export const SmallButton = function SmallButton({
-	onPress,
-	...props
-}: ButtonProps) {
-	const [presssed, setPressed] = useState(false)
+export const Button = function Button(props: TouchableOpacityProps) {
 	return (
-		<TouchableOpacity
-			{...props}
-			onPress={async () => {
-				setPressed(true)
-				const result = onPress?.(props) as void | undefined | Promise<void>
-				if (typeof result === 'object' && result instanceof Promise) {
-					await result
-					setPressed(false)
-				} else setTimeout(() => setPressed(false), 500)
-			}}
-			disabled={presssed}
-		/>
+		<TouchableOpacity center {...props} style={[buttonStyle(), props.style]} />
 	)
-}
-
-// eslint-disable-next-line mobx/missing-observer
-export const Button = function Button(props: ButtonProps) {
-	return <SmallButton center {...props} style={[buttonStyle(), props.style]} />
 }
 
 export function buttonStyle() {
@@ -49,7 +24,7 @@ export function buttonStyle() {
 	}
 }
 
-export type IconButtonProps = ButtonProps & {
+export type IconButtonProps = TouchableOpacityProps & {
 	icon: string
 	size: number
 	iconColor?: string
@@ -58,7 +33,7 @@ export type IconButtonProps = ButtonProps & {
 // eslint-disable-next-line mobx/missing-observer
 export const IconButton = function IconButton(props: IconButtonProps) {
 	return (
-		<SmallButton center br10 {...props}>
+		<TouchableOpacity center br10 {...props}>
 			<Ionicon
 				name={props.icon}
 				size={props.size}
@@ -68,6 +43,6 @@ export const IconButton = function IconButton(props: IconButtonProps) {
 						: (props.style as unknown as object)
 				}
 			/>
-		</SmallButton>
+		</TouchableOpacity>
 	)
 }

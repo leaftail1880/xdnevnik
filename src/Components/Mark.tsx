@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { Falsy, TextStyle } from 'react-native'
-import { Colors, Text } from 'react-native-ui-lib'
+import { Colors, Text, TouchableOpacity } from 'react-native-ui-lib'
 import { Settings } from '../Stores/Settings.store'
-import { ButtonProps, SmallButton } from './Button'
+import { TouchableOpacityProps } from './Button'
 
 const MarkColorsBG = {
 	5: '#007000',
@@ -27,7 +27,7 @@ export const Mark = observer(function Mark({
 	duty,
 	noColor = '#7A7A7A',
 	...props
-}: ButtonProps & {
+}: TouchableOpacityProps & {
 	finalMark?: number | null | string
 	mark: number | null | string
 	markWeight?: { max: number; min: number; current: number } | Falsy
@@ -81,7 +81,7 @@ export const Mark = observer(function Mark({
 	const textColor = bg ? Colors.white : color
 
 	return (
-		<SmallButton
+		<TouchableOpacity
 			br30
 			margin-s1
 			center
@@ -126,6 +126,6 @@ export const Mark = observer(function Mark({
 					{markProp}
 				</Text>
 			)}
-		</SmallButton>
+		</TouchableOpacity>
 	)
 })

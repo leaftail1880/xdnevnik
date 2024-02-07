@@ -1,8 +1,9 @@
+import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
+import { Text } from 'react-native-ui-lib'
+import { Settings } from '../../../../Stores/Settings.store'
 import { Theme } from '../../../../Stores/Theme.store'
 import { DropdownSettingsButton } from '../../Components/DropdownSettingsButton'
-import { Settings } from '../../../../Stores/Settings.store'
-import { Text } from 'react-native-ui-lib'
 import { AccentColorPicker } from './AccentColorPicker'
 
 const themes = [
@@ -16,8 +17,8 @@ const markStyles = [
 	{ name: 'Фон', i: 'background' as const },
 ]
 
-// eslint-disable-next-line mobx/missing-observer
-export default function Appearance() {
+export default observer(function Appearance() {
+	Theme.key
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -48,4 +49,4 @@ export default function Appearance() {
 			<AccentColorPicker />
 		</ScrollView>
 	)
-}
+})
