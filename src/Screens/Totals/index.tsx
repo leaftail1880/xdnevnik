@@ -1,6 +1,4 @@
 import { StackScreenProps } from '@react-navigation/stack'
-// import { TouchableOpacity } from 'react-native-gesture-handler'
-// import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Observer, observer } from 'mobx-react-lite'
 import { Switch, Text, View } from 'react-native-ui-lib'
 import { Education, SubjectPerformance } from '../../NetSchool/classes'
@@ -22,7 +20,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 	EducationStore.withParams({ studentId })
 	const themeKey = Theme.accentColor + Theme.scheme
 
-	// TODO Let user to schoose school year
+	// TODO Let user to choose school year
 	const schoolYear = EducationStore.result?.find(
 		e => !e.isAddSchool
 	)?.schoolyear

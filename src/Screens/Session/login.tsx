@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 import { Alert, BackHandler, RefreshControl, ScrollView } from 'react-native'
 import { Text, View } from 'react-native-ui-lib'
-import { URL } from 'react-native-url-polyfill'
 import WebView from 'react-native-webview'
 import { Button } from '../../Components/Button'
 import { Loading } from '../../Components/Loading'
@@ -12,6 +11,7 @@ import { ROUTES } from '../../NetSchool/routes'
 import { Logger } from '../../Setup/constants'
 import { APIStore } from '../../Stores/API.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
+import { Header } from '../../Components/Header'
 
 const LoginStore = new (class {
 	constructor() {
@@ -61,6 +61,7 @@ export const LoginScreen = observer(function LoginScreen() {
 	if (!regionName)
 		return (
 			<View flex center>
+				<Header title='Вход'></Header>
 				<ScrollView
 					style={{ margin: 0, padding: 0, minWidth: 350 }}
 					refreshControl={endpoints.refreshControl}

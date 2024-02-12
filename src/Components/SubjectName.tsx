@@ -26,8 +26,7 @@ export function getSubjectName(props: SubjectNameOptions) {
 	const { studentId } = XDnevnik
 	if (!studentId) return 'Загрузка'
 
-	const overriden =
-		Settings.studentOverrides[studentId]?.subjectNames[props.subjectId]
+	const overriden = Settings.forStudent(studentId).subjectNames[props.subjectId]
 
 	if (overriden) return overriden
 
@@ -84,15 +83,10 @@ export const SubjectName = observer(function SubjectName({
 					style={props.style}
 					size={props.iconsSize}
 					onPress={() => {
-						if (isEditing) {
+						if (isEditing && newName) {
 							runInAction(() => {
-								Settings.studentOverrides[studentId] ??= {
-									subjectNames: {},
-									subjects: {},
-								}
-								Settings.studentOverrides[studentId]!.subjectNames[
-									props.subjectId
-								] = newName ? newName : undefined
+								const overrides = Settings.forStudent(studentId)
+								overrides.subjectNames[props.subjectId] = newName
 							})
 						}
 						setIsEditing(!isEditing)

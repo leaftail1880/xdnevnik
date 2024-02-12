@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
 import { Colors, Spacings, Switch, Text, View } from 'react-native-ui-lib'
 import { dropdownButtonStyle, dropdownStyle } from '../../Components/Dropdown'
+import { Header } from '../../Components/Header'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
@@ -43,6 +44,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 
 	return (
 		<View key={themeKey}>
+			<Header title="Дневник"></Header>
 			<SelectDropdown
 				buttonStyle={dropdownButtonStyle()}
 				buttonTextStyle={{ color: Colors.$textPrimary }}
@@ -115,3 +117,4 @@ const DiaryDay = observer(function DiaryDay() {
 			<DiaryLesson key={lesson.classmeetingId.toString()} lesson={lesson} />
 		))
 })
+
