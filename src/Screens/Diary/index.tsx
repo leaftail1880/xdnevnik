@@ -43,7 +43,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 	})
 
 	return (
-		<View key={themeKey}>
+		<View key={themeKey} flex>
 			<Header title="Дневник"></Header>
 			<SelectDropdown
 				buttonStyle={dropdownButtonStyle()}
@@ -89,7 +89,7 @@ export const DiaryScreen = observer(function DiaryScreen() {
 					</View>
 				</View>
 				<View padding-s1>{DiaryStore.fallback || <DiaryDay />}</View>
-				<Text center $textDisabled marginB-20>
+				<Text center $textDisabled>
 					{DiaryStore.updateDate}
 				</Text>
 			</ScrollView>

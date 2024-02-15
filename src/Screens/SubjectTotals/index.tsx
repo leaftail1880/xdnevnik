@@ -9,6 +9,7 @@ import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
 import { SubjectPerformanceStores } from '../../Stores/API.stores'
 import { fullname } from '../../Stores/Settings.store'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import type { MarkInfo } from '../Totals'
 import type { ParamMap, S_SUBJECT_TOTALS } from '../Totals/navigation'
@@ -134,6 +135,7 @@ const MarkRow = observer(function MarkRow({
 	maxWeight: number
 	minWeight: number
 }) {
+	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
 	return (
 		<View flex row spread centerV padding-s2>

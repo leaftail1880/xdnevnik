@@ -1,15 +1,14 @@
-import { observer } from 'mobx-react-lite'
-import { Theme } from '../../Stores/Theme.store'
 import About from './Groups/About'
 import Appearance from './Groups/Appearance'
 import { MainSettings } from './Groups/Main'
+import { Notifications } from './Groups/Notifications'
 import PrivacyPolicy from './Groups/Policy/PrivacyPolicy'
 import TermsAndConditions from './Groups/Policy/TermsAndConditions'
 import { UpdatesScreen } from './Groups/Update/Update'
 import { SETTINGS_ROUTES, SettingsNavigation } from './SettingsNavigation'
 
-export const SettingsScreen = observer(function SettingsScreen() {
-	Theme.key
+// eslint-disable-next-line mobx/missing-observer
+export const SettingsScreen = function SettingsScreen() {
 	return (
 		<SettingsNavigation.Navigator
 			initialRouteName="main"
@@ -23,6 +22,7 @@ export const SettingsScreen = observer(function SettingsScreen() {
 			<SettingsNavigation.Screen name="terms" component={TermsAndConditions} />
 			<SettingsNavigation.Screen name="colors" component={Appearance} />
 			<SettingsNavigation.Screen name="about" component={About} />
+			<SettingsNavigation.Screen name="notifs" component={Notifications} />
 		</SettingsNavigation.Navigator>
 	)
-})
+}

@@ -15,12 +15,14 @@ import {
 	buttonStyle,
 } from '../../Components/Button'
 import { Ionicon } from '../../Components/Icon'
+import { Theme } from '../../Stores/Theme.store'
 import type { MarkInfo } from '../Totals'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {
 	setCustomMarks: (p: Partial<MarkInfo>[]) => void
 	customMarks: Partial<MarkInfo>[]
 }) {
+	Theme.key
 	const [weight, setWeight] = useState('')
 	const [mark, setMark] = useState('')
 	const [addingCustomMark, setAddingCustomMark] = useState(false)

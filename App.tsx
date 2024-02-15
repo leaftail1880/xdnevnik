@@ -40,6 +40,7 @@ type ParamListBase = Record<
 >
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 
+
 export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
@@ -51,12 +52,22 @@ export default Sentry.wrap(
 		Theme.accentColor
 
 		const students = StudentsStore
-		const Fallback =
-			(!API.session && <Loading text="Авторизация{dots}" />) ||
-			students.fallback
+
+		let Fallback
+		if (!API.session) {
+			// eslint-disable-next-line mobx/missing-observer
+			Fallback = function Fallback() {
+				return <Loading text="Авторизация{dots}" />
+			}
+		} else if (students.fallback) Fallback = () => students.fallback
 
 		return (
 			<SafeAreaProvider>
+				<StatusBar
+					translucent={true}
+					style={Theme.scheme === 'dark' ? 'light' : 'dark'}
+				/>
+				<StatusBar />
 				<NavigationContainer
 					theme={toJS(Theme.theme)}
 					ref={navigation}
@@ -64,10 +75,6 @@ export default Sentry.wrap(
 						SENTRY_ROUTING.registerNavigationContainer(navigation)
 					}}
 				>
-					<StatusBar
-						translucent={true}
-						style={Theme.scheme === 'dark' ? 'light' : 'dark'}
-					/>
 					<Tab.Navigator
 						// tabBar={props => (
 						// 	<View>
@@ -80,10 +87,10 @@ export default Sentry.wrap(
 						sceneAnimationType={'shifting'}
 						activeColor={Colors.$iconPrimaryLight}
 						inactiveColor={Theme.accentColor}
-						labeled={false}
+						// labeled={false}
 						barStyle={{
 							backgroundColor: Colors.$backgroundPrimaryMedium,
-							height: '6%',
+							height: '8%',
 							padding: 0,
 							margin: 0,
 							alignContent: 'center',
@@ -116,38 +123,28 @@ export default Sentry.wrap(
 						})}
 					>
 						{!API.session && (
-							<Tab.Screen name={LANG['s_log_in']}>
-								{() => <LoginScreen />}
-							</Tab.Screen>
+							<Tab.Screen name={LANG['s_log_in']} component={LoginScreen} />
 						)}
 
-						<Tab.Screen name={LANG['s_diary']}>
-							{() => Fallback || <DiaryScreen />}
-						</Tab.Screen>
+						<Tab.Screen
+							name={LANG['s_diary']}
+							component={Fallback || DiaryScreen}
+						/>
 
 						<Tab.Screen
 							name={LANG['s_totals']}
 							// Show header when component's custom header is not rendered
 							// options={{ headerShown: !!Fallback }}
-						>
-							{() => Fallback || <TotalsNavigation />}
-						</Tab.Screen>
+							component={Fallback || TotalsNavigation}
+						/>
 
 						<Tab.Screen
 							name={LANG['s_settings']}
-							// options={{ headerShown: false }}
-						>
-							{/* {() => {
-							const Render = gestureHandlerRootHOC(SettingsScreen)
-							return <Render />
-						}} */}
-							{() => <SettingsScreen />}
-						</Tab.Screen>
+							component={SettingsScreen}
+						></Tab.Screen>
 
 						{API.session && (
-							<Tab.Screen name={LANG['s_log_out']}>
-								{() => <LogoutScreen />}
-							</Tab.Screen>
+							<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
 						)}
 					</Tab.Navigator>
 				</NavigationContainer>

@@ -5,14 +5,17 @@ import { Theme } from '../Stores/Theme.store'
 
 export const Header = observer(function Header(props: { title: string }) {
 	return (
-		<Appbar.Header>
+		<Appbar.Header
+			style={{
+				backgroundColor: Theme.theme.colors.card,
+			}}
+		>
 			<Text
 				style={{
 					fontSize: 20,
 					color: Theme.theme.colors.text,
 					fontWeight: '600',
 					paddingLeft: Spacings.s2,
-					backgroundColor: Theme.theme.colors.card,
 				}}
 			>
 				{props.title}
