@@ -30,7 +30,9 @@ class SettingsStore {
 		id: number
 	): StudentOverride & { save(value: Partial<StudentOverride>): void } {
 		function save(this: StudentOverride, value: Partial<StudentOverride>) {
-			Object.assign(this, value)
+			runInAction(() => {
+				Object.assign(this, value)
+			})
 		}
 		const defaultValue = Object.assign(
 			{
@@ -56,7 +58,9 @@ class SettingsStore {
 
 		const clearOverrides = (value: this['studentOverrides']) => {
 			for (const override of Object.values(value)) {
-				if (override) Reflect.deleteProperty(override, 'save')
+				runInAction(() => {
+					if (override) Reflect.deleteProperty(override, 'save')
+				})
 			}
 
 			return value

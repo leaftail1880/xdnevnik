@@ -6,12 +6,9 @@ import { Loading } from '../../../Components/Loading'
 import { API } from '../../../NetSchool/api'
 import { StudentsStore } from '../../../Stores/API.stores'
 import { Settings, fullname } from '../../../Stores/Settings.store'
-import { Theme } from '../../../Stores/Theme.store'
-import { SettingsText } from '../Components/Base'
 import { DropdownSettingsButton } from '../Components/DropdownSettingsButton'
-import { SettingsButton } from '../Components/SettingsButton'
-import { SwitchSetting } from '../Components/SwitchSetting'
-import { SETTINGS_ROUTES, SettingsRoutes } from '../SettingsNavigation'
+import { SettingsJumpNavigation } from '../Components/Navigate'
+import { SettingsRoutes } from '../SettingsNavigation'
 
 export const MainSettings = observer(function MainSettings(
 	props: StackScreenProps<SettingsRoutes>
@@ -43,46 +40,10 @@ export const MainSettings = observer(function MainSettings(
 			) : (
 				<Loading text="Ожидание авторизации{dots}"></Loading>
 			)}
-			<SwitchSetting
-				label={'Уведомления'}
-				setting="notifications"
-				key={Theme.key}
-			/>
-
-			<SettingsButton onPress={() => props.navigation.navigate('update')}>
-				<SettingsText>{'' || SETTINGS_ROUTES.update}</SettingsText>
-			</SettingsButton>
-			<SettingsButton onPress={() => props.navigation.navigate('colors')}>
-				<SettingsText>{'' || SETTINGS_ROUTES.colors}</SettingsText>
-			</SettingsButton>
-			<SettingsButton onPress={() => props.navigation.navigate('privacy')}>
-				<SettingsText>{'' || SETTINGS_ROUTES.privacy}</SettingsText>
-			</SettingsButton>
-			{/* <SettingsButton onPress={() => props.navigation.navigate('terms')}>
-				<SettingsText>{'' || SETTINGS_ROUTES.terms}</SettingsText>
-			</SettingsButton> */}
-			<SettingsButton onPress={() => props.navigation.navigate('about')}>
-				<SettingsText>{'' || SETTINGS_ROUTES.about}</SettingsText>
-			</SettingsButton>
-
-			{/* <ScrollView>
-                {Object.entries(Colors)
-                    .sort((a, b) => a[0].localeCompare(b[0]))
-                    .map(([key, value]) => {
-                        if (key.startsWith('$'))
-                            return (
-                                <View key={key} flex row spread centerV>
-                                    <Text>{key}</Text>
-                                    <View key={key} row spread centerV>
-                                        <Text>{value}</Text>
-                                        <ColorSwatch color={value} />
-                                    </View>
-                                </View>
-                            )
-                        else return false
-                    })
-                    .filter(Boolean)}
-            </ScrollView> */}
+			<SettingsJumpNavigation navigation={props} target={'notifs'} />
+			<SettingsJumpNavigation navigation={props} target={'colors'} />
+			<SettingsJumpNavigation navigation={props} target={'update'} />
+			<SettingsJumpNavigation navigation={props} target={'about'} />
 		</ScrollView>
 	)
 })

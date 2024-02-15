@@ -36,7 +36,12 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 		? TotalsScreenTerm
 		: TotalsScreenTable
 	return (
-		<Stack.Navigator>
+		<Stack.Navigator
+			screenOptions={{
+				animationEnabled: true,
+				presentation: 'modal',
+			}}
+		>
 			<Stack.Screen
 				key={themeKey}
 				name={S_TOTALS}
@@ -70,9 +75,9 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 			<Stack.Screen
 				key={themeKey + '2'}
 				name={S_SUBJECT_TOTALS}
-				options={{
-					headerStyle: { elevation: 0 },
-				}}
+				// options={{
+				// 	headerStyle: { elevation: 0 },
+				// }}
 			>
 				{nav => <SubjectTotals {...nav} />}
 			</Stack.Screen>

@@ -47,6 +47,24 @@ export default observer(function Appearance() {
 				Цвет акцентов:
 			</Text>
 			<AccentColorPicker />
+			{/* <ScrollView>
+                {Object.entries(Colors)
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .map(([key, value]) => {
+                        if (key.startsWith('$'))
+                            return (
+                                <View key={key} flex row spread centerV>
+                                    <Text>{key}</Text>
+                                    <View key={key} row spread centerV>
+                                        <Text>{value}</Text>
+                                        <ColorSwatch color={value} />
+                                    </View>
+                                </View>
+                            )
+                        else return false
+                    })
+                    .filter(Boolean)}
+            </ScrollView> */}
 		</ScrollView>
 	)
 })

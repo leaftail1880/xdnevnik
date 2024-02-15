@@ -68,7 +68,7 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 			horizontal
 			style={viewStyle}
 			contentContainerStyle={containerStyle}
-			snapToAlignment="end"
+			fadingEdgeLength={5}
 		>
 			{totalsAndSheduledTotals.map(e => (
 				<Mark

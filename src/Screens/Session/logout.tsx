@@ -1,17 +1,20 @@
+import { observer } from 'mobx-react-lite'
 import { Colors, Text } from 'react-native-ui-lib'
 import View from 'react-native-ui-lib/view'
 import { Button } from '../../Components/Button'
 import { Header } from '../../Components/Header'
 import { API } from '../../NetSchool/api'
 import { LANG } from '../../Setup/constants'
+import { Theme } from '../../Stores/Theme.store'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 
-// eslint-disable-next-line mobx/missing-observer
-export const LogoutScreen = function LogoutScreen() {
+export const LogoutScreen = observer(function LogoutScreen() {
 	async function logout() {
 		XDnevnik.status = undefined
 		API.logOut()
 	}
+
+	Theme.key
 
 	return (
 		<View flex>
@@ -33,4 +36,4 @@ export const LogoutScreen = function LogoutScreen() {
 			</View>
 		</View>
 	)
-}
+})
