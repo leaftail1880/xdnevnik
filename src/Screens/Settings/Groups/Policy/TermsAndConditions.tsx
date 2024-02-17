@@ -1,12 +1,13 @@
 import { memo } from 'react'
-import { Text } from 'react-native-ui-lib'
+import { ScrollView } from 'react-native'
+import { Spacings, Text, View } from 'react-native-ui-lib'
 import { Link, Strong } from './PrivacyPolicy'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function TermsAndConditions() {
 	return (
-		<Text>
-			<Strong>Terms &amp; Conditions</Strong>{' '}
+		<ScrollView contentContainerStyle={{ flex: 1, padding: Spacings.s2 }}>
+			<Strong>Terms &amp; Conditions</Strong>
 			<Text>
 				By downloading or using the app, these terms will automatically apply to
 				you – you should make sure therefore that you read them carefully before
@@ -17,14 +18,14 @@ export default memo(function TermsAndConditions() {
 				app itself, and all the trademarks, copyright, database rights, and
 				other intellectual property rights related to it, still belong to
 				Leaftail1880.
-			</Text>{' '}
+			</Text>
 			<Text>
 				Leaftail1880 is committed to ensuring that the app is as useful and
 				efficient as possible. For that reason, we reserve the right to make
 				changes to the app or to charge for its services, at any time and for
 				any reason. We will never charge you for the app or its services without
 				making it very clear to you exactly what you’re paying for.
-			</Text>{' '}
+			</Text>
 			<Text>
 				The XDnevnik app stores and processes personal data that you have
 				provided to us, to provide my Service. It’s your responsibility to keep
@@ -35,37 +36,31 @@ export default memo(function TermsAndConditions() {
 				malware/viruses/malicious programs, compromise your phone’s security
 				features and it could mean that the XDnevnik app won’t work properly or
 				at all.
-			</Text>{' '}
-			<div>
+			</Text>
+			<View>
 				<Text>
 					The app does use third-party services that declare their Terms and
 					Conditions.
-				</Text>{' '}
+				</Text>
 				<Text>
 					Link to Terms and Conditions of third-party service providers used by
 					the app
-				</Text>{' '}
-				<ul>
-					<li>
-						<Link
-							href="https://expo.io/terms"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Expo
-						</Link>
-					</li>
-					<li>
-						<Link
-							href="https://sentry.io/terms/"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Sentry
-						</Link>
-					</li>
-				</ul>
-			</div>{' '}
+				</Text>
+				<Link
+					href="https://expo.io/terms"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Expo
+				</Link>
+				<Link
+					href="https://sentry.io/terms/"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Sentry
+				</Link>
+			</View>
 			<Text>
 				You should be aware that there are certain things that Leaftail1880 will
 				not take responsibility for. Certain functions of the app will require
@@ -74,8 +69,8 @@ export default memo(function TermsAndConditions() {
 				cannot take responsibility for the app not working at full functionality
 				if you don’t have access to Wi-Fi, and you don’t have any of your data
 				allowance left.
-			</Text>{' '}
-			<Text></Text>{' '}
+			</Text>
+			<Text></Text>
 			<Text>
 				If you’re using the app outside of an area with Wi-Fi, you should
 				remember that the terms of the agreement with your mobile network
@@ -88,13 +83,13 @@ export default memo(function TermsAndConditions() {
 				bill payer for the device on which you’re using the app, please be aware
 				that we assume that you have received permission from the bill payer for
 				using the app.
-			</Text>{' '}
+			</Text>
 			<Text>
 				Along the same lines, Leaftail1880 cannot always take responsibility for
 				the way you use the app i.e. You need to make sure that your device
 				stays charged – if it runs out of battery and you can’t turn it on to
 				avail the Service, Leaftail1880 cannot accept responsibility.
-			</Text>{' '}
+			</Text>
 			<Text>
 				With respect to Leaftail1880’s responsibility for your use of the app,
 				when you’re using the app, it’s important to bear in mind that although
@@ -103,7 +98,7 @@ export default memo(function TermsAndConditions() {
 				it available to you. Leaftail1880 accepts no liability for any loss,
 				direct or indirect, you experience as a result of relying wholly on this
 				functionality of the app.
-			</Text>{' '}
+			</Text>
 			<Text>
 				At some point, we may wish to update the app. The app is currently
 				available on Android &amp; iOS – the requirements for the both systems
@@ -118,23 +113,23 @@ export default memo(function TermsAndConditions() {
 				you. Unless we tell you otherwise, upon any termination, (a) the rights
 				and licenses granted to you in these terms will end; (b) you must stop
 				using the app, and (if needed) delete it from your device.
-			</Text>{' '}
+			</Text>
 			<Text>
 				<Strong>Changes to This Terms and Conditions</Strong>
-			</Text>{' '}
+			</Text>
 			<Text>
 				I may update our Terms and Conditions from time to time. Thus, you are
 				advised to review this page periodically for any changes. I will notify
 				you of any changes by posting the new Terms and Conditions on this page.
-			</Text>{' '}
-			<Text>These terms and conditions are effective as of 2024-02-01</Text>{' '}
+			</Text>
+			<Text>These terms and conditions are effective as of 2024-02-01</Text>
 			<Text>
 				<Strong>Contact Us</Strong>
-			</Text>{' '}
+			</Text>
 			<Text>
 				If you have any questions or suggestions about my Terms and Conditions,
 				do not hesitate to contact me at leaftail1880@outlook.com.
-			</Text>{' '}
+			</Text>
 			<Text>
 				This Terms and Conditions page was generated by{' '}
 				<Link
@@ -145,6 +140,6 @@ export default memo(function TermsAndConditions() {
 					App Privacy Policy Generator
 				</Link>
 			</Text>
-		</Text>
+		</ScrollView>
 	)
 })

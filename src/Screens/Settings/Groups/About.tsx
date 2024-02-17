@@ -1,6 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
-import * as updates from 'expo-updates'
 import { Linking, ScrollView } from 'react-native'
 import { Text, TouchableOpacity, View } from 'react-native-ui-lib'
 import { Ionicon } from '../../../Components/Icon'
@@ -19,7 +18,6 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
-				<Text>Версия сборки: {updates.updateId}</Text>
 				<Text key={Theme.key}>{LANG['made_by']}</Text>
 				<TouchableOpacity
 					centerV
