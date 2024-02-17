@@ -13,11 +13,11 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Colors, LoaderScreen } from 'react-native-ui-lib'
 import { Ionicon } from './src/Components/Icon'
 import { Loading } from './src/Components/Loading'
-// import { StatusBadge } from './src/Components/StatusBadge'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { StatusBadge } from './src/Components/StatusBadge'
 import { API } from './src/NetSchool/api'
 import { DiaryScreen } from './src/Screens/Diary'
 import { LoginScreen } from './src/Screens/Session/login'
@@ -63,11 +63,6 @@ export default Sentry.wrap(
 
 		return (
 			<SafeAreaProvider>
-				<StatusBar
-					translucent={true}
-					style={Theme.scheme === 'dark' ? 'light' : 'dark'}
-				/>
-				<StatusBar />
 				<NavigationContainer
 					theme={toJS(Theme.theme)}
 					ref={navigation}
@@ -75,6 +70,11 @@ export default Sentry.wrap(
 						SENTRY_ROUTING.registerNavigationContainer(navigation)
 					}}
 				>
+					<StatusBar
+						translucent={true}
+						style={Theme.scheme === 'dark' ? 'light' : 'dark'}
+					/>
+
 					<Tab.Navigator
 						// tabBar={props => (
 						// 	<View>
@@ -117,8 +117,8 @@ export default Sentry.wrap(
 								if (focused) iconName += '-outline'
 								return <Ionicon name={iconName} color={color} size={23} />
 							},
-							tabBarActiveTintColor: Colors.$iconPrimary,
-							tabBarInactiveTintColor: Colors.$iconDefault,
+							tabBarActiveTintColor: Colors.$iconDefault,
+							tabBarInactiveTintColor: Colors.$iconPrimary,
 							tabBarHideOnKeyboard: true,
 						})}
 					>
@@ -147,6 +147,7 @@ export default Sentry.wrap(
 							<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
 						)}
 					</Tab.Navigator>
+					<StatusBadge />
 				</NavigationContainer>
 			</SafeAreaProvider>
 		)

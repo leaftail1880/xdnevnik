@@ -3,9 +3,12 @@ import * as FileSystem from 'expo-file-system'
 import * as IntentLauncherAndroid from 'expo-intent-launcher'
 // import * as MediaLibrary from 'expo-media-library'
 // import * as Permissions from 'expo-permissions'
+import * as Application from 'expo-application'
 import * as ExpoSharing from 'expo-sharing'
+import * as Updates from 'expo-updates'
 import { useState } from 'react'
 import { Alert, ScrollView } from 'react-native'
+import { Text } from 'react-native-ui-lib'
 import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
 import { Logger } from '../../../../Setup/constants'
 import { SettingsText } from '../../Components/Base'
@@ -134,7 +137,10 @@ export const UpdatesScreen = function UpdatesScreen() {
 				justifyContent: 'flex-start',
 			}}
 		>
-			<UpdatesButton></UpdatesButton>
+			<UpdatesButton />
+
+			<Text>Версия: {Application.nativeApplicationVersion}</Text>
+			<Text>Версия патча: {Updates.updateId}</Text>
 		</ScrollView>
 	)
 }
