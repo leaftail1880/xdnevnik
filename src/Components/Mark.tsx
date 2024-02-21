@@ -1,8 +1,13 @@
 import { observer } from 'mobx-react-lite'
-import { Falsy, TextStyle } from 'react-native'
-import { Colors, Text, TouchableOpacity } from 'react-native-ui-lib'
-import { Settings } from '../Stores/Settings.store'
-import { TouchableOpacityProps } from './Button'
+import {
+	Falsy,
+	TextStyle,
+	TouchableOpacity,
+	TouchableOpacityProps,
+} from 'react-native'
+import { Text } from 'react-native-paper'
+import { Settings } from '../Stores/Settings'
+import { Theme } from '../Stores/Theme'
 
 const MarkColorsBG = {
 	5: '#007000',
@@ -78,17 +83,17 @@ export const Mark = observer(function Mark({
 		borderCurve: 'circular',
 	}
 
-	const textColor = bg ? Colors.white : color
+	const textColor = bg ? Theme.colors.surface : color
 
 	return (
 		<TouchableOpacity
-			br30
-			margin-s1
-			center
 			{...props}
 			style={[
 				{
 					elevation: 0,
+					borderRadius: Theme.roundness,
+					justifyContent: 'center',
+					alignItems: 'center',
 				},
 				bg
 					? { backgroundColor: color }
@@ -97,13 +102,11 @@ export const Mark = observer(function Mark({
 				style,
 			]}
 		>
-			<Text center text60 color={textColor} style={textStyle} margin-0>
+			<Text style={[{ color: textColor }, textStyle]}>
 				{duty ? '.' : finalMark ?? markProp}
 			</Text>
 			{markWeight && (
 				<Text
-					center
-					margin-0
 					style={{
 						fontSize: 10,
 						color: textColor,
@@ -115,13 +118,14 @@ export const Mark = observer(function Mark({
 			)}
 			{!!finalMark && (
 				<Text
-					margin-0
-					center
-					style={{
-						fontSize: 10,
-						color: textColor,
-						...subTextStyle,
-					}}
+					style={[
+						{
+							alignSelf: 'center',
+							fontSize: 10,
+							color: textColor,
+						},
+						subTextStyle,
+					]}
 				>
 					{markProp}
 				</Text>

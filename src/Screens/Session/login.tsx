@@ -1,17 +1,18 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
-import { Alert, BackHandler, RefreshControl, ScrollView } from 'react-native'
-import { Text, View } from 'react-native-ui-lib'
+import { BackHandler, RefreshControl, ScrollView, View } from 'react-native'
+import { Appbar, Button } from 'react-native-paper'
+import Toast from 'react-native-toast-message'
 import WebView from 'react-native-webview'
-import { Button } from '../../Components/Button'
+import { Header } from '../../Components/Header'
 import { Loading } from '../../Components/Loading'
+import { Spacings } from '../../Components/Spacings'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
 import { Logger } from '../../Setup/constants'
-import { APIStore } from '../../Stores/API.store'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
-import { Header } from '../../Components/Header'
+import { APIStore } from '../../Stores/Async'
+import { Theme } from '../../Stores/Theme'
 
 const LoginStore = new (class {
 	constructor() {
@@ -36,6 +37,28 @@ const EndpointsStore = new APIStore(
 )
 
 export const LoginScreen = observer(function LoginScreen() {
+	Theme.key
+	return (
+		<View
+			style={{
+				height: '100%',
+			}}
+		>
+			<Header title="Вход">
+				{LoginStore.regionName && (
+					<Appbar.BackAction
+						onPress={() => runInAction(() => (LoginStore.regionName = ''))}
+					/>
+				)}
+			</Header>
+
+			<LoginScreenContent />
+			<View style={{ margin: Spacings.s2 }}></View>
+		</View>
+	)
+})
+
+export const LoginScreenContent = observer(function LoginScreenContent() {
 	const { loggingIn, regionName } = LoginStore
 	const endpoints = EndpointsStore as unknown as ReturnType<
 		(typeof EndpointsStore)['state']
@@ -44,7 +67,8 @@ export const LoginScreen = observer(function LoginScreen() {
 
 	useEffect(() => {
 		const goBack = () => {
-			webviewRef.current?.goBack()
+			if (!webviewRef.current) return
+			webviewRef.current.goBack()
 			return true
 		}
 
@@ -60,38 +84,36 @@ export const LoginScreen = observer(function LoginScreen() {
 
 	if (!regionName)
 		return (
-			<View flex center>
-				<Header title='Вход'></Header>
-				<ScrollView
-					style={{ margin: 0, padding: 0, minWidth: 350 }}
-					refreshControl={endpoints.refreshControl}
-				>
-					{endpoints.result
-						.slice()
-						.sort((a, b) => a.name.localeCompare(b.name))
-						.map((endpoint, index) => (
-							<Button
-								margin-s2
-								br20
-								bg-$backgroundAccent
-								style={{
-									elevation: 3,
-								}}
-								key={index.toString()}
-								onPress={() => {
-									runInAction(() => {
-										API.setEndpoint(endpoint.url)
-										LoginStore.regionName = endpoint.name
-									})
-								}}
-							>
-								<Text $textAccent center margin-s2>
-									{endpoint.name}
-								</Text>
-							</Button>
-						))}
-				</ScrollView>
-			</View>
+			<ScrollView
+				style={{ margin: 0, padding: 0, minWidth: 350, flex: 1 }}
+				refreshControl={endpoints.refreshControl}
+			>
+				{endpoints.result
+					.slice()
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((endpoint, index) => (
+						<Button
+							key={index.toString()}
+							onPress={() => {
+								runInAction(() => {
+									API.setEndpoint(endpoint.url)
+									LoginStore.regionName = endpoint.name
+								})
+							}}
+							labelStyle={{
+								textAlign: 'left',
+								alignSelf: 'flex-start',
+								fontSize: 16,
+							}}
+							style={{
+								backgroundColor: Theme.colors.backdrop,
+								margin: Spacings.s1,
+							}}
+						>
+							{endpoint.name}
+						</Button>
+					))}
+			</ScrollView>
 		)
 
 	const onWebviewRefresh = () => {
@@ -122,30 +144,26 @@ export const LoginScreen = observer(function LoginScreen() {
 								try {
 									await API.getToken(ROUTES.getTokenTemplate(pincode))
 
-									runInAction(() => {
-										XDnevnik.status = {
-											content: 'Успешная авторизация!',
-											error: false,
-										}
-									})
-									setTimeout(
-										() => runInAction(() => (XDnevnik.status = undefined)),
-										5000
-									)
+									Toast.show({ text1: 'Успешная авторизация!' })
 								} catch (e) {
 									Logger.error(e)
-									Alert.alert('Не удалось получить токен авторизации', e)
-									runInAction(() => (LoginStore.loggingIn = true))
+									Toast.show({
+										text1: 'Не удалось получить токен авторизации',
+										text2: e + '',
+										type: 'error',
+									})
 								} finally {
 									runInAction(() => (LoginStore.loggingIn = true))
 								}
 							})()
 							return false
 						} else {
-							Alert.alert(
-								'Код не получен!',
-								'Попробуйте войти снова. Такое иногда происходит в конце четвертей когда журнал перегружен.'
-							)
+							Toast.show({
+								text1: 'Код не получен!',
+								text2:
+									'Такое иногда происходит в конце четвертей, когда журнал перегружен. Попробуйте снова',
+								type: 'error',
+							})
 							runInAction(() => (LoginStore.regionName = ''))
 
 							return false

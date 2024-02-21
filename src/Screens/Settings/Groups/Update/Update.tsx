@@ -7,12 +7,11 @@ import * as Application from 'expo-application'
 import * as ExpoSharing from 'expo-sharing'
 import * as Updates from 'expo-updates'
 import { useState } from 'react'
-import { Alert, ScrollView } from 'react-native'
-import { Text } from 'react-native-ui-lib'
+import { Alert, ScrollView, View } from 'react-native'
+import { Button, Text } from 'react-native-paper'
+import { Spacings } from '../../../../Components/Spacings'
 import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
-import { Logger } from '../../../../Setup/constants'
-import { SettingsText } from '../../Components/Base'
-import { SettingsButton } from '../../Components/SettingsButton'
+import { Logger, styles } from '../../../../Setup/constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {
@@ -80,8 +79,7 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 export const UpdatesButton = function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
-		<SettingsButton
-			br10
+		<Button
 			onPress={async () => {
 				try {
 					setProgress('Получение списка версий...')
@@ -120,10 +118,8 @@ export const UpdatesButton = function UpdatesButton() {
 				}
 			}}
 		>
-			<SettingsText marginR-s2>
-				{progress ?? 'Проверить обновления'}
-			</SettingsText>
-		</SettingsButton>
+			{progress ?? 'Проверить обновления'}
+		</Button>
 	)
 }
 
@@ -139,8 +135,18 @@ export const UpdatesScreen = function UpdatesScreen() {
 		>
 			<UpdatesButton />
 
-			<Text>Версия: {Application.nativeApplicationVersion}</Text>
-			<Text>Версия патча: {Updates.updateId}</Text>
+			<View
+				style={[styles.stretch, { padding: Spacings.s2, margin: Spacings.s1 }]}
+			>
+				<Text>Версия: </Text>
+				<Text variant="labelLarge">{Application.nativeApplicationVersion}</Text>
+			</View>
+			<View
+				style={[styles.stretch, { padding: Spacings.s2, margin: Spacings.s1 }]}
+			>
+				<Text>Версия патча: </Text>
+				<Text variant="labelLarge">{Updates.updateId ?? 'Без патча'}</Text>
+			</View>
 		</ScrollView>
 	)
 }

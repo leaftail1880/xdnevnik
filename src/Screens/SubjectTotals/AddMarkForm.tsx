@@ -15,7 +15,7 @@ import {
 	buttonStyle,
 } from '../../Components/Button'
 import { Ionicon } from '../../Components/Icon'
-import { Theme } from '../../Stores/Theme.store'
+import { Theme } from '../../Stores/Theme'
 import type { MarkInfo } from '../Totals'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {

@@ -1,14 +1,12 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
-import { Colors, Text, TextField, TextProps } from 'react-native-ui-lib'
-import View from 'react-native-ui-lib/view'
+import { ColorValue, StyleProp, TextStyle, View, ViewStyle } from 'react-native'
+import { IconButton, Text, TextInput, TextProps } from 'react-native-paper'
 import { Subject } from '../NetSchool/classes'
 import { styles } from '../Setup/constants'
-import { Settings } from '../Stores/Settings.store'
+import { Settings } from '../Stores/Settings'
 import { XDnevnik } from '../Stores/Xdnevnik.store'
-import { IconButton } from './Button'
 import { Loading } from './Loading'
 
 type SubjectNameOptions = {
@@ -38,10 +36,13 @@ export function getSubjectName(props: SubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
-	iconsSize: number
+	iconsSize?: number
 } & SubjectNameOptions &
-	Omit<TextProps, 'textAlign' | 'style'> & {
-		style: Omit<TextStyle, 'color'> & { color: ColorValue }
+	Omit<
+		TextProps<string>,
+		'textAlign' | 'style' | 'selectionColor' | 'children'
+	> & {
+		style: Omit<TextStyle, 'color'> & { color?: ColorValue }
 	}
 
 export const SubjectName = observer(function SubjectName({
@@ -54,6 +55,8 @@ export const SubjectName = observer(function SubjectName({
 
 	if (!studentId) return <Loading />
 
+	props.iconsSize ??= props.style.fontSize
+
 	const name = getSubjectName(props)
 
 	return (
@@ -61,27 +64,19 @@ export const SubjectName = observer(function SubjectName({
 			{!isEditing ? (
 				<Text {...props}>{name}</Text>
 			) : (
-				<TextField
+				<TextInput
 					{...props}
-					style={[
-						props.style,
-						{
-							backgroundColor: Colors.rgba(Colors.grey10, 0.1),
-						},
-					]}
 					defaultValue={name}
 					onChangeText={setNewName}
 					placeholder="Тот же, что и в сетевом городе"
 				/>
 			)}
 
-			<View row marginR-s3>
+			<View style={[styles.stretch, { padding: 0 }]}>
 				<IconButton
-					marginL-s2
-					padding-0
-					icon={isEditing ? 'save-sharp' : 'pencil'}
-					style={props.style}
+					icon={isEditing ? 'content-save' : 'pencil'}
 					size={props.iconsSize}
+					style={props.style}
 					onPress={() => {
 						if (isEditing && newName) {
 							runInAction(() => {
@@ -94,13 +89,11 @@ export const SubjectName = observer(function SubjectName({
 				/>
 				{isEditing && (
 					<IconButton
-						marginL-s1
-						padding-0
 						onPress={() => {
 							setNewName('')
 							setIsEditing(false)
 						}}
-						icon="arrow-undo"
+						icon="undo"
 						size={props.iconsSize}
 						style={props.style}
 					/>

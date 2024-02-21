@@ -1,17 +1,15 @@
 import { AnchorHTMLAttributes, memo } from 'react'
-import { Linking, ScrollView } from 'react-native'
-import { Spacings, Text, TextProps, View } from 'react-native-ui-lib'
+import { Linking, ScrollView, View } from 'react-native'
+import { Text, TextProps } from 'react-native-paper'
 
 // eslint-disable-next-line mobx/missing-observer
-export function Strong(props: TextProps) {
+export function Strong(props: TextProps<string>) {
 	return (
 		<Text
 			{...props}
 			style={{
 				fontWeight: 'bold',
 				fontSize: 20,
-				marginBottom: Spacings.s1,
-				marginTop: Spacings.s3,
 			}}
 		></Text>
 	)
@@ -19,12 +17,11 @@ export function Strong(props: TextProps) {
 
 // eslint-disable-next-line mobx/missing-observer
 export function Link(
-	props: TextProps & AnchorHTMLAttributes<never> & { href: string }
+	props: TextProps<string> & AnchorHTMLAttributes<never> & { href: string }
 ) {
 	return (
 		<Text
 			{...props}
-			underline
 			onPress={() => {
 				Linking.openURL(props.href)
 			}}
@@ -35,7 +32,7 @@ export function Link(
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function PrivacyPolicy() {
 	return (
-		<ScrollView contentContainerStyle={{ padding: Spacings.s2 }}>
+		<ScrollView contentContainerStyle={{ padding: 7 }}>
 			<View>
 				{/* eslint-disable-next-line react-native/no-raw-text */}
 				<Strong>Privacy Policy</Strong>

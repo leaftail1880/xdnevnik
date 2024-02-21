@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
-import { Colors, Switch, Text, View } from 'react-native-ui-lib'
 import { TotalsContext } from '.'
 import { dropdownButtonStyle, dropdownStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
@@ -13,9 +12,9 @@ import {
 	SubjectPerformanceStores,
 	SubjectsStore,
 	TotalsStore,
-} from '../../Stores/API.stores'
-import { Settings } from '../../Stores/Settings.store'
-import { Theme } from '../../Stores/Theme.store'
+} from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
+import { Theme } from '../../Stores/Theme'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { SubjectPerformanceInline } from './SubjectPerformanceInline'
 

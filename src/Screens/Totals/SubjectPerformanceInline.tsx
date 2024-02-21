@@ -1,10 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { Colors, Spacings, View } from 'react-native-ui-lib'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
 import { LANG } from '../../Setup/constants'
-import { Theme } from '../../Stores/Theme.store'
+import { Theme } from '../../Stores/Theme'
 import { SubjectMarksInline } from './SubjectMarksInline'
 import { SubjectInfo } from './TotalsScreenTerm'
 

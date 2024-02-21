@@ -1,9 +1,12 @@
-import { StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, View, ViewStyle } from 'react-native'
+import { Text } from 'react-native-paper'
 import SelectDropdown, {
 	SelectDropdownProps,
 } from 'react-native-select-dropdown'
-import { Colors, Text, View } from 'react-native-ui-lib'
-import { dropdownStyle } from '../../../Components/Dropdown'
+import { dropdown } from '../../../Components/Dropdown'
+import { Spacings } from '../../../Components/Spacings'
+import { styles } from '../../../Setup/constants'
+import { Theme } from '../../../Stores/Theme'
 import { BaseSetting, settingsButtonStyle } from './Base'
 
 type DropdownSettingsButtonProps<Item = object> = BaseSetting & {
@@ -15,6 +18,7 @@ type DropdownSettingsButtonProps<Item = object> = BaseSetting & {
 export const DropdownSettingsButton = function DropdownSettingsButton<
 	Item = object
 >(props: DropdownSettingsButtonProps<Item>) {
+	Theme.key
 	const selectionText = (i: Item) => {
 		const value = props.selectionText(i)
 
@@ -24,12 +28,10 @@ export const DropdownSettingsButton = function DropdownSettingsButton<
 
 	return (
 		<SelectDropdown
+			{...dropdown()}
 			buttonStyle={settingsButtonStyle()}
-			dropdownStyle={dropdownStyle()}
-			rowTextStyle={{ color: Colors.$textPrimary }}
 			buttonTextAfterSelection={selectionText}
 			rowTextForSelection={selectionText}
-			selectedRowTextStyle={{ color: Colors.rgba(Colors.$textPrimary, 0.5) }}
 			defaultButtonText={
 				typeof props.label === 'string' ? props.label : undefined
 			}
@@ -37,24 +39,29 @@ export const DropdownSettingsButton = function DropdownSettingsButton<
 				const value = props.selectionText(i)
 				return (
 					<View
-						flex
-						row
-						spread
-						centerV
-						paddingH-s3
-						style={[{ width: '100%' }, props.buttonViewStyle]}
+						style={[
+							styles.stretch,
+							{
+								padding: 0,
+								width: '100%',
+								paddingHorizontal: Spacings.s1,
+							},
+							props.buttonViewStyle,
+						]}
 					>
 						{typeof props.label === 'string' ? (
-							<Text style={{ fontSize: 18 }}>{props.label}</Text>
+							<Text variant="labelLarge">{props.label}</Text>
 						) : (
 							props.label
 						)}
 						{typeof value === 'string' ? (
 							<Text
-								style={{
-									fontSize: 18,
-									color: Colors.rgba(Colors.$textPrimary, 0.7),
-								}}
+								style={[
+									Theme.fonts.labelLarge,
+									{
+										color: Theme.colors.secondary,
+									},
+								]}
 							>
 								{value || 'По умолчанию'}
 							</Text>

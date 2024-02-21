@@ -6,12 +6,11 @@ import notifee, {
 import * as Device from 'expo-device'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
-import { Colors } from 'react-native-ui-lib'
 import { getSubjectName } from '../Components/SubjectName'
 import { Lesson, LessonState } from '../NetSchool/classes'
-import { createApiMethodStore } from '../Stores/API.store'
-import { DiaryStore } from '../Stores/API.stores'
-import { Settings } from '../Stores/Settings.store'
+import { DiaryStore } from '../Stores/API'
+import { createApiMethodStore } from '../Stores/Async'
+import { Settings } from '../Stores/Settings'
 import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
@@ -33,7 +32,7 @@ const Notification = new (class {
 })()
 
 autorun(() => {
-	const enabled = Settings.notifications
+	const enabled = Settings.lessonNotifications
 	notificationSetup(enabled)
 })
 
@@ -44,7 +43,6 @@ async function notificationSetup(enabled: boolean) {
 		name: 'Уроки',
 		importance: AndroidImportance.HIGH,
 		visibility: AndroidVisibility.PUBLIC,
-		lightColor: Colors.$iconPrimary,
 		description: 'Уведомления о текущих уроках',
 	})
 
@@ -53,7 +51,6 @@ async function notificationSetup(enabled: boolean) {
 		name: 'Новые оценки',
 		importance: AndroidImportance.HIGH,
 		visibility: AndroidVisibility.PUBLIC,
-		lightColor: Colors.$iconPrimary,
 		description: 'Уведомления о новых оценках',
 	})
 
@@ -70,12 +67,12 @@ async function notificationSetup(enabled: boolean) {
 		const { authorizationStatus } = await notifee.requestPermission()
 
 		if (authorizationStatus === AuthorizationStatus.DENIED) {
-			Settings.save({ notifications: false })
+			Settings.save({ lessonNotifications: false })
 			return
 		}
 	} else {
 		Alert.alert('Уведомления недоступны вне устройства')
-		Settings.save({ notifications: false })
+		Settings.save({ lessonNotifications: false })
 		return
 	}
 
@@ -97,17 +94,19 @@ let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function fetchMarks() {
 	if (fetchMarksInterval) clearBackgroundInterval(fetchMarksInterval)
-	if (!Settings.notifications || !Notification.marksChannelId) {
+	if (!Settings.lessonNotifications || !Notification.marksChannelId) {
 		return
 	}
 
 	fetchMarksInterval = setBackgroundInterval(async () => {
-		marksStore.withParams({
-			studentId: XDnevnik.studentId,
-			withExpiredClassAssign: true,
-			withoutMarks: false,
+		runInAction(() => {
+			marksStore.withParams({
+				studentId: XDnevnik.studentId,
+				withExpiredClassAssign: true,
+				withoutMarks: false,
+			})
+			marksStore.reload()
 		})
-		marksStore.reload()
 	}, 60000)
 	//
 })
@@ -120,7 +119,7 @@ const marksValueStore = new (class {
 })()
 
 autorun(function newMarksCheck() {
-	if (!Settings.notifications || !Notification.marksChannelId) {
+	if (!Settings.lessonNotifications || !Notification.marksChannelId) {
 		return
 	}
 
@@ -145,7 +144,7 @@ let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
-	if (!Settings.notifications || !Notification.lessonChannelId) {
+	if (!Settings.lessonNotifications || !Notification.lessonChannelId) {
 		return
 	}
 

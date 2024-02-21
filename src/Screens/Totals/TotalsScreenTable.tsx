@@ -6,11 +6,7 @@ import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
 import { LANG, styles } from '../../Setup/constants'
-import {
-	EducationStore,
-	SubjectsStore,
-	TotalsStore,
-} from '../../Stores/API.stores'
+import { EducationStore, SubjectsStore, TotalsStore } from '../../Stores/API'
 
 export const TotalsScreenTable = observer(function TotalsScreenTable(
 	props: TotalsContext

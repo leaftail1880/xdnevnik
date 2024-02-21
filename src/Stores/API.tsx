@@ -1,5 +1,5 @@
-import { createApiMethodStore } from './API.store'
-import { KeyStore } from './Key.store'
+import { createApiMethodStore } from './Async'
+import { KeyStore } from './Key'
 
 export const EducationStore = createApiMethodStore(
 	'education',
@@ -29,4 +29,3 @@ export const StudentsStore = createApiMethodStore(
 	'списка учеников',
 	{}
 )
-

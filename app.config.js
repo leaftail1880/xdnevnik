@@ -27,6 +27,11 @@ const Config = {
 			image: './assets/splash.png',
 			resizeMode: 'contain',
 			backgroundColor: '#ffffff',
+			dark: {
+				image: './assets/splash.png',
+				resizeMode: 'contain',
+				backgroundColor: '#000000',
+			},
 		},
 		assetBundlePatterns: ['**/*'],
 		ios: {
@@ -42,7 +47,7 @@ const Config = {
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
 			adaptiveIcon: {
 				foregroundImage: './assets/adaptive-icon.png',
-				backgroundColor: '#ffffff',
+				backgroundColor: '#FFFFFF00',
 			},
 
 			package: IS_DEV

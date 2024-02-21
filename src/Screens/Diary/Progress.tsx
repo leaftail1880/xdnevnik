@@ -1,8 +1,11 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
-import { Colors, ProgressBar, Text, View } from 'react-native-ui-lib'
+import { View } from 'react-native'
+import { ProgressBar, Text } from 'react-native-paper'
+import { Spacings } from '../../Components/Spacings'
 import { Lesson, LessonState } from '../../NetSchool/classes'
+import { Theme } from '../../Stores/Theme'
 
 export const LessonProgressStore = new (class {
 	now = Date.now()
@@ -34,23 +37,28 @@ export const LessonProgress = observer(function LessonProgress({
 		}
 	}, [state, lesson.classmeetingId])
 
+	const textStyle = {
+		marginBottom: Spacings.s2,
+		color: Theme.colors.onSurfaceDisabled,
+	}
+
 	if (state === LessonState.notStarted) {
 		// Do not show time above 15 mins
 		if (beforeStart < 15) {
-			return (
-				<Text
-					color={Colors.rgba(Colors.$textAccent, 0.5)}
-					center
-					marginH-s3
-					marginB-s2
-				>
-					Начнется через {beforeStart} мин
-				</Text>
-			)
+			return <Text style={textStyle}>Начнется через {beforeStart} мин</Text>
 		}
 	} else if (state === LessonState.going) {
 		return (
-			<View row center marginH-s3 paddingH-s2 marginB-s2 centerV>
+			<View
+				style={{
+					flexDirection: 'row',
+					alignSelf: 'center',
+					marginHorizontal: Spacings.s3,
+					paddingHorizontal: Spacings.s2,
+					marginBottom: Spacings.s2,
+					alignContent: 'center',
+				}}
+			>
 				<View
 					style={{
 						width: '80%',
@@ -60,28 +68,17 @@ export const LessonProgress = observer(function LessonProgress({
 						style={{
 							width: '100%',
 							height: 20,
-							backgroundColor: Colors.rgba(Colors.black, 0.3),
 						}}
 						progress={progress}
-						progressColor={Colors.$textAccent}
 					/>
 				</View>
-				<Text $textAccent margin-s1>
+				<Text style={{ margin: Spacings.s1 }}>
 					{beforeEnd}/{total} мин
 				</Text>
 			</View>
 		)
 	} else {
 		// Lesson is ended
-		return (
-			<Text
-				color={Colors.rgba(Colors.$textAccent, 0.5)}
-				center
-				marginH-s3
-				marginB-s2
-			>
-				Закончился
-			</Text>
-		)
+		return <Text style={textStyle}>Закончился</Text>
 	}
 })

@@ -248,7 +248,11 @@ export class NetSchoolApi {
 		try {
 			if (init.auth) {
 				if (this.session && this.session.expires.getTime() < Date.now()) {
-					Logger.debug('Session expired')
+					Logger.debug(
+						'Session expired',
+						this.session.expires.toReadable(),
+						new Date().toReadable()
+					)
 					// Request update of token
 					this.authorized = null
 				}

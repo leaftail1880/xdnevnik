@@ -7,9 +7,9 @@ import { dropdownButtonStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
 import { SubjectName } from '../../Components/SubjectName'
-import { SubjectPerformanceStores } from '../../Stores/API.stores'
-import { fullname } from '../../Stores/Settings.store'
-import { Theme } from '../../Stores/Theme.store'
+import { SubjectPerformanceStores } from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
+import { Theme } from '../../Stores/Theme'
 import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import type { MarkInfo } from '../Totals'
 import type { ParamMap, S_SUBJECT_TOTALS } from '../Totals/navigation'
@@ -101,7 +101,9 @@ export const SubjectTotals = observer(function SubjectTotals({
 				<View padding-s2>
 					<Text>
 						Учитель:{' '}
-						<Text text50>{fullname(performance.result.teachers[0].name)}</Text>
+						<Text text50>
+							{Settings.fullname(performance.result.teachers[0].name)}
+						</Text>
 					</Text>
 					<Text>
 						Прошло уроков:{' '}

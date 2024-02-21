@@ -9,17 +9,20 @@
 		"update": "eas update --channel production --auto"
 	},
 	"dependencies": {
+		"@material/material-color-utilities": "^0.2.7",
 		"@notifee/react-native": "^7.8.2",
 		"@react-navigation/native": "^6.1.9",
 		"@react-navigation/stack": "^6.3.20",
 		"@sentry/react-native": "5.17.0",
+		"@types/color": "^3.0.6",
+		"color": "^4.2.3",
 		"expo": "~50.0.6",
 		"expo-application": "~5.8.3",
 		"expo-dev-client": "~3.3.8",
 		"expo-device": "~5.9.3",
 		"expo-intent-launcher": "~10.11.0",
 		"expo-sharing": "~11.10.0",
-		"expo-splash-screen": "~0.26.4",
+		"expo-splash-screen": "^0.26.4",
 		"expo-status-bar": "~1.11.1",
 		"expo-system-ui": "~2.9.3",
 		"expo-updates": "~0.24.10",
@@ -37,9 +40,10 @@
 		"react-native-safe-area-context": "4.8.2",
 		"react-native-screens": "~3.29.0",
 		"react-native-select-dropdown": "patch:react-native-select-dropdown@patch%3Areact-native-select-dropdown@patch%253Areact-native-select-dropdown@npm%25253A3.4.0%2523~/.yarn/patches/react-native-select-dropdown-npm-3.4.0-3567283796.patch%253A%253Aversion=3.4.0&hash=ea6684%23~/.yarn/patches/react-native-select-dropdown-patch-108765e425.patch%3A%3Aversion=3.4.0&hash=cb9e21#~/.yarn/patches/react-native-select-dropdown-patch-744b8d9ea4.patch",
-		"react-native-ui-lib": "^7.16.0",
+		"react-native-toast-message": "^2.2.0",
 		"react-native-vector-icons": "^10.0.3",
-		"react-native-webview": "13.6.4"
+		"react-native-webview": "13.6.4",
+		"reanimated-color-picker": "^3.0.3"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.9",

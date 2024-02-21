@@ -2,20 +2,30 @@ import { makeAutoObservable } from 'mobx'
 import { LANG } from '../../Setup/constants'
 import { makeReloadPersistable } from '../../Stores/makePersistable'
 
-export const DiaryStateStore = new (class {
+export const DiaryState = new (class {
 	constructor() {
-		makeAutoObservable<this, 'weekOffset'>(this, { weekOffset: false })
-		makeReloadPersistable(this, { name: 'diary', properties: ['showHomework'] })
+		makeAutoObservable<this, 'weekOffset'>(this, {
+			weekOffset: false,
+		})
+		makeReloadPersistable(this, {
+			name: 'diary',
+			properties: ['showHomework', 'showAttachments', 'showLessonTheme'],
+		})
 	}
 
-	diaryDay = new Date().toYYYYMMDD()
-	weekDate = new Date()
+	day = new Date().toYYYYMMDD()
+	week = new Date()
+
+	showHomework = true
+	showAttachments = true
+	showLessonTheme = true
+
 	get weekDays() {
-		return Date.week(this.weekDate)
+		return Date.week(this.week)
 	}
 	private weekOffset(offset: number) {
 		const date = new Date()
-		date.setDate(this.weekDate.getDate() + offset)
+		date.setDate(this.week.getDate() + offset)
 		return date
 	}
 	get weekBefore() {
@@ -24,7 +34,7 @@ export const DiaryStateStore = new (class {
 	get weekAfter() {
 		return this.weekOffset(7)
 	}
-	get weekDaysOptions() {
+	get weekDaysDropdown() {
 		return [
 			{
 				name: 'Прошлая неделя',
@@ -39,7 +49,7 @@ export const DiaryStateStore = new (class {
 						today ? ', cегодня' : ` ${day.toYYYYMMDD()}`
 					}`,
 					day: day.toYYYYMMDD(),
-					selected: day.toYYYYMMDD() === this.diaryDay,
+					selected: day.toYYYYMMDD() === this.day,
 				}
 			}),
 			{
@@ -50,5 +60,4 @@ export const DiaryStateStore = new (class {
 			},
 		]
 	}
-	showHomework = true
 })()

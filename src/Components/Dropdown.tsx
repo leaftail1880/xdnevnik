@@ -1,22 +1,21 @@
 import { StyleProp, ViewStyle } from 'react-native'
-import { BorderRadiuses, Colors } from 'react-native-ui-lib'
+import { Theme } from '../Stores/Theme'
 
 export function dropdownButtonStyle(): StyleProp<ViewStyle> {
 	return {
-		elevation: 10,
 		alignSelf: 'center',
 		width: '100%',
-		backgroundColor: Colors.$backgroundPrimaryMedium,
-		borderBottomLeftRadius: BorderRadiuses.br50,
-		borderBottomRightRadius: BorderRadiuses.br50,
+		backgroundColor: Theme.colors.elevation.level2,
+		borderBottomLeftRadius: Theme.roundness,
+		borderBottomRightRadius: Theme.roundness,
 	}
 }
 
 export function dropdownStyle(): ViewStyle {
 	return {
-		borderRadius: BorderRadiuses.br40,
+		backgroundColor: Theme.colors.background,
+		borderRadius: Theme.roundness,
 		alignContent: 'center',
-		backgroundColor: Colors.$backgroundPrimaryLight,
 	}
 }
 
@@ -24,5 +23,8 @@ export function dropdown() {
 	return {
 		buttonStyle: dropdownButtonStyle(),
 		dropdownStyle: dropdownStyle(),
+		rowTextStyle: { color: Theme.colors.onSurface, fontSize: 16 },
+		rowStyle: { borderColor: Theme.colors.backdrop },
+		selectedRowTextStyle: { color: Theme.colors.secondary },
 	}
 }

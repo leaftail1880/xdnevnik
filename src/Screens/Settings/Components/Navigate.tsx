@@ -1,9 +1,9 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
-import { Theme } from '../../../Stores/Theme.store'
+import { Button } from 'react-native-paper'
+import { styles } from '../../../Setup/constants'
+import { Theme } from '../../../Stores/Theme'
 import { SETTINGS_ROUTES, SettingsRoutes } from '../SettingsNavigation'
-import { SettingsText } from './Base'
-import { SettingsButton } from './SettingsButton'
 
 export const SettingsJumpNavigation = observer(
 	function SettingsJumpNavigation(props: {
@@ -12,11 +12,17 @@ export const SettingsJumpNavigation = observer(
 	}) {
 		Theme.key
 		return (
-			<SettingsButton
+			<Button
 				onPress={() => props.navigation.navigation.navigate(props.target)}
+				icon={'arrow-right'}
+				contentStyle={[
+					styles.stretch,
+					{ padding: 0, flexDirection: 'row-reverse' },
+				]}
+				labelStyle={Theme.fonts.titleMedium}
 			>
-				<SettingsText>{'' || SETTINGS_ROUTES[props.target]}</SettingsText>
-			</SettingsButton>
+				{SETTINGS_ROUTES[props.target]}
+			</Button>
 		)
 	}
 )

@@ -16,7 +16,7 @@ autorun(function autologin() {
 	if (requestSent) return
 
 	// Session is still active
-	if (API.session.expires.getTime() > Date.now()) {
+	if (API.session.expires.getTime() < Date.now()) {
 		runInAction(() => {
 			API.authorized = true
 		})
@@ -30,26 +30,18 @@ autorun(function autologin() {
 	)
 		.then(() => {
 			if (XDnevnik.status) {
-				runInAction(() => {
-					XDnevnik.status = { content: 'Вы авторизовались.', error: false }
-				})
-				setTimeout(
-					() =>
-						runInAction(() => {
-							requestSent = false
-							XDnevnik.status = undefined
-						}),
-					5000
-				)
+				XDnevnik.showToast({ content: 'Вы авторизовались' })
 			}
 		})
 		.catch(e => {
 			runInAction(() => {
-				requestSent = false
-				XDnevnik.status = {
+				XDnevnik.showToast({
 					content: NetSchoolApi.stringifyError(e),
 					error: true,
-				}
+				})
 			})
+		})
+		.finally(() => {
+			requestSent = false
 		})
 })

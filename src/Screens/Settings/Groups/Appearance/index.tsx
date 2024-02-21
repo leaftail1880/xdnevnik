@@ -1,9 +1,13 @@
 import { observer } from 'mobx-react-lite'
-import { ScrollView } from 'react-native'
-import { Text } from 'react-native-ui-lib'
-import { Settings } from '../../../../Stores/Settings.store'
-import { Theme } from '../../../../Stores/Theme.store'
+import { ScrollView, View } from 'react-native'
+import { Button, Surface, Text } from 'react-native-paper'
+import Toast from 'react-native-toast-message'
+import { Spacings } from '../../../../Components/Spacings'
+import { styles } from '../../../../Setup/constants'
+import { Settings } from '../../../../Stores/Settings'
+import { Theme } from '../../../../Stores/Theme'
 import { DropdownSettingsButton } from '../../Components/DropdownSettingsButton'
+import { SwitchSetting } from '../../Components/SwitchSetting'
 import { AccentColorPicker } from './AccentColorPicker'
 
 const themes = [
@@ -20,51 +24,86 @@ const markStyles = [
 export default observer(function Appearance() {
 	Theme.key
 	return (
-		<ScrollView
-			contentContainerStyle={{
-				flex: 1,
-				alignContent: 'flex-start',
-				justifyContent: 'flex-start',
-			}}
-		>
-			<DropdownSettingsButton
-				label={'Тема'}
-				data={themes}
-				defaultValueByIndex={themes.findIndex(e => e.i === Theme.scheme)}
-				onSelect={s => Theme.setColorScheme(s.i)}
-				selectionText={i => i?.name}
-			/>
-			<DropdownSettingsButton
-				data={markStyles}
-				defaultValueByIndex={markStyles.findIndex(
-					e => e.i === Settings.markStyle
-				)}
-				onSelect={s => Settings.save({ markStyle: s.i })}
-				label="Стиль оценок"
-				selectionText={i => i?.name}
-			/>
-			<Text margin-s2 center key={Theme.key + 'text'}>
-				Цвет акцентов:
-			</Text>
+		<ScrollView contentContainerStyle={{}}>
+				<DropdownSettingsButton
+					label={'Тема'}
+					data={themes}
+					defaultValueByIndex={themes.findIndex(e => e.i === Theme.scheme)}
+					onSelect={s => Theme.setColorScheme(s.i)}
+					selectionText={i => i?.name}
+				/>
+
+				<DropdownSettingsButton
+					label="Стиль оценок"
+					data={markStyles}
+					defaultValueByIndex={markStyles.findIndex(
+						e => e.i === Settings.markStyle
+					)}
+					onSelect={s => Settings.save({ markStyle: s.i })}
+					selectionText={i => i?.name}
+				/>
+				<SwitchSetting setting="lastNameLast" label="Показывать ФИО как ИОФ" />
 			<AccentColorPicker />
-			{/* <ScrollView>
-                {Object.entries(Colors)
-                    .sort((a, b) => a[0].localeCompare(b[0]))
-                    .map(([key, value]) => {
-                        if (key.startsWith('$'))
-                            return (
-                                <View key={key} flex row spread centerV>
-                                    <Text>{key}</Text>
-                                    <View key={key} row spread centerV>
-                                        <Text>{value}</Text>
-                                        <ColorSwatch color={value} />
-                                    </View>
-                                </View>
-                            )
-                        else return false
-                    })
-                    .filter(Boolean)}
-            </ScrollView> */}
+			{false && <DevSettings />}
 		</ScrollView>
+	)
+})
+
+const DevSettings = observer(function DevSettings() {
+	return (
+		<Surface elevation={1} style={{ borderRadius: Theme.roundness }}>
+			<Button onPress={() => Toast.show({ text1: 'Проверка', text2: 'Тоста' })}>
+				Проверить тост
+			</Button>
+			<Button
+				onPress={() =>
+					Toast.show({
+						text1: 'Проверка',
+						text2:
+							'Тоста с обычно очень очень очень длинным текстом что аж жесть',
+						type: 'error',
+					})
+				}
+			>
+				Проверить тост ошибку
+			</Button>
+			<ThemePreview />
+		</Surface>
+	)
+})
+
+const ThemePreview = observer(function ThemePreview() {
+	return (
+		<View key={Theme.key}>
+			{Object.entries(Theme.colors)
+				.sort((a, b) => a[0].localeCompare(b[0]))
+				.map(([key, value]) => {
+					if (typeof value === 'string')
+						return (
+							<View
+								style={[
+									styles.stretch,
+									{
+										padding: 0,
+										paddingHorizontal: Spacings.s1,
+										margin: 0,
+									},
+								]}
+								key={key}
+							>
+								<Text>{key}</Text>
+								<View
+									style={{
+										backgroundColor: value,
+										padding: Spacings.s3,
+										width: '30%',
+										margin: 0,
+									}}
+								></View>
+							</View>
+						)
+				})
+				.filter(Boolean)}
+		</View>
 	)
 })

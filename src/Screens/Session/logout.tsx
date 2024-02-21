@@ -1,36 +1,37 @@
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Colors, Text } from 'react-native-ui-lib'
-import View from 'react-native-ui-lib/view'
-import { Button } from '../../Components/Button'
+import { View } from 'react-native'
+import { Button, Text } from 'react-native-paper'
 import { Header } from '../../Components/Header'
+import { Spacings } from '../../Components/Spacings'
 import { API } from '../../NetSchool/api'
 import { LANG } from '../../Setup/constants'
-import { Theme } from '../../Stores/Theme.store'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
+import { Theme } from '../../Stores/Theme'
 
 export const LogoutScreen = observer(function LogoutScreen() {
-	async function logout() {
-		XDnevnik.status = undefined
-		API.logOut()
+	function logout() {
+		runInAction(() => {
+			API.logOut()
+		})
 	}
 
-	Theme.key
-
 	return (
-		<View flex>
+		<View style={{ flex: 1 }}>
 			<Header title="Выход"></Header>
-			<View center>
+			<View style={{ alignContent: 'center', padding: Spacings.s3 }}>
 				<Button
 					onPress={logout}
 					style={{
-						backgroundColor: Colors.$backgroundDangerHeavy,
-						minWidth: 250,
-						minHeight: 50,
+						backgroundColor: Theme.colors.error,
+					}}
+					labelStyle={{
+						fontSize: 16,
+						color: Theme.colors.onError,
 					}}
 				>
-					<Text $textAccent>{LANG['log_out']}</Text>
+					{LANG['log_out']}
 				</Button>
-				<Text center style={{ maxWidth: 300 }}>
+				<Text style={{ alignSelf: 'center', marginTop: Spacings.s2 }}>
 					{LANG['log_out_info']}
 				</Text>
 			</View>
