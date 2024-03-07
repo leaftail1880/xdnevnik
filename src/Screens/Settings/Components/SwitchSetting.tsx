@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react-lite'
-import { Switch } from 'react-native-ui-lib'
-import { Logger } from '../../../Setup/constants'
-import { Settings } from '../../../Stores/Settings.store'
-import { SettingsText } from './Base'
-import { SettingsButton, SettingsButtonProps } from './SettingsButton'
+import { View } from 'react-native'
+import { Switch, Text, TouchableRipple } from 'react-native-paper'
+import { Spacings } from '../../../Components/Spacings'
+import { Logger, styles } from '../../../Setup/constants'
+import { Settings } from '../../../Stores/Settings'
+import { BaseSetting } from './Base'
 
-type SwitchSettingProps = SettingsButtonProps &
+type SwitchSettingProps = BaseSetting &
 	(
 		| {
 				setting: keyof FilterObject<typeof Settings, true | false>
@@ -25,22 +26,30 @@ export const SwitchSetting = observer(function SwitchSetting(
 		return false
 	}
 	const onChange = (v: boolean): void => {
-		if (setting) {
+		if ('onChange' in props) {
+			props.onChange(v)
+		} else {
 			Settings.save({ [setting]: v })
-			// @ts-expect-error Look at check above
-		} else props.onChange(v)
+		}
 	}
 	return (
-		<SettingsButton
-			{...props}
-			br10
-			onPress={() => onChange(!Settings[setting])}
-		>
-			<SettingsText>{props.label}</SettingsText>
-			<Switch
-				value={'setting' in props ? Settings[setting] : props.value}
-				onValueChange={onChange}
-			/>
-		</SettingsButton>
+		<TouchableRipple {...props} onPress={() => onChange(!Settings[setting])}>
+			<View
+				style={[
+					styles.stretch,
+					{
+						width: '100%',
+						padding: Spacings.s2,
+						margin: Spacings.s1,
+					},
+				]}
+			>
+				<Text variant="labelLarge">{props.label}</Text>
+				<Switch
+					value={'setting' in props ? Settings[setting] : props.value}
+					onValueChange={onChange}
+				/>
+			</View>
+		</TouchableRipple>
 	)
 })

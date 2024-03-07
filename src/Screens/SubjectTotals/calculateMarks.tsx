@@ -27,19 +27,25 @@ export function calculateMarks({
 			)
 		}
 
-		if (lessonsWithoutMark) {
-			attendance = attendance.concat(
-				new Array(
-					totals.classmeetingsStats.passed -
-						totals.results.length -
-						attendance.length
-				).fill({ result: 'Нет', assignmentTypeName: 'Урок прошел, оценки нет' })
-			)
-		}
+		
 
 		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
 			(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
 		) as Partial<MarkInfo>[]
+
+		if (lessonsWithoutMark) {
+			const length =
+				totals.classmeetingsStats.passed -
+				totals.results.length -
+				attendance.length
+			if (length > 0)
+				attendance = new Array(length)
+					.fill({
+						result: 'Нет',
+						assignmentTypeName: 'За этот урок оценки нет',
+					})
+					.concat(attendance)
+		}
 
 		let avgMark = totals.averageMark
 

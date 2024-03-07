@@ -1,9 +1,13 @@
-import { StyleProp, ViewStyle } from 'react-native'
+import { observer } from 'mobx-react-lite'
+import { Falsy, StyleProp, TextStyle, View, ViewStyle } from 'react-native'
+import { Text } from 'react-native-paper'
 import SelectDropdown, {
 	SelectDropdownProps,
 } from 'react-native-select-dropdown'
-import { Colors, Text, View } from 'react-native-ui-lib'
-import { dropdownStyle } from '../../../Components/Dropdown'
+import { dropdown } from '../../../Components/Dropdown'
+import { Spacings } from '../../../Components/Spacings'
+import { styles } from '../../../Setup/constants'
+import { Theme } from '../../../Stores/Theme'
 import { BaseSetting, settingsButtonStyle } from './Base'
 
 type DropdownSettingsButtonProps<Item = object> = BaseSetting & {
@@ -11,10 +15,10 @@ type DropdownSettingsButtonProps<Item = object> = BaseSetting & {
 	buttonViewStyle?: StyleProp<ViewStyle>
 } & SelectDropdownProps<Item>
 
-// eslint-disable-next-line mobx/missing-observer
-export const DropdownSettingsButton = function DropdownSettingsButton<
+export const DropdownSettingsButton = observer(function DropdownSettingsButton<
 	Item = object
 >(props: DropdownSettingsButtonProps<Item>) {
+	Theme.key
 	const selectionText = (i: Item) => {
 		const value = props.selectionText(i)
 
@@ -24,47 +28,53 @@ export const DropdownSettingsButton = function DropdownSettingsButton<
 
 	return (
 		<SelectDropdown
+			{...dropdown()}
 			buttonStyle={settingsButtonStyle()}
-			dropdownStyle={dropdownStyle()}
-			rowTextStyle={{ color: Colors.$textPrimary }}
 			buttonTextAfterSelection={selectionText}
 			rowTextForSelection={selectionText}
-			selectedRowTextStyle={{ color: Colors.rgba(Colors.$textPrimary, 0.5) }}
 			defaultButtonText={
 				typeof props.label === 'string' ? props.label : undefined
 			}
 			renderCustomizedButtonChild={i => {
 				const value = props.selectionText(i)
+				const viewStyle: StyleProp<ViewStyle> = [
+					styles.stretch,
+					{
+						padding: 0,
+						width: '100%',
+						paddingHorizontal: Spacings.s1,
+					},
+					props.buttonViewStyle,
+				]
+
 				return (
-					<View
-						flex
-						row
-						spread
-						centerV
-						paddingH-s3
-						style={[{ width: '100%' }, props.buttonViewStyle]}
-					>
-						{typeof props.label === 'string' ? (
-							<Text style={{ fontSize: 18 }}>{props.label}</Text>
-						) : (
-							props.label
-						)}
-						{typeof value === 'string' ? (
-							<Text
-								style={{
-									fontSize: 18,
-									color: Colors.rgba(Colors.$textPrimary, 0.7),
-								}}
-							>
-								{value || 'По умолчанию'}
-							</Text>
-						) : (
-							value
-						)}
+					<View style={viewStyle}>
+						<TextOrNode>{props.label}</TextOrNode>
+						<TextOrNode
+							style={{
+								color: Theme.colors.secondary,
+							}}
+						>
+							{value}
+						</TextOrNode>
 					</View>
 				)
 			}}
 			{...props}
 		/>
 	)
-}
+})
+
+const TextOrNode = observer(function TextOrNode(props: {
+	children: React.JSX.Element | Falsy | string
+	style?: StyleProp<TextStyle>
+}) {
+	Theme.key
+	return typeof props.children === 'string' ? (
+		<Text variant="labelLarge" style={props.style}>
+			{props.children || 'По умолчанию'}
+		</Text>
+	) : (
+		props.children
+	)
+})

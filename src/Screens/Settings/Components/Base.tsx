@@ -1,12 +1,13 @@
 import { Falsy, ViewStyle } from 'react-native'
-import { Colors, Spacings, Text, TextProps } from 'react-native-ui-lib'
+import { Spacings } from '../../../Components/Spacings'
+import { Theme } from '../../../Stores/Theme'
 
 export function settingsButtonStyle(): ViewStyle {
 	return {
 		width: '100%',
-		backgroundColor: Colors.rgba(Colors.$backgroundPrimaryMedium, 0.5),
-		padding: Spacings.s3,
-		marginBottom: Spacings.s1,
+		backgroundColor: Theme.colors.background,
+		margin: Spacings.s1,
+		padding: Spacings.s1,
 		borderRadius: 0,
 	}
 }
@@ -16,9 +17,4 @@ export type BaseSetting = {
 	 * Label that will be displayed in the right
 	 */
 	label?: string | React.JSX.Element | Falsy
-}
-
-// eslint-disable-next-line mobx/missing-observer
-export const SettingsText = function SettingsText(props: TextProps) {
-	return <Text style={{ fontSize: 18 }} {...props} />
 }

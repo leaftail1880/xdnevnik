@@ -1,16 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
-import { Colors, Text, View } from 'react-native-ui-lib'
-import { TotalsContext } from '.'
+import { DataTable, Text } from 'react-native-paper'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
+import { Spacings } from '../../Components/Spacings'
 import { SubjectName } from '../../Components/SubjectName'
-import { LANG, styles } from '../../Setup/constants'
-import {
-	EducationStore,
-	SubjectsStore,
-	TotalsStore,
-} from '../../Stores/API.stores'
+import { LANG } from '../../Setup/constants'
+import { EducationStore, SubjectsStore, TotalsStore } from '../../Stores/API'
+import { Theme } from '../../Stores/Theme'
+import { TotalsContext } from './index'
 
 export const TotalsScreenTable = observer(function TotalsScreenTable(
 	props: TotalsContext
@@ -19,14 +17,6 @@ export const TotalsScreenTable = observer(function TotalsScreenTable(
 	const subjects = SubjectsStore
 	const education = EducationStore
 	const { schoolYear } = props
-	const headerWidth = 45
-	const termTotalWidth =
-		totals.result &&
-		totals.result[0] &&
-		(`${~~(
-			(100 - headerWidth) /
-			totals.result[0].termTotals.length
-		)}%` as const)
 
 	return education.fallback ||
 		subjects.fallback ||
@@ -34,78 +24,68 @@ export const TotalsScreenTable = observer(function TotalsScreenTable(
 		totals.result.length < 1 ? (
 		<Loading text="Загрузка из кэша{dots}" />
 	) : (
-		<ScrollView contentContainerStyle={styles.table}>
-			{/* Table head */}
-			<View
-				style={{
-					...styles.tableRow,
-					backgroundColor: Colors.$backgroundPrimaryHeavy,
-				}}
-			>
-				{/* Table first row */}
-				<Text $textAccent style={{ width: `${headerWidth}%` }}>
-					{new Date(schoolYear!.startDate).getFullYear()}/
-					{new Date(schoolYear!.endDate).getFullYear()} Четверти
-				</Text>
+		<ScrollView contentContainerStyle={{ flex: 0 }}>
+			<DataTable style={{ alignSelf: 'center' }}>
+				<DataTable.Header>
+					<DataTable.Title style={{ flex: 3 }}>
+						{new Date(schoolYear!.startDate).getFullYear()}/
+						{new Date(schoolYear!.endDate).getFullYear()} Четверти
+					</DataTable.Title>
 
-				{/* Table rows */}
-				{totals.result[0].termTotals.map((_, i, a) => (
-					<Text
-						$textAccent
-						style={{ width: termTotalWidth }}
-						key={i.toString()}
-					>
-						{i + 1}/{a.length}
-					</Text>
-				))}
-			</View>
+					{totals.result[0].termTotals.map((_, i, a) => (
+						<DataTable.Title
+							key={i.toString()}
+							style={{
+								justifyContent: 'center',
+								alignContent: 'center',
+								alignItems: 'center',
+							}}
+						>
+							{i + 1}/{a.length}
+						</DataTable.Title>
+					))}
+				</DataTable.Header>
+			</DataTable>
 
-			{/* Table body */}
 			{totals.result.map(total => (
-				<View
-					style={{ ...styles.tableRow, padding: 0 }}
-					key={total.subjectId.toString()}
-				>
-					{/* Table first row */}
-					<View
-						style={{
-							...styles.tableCell,
-							width: `${headerWidth}%`,
-						}}
-					>
+				<DataTable.Row key={total.subjectId.toString()}>
+					<DataTable.Cell style={{ flex: 3 }}>
 						<SubjectName
-							iconsSize={16}
+							style={{ maxWidth: '80%' }}
+							viewStyle={{ width: '100%' }}
 							subjectId={total.subjectId}
 							subjects={subjects.result!}
-							style={{
-								color: Colors.$textDefault,
-							}}
+							iconsSize={14}
 						/>
-					</View>
+					</DataTable.Cell>
 
-					{/* Table rows */}
 					{total.termTotals.map((term, i) => (
-						<Mark
-							duty={false}
-							finalMark={term.mark}
-							mark={term.avgMark}
-							style={{
-								...styles.tableCell,
-								width: termTotalWidth,
-							}}
-							onPress={() => {
-								props.navigation.navigate(LANG['s_subject_totals'], {
-									termId: term.term.id,
-									finalMark: term.mark,
-									subjectId: total.subjectId,
-								})
-							}}
-							key={i.toString() + term.avgMark + term.term.name}
-						/>
+						<DataTable.Cell key={i.toString() + term.avgMark + term.term.name}>
+							<Mark
+								style={{ width: '80%', height: '80%', flex: 0 }}
+								duty={false}
+								finalMark={term.mark}
+								mark={term.avgMark}
+								onPress={() => {
+									props.navigation.navigate(LANG['s_subject_totals'], {
+										termId: term.term.id,
+										finalMark: term.mark,
+										subjectId: total.subjectId,
+									})
+								}}
+							/>
+						</DataTable.Cell>
 					))}
-				</View>
+				</DataTable.Row>
 			))}
-			<Text $textDisabled center margin-s1>
+			<Text
+				style={{
+					color: Theme.colors.onSurfaceDisabled,
+					marginBottom: Spacings.s4,
+					margin: Spacings.s2,
+					alignSelf: 'center',
+				}}
+			>
 				{totals.updateDate}
 			</Text>
 		</ScrollView>

@@ -44,3 +44,13 @@ Date.week = date =>
 		.map(
 			(_, i) => new Date(date.getTime() - (date.getDayMon() - i) * dayInMs)
 		) as ReturnType<typeof Date.week>
+
+AbortSignal.timeout = ms => {
+	const controller = new AbortController()
+
+	setTimeout(() => {
+		if (!controller.signal.aborted) controller.abort()
+	}, ms)
+
+	return controller.signal
+}

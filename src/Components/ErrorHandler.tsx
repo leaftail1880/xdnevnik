@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
-import { Colors, Spacings, Text, View } from 'react-native-ui-lib'
+import { View } from 'react-native'
+import { Button, Text } from 'react-native-paper'
 import { NetSchoolApi, NetSchoolError } from '../NetSchool/api'
-import { Button } from './Button'
-import { Ionicon } from './Icon'
+import { Theme } from '../Stores/Theme'
 
 interface ErrorHandlerProps {
 	error: [number, Error]
@@ -22,15 +22,21 @@ export const ErrorHandler = function ErrorHandler({
 	const needAuth = error[1] instanceof NetSchoolError && error[1].beforeAuth
 	return (
 		<View
-			flex
-			center
-			margin-s1
 			style={{
+				flex: 1,
+				alignContent: 'center',
+				justifyContent: 'center',
 				alignSelf: 'center',
 				maxWidth: 300,
 			}}
 		>
-			<Text $textDanger style={{ fontSize: 20, fontWeight: 'bold' }}>
+			<Text
+				style={{
+					fontSize: 20,
+					fontWeight: 'bold',
+					color: Theme.colors.error,
+				}}
+			>
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
 			<Text>При загрузке {name}</Text>
@@ -41,26 +47,19 @@ export const ErrorHandler = function ErrorHandler({
 			{more && <Text>{errorString}</Text>}
 			<View margin-s2>
 				<Button onPress={() => setMore(!more)} margin-s1 padding-s2>
-					<Text $textDefault>{!more ? 'Подробнее' : 'Свернуть'}</Text>
+					<Text>{!more ? 'Подробнее' : 'Свернуть'}</Text>
 				</Button>
-				<Button onPress={reload} margin-s1 padding-s2 row>
-					<Text $textDefault>Попробовать снова</Text>
-					<Ionicon
-						name="reload"
-						size={18}
-						color={Colors.$textDefault}
-						style={{ paddingLeft: Spacings.s1 }}
-					/>
+				{/* eslint-disable-next-line react-native/no-raw-text */}
+				<Button onPress={reload} icon="reload">
+					Попробовать снова
 				</Button>
 				{!needAuth && (
 					<Button
 						onPress={() => {
 							Sentry.captureException(error)
 						}}
-						margin-s1
-						padding-s2
 					>
-						<Text $textDefault>{'Отправить отчет об ошибке разработчику'}</Text>
+						<Text>{'Отправить отчет об ошибке разработчику'}</Text>
 					</Button>
 				)}
 			</View>

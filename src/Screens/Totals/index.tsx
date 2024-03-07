@@ -1,24 +1,19 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { Observer, observer } from 'mobx-react-lite'
-import { Switch, Text, View } from 'react-native-ui-lib'
+import { View } from 'react-native'
+import { Chip } from 'react-native-paper'
+import { Spacings } from '../../Components/Spacings'
 import { Education, SubjectPerformance } from '../../NetSchool/classes'
-import {
-	EducationStore,
-	SubjectsStore,
-	TotalsStore,
-} from '../../Stores/API.stores'
-import { Settings } from '../../Stores/Settings.store'
-import { Theme } from '../../Stores/Theme.store'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
+import { EducationStore, SubjectsStore, TotalsStore } from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
 import { SubjectTotals } from '../SubjectTotals/index'
 import { TotalsScreenTable } from './TotalsScreenTable'
 import { TotalsScreenTerm } from './TotalsScreenTerm'
 import { ParamMap, S_SUBJECT_TOTALS, S_TOTALS, Stack } from './navigation'
 
-export const TotalsNavigation = observer(function TotalsNavigation() {
-	const { studentId } = XDnevnik
+export default observer(function TotalsNavigation() {
+	const { studentId } = Settings
 	EducationStore.withParams({ studentId })
-	const themeKey = Theme.accentColor + Theme.scheme
 
 	// TODO Let user to choose school year
 	const schoolYear = EducationStore.result?.find(
@@ -35,6 +30,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 	const TotalsScreen = Settings.currentTotalsOnly
 		? TotalsScreenTerm
 		: TotalsScreenTable
+		
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -43,7 +39,6 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 			}}
 		>
 			<Stack.Screen
-				key={themeKey}
 				name={S_TOTALS}
 				options={{
 					headerRight() {
@@ -51,17 +46,17 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 							<Observer>
 								{function headerSwitch() {
 									return (
-										<View flex row spread center padding-s1>
-											<Text marginR-s2 key={Theme.key}>
-												Только одна четверть
-											</Text>
-											<Switch
-												value={Settings.currentTotalsOnly}
-												onValueChange={(currentTotalsOnly: boolean) =>
-													Settings.save({ currentTotalsOnly })
+										<View style={{ margin: Spacings.s2 }}>
+											<Chip
+												selected={!Settings.currentTotalsOnly}
+												onPress={() =>
+													Settings.save({
+														currentTotalsOnly: !Settings.currentTotalsOnly,
+													})
 												}
-												key={Theme.key + 's'}
-											/>
+											>
+												Все четверти
+											</Chip>
 										</View>
 									)
 								}}
@@ -73,14 +68,9 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 				{nav => <TotalsScreen {...nav} {...{ schoolYear }} />}
 			</Stack.Screen>
 			<Stack.Screen
-				key={themeKey + '2'}
+				component={SubjectTotals}
 				name={S_SUBJECT_TOTALS}
-				// options={{
-				// 	headerStyle: { elevation: 0 },
-				// }}
-			>
-				{nav => <SubjectTotals {...nav} />}
-			</Stack.Screen>
+			></Stack.Screen>
 		</Stack.Navigator>
 	)
 })

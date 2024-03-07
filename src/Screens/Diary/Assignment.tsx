@@ -1,16 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import {
-	Colors,
-	Spacings,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native-ui-lib'
-import { Button } from '../../Components/Button'
+import { View } from 'react-native'
+import { Button, Text, TouchableRipple } from 'react-native-paper'
 import { Mark } from '../../Components/Mark'
+import { Spacings } from '../../Components/Spacings'
 import { Assignment, Attachment } from '../../NetSchool/classes'
-import { AttachmentsStore } from '../../Stores/API.stores'
+import { AttachmentsStore } from '../../Stores/API'
+import { Theme } from '../../Stores/Theme'
 // import * as FileSystem from 'expo-file-system'
 // import * as ExpoSharing from 'expo-sharing'
 // import { Alert } from 'react-native'
@@ -38,62 +34,56 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 
 	return (
 		<View
-			margin-s1
-			backgroundColor={Colors.rgba(Colors.$backgroundPrimaryLight, 0.2)}
-			padding-s1
-			br20
+			style={{
+				borderRadius: Theme.roundness,
+				margin: Spacings.s2,
+				flexDirection: 'row',
+				justifyContent: 'space-between',
+				alignContent: 'stretch',
+				alignItems: 'center',
+			}}
 		>
-			<View row spread centerV style={{ width: '100%' }}>
-				{assignment.assignmentTypeName && (
-					<TouchableOpacity
-						onPress={() => setShowHw(!showHw)}
-						style={{
-							backgroundColor: Colors.rgba(Colors.$textAccent, 0.2),
-							width: 45,
-							height: 45,
-							alignSelf: 'center',
-						}}
-						centerH
-						centerV
-						br20
-					>
-						<Text $textAccent margin-s1>
-							{assignment.assignmentTypeAbbr}
-						</Text>
-					</TouchableOpacity>
-				)}
-
-				<Text
-					$textAccent
-					margin-s2
-					style={{ alignSelf: 'center', width: '60%' }}
-					selectable
+			{assignment.assignmentTypeName && (
+				<TouchableRipple
+					onPress={() => setShowHw(!showHw)}
+					style={{
+						borderRadius: Theme.roundness,
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: Theme.colors.primaryContainer,
+						width: 45,
+						height: 45,
+						alignSelf: 'center',
+					}}
 				>
-					{showHw
-						? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
-						: '...'}
-				</Text>
+					<Text style={{ margin: Spacings.s2 }}>
+						{assignment.assignmentTypeAbbr}
+					</Text>
+				</TouchableRipple>
+			)}
 
-				<View row center>
-					<Mark
-						noColor={Colors.rgba(Colors.$textAccent, 0.5)}
-						mark={assignment.result ?? 'Нет'}
-						duty={assignment.duty}
-						markWeight={{
-							max: assignment.weight,
-							min: assignment.weight,
-							current: assignment.weight,
-						}}
-						style={{
-							width: 45,
-							height: 45,
-							alignSelf: 'center',
-						}}
-						textStyle={{ fontSize: 16 }}
-						subTextStyle={{ fontSize: 14, alignSelf: 'center' }}
-					/>
-				</View>
-			</View>
+			<Text
+				style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
+				selectable
+			>
+				{showHw
+					? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
+					: '...'}
+			</Text>
+
+			<Mark
+				mark={assignment.result ?? 'Нет'}
+				duty={assignment.duty}
+				markWeight={{
+					max: assignment.weight,
+					min: assignment.weight,
+					current: assignment.weight,
+				}}
+				style={{
+					width: 45,
+					height: 45,
+				}}
+			/>
 
 			{showHw &&
 				((assignment.attachmentsExists && attachments.fallback) ||
@@ -113,7 +103,6 @@ const AttachmentFile = observer(function AttachmentFile({
 	return (
 		<Button
 			style={{
-				backgroundColor: Colors.$backgroundPrimaryLight,
 				margin: Spacings.s1,
 				padding: Spacings.s2,
 				elevation: 2,

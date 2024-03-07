@@ -1,36 +1,40 @@
 import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
-import { FlatList, ListRenderItem } from 'react-native'
+import { useCallback } from 'react'
+import { FlatList, ListRenderItem, View } from 'react-native'
+import { Chip, Text } from 'react-native-paper'
 import SelectDropdown from 'react-native-select-dropdown'
-import { Colors, Switch, Text, View } from 'react-native-ui-lib'
 import { TotalsContext } from '.'
-import { dropdownButtonStyle, dropdownStyle } from '../../Components/Dropdown'
+import { dropdown, dropdownStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
+import { Spacings } from '../../Components/Spacings'
 import { NSEntity, Subject, Total } from '../../NetSchool/classes'
 import {
 	EducationStore,
 	SubjectPerformanceStores,
 	SubjectsStore,
 	TotalsStore,
-} from '../../Stores/API.stores'
-import { Settings } from '../../Stores/Settings.store'
-import { Theme } from '../../Stores/Theme.store'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
+} from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
+import { Theme } from '../../Stores/Theme'
 import { SubjectPerformanceInline } from './SubjectPerformanceInline'
 
-const TermStore = new (class {
+export const TermStore = new (class {
 	sort = true
+	attendance = false
+
 	getTerms(totals = TotalsStore) {
 		return totals.result?.[0]?.termTotals.map(e => e.term)
 	}
 	get totalsResult() {
 		const selectedTerm = Settings.currentTerm
-		if (!TotalsStore.result || !selectedTerm) return
+		if (!TotalsStore.result || !selectedTerm) return []
 
+		if (this.sort)
+			return TotalsStore.result
+				.slice()
+				.sort((a, b) => getTermSortValue(a) - getTermSortValue(b))
 		return TotalsStore.result
-			.slice()
-			.sort((a, b) => getTermSortValue(a) - getTermSortValue(b))
 
 		function getTermSortValue(
 			total: Total,
@@ -45,7 +49,7 @@ const TermStore = new (class {
 
 			const { store } = SubjectPerformanceStores.get(
 				{
-					studentId: XDnevnik.studentId,
+					studentId: Settings.studentId,
 					subjectId: total.subjectId,
 				},
 				false
@@ -77,13 +81,10 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	const totals = TotalsStore
 	const subjects = SubjectsStore
 	const education = EducationStore
-	const terms = TermStore.getTerms()
-	const [attendance, setAttendance] = useState(false)
-
 	const renderItem = useCallback<ListRenderItem<Total>>(
 		total => (
 			<SubjectPerformanceInline
-				attendance={attendance}
+				attendance
 				navigation={navigation}
 				total={total.item}
 				selectedTerm={Settings.currentTerm!}
@@ -100,77 +101,32 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	return (
 		education.fallback ||
 		subjects.fallback ||
-		totals.fallback || (
-			<View>
-				{totals.result === null ||
-				totals.result.length < 1 ||
-				!TermStore.totalsResult ? (
-					<Loading text="Загрузка из кэша{dots}" />
-				) : (
-					<FlatList
-						initialNumToRender={1}
-						maxToRenderPerBatch={1}
-						ListHeaderComponent={
-							<View>
-								{terms && (
-									<SelectDropdown
-										data={terms}
-										defaultValue={Settings.currentTerm}
-										onSelect={v => Settings.save({ currentTerm: v })}
-										buttonStyle={dropdownButtonStyle()}
-										buttonTextStyle={{ color: Colors.$textPrimary }}
-										dropdownStyle={[
-											dropdownStyle(),
-											{ maxWidth: 110, alignSelf: 'center' },
-										]}
-										defaultButtonText={
-											Settings.currentTerm?.name ?? 'Выбери четверть'
-										}
-										buttonTextAfterSelection={i => i?.name ?? 'F'}
-										rowTextForSelection={i => i?.name ?? 'F'}
-									/>
-								)}
-								<View>
-									<View flex row spread padding-s1>
-										<Text margin-s1 key={Theme.key}>
-											Сначала плохие оценки
-										</Text>
-										<Switch
-											margin-s1
-											onValueChange={(a: boolean) =>
-												runInAction(() => (TermStore.sort = a))
-											}
-											value={TermStore.sort}
-											key={Theme.key + 's'}
-										/>
-									</View>
-									<View flex row spread padding-s1>
-										<Text margin-s1 key={Theme.key}>
-											Пропуски
-										</Text>
-										<Switch
-											margin-s1
-											onValueChange={setAttendance}
-											value={attendance}
-											key={Theme.key + 's'}
-										/>
-									</View>
-								</View>
-							</View>
-						}
-						data={TermStore.totalsResult}
-						refreshControl={totals.refreshControl}
-						renderItem={renderItem}
-						keyExtractor={keyExtractor}
-						ListFooterComponent={
-							<Text $textDisabled center margin-s1>
-								{totals.updateDate}
-							</Text>
-						}
-					/>
-				)}
-			</View>
-		)
+		totals.fallback ||
+		(totals.result === null || totals.result.length < 1 ? (
+			<Loading text="Загрузка из кэша{dots}" />
+		) : (
+			<FlatList
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				ListHeaderComponent={<TotalsScreenHeader />}
+				data={TermStore.totalsResult}
+				refreshControl={totals.refreshControl}
+				renderItem={renderItem}
+				keyExtractor={keyExtractor}
+				ListFooterComponent={
+					<Text
+						style={{
+							color: Theme.colors.onSurfaceDisabled,
+							margin: Spacings.s2,
+							marginBottom: Spacings.s4,
+							alignSelf: 'center',
+						}}
+					>
+						{totals.updateDate}
+					</Text>
+				}
+			/>
+		))
 	)
 })
 
@@ -180,3 +136,55 @@ export type SubjectInfo = {
 	attendance: boolean
 	subjects: Subject[]
 } & Pick<TotalsContext, 'navigation'>
+
+const TotalsScreenHeader = observer(function TotalsScreenHeader() {
+	const terms = TermStore.getTerms()
+	return (
+		<View>
+			{terms && (
+				<SelectDropdown
+					{...dropdown()}
+					data={terms}
+					defaultValue={Settings.currentTerm}
+					onSelect={v => Settings.save({ currentTerm: v })}
+					dropdownStyle={[
+						dropdownStyle(),
+						{ maxWidth: 110, alignSelf: 'center' },
+					]}
+					defaultButtonText={Settings.currentTerm?.name ?? 'Выбери четверть'}
+					buttonTextAfterSelection={i => i?.name ?? 'F'}
+					rowTextForSelection={i => i?.name ?? 'F'}
+				/>
+			)}
+
+			<View
+				style={{
+					flex: 1,
+					flexDirection: 'row',
+					paddingVertical: Spacings.s2,
+				}}
+			>
+				<Chip
+					mode="outlined"
+					selected={TermStore.sort}
+					onPress={() => {
+						runInAction(() => (TermStore.sort = !TermStore.sort))
+					}}
+					style={{ marginHorizontal: Spacings.s2 }}
+				>
+					Плохие оценки вверху
+				</Chip>
+				<Chip
+					mode="outlined"
+					selected={TermStore.attendance}
+					onPress={() => {
+						runInAction(() => (TermStore.attendance = !TermStore.attendance))
+					}}
+				>
+					Пропуски
+				</Chip>
+			</View>
+		</View>
+	)
+})
+
