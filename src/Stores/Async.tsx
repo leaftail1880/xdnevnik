@@ -9,21 +9,26 @@ import {
 import { RefreshControl } from 'react-native'
 import { ErrorHandler } from '../Components/ErrorHandler'
 import { Loading } from '../Components/Loading'
-import { API, API as NSApi, NetSchoolError } from '../NetSchool/api'
+import { API as NSApi, NetSchoolError } from '../NetSchool/api'
 import { Logger } from '../Setup/constants'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type APIMethod = (arg: Record<string, any>) => Promise<any>
+const useCache = Symbol('useCache')
+export type CacheableInit = { [useCache]?: boolean }
+
+export type AsyncMethod = (
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	arg: Record<string, any> & CacheableInit
+) => Promise<unknown>
 
 /**
- * A way to select only accepted api methods
+ * Selects only accepted api methods
  */
-type FunctionsFromObject<O extends object> = FilterObject<O, APIMethod>
+export type FunctionsFromObject<O extends object> = FilterObject<O, AsyncMethod>
 
 /**
  * Return type of the useAPI hook
  */
-export type APIState<Result> = (
+export type AsyncState<Result> = (
 	| { result: Result; fallback: undefined }
 	| { result: undefined; fallback: React.JSX.Element }
 ) & {
@@ -38,38 +43,21 @@ export type APIState<Result> = (
  */
 type Optional<T> = { [Key in Exclude<keyof T, symbol>]: T[Key] | undefined }
 
-type AdditionalDeps = (object | null | undefined | string | boolean | number)[]
+export type AdditionalDeps = (
+	| object
+	| null
+	| undefined
+	| string
+	| boolean
+	| number
+)[]
 
-export function createApiMethodStore<
-	APIMethodName extends keyof FunctionsFromObject<typeof API>,
-	Fn = FunctionsFromObject<typeof API>[APIMethodName],
-	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
-	DefaultParams = Record<string, never>
->(
-	method: APIMethodName,
-	name: string,
-	defaultParams?: DefaultParams,
-	additionalDeps?: () => AdditionalDeps,
-	debug?: boolean
-) {
-	const store = new APIStore(
-		API,
-		method,
-		name,
-		defaultParams,
-		additionalDeps,
-		debug
-	)
-	return store as unknown as APIState<FnReturn> &
-		Pick<typeof store, 'withParams'>
-}
-
-export class APIStore<
-	APISource extends object,
-	APIMethodName extends keyof FunctionsFromObject<APISource>,
-	Fn = FunctionsFromObject<APISource>[APIMethodName],
-	FnReturn = Fn extends APIMethod ? Awaited<ReturnType<Fn>> : never,
-	FnParams = Fn extends APIMethod ? Optional<Parameters<Fn>[0]> : never,
+export class AsyncStore<
+	Source extends object,
+	MethodName extends keyof FunctionsFromObject<Source>,
+	Fn = FunctionsFromObject<Source>[MethodName],
+	FnReturn = Fn extends AsyncMethod ? Awaited<ReturnType<Fn>> : never,
+	FnParams = Fn extends AsyncMethod ? Optional<Parameters<Fn>[0]> : never,
 	DefaultParams = Record<string, never>
 > {
 	log(...data: unknown[]) {
@@ -78,8 +66,8 @@ export class APIStore<
 	}
 	constructor(
 		// eslint-disable-next-line @typescript-eslint/naming-convention
-		private readonly API: APISource,
-		private readonly method: APIMethodName,
+		private readonly API: Source,
+		private readonly method: MethodName,
 		public readonly name: string,
 		private readonly defaultParams?: DefaultParams,
 		private readonly additionalDeps: () => AdditionalDeps = () => [
@@ -190,7 +178,7 @@ export class APIStore<
 		this.params = params
 	}
 
-	state(): APIState<FnReturn> {
+	state(): AsyncState<FnReturn> {
 		// @ts-expect-error Uh huh
 		return this
 	}
@@ -242,7 +230,7 @@ export class APIStore<
 			this.loading = false
 			this.log('Loaded')
 		} catch (error) {
-			const canIgnore = error instanceof NetSchoolError && error.canIgnore
+			const canIgnore = error instanceof NetSchoolError && error.loggerIgnore
 
 			if (!canIgnore) {
 				Logger.error(

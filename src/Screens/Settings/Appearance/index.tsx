@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { ScrollView, View } from 'react-native'
-import { Button, Divider, Surface, Text } from 'react-native-paper'
+import { Button, Divider, List, Surface, Text } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { Spacings } from '../../../Components/Spacings'
+import { Dropdown } from '../../../Components/Dropdown'
 import { styles } from '../../../Setup/constants'
+import { Settings } from '../../../Stores/Settings'
 import { Theme } from '../../../Stores/Theme'
-import { SegmentedSettingsButton } from '../Components/SegmentedSettingsButton'
+import { Spacings } from '../../../utils/Spacings'
 import { AccentColorPicker } from './AccentColorPicker'
+import { RoundnessSetting } from './RoundnessSetting'
 
 const themes = [
 	{ label: 'Системная', value: 'system' as const },
@@ -19,31 +21,42 @@ const markStyles = [
 	{ label: 'Фон', value: 'background' as const },
 ]
 
+const nameFormat = [
+	{ label: 'ФИО', value: 'fio' as const },
+	{ label: 'ИФО', value: 'ifo' as const },
+]
+
 export default observer(function Appearance() {
 	Theme.key
+
 	return (
 		<ScrollView>
-			<SegmentedSettingsButton
-				label="Тема"
-				source={Theme}
-				setting="scheme"
-				values={themes}
-			/>
+			<List.Section title="Общие">
+				<Dropdown
+					label="Тема"
+					value={Theme.scheme}
+					data={themes}
+					onSelect={({ value }) => Theme.setColorScheme(value)}
+				/>
 
-			<SegmentedSettingsButton
-				label="Стиль оценок"
-				setting="markStyle"
-				values={markStyles}
-			/>
+				<Dropdown
+					label="Стиль оценок"
+					value={Settings.markStyle}
+					data={markStyles}
+					onSelect={({ value }) => Settings.save({ markStyle: value })}
+				/>
 
-			<SegmentedSettingsButton
-				setting="nameFormat"
-				label="В каком порядке отображать Фамилию Имя Отчество"
-				values={[
-					{ label: 'ФИО', value: 'fio' },
-					{ label: 'ИФО', value: 'ifo' },
-				]}
-			/>
+				<Dropdown
+					label="Порядок Фамилии Имени Отчества"
+					value={Settings.nameFormat}
+					data={nameFormat}
+					onSelect={({ value }) => Settings.save({ nameFormat: value })}
+				/>
+
+				<RoundnessSetting />
+			</List.Section>
+			<Divider style={{ margin: Spacings.s1 }} />
+
 			<AccentColorPicker />
 			<Divider style={{ margin: Spacings.s1 }} />
 			{/* {__DEV__ && <DevSettings />} */}

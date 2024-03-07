@@ -18,7 +18,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.12.5',
+		version: '0.13.1',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -63,7 +63,7 @@ const Config = {
 			policy: 'appVersion',
 		},
 		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
+			'expo-dev-client',
 			'expo-updates',
 			sentryPlugin,
 			'expo-build-properties',

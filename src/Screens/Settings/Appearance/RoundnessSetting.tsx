@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, TextInput } from 'react-native-paper'
-import { Spacings } from '../../../Components/Spacings'
 import { styles } from '../../../Setup/constants'
 import { Theme } from '../../../Stores/Theme'
+import { Spacings } from '../../../utils/Spacings'
 
 export const RoundnessSetting = observer(function RoundnessSetting() {
 	const [error, setError] = useState(false)

@@ -5,9 +5,9 @@ import SelectDropdown, {
 	SelectDropdownProps,
 } from 'react-native-select-dropdown'
 import { dropdown } from '../../../Components/Dropdown'
-import { Spacings } from '../../../Components/Spacings'
 import { styles } from '../../../Setup/constants'
 import { Theme } from '../../../Stores/Theme'
+import { Spacings } from '../../../utils/Spacings'
 import { BaseSetting, settingsButtonStyle } from './Base'
 
 type DropdownSettingsButtonProps<Item = object> = BaseSetting & {

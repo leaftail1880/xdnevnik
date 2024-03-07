@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { NSEntity } from '../NetSchool/classes'
-import { StudentsStore } from './API'
-import { makeReloadPersistable } from './makePersistable'
+import { makeReloadPersistable } from '../utils/makePersistable'
+import { StudentsStore } from './NetSchool'
 
 type StudentOverride = {
 	/**

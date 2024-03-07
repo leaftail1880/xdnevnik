@@ -1,7 +1,6 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
-import { Button } from 'react-native-paper'
-import { styles } from '../../../Setup/constants'
+import { Divider, List } from 'react-native-paper'
 import { Theme } from '../../../Stores/Theme'
 import { SETTINGS_ROUTES, SettingsRoutes } from '../navigation'
 
@@ -10,19 +9,16 @@ export const SettingsJumpNavigation = observer(
 		target: keyof typeof SETTINGS_ROUTES
 		navigation: StackScreenProps<SettingsRoutes>
 	}) {
-		Theme.key
 		return (
-			<Button
-				onPress={() => props.navigation.navigation.navigate(props.target)}
-				icon={'arrow-right'}
-				contentStyle={[
-					styles.stretch,
-					{ padding: 0, flexDirection: 'row-reverse' },
-				]}
-				labelStyle={Theme.fonts.titleMedium}
-			>
-				{SETTINGS_ROUTES[props.target]}
-			</Button>
+			<>
+				<List.Item
+					onPress={() => props.navigation.navigation.navigate(props.target)}
+					title={SETTINGS_ROUTES[props.target]}
+					titleStyle={Theme.fonts.titleMedium}
+					right={props => <List.Icon {...props} icon="arrow-right" />}
+				/>
+				<Divider />
+			</>
 		)
 	}
 )

@@ -1,8 +1,5 @@
-import { observer } from 'mobx-react-lite'
-import { View } from 'react-native'
-import { Switch, Text, TouchableRipple } from 'react-native-paper'
-import { Spacings } from '../../../Components/Spacings'
-import { Logger, styles } from '../../../Setup/constants'
+import { Observer } from 'mobx-react-lite'
+import { List, Switch } from 'react-native-paper'
 import { Settings } from '../../../Stores/Settings'
 import { BaseSetting } from './Base'
 
@@ -12,44 +9,44 @@ type SwitchSettingProps = BaseSetting &
 				setting: keyof FilterObject<typeof Settings, true | false>
 		  }
 		| {
-				onChange(v: boolean): void
+				onChange(): void
 				value: boolean
 		  }
 	)
 
-export const SwitchSetting = observer(function SwitchSetting(
-	props: SwitchSettingProps
-) {
-	const setting = 'setting' in props && props.setting
-	if (typeof setting === 'boolean') {
-		Logger.warn(`SwutchSetting.setting type cannot be boolean!`)
-		return false
-	}
-	const onChange = (v: boolean): void => {
+// eslint-disable-next-line mobx/missing-observer
+export const SwitchSetting = function SwitchSetting(props: SwitchSettingProps) {
+	const onChange = () => {
 		if ('onChange' in props) {
-			props.onChange(v)
+			props.onChange()
 		} else {
-			Settings.save({ [setting]: v })
+			Settings.save({ [props.setting]: !Settings[props.setting] })
 		}
 	}
+
 	return (
-		<TouchableRipple {...props} onPress={() => onChange(!Settings[setting])}>
-			<View
-				style={[
-					styles.stretch,
-					{
-						width: '100%',
-						padding: Spacings.s2,
-						margin: Spacings.s1,
-					},
-				]}
-			>
-				<Text variant="labelLarge">{props.label}</Text>
-				<Switch
-					value={'setting' in props ? Settings[setting] : props.value}
-					onValueChange={onChange}
-				/>
-			</View>
-		</TouchableRipple>
+		<>
+			<List.Item
+				title={props.label}
+				onPress={onChange}
+				right={() => (
+					<Observer>
+						{
+							// eslint-disable-next-line mobx/missing-observer
+							function SwitchInternal() {
+								return (
+									<Switch
+										value={
+											'setting' in props ? Settings[props.setting] : props.value
+										}
+										onChange={onChange}
+									/>
+								)
+							}
+						}
+					</Observer>
+				)}
+			/>
+		</>
 	)
-})
+}

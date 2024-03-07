@@ -3,10 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { Loading } from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
-import { StudentsStore } from '../../Stores/API'
+import { StudentsStore } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
-import { DropdownSettingsButton } from './Components/DropdownSettingsButton'
 import { SettingsJumpNavigation } from './Components/Navigate'
 
 import About from './About'
@@ -16,6 +15,8 @@ import PrivacyPolicy from './Policy/PrivacyPolicy'
 import TermsAndConditions from './Policy/TermsAndConditions'
 import UpdatesScreen from './Update'
 
+import { Divider } from 'react-native-paper'
+import { Dropdown } from '../../Components/Dropdown'
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,
@@ -60,17 +61,21 @@ const MainSettings = observer(function MainSettings(
 		>
 			{API.session ? (
 				StudentsStore.fallback || (
-					<DropdownSettingsButton
-						data={StudentsStore.result.map((student, i) => ({
-							i,
-							name: Settings.fullname(student.name),
-						}))}
-						onSelect={s => Settings.save({ studentIndex: s.i })}
-						selectionText={i => i?.name}
-						defaultValueByIndex={Settings.studentIndex}
-						label={false}
-						buttonViewStyle={{ alignItems: 'center', justifyContent: 'center' }}
-					/>
+					<>
+						<Dropdown
+							data={StudentsStore.result.map((student, index) => ({
+								value: index + '',
+								label: Settings.fullname(student.name),
+							}))}
+							mode="list.item"
+							value={Settings.studentIndex + ''}
+							onSelect={student =>
+								Settings.save({ studentIndex: Number(student.value) })
+							}
+							label={'Ученик'}
+						/>
+						<Divider />
+					</>
 				)
 			) : (
 				<Loading text="Ожидание авторизации{dots}"></Loading>

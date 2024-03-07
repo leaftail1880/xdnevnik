@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import { View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
-import { Spacings } from '../../Components/Spacings'
 import { Lesson, LessonState } from '../../NetSchool/classes'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
 
 export const LessonProgressStore = new (class {
 	now = Date.now()
@@ -53,10 +53,10 @@ export const LessonProgress = observer(function LessonProgress({
 				style={{
 					flexDirection: 'row',
 					alignSelf: 'center',
+					alignContent: 'center',
 					marginHorizontal: Spacings.s3,
 					paddingHorizontal: Spacings.s2,
 					marginBottom: Spacings.s2,
-					alignContent: 'center',
 				}}
 			>
 				<View

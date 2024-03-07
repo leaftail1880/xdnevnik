@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 import { ActivityIndicator, Text } from 'react-native-paper'
-import { Spacings } from './Spacings'
+import { Spacings } from '../utils/Spacings'
 
 interface LoadingProps {
 	/**

@@ -1,44 +1,34 @@
 import { observer } from 'mobx-react-lite'
 import { memo } from 'react'
 import { View } from 'react-native'
-import { Button, Divider, Text } from 'react-native-paper'
+import { Divider, List } from 'react-native-paper'
 import ColorPicker, {
 	HueSlider,
 	Preview,
 	SaturationSlider,
 	Swatches,
 } from 'reanimated-color-picker'
-import { Spacings } from '../../../Components/Spacings'
 import { Theme, ThemeStore } from '../../../Stores/Theme'
-import { RoundnessSetting } from './RoundnessSetting'
 
 export const AccentColorPicker = observer(function AccentColorPicker() {
 	const meta = ThemeStore.meta(Theme)
 	return (
-		<>
-			<Divider style={{ marginBottom: Spacings.s2, margin: Spacings.s1 }} />
-			<View>
-				<RoundnessSetting />
-				<Text variant="labelLarge" style={{ margin: Spacings.s2 }}>
-					Цвет акцентов:
-				</Text>
-				<ColorPicker
-					style={{ width: '90%', alignSelf: 'center' }}
-					value={meta.accentColor}
-					onComplete={color => Theme.setAccentColor(color.hex)}
-				>
-					<ColorPickerPanel />
-					<Button
-						icon="delete"
-						style={{ margin: Spacings.s2 }}
-						onPress={meta.clearAccentColors}
-					>
-						Очистить использованные цвета
-					</Button>
-					<Swatches colors={meta.accentColors} />
-				</ColorPicker>
-			</View>
-		</>
+		<List.Section title="Акценты">
+			<List.Item title="Цвет акцентов"></List.Item>
+			<ColorPicker
+				style={{ width: '90%', alignSelf: 'center' }}
+				value={meta.accentColor}
+				onComplete={color => Theme.setAccentColor(color.hex)}
+			>
+				<ColorPickerPanel />
+				<Swatches colors={meta.accentColors} />
+			</ColorPicker>
+			<List.Item
+				title={'Очистить использованные цвета'}
+				onPress={meta.clearAccentColors}
+				left={props => <List.Icon icon="delete" {...props}></List.Icon>}
+			></List.Item>
+		</List.Section>
 	)
 })
 

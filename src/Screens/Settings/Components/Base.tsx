@@ -1,6 +1,6 @@
 import { Falsy, ViewStyle } from 'react-native'
-import { Spacings } from '../../../Components/Spacings'
 import { Theme } from '../../../Stores/Theme'
+import { Spacings } from '../../../utils/Spacings'
 
 export function settingsButtonStyle(): ViewStyle {
 	return {

@@ -1,6 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
+import { List } from 'react-native-paper'
 import { Theme } from '../../Stores/Theme'
 import { SwitchSetting } from './Components/SwitchSetting'
 import { SettingsRoutes } from './navigation'
@@ -12,14 +13,16 @@ export default observer(function Notifications(
 	Theme.key
 	return (
 		<ScrollView>
-			<SwitchSetting
-				label={'Уведомления об уроках'}
-				setting="lessonNotifications"
-			/>
-			<SwitchSetting
-				label={'Уведомления об оценках'}
-				setting="marksNotifications"
-			/>
+			<List.Section title="Общие">
+				<SwitchSetting
+					label={'Уведомления об уроках'}
+					setting="lessonNotifications"
+				/>
+				<SwitchSetting
+					label={'Уведомления об оценках'}
+					setting="marksNotifications"
+				/>
+			</List.Section>
 		</ScrollView>
 	)
 })

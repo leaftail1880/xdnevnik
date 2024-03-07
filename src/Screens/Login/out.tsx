@@ -3,10 +3,10 @@ import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
 import { Header } from '../../Components/Header'
-import { Spacings } from '../../Components/Spacings'
 import { API } from '../../NetSchool/api'
 import { LANG } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
 
 export const LogoutScreen = observer(function LogoutScreen() {
 	function logout() {
