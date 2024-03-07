@@ -7,12 +7,12 @@ import Toast from 'react-native-toast-message'
 import WebView from 'react-native-webview'
 import { Header } from '../../Components/Header'
 import { Loading } from '../../Components/Loading'
-import { Spacings } from '../../Components/Spacings'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
 import { Logger } from '../../Setup/constants'
-import { APIStore } from '../../Stores/Async'
+import { AsyncStore } from '../../Stores/Async'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
 
 const LoginStore = new (class {
 	constructor() {
@@ -26,7 +26,7 @@ const LoginStore = new (class {
 	loading: 'loaded' | undefined = undefined
 })()
 
-const EndpointsStore = new APIStore(
+const EndpointsStore = new AsyncStore(
 	NetSchoolApi,
 	'fetchEndpoints',
 	'списка регионов',
@@ -119,7 +119,6 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 	const onWebviewRefresh = () => {
 		webviewRef.current?.reload()
 	}
-	BackHandler.addEventListener
 
 	return (
 		<ScrollView
@@ -153,7 +152,7 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 										type: 'error',
 									})
 								} finally {
-									runInAction(() => (LoginStore.loggingIn = true))
+									runInAction(() => (LoginStore.loggingIn = false))
 								}
 							})()
 							return false

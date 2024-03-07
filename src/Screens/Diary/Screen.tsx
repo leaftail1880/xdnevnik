@@ -1,24 +1,24 @@
-import { runInAction } from 'mobx'
+import { autorun, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import { useCallback } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
-import SelectDropdown from 'react-native-select-dropdown'
-import { dropdown, dropdownStyle } from '../../Components/Dropdown'
+import { Dropdown } from '../../Components/Dropdown'
 import { Header } from '../../Components/Header'
-import { Spacings } from '../../Components/Spacings'
+import { UpdateDate } from '../../Components/UpdateDate'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
 	DiaryStore,
-} from '../../Stores/API'
+} from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
-import { Theme } from '../../Stores/Theme'
-import { DiaryLesson } from './Lesson'
+import { Spacings } from '../../utils/Spacings'
+import DiaryLesson, { DiaryLessonProps } from './Lesson'
 import { DiaryState } from './StateStore'
 
-export const DiaryScreen = observer(function DiaryScreen() {
+autorun(() => {
 	const { studentId } = Settings
-	const { showHomework, weekDays, weekDaysDropdown, day } = DiaryState
+	const { showHomework, weekDays } = DiaryState
 
 	DiaryStore.withParams({
 		studentId,
@@ -41,48 +41,13 @@ export const DiaryScreen = observer(function DiaryScreen() {
 		studentId,
 		assignmentIds: withAttachments?.length ? withAttachments : undefined,
 	})
+})
 
+export const DiaryScreen = observer(function DiaryScreen(props: Pick<DiaryLessonProps, 'navigation' | 'route'>) {
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
-			<SelectDropdown
-				{...dropdown()}
-				dropdownStyle={{
-					...dropdownStyle(),
-					minHeight: 350,
-				}}
-				renderCustomizedButtonChild={selected => {
-					return (
-						<View>
-							<Text variant="titleMedium" style={{ alignSelf: 'center' }}>
-								{selected?.name ?? 'День недели'}
-							</Text>
-						</View>
-					)
-				}}
-				data={weekDaysDropdown}
-				defaultButtonText="День недели"
-				buttonTextAfterSelection={i => i.name}
-				renderCustomizedRowChild={i => (
-					<Text
-						style={{
-							alignSelf: 'center',
-							color: i.selected
-								? Theme.colors.onSurfaceDisabled
-								: Theme.colors.onSurface,
-						}}
-					>
-						{i.name}
-					</Text>
-				)}
-				defaultValue={weekDaysDropdown.find(e => e.day === day)}
-				onSelect={item => {
-					runInAction(() => {
-						if ('week' in item) DiaryState.week = item.week
-						DiaryState.day = item.day
-					})
-				}}
-			/>
+			<SelectDay />
 			<ScrollView
 				contentContainerStyle={{
 					justifyContent: 'center',
@@ -91,41 +56,55 @@ export const DiaryScreen = observer(function DiaryScreen() {
 				refreshControl={DiaryStore.refreshControl}
 			>
 				<View style={{ flex: 1, flexDirection: 'row', padding: Spacings.s2 }}>
-					<DiaryChip state="showHomework" label="Оценки" />
-					<DiaryChip state="showAttachments" label="Файлы" />
-					<DiaryChip state="showLessonTheme" label="Темы" />
+					<Filter type="showHomework" label="Оценки" />
+					<Filter type="showAttachments" label="Файлы" />
+					<Filter type="showLessonTheme" label="Темы" />
 				</View>
 				<View style={{ padding: Spacings.s1 }}>
-					{DiaryStore.fallback || <DiaryDay />}
+					{DiaryStore.fallback || <DiaryDay {...props}/>}
 				</View>
-				<Text
-					style={{
-						alignSelf: 'center',
-						color: Theme.colors.onSurfaceDisabled,
-						marginBottom: Spacings.s3,
-					}}
-				>
-					{DiaryStore.updateDate}
-				</Text>
+				<UpdateDate store={DiaryStore} />
 			</ScrollView>
 		</View>
 	)
 })
 
-const DiaryChip = observer(function DiaryChip(props: {
-	state: keyof FilterObject<typeof DiaryState, boolean>
+const SelectDay = observer(function SelectDay() {
+	return (
+		<Dropdown
+			label="День"
+			mode="button"
+			data={DiaryState.weekDaysDropdown}
+			value={DiaryState.day}
+			onSelect={item =>
+				runInAction(() => {
+					if ('week' in item) DiaryState.week = item.week
+					DiaryState.day = item.value
+				})
+			}
+		/>
+	)
+})
+
+type FilterProps = {
+	type: keyof FilterObject<typeof DiaryState, boolean>
 	label: string
-}) {
-	const enabled = DiaryState[props.state]
+}
+
+const Filter = observer(function Filter(props: FilterProps) {
+	const onPress = useCallback(
+		() =>
+			runInAction(() => {
+				DiaryState[props.type] = !DiaryState[props.type]
+			}),
+		[props.type]
+	)
+
 	return (
 		<Chip
 			mode="outlined"
-			selected={enabled}
-			onPress={() =>
-				runInAction(() => {
-					DiaryState[props.state] = !enabled
-				})
-			}
+			selected={DiaryState[props.type]}
+			onPress={onPress}
 			style={{ marginHorizontal: Spacings.s1 }}
 		>
 			{props.label}
@@ -133,13 +112,10 @@ const DiaryChip = observer(function DiaryChip(props: {
 	)
 })
 
-const DiaryDay = observer(function DiaryDay() {
-	const { result, fallback } = DiaryStore
+const DiaryDay = observer(function DiaryDay(props: Pick<DiaryLessonProps, 'navigation' | 'route'>) {
+	if (DiaryStore.fallback) return DiaryStore.fallback
 
-	if (fallback) return fallback
-
-	const { day: diaryDay } = DiaryState
-	const day = result.forDay(diaryDay)
+	const day = DiaryStore.result.forDay(DiaryState.day)
 	if (day.length === 0) {
 		return (
 			<Text
@@ -154,6 +130,6 @@ const DiaryDay = observer(function DiaryDay() {
 	return day
 		.sort((a, b) => a.order - b.order)
 		.map(lesson => (
-			<DiaryLesson key={lesson.classmeetingId.toString()} lesson={lesson} />
+			<DiaryLesson key={lesson.classmeetingId.toString()} lesson={lesson} {...props} />
 		))
 })

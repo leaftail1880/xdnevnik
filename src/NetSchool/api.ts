@@ -1,7 +1,8 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import Toast from 'react-native-toast-message'
 import { Logger } from '../Setup/constants'
-import { makeReloadPersistable } from '../Stores/makePersistable'
+import { CacheableInit } from '../Stores/Async'
+import { makeReloadPersistable } from '../utils/makePersistable'
 import {
 	Assignment,
 	Attachment,
@@ -15,6 +16,7 @@ import {
 	Total,
 } from './classes'
 import { ROUTES } from './routes'
+import { RequestError, RequestErrorOptions } from '../utils/RequestError'
 
 // Common request options
 interface StudentId {
@@ -36,24 +38,18 @@ interface ReqInit extends RequestInit {
 /**
  * Main error class.
  */
-export class NetSchoolError extends Error {
-	public cacheGuide = false
-	public beforeAuth = false
-	public canIgnore = false
-	public constructor(
+export class NetSchoolError extends RequestError {
+	cacheGuide = false
+	useCache = false
+	
+	constructor(
 		message: string,
 		options?: {
 			cacheGuide?: boolean
-			beforeAuth?: boolean
-			canIgnore?: boolean
-		}
+			useCache?: boolean
+		} & RequestErrorOptions
 	) {
-		super(message)
-		if (options) {
-			this.cacheGuide = options.cacheGuide ?? false
-			this.beforeAuth = options.beforeAuth ?? false
-			this.canIgnore = options.canIgnore ?? false
-		}
+		super(message, options)
 	}
 }
 
@@ -61,27 +57,6 @@ export class NetSchoolError extends Error {
  * Main api class.
  */
 export class NetSchoolApi {
-	static noConnection = 'Нет сети.' as const
-	static stringifyError(
-		e: object
-	): string | (typeof NetSchoolApi)['noConnection'] {
-		let result = ''
-		if (
-			e instanceof TypeError &&
-			e.message.includes('Network request failed')
-		) {
-			result = this.noConnection
-		} else if (e instanceof Error && e.name === 'AbortError') {
-			result =
-				'Нет ответа от сервера. Плохой интернет или сетевой город на техработах'
-		} else {
-			result = e + ''
-		}
-
-		result = result.replace(/^Error: /, '')
-
-		return result
-	}
 	static async fetchEndpoints() {
 		const result = await fetch(ROUTES.getEndPointsList)
 			.then<RawEndpoints>(res => res.json())
@@ -160,6 +135,8 @@ export class NetSchoolApi {
 	} | null = null
 
 	endpoint = ''
+	private origin = ''
+	private base = '/api/mobile'
 	setEndpoint(b: string) {
 		if (!b) return
 		const url = new URL(b)
@@ -167,8 +144,6 @@ export class NetSchoolApi {
 		this.origin = url.origin
 		this.base = url.pathname
 	}
-	private origin = ''
-	private base = '/api/mobile'
 
 	public async logOut() {
 		this.session = null
@@ -178,9 +153,9 @@ export class NetSchoolApi {
 
 	public async getToken(
 		form: Record<string, string>,
-		error400: string = 'Неверный токен для входа, перезайдите. Ошибка 400'
+		error400: string = 'Вход не удался, перезайдите.'
 	) {
-		Logger.debug({
+		Logger.debug('getToken request', {
 			expires: this.session?.expires.toReadable(),
 			today: new Date().toReadable(),
 			form,
@@ -191,7 +166,7 @@ export class NetSchoolApi {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		})
 
-		Logger.debug({ status: response.status })
+		Logger.debug('getToken respone', { status: response.status })
 		if (response.status === 400) {
 			throw new NetSchoolError(error400)
 		}
@@ -211,7 +186,7 @@ export class NetSchoolApi {
 			})
 		} else
 			throw new NetSchoolError(
-				'Запрос токена не удался, код ошибки ' + response.status
+				'Ошибка ' + response.status + ' при получении токена'
 			)
 	}
 
@@ -232,7 +207,7 @@ export class NetSchoolApi {
 
 	async request<T extends object | null | undefined>(
 		url: string,
-		init: ReqInit = {},
+		init: ReqInit & CacheableInit = {},
 		fetchFn: (
 			url: string,
 			init: RequestInit
@@ -261,14 +236,15 @@ export class NetSchoolApi {
 						this.session.expires.toReadable(),
 						new Date().toReadable()
 					)
-					// Request update of token
+
+					// Request update of the token
 					this.authorized = null
 				}
 
 				if (!this.session || !this.authorized) {
 					throw new NetSchoolError('Запрос к ' + url, {
 						cacheGuide: true,
-						beforeAuth: true,
+						useCache: true,
 					})
 				} else {
 					request.headers[
@@ -308,14 +284,14 @@ export class NetSchoolApi {
 			return json
 		} catch (error) {
 			if (this.cache[url]) {
-				const beforeAuth = error instanceof NetSchoolError && error.beforeAuth
+				const beforeAuth = error instanceof NetSchoolError && error.useCache
 				const errText = beforeAuth ? '' : 'error: ' + error
 
 				if (!beforeAuth) {
 					Toast.show({
 						type: 'error',
 						text1: 'Ошибка',
-						text2: NetSchoolApi.stringifyError(error),
+						text2: RequestError.stringify(error),
 					})
 				}
 				Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
@@ -323,7 +299,7 @@ export class NetSchoolApi {
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
 					this.errorReasons.HowToCache + ' ' + error.message,
-					{ beforeAuth: error.beforeAuth, canIgnore: true }
+					{ useCache: error.useCache, loggerIgnore: true }
 				)
 			} else throw error
 		}

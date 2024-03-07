@@ -8,8 +8,7 @@ import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Alert } from 'react-native'
 import { getSubjectName } from '../Components/SubjectName'
 import { Lesson, LessonState } from '../NetSchool/classes'
-import { DiaryStore } from '../Stores/API'
-import { createApiMethodStore } from '../Stores/Async'
+import { DiaryStore, HomeworkMarksStore } from '../Stores/NetSchool'
 import { Settings } from '../Stores/Settings'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
@@ -86,13 +85,6 @@ async function notificationSetup(enabled: boolean) {
 	})
 }
 
-const marksStore = createApiMethodStore(
-	'homework',
-	'домашка',
-	undefined,
-	undefined
-)
-
 let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function fetchMarks() {
@@ -103,12 +95,12 @@ autorun(function fetchMarks() {
 
 	fetchMarksInterval = setBackgroundInterval(async () => {
 		runInAction(() => {
-			marksStore.withParams({
+			HomeworkMarksStore.withParams({
 				studentId: Settings.studentId,
 				withExpiredClassAssign: true,
 				withoutMarks: false,
 			})
-			marksStore.reload()
+			HomeworkMarksStore.reload()
 		})
 	}, 60000)
 	//
@@ -126,9 +118,9 @@ autorun(function newMarksCheck() {
 		return
 	}
 
-	if (!marksStore.result) return
+	if (!HomeworkMarksStore.result) return
 
-	for (const assignment of marksStore.result.filter(
+	for (const assignment of HomeworkMarksStore.result.filter(
 		e => typeof e.result === 'number'
 	)) {
 		if (!marksValueStore.notified.has(assignment.assignmentId + '')) {

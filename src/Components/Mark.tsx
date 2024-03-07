@@ -56,7 +56,7 @@ export const Mark = observer(function Mark({
 		}
 	}
 
-	const textColor = bg ? Theme.colors.surface : color
+	const textColor = bg ? 'white' : color
 
 	if (markWeight) {
 		const minAlpha = 100

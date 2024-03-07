@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { LANG } from '../../Setup/constants'
-import { makeReloadPersistable } from '../../Stores/makePersistable'
+import { makeReloadPersistable } from '../../utils/makePersistable'
 
 export const DiaryState = new (class {
 	constructor() {
@@ -37,26 +37,23 @@ export const DiaryState = new (class {
 	get weekDaysDropdown() {
 		return [
 			{
-				name: 'Прошлая неделя',
-				day: Date.week(this.weekBefore)[0].toYYYYMMDD(),
+				label: 'Прошлая неделя',
+				value: Date.week(this.weekBefore)[0].toYYYYMMDD(),
 				week: this.weekBefore,
-				selected: false,
 			},
 			...this.weekDays.map((day, i) => {
 				const today = new Date().toYYYYMMDD() === day.toYYYYMMDD()
 				return {
-					name: `${LANG.days[i]}${
+					label: `${LANG.days[i]}${
 						today ? ', cегодня' : ` ${day.toYYYYMMDD()}`
 					}`,
-					day: day.toYYYYMMDD(),
-					selected: day.toYYYYMMDD() === this.day,
+					value: day.toYYYYMMDD(),
 				}
 			}),
 			{
-				name: 'Следующая неделя',
-				day: Date.week(this.weekAfter)[0].toYYYYMMDD(),
+				label: 'Следующая неделя',
+				value: Date.week(this.weekAfter)[0].toYYYYMMDD(),
 				week: this.weekAfter,
-				selected: false,
 			},
 		]
 	}

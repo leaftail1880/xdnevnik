@@ -1,8 +1,7 @@
-import * as Application from 'expo-application'
-import { Alert } from 'react-native'
+import { AsyncStore } from '../Stores/Async'
 
 /* eslint-disable @typescript-eslint/naming-convention */
-interface GithubRelease {
+export interface GithubRelease {
 	url: string
 	html_url: string
 	assets_url: string
@@ -28,43 +27,54 @@ interface GithubRelease {
 	}[]
 }
 
-export async function getLatestGithubReleaseUrl(
-	filename: string,
-	{
-		ifAlreadyLatest = () => Alert.alert('Уже последняя'),
-		ifNoRelease = () => Alert.alert('Не удалось найти релиз'),
-		ifNoAsset = () =>
-			Alert.alert('Обновление еще собирается, попробуйте через пару минут!'),
-		ifRatelimit = (max: number, resetOn: number) =>
-			Alert.alert(
-				`Достигнут лимит запросов: 0/${max}`,
-				`Попробуйте снова после ${new Date(resetOn).toReadable()}`
-			),
-	}
-) {
-	const response = await fetch(
-		'https://api.github.com/repos/leaftail1880/xdnevnik/releases'
-	)
+class GithubApi {
+	static Error = class GithubApiError extends Error {}
 
-	if (!response.ok) {
-		if (Number(response.headers.get('x-ratelimit-remaining')) === 0) {
-			return ifRatelimit(
-				Number(response.headers.get('x-ratelimit-limit')),
-				Number(response.headers.get('x-ratelimit-reset'))
-			)
-		} else
-			Error(`Ошибка при запросе: ${response.status} ${response.statusText}`)
+	async fetch(url: string) {
+		const response = await fetch(url)
+
+		if (!response.ok) {
+			if (Number(response.headers.get('x-ratelimit-remaining')) === 0) {
+				const max = Number(response.headers.get('x-ratelimit-limit'))
+				const resetOn = Number(response.headers.get('x-ratelimit-reset'))
+				throw new GithubApi.Error(
+					`Достигнут лимит запросов: 0/${max}. Попробуйте снова после ${new Date(
+						resetOn
+					).toReadable()}`
+				)
+			} else {
+				throw new GithubApi.Error(
+					`Ошибка ${response.status}: ${response.statusText}`
+				)
+			}
+		}
+
+		return response.json()
 	}
 
-	const releases: GithubRelease[] = await response.json()
-	const release = releases[0]
-	if (!release) return ifNoRelease()
+	async getReleases() {
+		return (await this.fetch(
+			'https://api.github.com/repos/leaftail1880/xdnevnik/releases'
+		)) as GithubRelease[]
 
-	if (release.tag_name === Application.nativeApplicationVersion)
-		return ifAlreadyLatest()
+		// const release = releases[0]
+		// if (!release) return () => Alert.alert('Не удалось найти релиз')
 
-	const asset = release.assets.find(e => e.name === filename)
-	if (!asset) return ifNoAsset()
+		// if (release.tag_name === Application.nativeApplicationVersion)
+		// 	return () => Alert.alert('Уже последняя')
 
-	return asset?.browser_download_url
+		// const asset = release.assets.find(e => e.name === filename)
+		// if (!asset)
+		// 	return Alert.alert(
+		// 		'Обновление еще собирается, попробуйте через пару минут!'
+		// 	)
+
+		// return asset?.browser_download_url
+	}
+}
+
+const API = new GithubApi()
+
+export const Github = {
+	Releases: new AsyncStore(API, 'getReleases', 'список версий', {}),
 }

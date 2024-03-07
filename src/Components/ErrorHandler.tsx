@@ -2,8 +2,9 @@ import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { NetSchoolApi, NetSchoolError } from '../NetSchool/api'
+import { NetSchoolError } from '../NetSchool/api'
 import { Theme } from '../Stores/Theme'
+import { RequestError } from '../utils/RequestError'
 
 interface ErrorHandlerProps {
 	error: [number, Error]
@@ -18,8 +19,8 @@ export const ErrorHandler = function ErrorHandler({
 	name,
 }: ErrorHandlerProps) {
 	const [more, setMore] = useState<boolean>(false)
-	const errorString = NetSchoolApi.stringifyError(error[1])
-	const needAuth = error[1] instanceof NetSchoolError && error[1].beforeAuth
+	const errorString = RequestError.stringify(error[1])
+	const beforeAuth = error[1] instanceof NetSchoolError && error[1].useCache
 	return (
 		<View
 			style={{
@@ -40,26 +41,25 @@ export const ErrorHandler = function ErrorHandler({
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
 			<Text>При загрузке {name}</Text>
-			{needAuth && <Text>Авторизуйтесь!</Text>}
-			{errorString === NetSchoolApi.noConnection && (
-				<Text>Вы не в сети, сетевая ошибка!</Text>
+			{beforeAuth && <Text>Авторизуйтесь!</Text>}
+			{errorString === RequestError.reasons.noConnection && (
+				<Text>Нет сети</Text>
 			)}
 			{more && <Text>{errorString}</Text>}
-			<View margin-s2>
-				<Button onPress={() => setMore(!more)} margin-s1 padding-s2>
+			<View>
+				<Button onPress={() => setMore(!more)}>
 					<Text>{!more ? 'Подробнее' : 'Свернуть'}</Text>
 				</Button>
-				{/* eslint-disable-next-line react-native/no-raw-text */}
 				<Button onPress={reload} icon="reload">
 					Попробовать снова
 				</Button>
-				{!needAuth && (
+				{!beforeAuth && (
 					<Button
 						onPress={() => {
 							Sentry.captureException(error)
 						}}
 					>
-						<Text>{'Отправить отчет об ошибке разработчику'}</Text>
+						<Text>Отправить отчет об ошибке разработчику</Text>
 					</Button>
 				)}
 			</View>

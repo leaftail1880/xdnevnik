@@ -5,6 +5,7 @@ export const makeReloadPersistable: typeof makePersistable = (
 	object,
 	options
 ) => {
+	// Prevent warnings while dev
 	if (__DEV__) {
 		for (const [key, store] of PersistStoreMap.entries()) {
 			if (store.storageName === options.name) {
@@ -13,5 +14,6 @@ export const makeReloadPersistable: typeof makePersistable = (
 			}
 		}
 	}
+
 	return makePersistable(object, options)
 }

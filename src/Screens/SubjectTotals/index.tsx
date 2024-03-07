@@ -6,21 +6,25 @@ import { Chip, Surface, Text } from 'react-native-paper'
 import { dropdownButtonStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
-import { Spacings } from '../../Components/Spacings'
 import { SubjectName } from '../../Components/SubjectName'
+import { UpdateDate } from '../../Components/UpdateDate'
 import { styles } from '../../Setup/constants'
-import { SubjectPerformanceStores } from '../../Stores/API'
+import { SubjectPerformanceStores } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
 import type { MarkInfo } from '../Totals'
-import type { ParamMap, S_SUBJECT_TOTALS } from '../Totals/navigation'
+import type {
+	S_SUBJECT_TOTALS,
+	TermNavigationParamMap,
+} from '../Totals/navigation'
 import { AddMarkForm } from './AddMarkForm'
 import { calculateMarks } from './calculateMarks'
 
 // TODO Move custom marks to store
 export const SubjectTotals = observer(function SubjectTotals({
 	route,
-}: StackScreenProps<ParamMap, typeof S_SUBJECT_TOTALS>) {
+}: StackScreenProps<TermNavigationParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
 	const { studentId } = Settings
 	const performance = SubjectPerformanceStores.use({
@@ -102,7 +106,14 @@ export const SubjectTotals = observer(function SubjectTotals({
 					setCustomMarks={setCustomMarks}
 					customMarks={customMarks}
 				/>
-				<Surface elevation={1} style={{ padding: Spacings.s2 }}>
+				<Surface
+					elevation={1}
+					style={{
+						padding: Spacings.s2,
+						margin: Spacings.s2,
+						borderRadius: Theme.roundness * 2,
+					}}
+				>
 					<Text>
 						Учитель:{' '}
 						<Text variant="labelLarge">
@@ -123,14 +134,7 @@ export const SubjectTotals = observer(function SubjectTotals({
 						</Text>
 					</Text>
 				</Surface>
-				<Text
-					style={{
-						color: Theme.colors.onSurfaceDisabled,
-						margin: Spacings.s2,
-					}}
-				>
-					{performance.updateDate}
-				</Text>
+				<UpdateDate store={performance} />
 			</ScrollView>
 		</View>
 	)

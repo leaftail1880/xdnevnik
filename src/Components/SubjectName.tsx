@@ -30,7 +30,7 @@ export function getSubjectName(props: SubjectNameOptions) {
 	return 'subjectName' in props
 		? props.subjectName
 		: props.subjects.find(subject => props.subjectId === subject.id)?.name ??
-				'Предмет404'
+				'Предмет 404'
 }
 
 type SubjectNameProps = {
@@ -66,7 +66,12 @@ export const SubjectName = observer(function SubjectName({
 			) : (
 				<TextInput
 					{...props}
-					style={[props.style, props.textInputStyle]}
+					style={[
+						props.style,
+						props.textInputStyle,
+						// eslint-disable-next-line react-native/no-color-literals
+						{ backgroundColor: '#00000000' },
+					]}
 					mode="outlined"
 					defaultValue={name}
 					onChangeText={setNewName}

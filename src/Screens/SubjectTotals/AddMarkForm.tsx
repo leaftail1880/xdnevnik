@@ -2,9 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { Button, IconButton, Surface, TextInput } from 'react-native-paper'
-import { Spacings } from '../../Components/Spacings'
 import { styles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
 import type { MarkInfo } from '../Totals'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {

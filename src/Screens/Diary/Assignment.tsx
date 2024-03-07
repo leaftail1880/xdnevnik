@@ -3,10 +3,14 @@ import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text, TouchableRipple } from 'react-native-paper'
 import { Mark } from '../../Components/Mark'
-import { Spacings } from '../../Components/Spacings'
 import { Assignment, Attachment } from '../../NetSchool/classes'
-import { AttachmentsStore } from '../../Stores/API'
+import { LANG } from '../../Setup/constants'
+import { AttachmentsStore } from '../../Stores/NetSchool'
+import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
+import { Spacings } from '../../utils/Spacings'
+import { TermNavigationParamMap } from '../Totals/navigation'
+import { DiaryLessonProps } from './Lesson'
 // import * as FileSystem from 'expo-file-system'
 // import * as ExpoSharing from 'expo-sharing'
 // import { Alert } from 'react-native'
@@ -17,11 +21,13 @@ import { Theme } from '../../Stores/Theme'
 
 export const DiaryAssignment = observer(function DiaryAssignment({
 	assignment,
+	navigation,
+	lesson,
 }: {
 	assignment: Assignment
-}) {
-	const [showHw, setShowHw] = useState(
-		// Do not show long hw by default
+} & Pick<DiaryLessonProps, 'navigation' | 'lesson'>) {
+	const [showHomework, setShowHomework] = useState(
+		// Do not show long homework by default
 		assignment.assignmentName.length < 40
 	)
 
@@ -45,7 +51,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 		>
 			{assignment.assignmentTypeName && (
 				<TouchableRipple
-					onPress={() => setShowHw(!showHw)}
+					onPress={() => setShowHomework(!showHomework)}
 					style={{
 						borderRadius: Theme.roundness,
 						alignItems: 'center',
@@ -66,7 +72,7 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 				style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
 				selectable
 			>
-				{showHw
+				{showHomework
 					? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
 					: '...'}
 			</Text>
@@ -83,9 +89,21 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 					width: 45,
 					height: 45,
 				}}
+				onPress={() => {
+					Settings.currentTerm &&
+						// @ts-expect-error Huh
+						navigation.navigate(LANG['s_totals'], {
+							screen: LANG['s_subject_totals'],
+							params: {
+								subjectId: lesson.subjectId,
+								termId: Settings.currentTerm.id,
+								finalMark: null,
+							} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
+						})
+				}}
 			/>
 
-			{showHw &&
+			{showHomework &&
 				((assignment.attachmentsExists && attachments.fallback) ||
 					(attachment &&
 						attachment.map(e => (

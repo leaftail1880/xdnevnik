@@ -30,13 +30,13 @@ import { SettingsScreen } from './src/Screens/Settings/index'
 import TotalsNavigation from './src/Screens/Totals/index'
 import { SENTRY_ROUTING } from './src/Setup/sentry'
 import { ToastConfig } from './src/Setup/toast'
-import { StudentsStore } from './src/Stores/API'
+import { StudentsStore } from './src/Stores/NetSchool'
 import { Theme, ThemeStore } from './src/Stores/Theme'
 
 import './src/NetSchool/autologin'
 import './src/Setup/notifications'
 
-type ParamListBase = Record<
+export type ParamListBase = Record<
 	(typeof LANG)[
 		| 's_log_in'
 		| 's_log_out'
@@ -127,10 +127,10 @@ export default Sentry.wrap(
 								alignItems: 'center',
 								justifyContent: 'center',
 							}}
-							// inactiveColor={Theme.colors.primaryContainer}
-							// activeColor={Theme.colors.onPrimaryContainer}
+							inactiveColor={Theme.colors.onSurfaceVariant}
+							activeColor={Theme.colors.onPrimaryContainer}
 							activeIndicatorStyle={{
-								// backgroundColor: Theme.colors.primaryContainer,
+								backgroundColor: Theme.colors.primaryContainer,
 								height: '120%',
 								margin: 0,
 								padding: 0,

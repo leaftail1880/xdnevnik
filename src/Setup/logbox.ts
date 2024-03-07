@@ -1,3 +1,3 @@
 import { LogBox } from 'react-native'
 
-LogBox.ignoreLogs([/new NativeEventEmitter/g])
+LogBox.ignoreLogs([/was called with a non-null/g])

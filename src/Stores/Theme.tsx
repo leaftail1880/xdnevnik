@@ -2,7 +2,7 @@ import {
 	DarkTheme as NavigationDarkTheme,
 	DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native'
-// import * as NavigationBar from 'expo-navigation-bar'
+import * as NavigationBar from 'expo-navigation-bar'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { Appearance } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
@@ -10,9 +10,9 @@ import type {
 	MD3Colors,
 	MD3Theme,
 } from 'react-native-paper/lib/typescript/types'
-import { prepareVariant } from '../Components/createTheme'
 import { Logger } from '../Setup/constants'
-import { makeReloadPersistable } from './makePersistable'
+import { prepareVariant } from '../utils/createTheme'
+import { makeReloadPersistable } from '../utils/makePersistable'
 
 type ThemeName = 'light' | 'dark'
 type SchemeName = ThemeName | 'system'
@@ -23,8 +23,8 @@ type PersistentKeys = Record<'scheme' | 'accentColor', string> & {
 }
 
 export class ThemeStore {
-	static defaultAccentColor = '#578059'
-	static defaultScheme: ThemeName = 'light'
+	static readonly defaultAccentColor = '#578059'
+	static readonly defaultScheme: ThemeName = 'light'
 	static meta(store: ThemeStore) {
 		return {
 			scheme: store.scheme,
@@ -139,8 +139,8 @@ export class ThemeStore {
 			})
 		)
 
-		// NavigationBar.setBackgroundColorAsync(this.theme.colors.card)
-		// NavigationBar.setButtonStyleAsync(dark ? 'dark' : 'light')
+		NavigationBar.setBackgroundColorAsync(this.theme.colors.card)
+		NavigationBar.setButtonStyleAsync(dark ? 'light' : 'dark')
 	}
 }
 
