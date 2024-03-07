@@ -143,7 +143,7 @@ export class APIStore<
 	}
 
 	private reload() {
-		this.log('RELOADING ДЛЯ ' + this.name)
+		this.log('RELOADING')
 		if (!this.params) return
 		this.reloadTimes++
 		this.update(this.params)
@@ -199,7 +199,7 @@ export class APIStore<
 		this.log(
 			'Request update, params:',
 			params,
-			'default params:',
+			'\ndefault params:',
 			this.defaultParams
 		)
 
@@ -220,7 +220,7 @@ export class APIStore<
 			params = { ...this.defaultParams, ...params } as FnParams
 
 		if (!params) {
-			this.log('undefined params object')
+			this.log('no params!!!')
 			return
 		}
 		this.log('Params', params)
@@ -230,7 +230,9 @@ export class APIStore<
 		this.log('deps', deps)
 
 		if (deps.some(e => typeof e === 'undefined' || e === null)) {
-			this.log('Undefined params', 'additional ' + this.additionalDeps())
+			this.log(
+				'Undefined values in params, additional ' + this.additionalDeps()
+			)
 			return
 		}
 

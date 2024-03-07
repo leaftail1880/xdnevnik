@@ -11,7 +11,6 @@ import { Lesson, LessonState } from '../NetSchool/classes'
 import { DiaryStore } from '../Stores/API'
 import { createApiMethodStore } from '../Stores/Async'
 import { Settings } from '../Stores/Settings'
-import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { clearBackgroundInterval, setBackgroundInterval } from './timers'
 
 const Notification = new (class {
@@ -30,6 +29,10 @@ const Notification = new (class {
 		if (Notification.id) Notification.id = undefined
 	}
 })()
+
+notifee.onBackgroundEvent(async () => {
+	// TODO React on event, e.g. open approprietary screen etc
+})
 
 autorun(() => {
 	const enabled = Settings.lessonNotifications
@@ -101,7 +104,7 @@ autorun(function fetchMarks() {
 	fetchMarksInterval = setBackgroundInterval(async () => {
 		runInAction(() => {
 			marksStore.withParams({
-				studentId: XDnevnik.studentId,
+				studentId: Settings.studentId,
 				withExpiredClassAssign: true,
 				withoutMarks: false,
 			})
@@ -119,7 +122,7 @@ const marksValueStore = new (class {
 })()
 
 autorun(function newMarksCheck() {
-	if (!Settings.lessonNotifications || !Notification.marksChannelId) {
+	if (!Settings.marksNotifications || !Notification.marksChannelId) {
 		return
 	}
 
@@ -152,96 +155,100 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
-	currentLessonInterval = setBackgroundInterval(async () => {
-		// const date = new Date()
-		// date.setHours(8, 41)
-		// const now = date.getTime()
-		const now = Date.now()
+	currentLessonInterval = setBackgroundInterval(
+		() =>
+			runInAction(async () => {
+				// const date = new Date()
+				// date.setHours(8, 41)
+				// const now = date.getTime()
+				const now = Date.now()
 
-		for (const [i, lesson] of diary.lessons.entries()) {
-			if (!lesson.end || !lesson.start) continue
-			if (now > lesson.end.getTime()) continue
+				for (const [i, lesson] of diary.lessons.entries()) {
+					if (!lesson.end || !lesson.start) continue
+					if (now > lesson.end.getTime()) continue
 
-			let period: Date | undefined
-			let date: Date
-			const previous = diary.lessons[i - 1]
+					let period: Date | undefined
+					let date: Date
+					const previous = diary.lessons[i - 1]
 
-			// If previous lesson is in the same day, send notification in the end of it
-			if (
-				previous &&
-				lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
-				// Only when delay between lessons is less then 15
-				(lesson.start.getTime() - previous.end.getTime()) / (60 * 1000) < 15
-			) {
-				date = new Date(previous.end.getTime())
-				date.setMinutes(date.getMinutes() + 1)
-				period = new Date(lesson.start.getTime() - previous.end.getTime())
-			} else {
-				// Send by 15 mins before lesson
-				// TODO Support custom beforeLessonNotifTime
-				date = new Date(lesson.start.getTime())
-				date.setMinutes(date.getMinutes() - 15)
-			}
+					// If previous lesson is in the same day, send notification in the end of it
+					if (
+						previous &&
+						lesson.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
+						// Only when delay between lessons is less then 15
+						(lesson.start.getTime() - previous.end.getTime()) / (60 * 1000) < 15
+					) {
+						date = new Date(previous.end.getTime())
+						date.setMinutes(date.getMinutes() + 1)
+						period = new Date(lesson.start.getTime() - previous.end.getTime())
+					} else {
+						// Send by 15 mins before lesson
+						// TODO Support custom beforeLessonNotifTime
+						date = new Date(lesson.start.getTime())
+						date.setMinutes(date.getMinutes() - 15)
+					}
 
-			if (now < date.getTime()) continue
+					if (now < date.getTime()) continue
 
-			const uuid = lesson.classmeetingId + '' + lesson.subjectId
-			const lessonName = getSubjectName({
-				subjectId: lesson.subjectId,
-				subjectName: lesson.subjectName,
-			})
+					const uuid = lesson.classmeetingId + '' + lesson.subjectId
+					const lessonName = getSubjectName({
+						subjectId: lesson.subjectId,
+						subjectName: lesson.subjectName,
+					})
 
-			const { state, beforeEnd, beforeStart, progress, total } =
-				Lesson.prototype.minutes.call(lesson, now) as ReturnType<
-					Lesson['minutes']
-				>
+					const { state, beforeEnd, beforeStart, progress, total } =
+						Lesson.prototype.minutes.call(lesson, now) as ReturnType<
+							Lesson['minutes']
+						>
 
-			let title = ''
-			title += lessonName
-			title += ' | '
-			title += lesson.roomName ?? 'Нет кабинета'
+					let title = ''
+					title += lessonName
+					title += ' | '
+					title += lesson.roomName ?? 'Нет кабинета'
 
-			let body = ''
+					let body = ''
 
-			body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
-			if (state === LessonState.notStarted) {
-				body += `До начала ${beforeStart} мин `
-				if (period) body += `Перемена ${period.getMinutes()} мин.`
-			} else if (state === LessonState.going) {
-				body += `Прошло ${beforeEnd}/${total} мин`
-			}
+					body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
+					if (state === LessonState.notStarted) {
+						body += `До начала ${beforeStart} мин `
+						if (period) body += `Перемена ${period.getMinutes()} мин.`
+					} else if (state === LessonState.going) {
+						body += `Прошло ${beforeEnd}/${total} мин`
+					}
 
-			const id = await notifee.displayNotification({
-				...(Notification.id ? { id: Notification.id } : {}),
-				title,
-				body,
-				android: {
-					channelId: Notification.lessonChannelId,
-					ongoing: true,
+					const id = await notifee.displayNotification({
+						...(Notification.id ? { id: Notification.id } : {}),
+						title,
+						body,
+						android: {
+							channelId: Notification.lessonChannelId,
+							ongoing: true,
 
-					// only alert when lesson notification
-					onlyAlertOnce: Notification.currentLesson === uuid,
+							// only alert when lesson notification
+							onlyAlertOnce: Notification.currentLesson === uuid,
 
-					progress:
-						state === LessonState.going
-							? {
-									current: progress,
-									max: 100,
-							  }
-							: void 0,
-				},
-				ios: {},
-			})
+							progress:
+								state === LessonState.going
+									? {
+											current: progress,
+											max: 100,
+									  }
+									: void 0,
+						},
+						ios: {},
+					})
 
-			runInAction(() => {
-				Notification.id = id
-				Notification.currentLesson = uuid
-			})
+					runInAction(() => {
+						Notification.id = id
+						Notification.currentLesson = uuid
+					})
 
-			return
-		}
+					return
+				}
 
-		// Nothing to show
-		Notification.remove()
-	}, 3000)
+				// Nothing to show
+				Notification.remove()
+			}),
+		3000
+	)
 })

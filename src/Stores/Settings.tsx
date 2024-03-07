@@ -19,10 +19,11 @@ class SettingsStore {
 
 	lessonNotifications = true
 	marksNotifications = false
-	lastNameLast = true
+	nameFormat: 'fio' | 'ifo' = 'ifo'
 	currentTotalsOnly = true
 	currentTerm?: NSEntity = undefined
 	markStyle: 'background' | 'border' = 'background'
+	requestTimeout = 3
 	/**
 	 * Map containing per student overrides
 	 */
@@ -61,7 +62,11 @@ class SettingsStore {
 	}
 
 	constructor() {
-		makeAutoObservable(this, { forStudent: false, fullname: false })
+		makeAutoObservable(this, {
+			forStudent: false,
+			fullname: false,
+			studentId: false,
+		})
 
 		const clearOverrides = (value: this['studentOverrides']) => {
 			runInAction(() => {
@@ -93,7 +98,7 @@ class SettingsStore {
 	}
 
 	fullname(name: string) {
-		if (this.lastNameLast) {
+		if (this.nameFormat === 'ifo') {
 			const parts = name.split(' ')
 			return [parts[1], parts[2], parts[0]].join(' ')
 		} else {

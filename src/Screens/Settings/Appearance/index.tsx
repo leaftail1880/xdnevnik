@@ -1,54 +1,57 @@
 import { observer } from 'mobx-react-lite'
 import { ScrollView, View } from 'react-native'
-import { Button, Surface, Text } from 'react-native-paper'
+import { Button, Divider, Surface, Text } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { Spacings } from '../../../../Components/Spacings'
-import { styles } from '../../../../Setup/constants'
-import { Settings } from '../../../../Stores/Settings'
-import { Theme } from '../../../../Stores/Theme'
-import { DropdownSettingsButton } from '../../Components/DropdownSettingsButton'
-import { SwitchSetting } from '../../Components/SwitchSetting'
+import { Spacings } from '../../../Components/Spacings'
+import { styles } from '../../../Setup/constants'
+import { Theme } from '../../../Stores/Theme'
+import { SegmentedSettingsButton } from '../Components/SegmentedSettingsButton'
 import { AccentColorPicker } from './AccentColorPicker'
 
 const themes = [
-	{ name: 'Системная', i: 'system' as const },
-	{ name: 'Темная', i: 'dark' as const },
-	{ name: 'Светлая', i: 'light' as const },
+	{ label: 'Системная', value: 'system' as const },
+	{ label: 'Темная', value: 'dark' as const },
+	{ label: 'Светлая', value: 'light' as const },
 ]
 
 const markStyles = [
-	{ name: 'Линия', i: 'border' as const },
-	{ name: 'Фон', i: 'background' as const },
+	{ label: 'Линия', value: 'border' as const },
+	{ label: 'Фон', value: 'background' as const },
 ]
 
 export default observer(function Appearance() {
 	Theme.key
 	return (
-		<ScrollView contentContainerStyle={{}}>
-				<DropdownSettingsButton
-					label={'Тема'}
-					data={themes}
-					defaultValueByIndex={themes.findIndex(e => e.i === Theme.scheme)}
-					onSelect={s => Theme.setColorScheme(s.i)}
-					selectionText={i => i?.name}
-				/>
+		<ScrollView>
+			<SegmentedSettingsButton
+				label="Тема"
+				source={Theme}
+				setting="scheme"
+				values={themes}
+			/>
 
-				<DropdownSettingsButton
-					label="Стиль оценок"
-					data={markStyles}
-					defaultValueByIndex={markStyles.findIndex(
-						e => e.i === Settings.markStyle
-					)}
-					onSelect={s => Settings.save({ markStyle: s.i })}
-					selectionText={i => i?.name}
-				/>
-				<SwitchSetting setting="lastNameLast" label="Показывать ФИО как ИОФ" />
+			<SegmentedSettingsButton
+				label="Стиль оценок"
+				setting="markStyle"
+				values={markStyles}
+			/>
+
+			<SegmentedSettingsButton
+				setting="nameFormat"
+				label="В каком порядке отображать Фамилию Имя Отчество"
+				values={[
+					{ label: 'ФИО', value: 'fio' },
+					{ label: 'ИФО', value: 'ifo' },
+				]}
+			/>
 			<AccentColorPicker />
-			{false && <DevSettings />}
+			<Divider style={{ margin: Spacings.s1 }} />
+			{/* {__DEV__ && <DevSettings />} */}
 		</ScrollView>
 	)
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DevSettings = observer(function DevSettings() {
 	return (
 		<Surface elevation={1} style={{ borderRadius: Theme.roundness }}>

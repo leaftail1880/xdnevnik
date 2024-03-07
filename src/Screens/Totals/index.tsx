@@ -2,17 +2,17 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { Observer, observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Chip } from 'react-native-paper'
+import { Spacings } from '../../Components/Spacings'
 import { Education, SubjectPerformance } from '../../NetSchool/classes'
 import { EducationStore, SubjectsStore, TotalsStore } from '../../Stores/API'
 import { Settings } from '../../Stores/Settings'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { SubjectTotals } from '../SubjectTotals/index'
 import { TotalsScreenTable } from './TotalsScreenTable'
 import { TotalsScreenTerm } from './TotalsScreenTerm'
 import { ParamMap, S_SUBJECT_TOTALS, S_TOTALS, Stack } from './navigation'
 
-export const TotalsNavigation = observer(function TotalsNavigation() {
-	const { studentId } = XDnevnik
+export default observer(function TotalsNavigation() {
+	const { studentId } = Settings
 	EducationStore.withParams({ studentId })
 
 	// TODO Let user to choose school year
@@ -30,6 +30,7 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 	const TotalsScreen = Settings.currentTotalsOnly
 		? TotalsScreenTerm
 		: TotalsScreenTable
+		
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -45,12 +46,12 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 							<Observer>
 								{function headerSwitch() {
 									return (
-										<View>
+										<View style={{ margin: Spacings.s2 }}>
 											<Chip
-												mode="outlined"
+												selected={!Settings.currentTotalsOnly}
 												onPress={() =>
 													Settings.save({
-														currentTotalsOnly: Settings.currentTotalsOnly,
+														currentTotalsOnly: !Settings.currentTotalsOnly,
 													})
 												}
 											>
@@ -69,9 +70,6 @@ export const TotalsNavigation = observer(function TotalsNavigation() {
 			<Stack.Screen
 				component={SubjectTotals}
 				name={S_SUBJECT_TOTALS}
-				// options={{
-				// 	headerStyle: { elevation: 0 },
-				// }}
 			></Stack.Screen>
 		</Stack.Navigator>
 	)

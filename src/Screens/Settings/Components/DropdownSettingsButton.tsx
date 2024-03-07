@@ -1,4 +1,5 @@
-import { StyleProp, View, ViewStyle } from 'react-native'
+import { observer } from 'mobx-react-lite'
+import { Falsy, StyleProp, TextStyle, View, ViewStyle } from 'react-native'
 import { Text } from 'react-native-paper'
 import SelectDropdown, {
 	SelectDropdownProps,
@@ -14,8 +15,7 @@ type DropdownSettingsButtonProps<Item = object> = BaseSetting & {
 	buttonViewStyle?: StyleProp<ViewStyle>
 } & SelectDropdownProps<Item>
 
-// eslint-disable-next-line mobx/missing-observer
-export const DropdownSettingsButton = function DropdownSettingsButton<
+export const DropdownSettingsButton = observer(function DropdownSettingsButton<
 	Item = object
 >(props: DropdownSettingsButtonProps<Item>) {
 	Theme.key
@@ -37,41 +37,44 @@ export const DropdownSettingsButton = function DropdownSettingsButton<
 			}
 			renderCustomizedButtonChild={i => {
 				const value = props.selectionText(i)
+				const viewStyle: StyleProp<ViewStyle> = [
+					styles.stretch,
+					{
+						padding: 0,
+						width: '100%',
+						paddingHorizontal: Spacings.s1,
+					},
+					props.buttonViewStyle,
+				]
+
 				return (
-					<View
-						style={[
-							styles.stretch,
-							{
-								padding: 0,
-								width: '100%',
-								paddingHorizontal: Spacings.s1,
-							},
-							props.buttonViewStyle,
-						]}
-					>
-						{typeof props.label === 'string' ? (
-							<Text variant="labelLarge">{props.label}</Text>
-						) : (
-							props.label
-						)}
-						{typeof value === 'string' ? (
-							<Text
-								style={[
-									Theme.fonts.labelLarge,
-									{
-										color: Theme.colors.secondary,
-									},
-								]}
-							>
-								{value || 'По умолчанию'}
-							</Text>
-						) : (
-							value
-						)}
+					<View style={viewStyle}>
+						<TextOrNode>{props.label}</TextOrNode>
+						<TextOrNode
+							style={{
+								color: Theme.colors.secondary,
+							}}
+						>
+							{value}
+						</TextOrNode>
 					</View>
 				)
 			}}
 			{...props}
 		/>
 	)
-}
+})
+
+const TextOrNode = observer(function TextOrNode(props: {
+	children: React.JSX.Element | Falsy | string
+	style?: StyleProp<TextStyle>
+}) {
+	Theme.key
+	return typeof props.children === 'string' ? (
+		<Text variant="labelLarge" style={props.style}>
+			{props.children || 'По умолчанию'}
+		</Text>
+	) : (
+		props.children
+	)
+})

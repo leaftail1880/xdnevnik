@@ -1,4 +1,5 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
+import Toast from 'react-native-toast-message'
 import { Logger } from '../Setup/constants'
 import { makeReloadPersistable } from '../Stores/makePersistable'
 import {
@@ -70,6 +71,9 @@ export class NetSchoolApi {
 			e.message.includes('Network request failed')
 		) {
 			result = this.noConnection
+		} else if (e instanceof Error && e.name === 'AbortError') {
+			result =
+				'Нет ответа от сервера. Плохой интернет или сетевой город на техработах'
 		} else {
 			result = e + ''
 		}
@@ -111,6 +115,7 @@ export class NetSchoolApi {
 			endpoint: observable,
 			logOut: action,
 			setEndpoint: true,
+			timeoutLimit: true,
 		})
 		makeReloadPersistable(this, {
 			name: 'api',
@@ -133,9 +138,12 @@ export class NetSchoolApi {
 						return session
 					},
 				},
+				{ key: 'timeoutLimit', serialize: e => e, deserialize: e => e },
 			],
 		})
 	}
+
+	timeoutLimit = 5
 
 	/**
 	 * Cache to store responses to work in offline mode
@@ -269,9 +277,8 @@ export class NetSchoolApi {
 				}
 			}
 
-			// logger.debug('Request to', url)
-
-			const response = await fetchFn(url, { ...init, ...request })
+			const signal = AbortSignal.timeout(this.timeoutLimit * 1000)
+			const response = await fetchFn(url, { signal, ...init, ...request })
 
 			if (response.status === 503)
 				throw new NetSchoolError(this.errorReasons[503], {
@@ -301,10 +308,16 @@ export class NetSchoolApi {
 			return json
 		} catch (error) {
 			if (this.cache[url]) {
-				const errText =
-					error instanceof NetSchoolError && error.beforeAuth
-						? ''
-						: 'error: ' + error
+				const beforeAuth = error instanceof NetSchoolError && error.beforeAuth
+				const errText = beforeAuth ? '' : 'error: ' + error
+
+				if (!beforeAuth) {
+					Toast.show({
+						type: 'error',
+						text1: 'Ошибка',
+						text2: NetSchoolApi.stringifyError(error),
+					})
+				}
 				Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
@@ -323,8 +336,7 @@ export class NetSchoolApi {
 		500: 'Ошибка на стороне сервера дневника. Возможно, неправильный запрос',
 		503: 'Сервер дневника недоступен, технические работы.',
 
-		HowToCache:
-			'Зайдите в приложение и откройте этот экран чтобы кэш стал доступен.',
+		HowToCache: 'Авторизируйтесь чтобы этот экран стал доступен.',
 	}
 
 	private async get<T extends object>(

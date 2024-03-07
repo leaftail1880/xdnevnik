@@ -1,11 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import {
-	Falsy,
-	TextStyle,
-	TouchableOpacity,
-	TouchableOpacityProps,
-} from 'react-native'
-import { Text } from 'react-native-paper'
+import { Falsy, TextStyle, TouchableOpacityProps, View } from 'react-native'
+import { Text, TouchableRipple } from 'react-native-paper'
 import { Settings } from '../Stores/Settings'
 import { Theme } from '../Stores/Theme'
 
@@ -61,6 +56,8 @@ export const Mark = observer(function Mark({
 		}
 	}
 
+	const textColor = bg ? Theme.colors.surface : color
+
 	if (markWeight) {
 		const minAlpha = 100
 		const maxAlpha = 16 * 16 - 1 - minAlpha
@@ -76,60 +73,70 @@ export const Mark = observer(function Mark({
 		}
 	}
 
-	const FinalMarkStyle: TextStyle = {
-		borderWidth: 2,
-		borderColor: color,
-		borderStyle: 'dotted',
-		borderCurve: 'circular',
-	}
-
-	const textColor = bg ? Theme.colors.surface : color
-
 	return (
-		<TouchableOpacity
+		<TouchableRipple
 			{...props}
 			style={[
 				{
 					elevation: 0,
 					borderRadius: Theme.roundness,
+					alignContent: 'center',
 					justifyContent: 'center',
 					alignItems: 'center',
 				},
 				bg
 					? { backgroundColor: color }
-					: { borderColor: color, borderWidth: 2 },
-				finalMark ? FinalMarkStyle : false,
+					: { borderColor: color, borderWidth: 1.5 },
+				finalMark
+					? {
+							borderWidth: 1.5,
+							borderColor: Theme.colors.onSurface,
+							borderCurve: 'circular',
+					  }
+					: false,
 				style,
 			]}
 		>
-			<Text style={[{ color: textColor }, textStyle]}>
-				{duty ? '.' : finalMark ?? markProp}
-			</Text>
-			{markWeight && (
-				<Text
-					style={{
-						fontSize: 10,
-						color: textColor,
-						...subTextStyle,
-					}}
-				>
-					{markWeight.current}
+			<View
+				style={{
+					padding: 0,
+					margin: 0,
+					alignContent: 'center',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
+					{duty ? '.' : finalMark ?? markProp}
 				</Text>
-			)}
-			{!!finalMark && (
-				<Text
-					style={[
-						{
-							alignSelf: 'center',
-							fontSize: 10,
-							color: textColor,
-						},
-						subTextStyle,
-					]}
-				>
-					{markProp}
-				</Text>
-			)}
-		</TouchableOpacity>
+				{markWeight && (
+					<Text
+						style={[
+							{
+								fontSize: 12,
+								color: textColor,
+							},
+							subTextStyle,
+						]}
+					>
+						Вес: {markWeight.current}
+					</Text>
+				)}
+				{!!finalMark && markProp && (
+					<Text
+						style={[
+							{
+								alignSelf: 'center',
+								fontSize: 10,
+								color: textColor,
+							},
+							subTextStyle,
+						]}
+					>
+						Балл: {markProp}
+					</Text>
+				)}
+			</View>
+		</TouchableRipple>
 	)
 })

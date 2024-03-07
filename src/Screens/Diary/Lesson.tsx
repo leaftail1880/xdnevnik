@@ -23,6 +23,7 @@ export const DiaryLesson = observer(function DiaryLesson({
 				margin: Spacings.s1,
 				padding: 0,
 				borderCurve: 'continuous',
+
 				// Display border frame only when lesson is going
 				borderWidth:
 					LessonProgressStore.currentLesson === lesson.classmeetingId ? 5 : 0,
@@ -66,7 +67,8 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 					styles.stretch,
 					{
 						elevation: 5,
-						padding: Spacings.s2,
+						padding: Spacings.s1,
+						paddingHorizontal: Spacings.s3,
 						borderRadius: Theme.roundness * 2,
 						backgroundColor: Theme.colors.secondaryContainer,
 						width: '100%',
@@ -77,6 +79,8 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 			>
 				<SubjectName
 					style={Theme.theme.fonts.titleMedium}
+					// eslint-disable-next-line react-native/no-color-literals
+					textInputStyle={{ backgroundColor: '#00000000' }}
 					viewStyle={{
 						maxWidth: '70%',
 					}}
@@ -95,7 +99,7 @@ const TopRow = observer(function TopRow({ lesson }: { lesson: Lesson }) {
 })
 const MiddleRow = observer(function MiddleRow({ lesson }: { lesson: Lesson }) {
 	return (
-		<View style={{ padding: Spacings.s2 }}>
+		<View style={{ paddingHorizontal: Spacings.s2 }}>
 			{DiaryState.showLessonTheme && (
 				<Text style={{ marginBottom: Spacings.s2 }}>
 					{lesson.lessonTheme ?? 'Тема урока не указана'}

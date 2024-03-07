@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { TouchableOpacity, View } from 'react-native'
-import { Button, Surface, Text } from 'react-native-paper'
+import { View } from 'react-native'
+import { Button, Text, TouchableRipple } from 'react-native-paper'
 import { Mark } from '../../Components/Mark'
 import { Spacings } from '../../Components/Spacings'
 import { Assignment, Attachment } from '../../NetSchool/classes'
@@ -33,75 +33,64 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 		attachments.result?.filter(e => e.assignmentId === assignment.assignmentId)
 
 	return (
-		<View>
-			<Surface
-				elevation={2}
-				style={{
-					borderRadius: Theme.roundness,
-					marginVertical: Spacings.s2,
-					margin: Spacings.s1,
-					padding: Spacings.s1,
-					width: '97%',
-					flexDirection: 'row',
-					justifyContent: 'space-between',
-					alignContent: 'stretch',
-					alignItems: 'center',
-				}}
-			>
-				{assignment.assignmentTypeName && (
-					<TouchableOpacity
-						onPress={() => setShowHw(!showHw)}
-						style={{
-							borderRadius: Theme.roundness,
-							alignItems: 'center',
-							justifyContent: 'center',
-							backgroundColor: Theme.colors.primaryContainer,
-							width: 45,
-							height: 45,
-							alignSelf: 'center',
-						}}
-					>
-						<Text style={{ margin: Spacings.s2 }}>
-							{assignment.assignmentTypeAbbr}
-						</Text>
-					</TouchableOpacity>
-				)}
-
-				<Text
-					style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
-					selectable
+		<View
+			style={{
+				borderRadius: Theme.roundness,
+				margin: Spacings.s2,
+				flexDirection: 'row',
+				justifyContent: 'space-between',
+				alignContent: 'stretch',
+				alignItems: 'center',
+			}}
+		>
+			{assignment.assignmentTypeName && (
+				<TouchableRipple
+					onPress={() => setShowHw(!showHw)}
+					style={{
+						borderRadius: Theme.roundness,
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: Theme.colors.primaryContainer,
+						width: 45,
+						height: 45,
+						alignSelf: 'center',
+					}}
 				>
-					{showHw
-						? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
-						: '...'}
-				</Text>
+					<Text style={{ margin: Spacings.s2 }}>
+						{assignment.assignmentTypeAbbr}
+					</Text>
+				</TouchableRipple>
+			)}
 
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Mark
-						mark={assignment.result ?? 'Нет'}
-						duty={assignment.duty}
-						markWeight={{
-							max: assignment.weight,
-							min: assignment.weight,
-							current: assignment.weight,
-						}}
-						style={{
-							width: 45,
-							height: 45,
-							alignSelf: 'center',
-						}}
-						textStyle={{ fontSize: 16 }}
-						subTextStyle={{ fontSize: 14, alignSelf: 'center' }}
-					/>
-				</View>
+			<Text
+				style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
+				selectable
+			>
+				{showHw
+					? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
+					: '...'}
+			</Text>
 
-				{showHw &&
-					((assignment.attachmentsExists && attachments.fallback) ||
-						(attachment &&
-							attachment.map(e => (
-								<AttachmentFile attachment={e} key={e.attachmentId} />
-							))))}
-			</Surface>
+			<Mark
+				mark={assignment.result ?? 'Нет'}
+				duty={assignment.duty}
+				markWeight={{
+					max: assignment.weight,
+					min: assignment.weight,
+					current: assignment.weight,
+				}}
+				style={{
+					width: 45,
+					height: 45,
+				}}
+			/>
+
+			{showHw &&
+				((assignment.attachmentsExists && attachments.fallback) ||
+					(attachment &&
+						attachment.map(e => (
+							<AttachmentFile attachment={e} key={e.attachmentId} />
+						))))}
 		</View>
 	)
 })

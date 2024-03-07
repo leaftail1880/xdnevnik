@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Button } from 'react-native-paper'
 import { styles } from '../../../Setup/constants'
 import { Theme } from '../../../Stores/Theme'
-import { SETTINGS_ROUTES, SettingsRoutes } from '../SettingsNavigation'
+import { SETTINGS_ROUTES, SettingsRoutes } from '../navigation'
 
 export const SettingsJumpNavigation = observer(
 	function SettingsJumpNavigation(props: {

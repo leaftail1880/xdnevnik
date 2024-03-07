@@ -2,11 +2,10 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { ColorValue, StyleProp, TextStyle, View, ViewStyle } from 'react-native'
-import { IconButton, Text, TextInput, TextProps } from 'react-native-paper'
+import { IconButton, Text, TextInput, TextInputProps, TextProps } from 'react-native-paper'
 import { Subject } from '../NetSchool/classes'
 import { styles } from '../Setup/constants'
 import { Settings } from '../Stores/Settings'
-import { XDnevnik } from '../Stores/Xdnevnik.store'
 import { Loading } from './Loading'
 
 type SubjectNameOptions = {
@@ -21,7 +20,7 @@ type SubjectNameOptions = {
 )
 
 export function getSubjectName(props: SubjectNameOptions) {
-	const { studentId } = XDnevnik
+	const { studentId } = Settings
 	if (!studentId) return 'Загрузка'
 
 	const overriden = Settings.forStudent(studentId).subjectNames[props.subjectId]
@@ -36,13 +35,14 @@ export function getSubjectName(props: SubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
+	textInputStyle?: TextInputProps['style']
 	iconsSize?: number
 } & SubjectNameOptions &
 	Omit<
 		TextProps<string>,
 		'textAlign' | 'style' | 'selectionColor' | 'children'
 	> & {
-		style: Omit<TextStyle, 'color'> & { color?: ColorValue }
+		style?: Omit<TextStyle, 'color'> & { color?: ColorValue }
 	}
 
 export const SubjectName = observer(function SubjectName({
@@ -51,11 +51,11 @@ export const SubjectName = observer(function SubjectName({
 }: SubjectNameProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [newName, setNewName] = useState('')
-	const { studentId } = XDnevnik
+	const { studentId } = Settings
 
 	if (!studentId) return <Loading />
 
-	props.iconsSize ??= props.style.fontSize
+	props.iconsSize ??= props.style?.fontSize
 
 	const name = getSubjectName(props)
 
@@ -66,39 +66,41 @@ export const SubjectName = observer(function SubjectName({
 			) : (
 				<TextInput
 					{...props}
+					style={[props.style, props.textInputStyle]}
+					mode="outlined"
 					defaultValue={name}
 					onChangeText={setNewName}
-					placeholder="Тот же, что и в сетевом городе"
+					placeholder="По умолчанию"
 				/>
 			)}
 
-			<View style={[styles.stretch, { padding: 0 }]}>
+			{/* <View style={[styles.stretch, { padding: 0 }]}> */}
+			<IconButton
+				icon={isEditing ? 'content-save' : 'pencil'}
+				size={props.iconsSize}
+				style={props.style}
+				onPress={() => {
+					if (isEditing && newName) {
+						runInAction(() => {
+							const overrides = Settings.forStudent(studentId)
+							overrides.subjectNames[props.subjectId] = newName
+						})
+					}
+					setIsEditing(!isEditing)
+				}}
+			/>
+			{isEditing && (
 				<IconButton
-					icon={isEditing ? 'content-save' : 'pencil'}
+					onPress={() => {
+						setNewName('')
+						setIsEditing(false)
+					}}
+					icon="undo"
 					size={props.iconsSize}
 					style={props.style}
-					onPress={() => {
-						if (isEditing && newName) {
-							runInAction(() => {
-								const overrides = Settings.forStudent(studentId)
-								overrides.subjectNames[props.subjectId] = newName
-							})
-						}
-						setIsEditing(!isEditing)
-					}}
 				/>
-				{isEditing && (
-					<IconButton
-						onPress={() => {
-							setNewName('')
-							setIsEditing(false)
-						}}
-						icon="undo"
-						size={props.iconsSize}
-						style={props.style}
-					/>
-				)}
-			</View>
+			)}
+			{/* </View> */}
 		</View>
 	)
 })

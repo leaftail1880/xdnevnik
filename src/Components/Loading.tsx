@@ -11,7 +11,7 @@ interface LoadingProps {
 
 // eslint-disable-next-line mobx/missing-observer
 export function Loading({ text = 'Загрузка' }: LoadingProps) {
-	if (!text.includes('{dots}')) text += '{dots}'
+	if (!text.includes('{dots}')) text += '...'
 
 	return (
 		<View
@@ -20,12 +20,13 @@ export function Loading({ text = 'Загрузка' }: LoadingProps) {
 				flexDirection: 'row',
 				alignItems: 'center',
 				alignContent: 'stretch',
+				alignSelf: 'center',
 			}}
 		>
-			<Text style={{ margin: Spacings.s2 }}>
-				{text.replace(/\{dots\}/g, '')}
-			</Text>
 			<ActivityIndicator />
+			<Text style={{ margin: Spacings.s2 }}>
+				{text.replace(/\{dots\}/g, '...')}
+			</Text>
 		</View>
 	)
 }

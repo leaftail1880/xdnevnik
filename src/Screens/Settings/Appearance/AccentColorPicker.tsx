@@ -8,8 +8,8 @@ import ColorPicker, {
 	SaturationSlider,
 	Swatches,
 } from 'reanimated-color-picker'
-import { Spacings } from '../../../../Components/Spacings'
-import { Theme, ThemeStore } from '../../../../Stores/Theme'
+import { Spacings } from '../../../Components/Spacings'
+import { Theme, ThemeStore } from '../../../Stores/Theme'
 import { RoundnessSetting } from './RoundnessSetting'
 
 export const AccentColorPicker = observer(function AccentColorPicker() {

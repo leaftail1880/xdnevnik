@@ -9,14 +9,14 @@ import * as Updates from 'expo-updates'
 import { useState } from 'react'
 import { Alert, ScrollView, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { Spacings } from '../../../../Components/Spacings'
-import { getLatestGithubReleaseUrl } from '../../../../GithubUpdate/update'
-import { Logger, styles } from '../../../../Setup/constants'
+import { Spacings } from '../../Components/Spacings'
+import { getLatestGithubReleaseUrl } from '../../GithubUpdate/update'
+import { Logger, styles } from '../../Setup/constants'
 
 const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 	try {
 		if (Device.deviceType !== Device.DeviceType.PHONE || !Device.osName) {
-			Alert.alert('Обновление вне телефона не поддерживается')
+			Alert.alert('Обновление работает только в мобильном приложении')
 			return
 		}
 
@@ -76,7 +76,7 @@ const openAppInstaller = async (download: typeof FileSystem.downloadAsync) => {
 }
 
 // eslint-disable-next-line mobx/missing-observer
-export const UpdatesButton = function UpdatesButton() {
+export default function UpdatesButton() {
 	const [progress, setProgress] = useState<string | undefined>()
 	return (
 		<Button

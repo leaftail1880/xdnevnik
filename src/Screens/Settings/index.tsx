@@ -4,21 +4,23 @@ import { ScrollView } from 'react-native'
 import { Loading } from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
 import { StudentsStore } from '../../Stores/API'
-import { fullname, Settings } from '../../Stores/Settings'
+import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
 import { DropdownSettingsButton } from './Components/DropdownSettingsButton'
 import { SettingsJumpNavigation } from './Components/Navigate'
-import About from './Groups/About'
-import Appearance from './Groups/Appearance'
-import { Notifications } from './Groups/Notifications'
-import PrivacyPolicy from './Groups/Policy/PrivacyPolicy'
-import TermsAndConditions from './Groups/Policy/TermsAndConditions'
-import { UpdatesScreen } from './Groups/Update/Update'
+
+import About from './About'
+import Appearance from './Appearance'
+import Notifications from './Notifications'
+import PrivacyPolicy from './Policy/PrivacyPolicy'
+import TermsAndConditions from './Policy/TermsAndConditions'
+import UpdatesScreen from './Update'
+
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,
 	SettingsRoutes,
-} from './SettingsNavigation'
+} from './navigation'
 
 export const SettingsScreen = observer(function SettingsScreen() {
 	Theme.key

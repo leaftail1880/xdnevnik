@@ -1,16 +1,17 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
-import { Alert, ScrollView } from 'react-native'
-import { Colors, Switch, Text, View } from 'react-native-ui-lib'
+import { Alert, ScrollView, View } from 'react-native'
+import { Chip, Surface, Text } from 'react-native-paper'
 import { dropdownButtonStyle } from '../../Components/Dropdown'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
+import { Spacings } from '../../Components/Spacings'
 import { SubjectName } from '../../Components/SubjectName'
+import { styles } from '../../Setup/constants'
 import { SubjectPerformanceStores } from '../../Stores/API'
 import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import type { MarkInfo } from '../Totals'
 import type { ParamMap, S_SUBJECT_TOTALS } from '../Totals/navigation'
 import { AddMarkForm } from './AddMarkForm'
@@ -21,7 +22,7 @@ export const SubjectTotals = observer(function SubjectTotals({
 	route,
 }: StackScreenProps<ParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
-	const studentId = XDnevnik.studentId
+	const { studentId } = Settings
 	const performance = SubjectPerformanceStores.use({
 		studentId,
 		subjectId,
@@ -45,46 +46,49 @@ export const SubjectTotals = observer(function SubjectTotals({
 
 	if (performance.fallback) return performance.fallback
 
-	if (!marks) return <Loading text="Подсчет оценок{dots}" />
+	if (!marks) return <Loading text="Подсчет оценок..." />
 	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } = marks
 
 	return (
-		<View>
+		<View style={{ flex: 1 }}>
 			<View
-				row
-				spread
-				padding-s2
-				centerV
-				style={[dropdownButtonStyle(), { elevation: 0 }]}
+				style={[
+					styles.stretch,
+					dropdownButtonStyle(),
+					{ padding: Spacings.s2 },
+				]}
 			>
 				<SubjectName
 					subjectName={performance.result.subject.name}
 					subjectId={performance.result.subject.id}
-					iconsSize={20}
+					iconsSize={18}
 					style={{
 						fontSize: 20,
 						fontWeight: 'bold',
-						color: Colors.$textDefault,
+						margin: Spacings.s1,
 					}}
-					margin-s1
 				/>
 				<Mark
 					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
-					style={{ height: 50, width: 60 }}
-					textStyle={{ fontSize: 20 }}
+					style={{ height: 60, width: 60 }}
+					textStyle={{ fontSize: 22 }}
 				/>
 			</View>
 			<ScrollView refreshControl={performance.refreshControl}>
-				<View flex row center padding-s3>
-					<Text marginR-s2>Уроки без оценок</Text>
-					<Switch
-						value={lessonsWithoutMark}
-						onValueChange={setLessonsWithoutMark}
-					/>
+				<View style={{ padding: Spacings.s1 }}>
+					<Chip
+						mode="outlined"
+						selected={!lessonsWithoutMark}
+						onPress={() => {
+							setLessonsWithoutMark(!lessonsWithoutMark)
+						}}
+					>
+						Только оценки
+					</Chip>
 				</View>
-				<View padding-s1 bg-$backgroundNeutralLight br50>
+				<Surface elevation={1}>
 					{totalsAndSheduledTotals.map((e, i) => (
 						<MarkRow
 							mark={e}
@@ -93,36 +97,40 @@ export const SubjectTotals = observer(function SubjectTotals({
 							key={e.assignmentId ?? i.toString()}
 						/>
 					))}
-				</View>
+				</Surface>
 				<AddMarkForm
 					setCustomMarks={setCustomMarks}
 					customMarks={customMarks}
 				/>
-				<View padding-s2>
+				<Surface elevation={1} style={{ padding: Spacings.s2 }}>
 					<Text>
 						Учитель:{' '}
-						<Text text50>
+						<Text variant="labelLarge">
 							{Settings.fullname(performance.result.teachers[0].name)}
 						</Text>
 					</Text>
 					<Text>
 						Прошло уроков:{' '}
-						<Text text50>
+						<Text variant="labelLarge">
 							{performance.result.classmeetingsStats.passed}/
 							{performance.result.classmeetingsStats.scheduled}
 						</Text>
 					</Text>
 					<Text>
 						Средний бал класса:{' '}
-						<Text text50>{performance.result.classAverageMark}</Text>
+						<Text variant="labelLarge">
+							{performance.result.classAverageMark}
+						</Text>
 					</Text>
-				</View>
-				<Text $textDisabled center margin-s2>
+				</Surface>
+				<Text
+					style={{
+						color: Theme.colors.onSurfaceDisabled,
+						margin: Spacings.s2,
+					}}
+				>
 					{performance.updateDate}
 				</Text>
-				<View margin-s10>
-					<Text>-</Text>
-				</View>
 			</ScrollView>
 		</View>
 	)
@@ -139,8 +147,9 @@ const MarkRow = observer(function MarkRow({
 }) {
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
+	// TODO Use placeholder if not loaded
 	return (
-		<View flex row spread centerV padding-s2>
+		<View style={[styles.stretch, { padding: Spacings.s2 }]}>
 			<Mark
 				duty={mark.duty ?? false}
 				mark={mark.result ?? null}
@@ -157,6 +166,7 @@ const MarkRow = observer(function MarkRow({
 				}}
 				textStyle={{ fontSize: 17 }}
 				onPress={() => {
+					// TODO Use modal
 					Alert.alert(
 						(mark.assignmentTypeName ?? '') +
 							' ' +

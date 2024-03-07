@@ -35,28 +35,6 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		alignContent: 'stretch',
 	},
-	table: {
-		margin: 0,
-		justifyContent: 'center',
-		alignItems: 'center',
-		minWidth: 400,
-		padding: 0,
-		width: '100%',
-		elevation: 1,
-	},
-	tableRow: {
-		flexDirection: 'row',
-		alignSelf: 'center',
-		width: '100%',
-		padding: 7,
-
-		borderBottomWidth: 3,
-	},
-	tableCell: {
-		padding: 7,
-		margin: 3,
-		borderRadius: 5,
-	},
 })
 
 export const LANG = {

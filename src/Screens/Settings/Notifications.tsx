@@ -1,11 +1,11 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
-import { Theme } from '../../../../Stores/Theme'
-import { SwitchSetting } from '../../Components/SwitchSetting'
-import { SettingsRoutes } from '../../SettingsNavigation'
+import { Theme } from '../../Stores/Theme'
+import { SwitchSetting } from './Components/SwitchSetting'
+import { SettingsRoutes } from './navigation'
 
-export const Notifications = observer(function Notifications(
+export default observer(function Notifications(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	props: StackScreenProps<SettingsRoutes>
 ) {

@@ -9,25 +9,28 @@ import {
 import { Theme } from '../Stores/Theme'
 
 export const ToastConfig: ToastConfigType = {
-	success: createToast('secondaryContainer'),
-	error: createToast('errorContainer'),
+	success: createToast('secondaryContainer', 'onSecondaryContainer'),
+	error: createToast('errorContainer', 'onErrorContainer'),
 }
 
-function createToast(color: Exclude<keyof MD3Colors, 'elevation'>) {
+function createToast(
+	color: Exclude<keyof MD3Colors, 'elevation'>,
+	textColor: Exclude<keyof MD3Colors, 'elevation'>
+) {
 	// eslint-disable-next-line mobx/missing-observer
 	return function Toast(props: ToastConfigParams<unknown>) {
+		const textStyle = { color: Theme.colors[textColor] }
 		return (
 			<Observer>
 				{() => (
 					<BaseToast
 						{...props}
-						text1Style={[
-							Theme.fonts.titleMedium,
-							{ color: Theme.colors.onErrorContainer },
-						]}
-						text2Style={Theme.fonts.bodyMedium}
+						text1Style={[Theme.fonts.titleMedium, textStyle]}
+						text2Style={[Theme.fonts.bodyMedium, textStyle]}
+						text2NumberOfLines={4}
 						style={{
 							backgroundColor: Theme.colors[color],
+							height: '110%',
 						}}
 					/>
 				)}

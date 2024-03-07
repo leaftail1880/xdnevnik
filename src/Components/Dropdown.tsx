@@ -7,6 +7,7 @@ export function dropdownButtonStyle(): StyleProp<ViewStyle> {
 		width: '100%',
 		backgroundColor: Theme.colors.elevation.level2,
 		borderBottomLeftRadius: Theme.roundness,
+		elevation: 2,
 		borderBottomRightRadius: Theme.roundness,
 	}
 }

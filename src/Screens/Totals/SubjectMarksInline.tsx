@@ -1,21 +1,24 @@
 import { observer } from 'mobx-react-lite'
-import { ScrollView, StyleProp, ViewStyle } from 'react-native'
+import { useMemo } from 'react'
+import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
+import { Text } from 'react-native-paper'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
+import { Spacings } from '../../Components/Spacings'
 import { Total } from '../../NetSchool/classes'
 import { SubjectPerformanceStores } from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { calculateMarks } from '../SubjectTotals/calculateMarks'
-import { SubjectInfo } from './TotalsScreenTerm'
+import { SubjectInfo, TermStore } from './TotalsScreenTerm'
 
 export const SubjectMarksInline = observer(function SubjectMarksInline(
-	props: SubjectInfo & {
+	props: Omit<SubjectInfo, 'attendance'> & {
 		term: Total['termTotals'][number]
 		openDetails: () => void
 	}
 ) {
-	const { studentId } = XDnevnik
+	const { studentId } = Settings
 	const assignments = SubjectPerformanceStores.use({
 		studentId,
 		subjectId: props.total.subjectId,
@@ -26,26 +29,33 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 	})
 
 	const viewStyle: StyleProp<ViewStyle> = {
-		height: '100%',
 		margin: 0,
-		width: '100%',
+		flex: 1,
 		alignSelf: 'center',
-		backgroundColor: Colors.$backgroundPrimaryMedium,
+		backgroundColor: Theme.colors.elevation.level1,
 	}
+
 	const containerStyle: StyleProp<ViewStyle> = {
 		padding: Spacings.s1,
 		alignItems: 'center',
 	}
+
+	const marks = useMemo(
+		() =>
+			assignments.result &&
+			calculateMarks({
+				totals: assignments.result,
+				missedLessons: TermStore.attendance,
+			}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[assignments.result, TermStore.attendance]
+	)
 
 	if (assignments.fallback)
 		return (
 			<View style={[viewStyle, containerStyle]}>{assignments.fallback}</View>
 		)
 
-	const marks = calculateMarks({
-		totals: assignments.result,
-		missedLessons: props.attendance,
-	})
 	if (!marks)
 		return (
 			<View style={[viewStyle, containerStyle]}>
@@ -57,8 +67,8 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 
 	if (totalsAndSheduledTotals.length === 0)
 		return (
-			<View centerV style={[viewStyle, containerStyle]}>
-				<Text key={Theme.key}>Оценок нет</Text>
+			<View style={[viewStyle, containerStyle, { alignContent: 'center' }]}>
+				<Text>Оценок нет</Text>
 			</View>
 		)
 
@@ -82,7 +92,7 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 							  }
 							: void 0
 					}
-					style={{ height: 50, width: 50 }}
+					style={{ height: 45, width: 45, marginHorizontal: 2 }}
 					key={e.assignmentId}
 					onPress={props.openDetails}
 				/>

@@ -106,7 +106,7 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 								fontSize: 16,
 							}}
 							style={{
-								backgroundColor: Theme.colors.backdrop,
+								backgroundColor: Theme.colors.elevation.level1,
 								margin: Spacings.s1,
 							}}
 						>

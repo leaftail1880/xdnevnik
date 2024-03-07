@@ -1,20 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
-// import { SafeAreaView } from 'react-native-safe-area-context'
-import {
-	Colors,
-	Text,
-	TextField,
-	TextFieldProps,
-	View,
-} from 'react-native-ui-lib'
-import {
-	Button,
-	IconButton,
-	IconButtonProps,
-	buttonStyle,
-} from '../../Components/Button'
-import { Ionicon } from '../../Components/Icon'
+import { useCallback, useState } from 'react'
+import { View } from 'react-native'
+import { Button, IconButton, Surface, TextInput } from 'react-native-paper'
+import { Spacings } from '../../Components/Spacings'
+import { styles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import type { MarkInfo } from '../Totals'
 
@@ -26,58 +15,33 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 	const [weight, setWeight] = useState('')
 	const [mark, setMark] = useState('')
 	const [addingCustomMark, setAddingCustomMark] = useState(false)
-
-	const textFieldProps = {
-		'br20': true,
-		'margin-s2': true,
-		'text70': true,
-		'floatingPlaceholder': true,
-		'keyboardType': 'numeric',
-	} satisfies TextFieldProps
-
-	const iconProps = {
-		'marginL-s2': true,
-		'iconColor': Colors.$textAccent,
-		'style': buttonStyle(),
-		'size': 26,
-	} as Omit<IconButtonProps, 'icon'>
+	const addCustomMark = useCallback(() => {
+		if (addingCustomMark) {
+			// Saving
+			props.setCustomMarks(
+				props.customMarks.concat({
+					result: Number(mark),
+					weight: Number(weight),
+					comment: 'Кастомная',
+					assignmentTypeName: 'ВОЗМОЖНАЯ',
+				})
+			)
+		}
+		setAddingCustomMark(!addingCustomMark)
+	}, [addingCustomMark, mark, props, weight])
 
 	return (
-		<View padding-s2>
-			<View flex row centerV padding-s2>
+		<View style={{ padding: Spacings.s2 }}>
+			<View style={styles.stretch}>
 				<Button
-					center
-					br20
-					onPress={() => {
-						if (addingCustomMark) {
-							// Saving
-							props.setCustomMarks(
-								props.customMarks.concat({
-									result: Number(mark),
-									weight: Number(weight),
-									comment: 'Кастомная',
-									assignmentTypeName: 'ВОЗМОЖНАЯ',
-								})
-							)
-						}
-						setAddingCustomMark(!addingCustomMark)
-					}}
+					onPress={addCustomMark}
+					icon={addingCustomMark ? 'content-save' : 'plus'}
 				>
-					<View flex row spread centerV padding-s1>
-						<Ionicon
-							name={addingCustomMark ? 'save-sharp' : 'add'}
-							size={18}
-							color={Colors.$textAccent}
-						></Ionicon>
-						<Text marginL-s1 $textAccent>
-							{addingCustomMark ? 'Сохранить' : 'Добавить оценку'}
-						</Text>
-					</View>
+					{addingCustomMark ? 'Сохранить' : 'Добавить оценку'}
 				</Button>
 				{addingCustomMark && (
 					<IconButton
-						{...iconProps}
-						icon="arrow-undo"
+						icon="undo"
 						onPress={() => {
 							setAddingCustomMark(false)
 						}}
@@ -85,8 +49,7 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				)}
 				{!addingCustomMark && !!props.customMarks.length && (
 					<IconButton
-						{...iconProps}
-						icon="trash"
+						icon="delete"
 						onPress={() => {
 							props.setCustomMarks([])
 						}}
@@ -94,27 +57,26 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				)}
 			</View>
 			{addingCustomMark && (
-				<View padding-s4 backgroundColor={Colors.$backgroundPrimaryMedium} br30>
-					<View flex row spread>
-						<TextField
-							{...textFieldProps}
-							placeholder="Оценка"
-							onChangeText={setMark}
-						/>
-						{/* <SafeAreaView>
-							<WheelPicker
-								items={new Array(5)
-									.fill({})
-									.map((_, i) => ({ label: i + '', value: i }))}
-							/>
-						</SafeAreaView> */}
-					</View>
-					<TextField
-						{...textFieldProps}
+				<Surface
+					elevation={2}
+					style={{ borderRadius: Theme.roundness, padding: Spacings.s2 }}
+				>
+					<TextInput
+						mode="outlined"
+						style={{ marginBottom: Spacings.s2 }}
+						placeholder="Оценка"
+						defaultValue={mark}
+						keyboardType="numeric"
+						onChangeText={setMark}
+					/>
+					<TextInput
+						mode="outlined"
 						placeholder="Вес"
+						defaultValue={weight}
+						keyboardType="numeric"
 						onChangeText={setWeight}
 					/>
-				</View>
+				</Surface>
 			)}
 		</View>
 	)

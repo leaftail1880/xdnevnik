@@ -5,9 +5,3 @@ export const Spacings = {
 	s4: 24,
 	s5: 28,
 }
-
-export const BorderRadiuses = {
-	br10: 2,
-	br50: 5,
-	br40: 10,
-}

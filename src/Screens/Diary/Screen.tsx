@@ -11,13 +11,13 @@ import {
 	AttachmentsStore,
 	DiaryStore,
 } from '../../Stores/API'
+import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
-import { XDnevnik } from '../../Stores/Xdnevnik.store'
 import { DiaryLesson } from './Lesson'
 import { DiaryState } from './StateStore'
 
 export const DiaryScreen = observer(function DiaryScreen() {
-	const { studentId } = XDnevnik
+	const { studentId } = Settings
 	const { showHomework, weekDays, weekDaysDropdown, day } = DiaryState
 
 	DiaryStore.withParams({
@@ -141,7 +141,14 @@ const DiaryDay = observer(function DiaryDay() {
 	const { day: diaryDay } = DiaryState
 	const day = result.forDay(diaryDay)
 	if (day.length === 0) {
-		return <Text variant="displayMedium">Уроков нет</Text>
+		return (
+			<Text
+				variant="titleMedium"
+				style={{ textAlign: 'center', margin: Spacings.s4 }}
+			>
+				Уроков нет
+			</Text>
+		)
 	}
 
 	return day

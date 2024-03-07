@@ -1,85 +1,76 @@
 import { observer } from 'mobx-react-lite'
+import { View } from 'react-native'
+import { Surface } from 'react-native-paper'
 import { Loading } from '../../Components/Loading'
 import { Mark } from '../../Components/Mark'
+import { Spacings } from '../../Components/Spacings'
 import { SubjectName } from '../../Components/SubjectName'
 import { LANG } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import { SubjectMarksInline } from './SubjectMarksInline'
 import { SubjectInfo } from './TotalsScreenTerm'
 
-export const SubjectPerformanceInline = observer(
-	function SubjectPerformanceInline(props: SubjectInfo) {
-		Theme.key
-		const term = props.total.termTotals.find(
-			e => e.term.id === props.selectedTerm.id
-		)
+export const SubjectPerformanceInline = observer(function SubjectPerformanceInline(
+	props: SubjectInfo
+) {
+	const term = props.total.termTotals.find(
+		e => e.term.id === props.selectedTerm.id
+	)
 
-		if (!term) return <Loading text="Загрузка четверти{dots}" />
+	if (!term) return <Loading text="Загрузка четверти{dots}" />
 
-		const openDetails = () =>
-			props.navigation.navigate(LANG['s_subject_totals'], {
-				termId: props.selectedTerm.id,
-				finalMark: term.mark,
-				subjectId: props.total.subjectId,
-			})
+	const openDetails = () =>
+		props.navigation.navigate(LANG['s_subject_totals'], {
+			termId: props.selectedTerm.id,
+			finalMark: term.mark,
+			subjectId: props.total.subjectId,
+		})
 
-		return (
-			<View
-				br20
-				margin-s2
+	return (
+		<Surface
+			elevation={1}
+			style={{
+				margin: Spacings.s2,
+				borderRadius: Theme.roundness * 2,
+				flex: 1,
+			}}
+		>
+			<SubjectName
+				subjectId={props.total.subjectId}
+				subjects={props.subjects}
+				iconsSize={16}
 				style={{
-					elevation: 10,
-					width: '98%',
-					backgroundColor: Colors.$backgroundPrimaryLight,
+					fontSize: 16,
+					fontWeight: 'bold',
+					margin: 0,
+					marginHorizontal: Spacings.s2,
 				}}
-			>
-				<SubjectName
-					subjectId={props.total.subjectId}
-					subjects={props.subjects}
-					iconsSize={18}
-					flex
+			/>
+			{term ? (
+				<View
 					style={{
-						maxWidth: '90%',
-
-						fontSize: 18,
-						color: Colors.$textDefault,
-						fontWeight: 'bold',
+						width: '100%',
+						flexDirection: 'row',
+						paddingHorizontal: Spacings.s2,
 					}}
-					viewStyle={{
-						padding: Spacings.s2,
-						paddingTop: Spacings.s1,
-					}}
-				/>
-				{term ? (
-					<View flex row style={{ width: '100%' }}>
-						<View flex row style={{ alignItems: 'flex-end' }}>
-							<SubjectMarksInline
-								{...props}
-								openDetails={openDetails}
-								term={term}
-							/>
-						</View>
-						<View
-							row
-							spread
-							backgroundColor={Colors.$backgroundPrimaryLight}
-							padding-s1
-							br20
-						>
-							<Mark
-								duty={false}
-								noColor={Colors.$backgroundDefault}
-								finalMark={term?.mark}
-								mark={term.avgMark}
-								onPress={openDetails}
-								style={{ height: 50, width: 50, alignSelf: 'center' }}
-							/>
-						</View>
-					</View>
-				) : (
-					<Loading />
-				)}
-			</View>
-		)
-	}
-)
+				>
+					<SubjectMarksInline
+						{...props}
+						openDetails={openDetails}
+						term={term}
+					/>
+					<Mark
+						duty={false}
+						finalMark={term?.mark}
+						mark={term.avgMark}
+						onPress={openDetails}
+						textStyle={{ fontSize: 18 }}
+						style={{ height: 50, width: 50, alignSelf: 'center' }}
+					/>
+				</View>
+			) : (
+				<Loading />
+			)}
+		</Surface>
+	)
+})

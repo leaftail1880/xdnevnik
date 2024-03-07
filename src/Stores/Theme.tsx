@@ -2,6 +2,7 @@ import {
 	DarkTheme as NavigationDarkTheme,
 	DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native'
+// import * as NavigationBar from 'expo-navigation-bar'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { Appearance } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
@@ -137,6 +138,9 @@ export class ThemeStore {
 				type: dark ? 'dark' : 'light',
 			})
 		)
+
+		// NavigationBar.setBackgroundColorAsync(this.theme.colors.card)
+		// NavigationBar.setButtonStyleAsync(dark ? 'dark' : 'light')
 	}
 }
 

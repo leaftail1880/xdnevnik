@@ -2,11 +2,11 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
 import { Linking, ScrollView, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { Spacings } from '../../../Components/Spacings'
-import { LANG } from '../../../Setup/constants'
-import { Theme } from '../../../Stores/Theme'
-import { SettingsJumpNavigation } from '../Components/Navigate'
-import { SettingsRoutes } from '../SettingsNavigation'
+import { Spacings } from '../../Components/Spacings'
+import { LANG } from '../../Setup/constants'
+import { Theme } from '../../Stores/Theme'
+import { SettingsJumpNavigation } from './Components/Navigate'
+import { SettingsRoutes } from './navigation'
 
 // eslint-disable-next-line mobx/missing-observer
 export default function About(props: StackScreenProps<SettingsRoutes>) {
