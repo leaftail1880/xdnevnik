@@ -67,7 +67,7 @@ const Config = {
 			'expo-updates',
 			sentryPlugin,
 			'expo-build-properties',
-		].filter(Boolean),
+		],
 
 		updates: {
 			url: 'https://u.expo.dev/97163afe-5c7e-4856-ba8f-348e00aa7c04',
