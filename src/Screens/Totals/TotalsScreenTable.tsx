@@ -1,8 +1,10 @@
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { DataTable } from 'react-native-paper'
 import Loading from '../../Components/Loading'
 import Mark from '../../Components/Mark'
+import SelectModal from '../../Components/SelectModal'
 import SubjectName from '../../Components/SubjectName'
 import UpdateDate from '../../Components/UpdateDate'
 import { LANG } from '../../Setup/constants'
@@ -24,8 +26,8 @@ export default observer(function TotalsScreenTable({
 			<ScrollView contentContainerStyle={{ flex: 0 }}>
 				<DataTable style={{ alignSelf: 'center' }}>
 					<DataTable.Header>
-						<DataTable.Title style={{ flex: 3 }}>
-							Четверти <SchoolYear />
+						<DataTable.Title style={{ flex: 3, padding: 0, margin: 0 }}>
+							<SchoolYear />
 						</DataTable.Title>
 
 						{TotalsStore.result?.[0]?.termTotals.map((_, i, a) => (
@@ -84,9 +86,16 @@ export default observer(function TotalsScreenTable({
 
 const SchoolYear = observer(function SchoolYear() {
 	const { schoolYear } = TotalsStateStore
-	if (!schoolYear) return <Loading />
+	const education = EducationStore.result
+	if (!education || !schoolYear) return <Loading />
 
-	const start = new Date(schoolYear.startDate).getFullYear()
-	const end = new Date(schoolYear.endDate).getFullYear()
-	return `${start}/${end}`
+	return (
+		<SelectModal
+			mode="chip"
+			label={'Год'}
+			value={schoolYear.id + ''}
+			data={TotalsStateStore.years}
+			onSelect={v => runInAction(() => (TotalsStateStore.schoolYear = v.year))}
+		/>
+	)
 })

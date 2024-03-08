@@ -1,8 +1,15 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import {
+	ScrollView,
+	StyleProp,
+	StyleSheet,
+	View,
+	ViewStyle,
+} from 'react-native'
 import {
 	Button,
+	Chip,
 	Dialog,
 	List,
 	Portal,
@@ -21,31 +28,46 @@ export default observer(function SelectModal<
 	value: T
 	data: D[]
 	onSelect: (v: D) => void
-	mode?: 'button' | 'list.item'
+	mode?: 'button' | 'list.item' | 'chip'
+	style?: StyleProp<ViewStyle>
 	description?: string
 }) {
 	Theme.key
 	const [visible, setVisible] = useState(false)
 	const value =
 		props.data.find(e => e.value === props.value)?.label ?? 'Выбери...'
+	let label = props.label
+	if (label !== '') label += ': '
 
 	return (
 		<>
 			{props.mode === 'button' ? (
 				<Button
 					onPress={() => setVisible(!visible)}
-					style={{
-						borderTopLeftRadius: 0,
-						borderTopRightRadius: 0,
-						backgroundColor: Theme.colors.elevation.level2,
-					}}
+					style={[
+						{
+							borderTopLeftRadius: 0,
+							borderTopRightRadius: 0,
+							backgroundColor: Theme.colors.elevation.level2,
+						},
+						props.style,
+					]}
 					labelStyle={[Theme.fonts.titleMedium, { padding: Spacings.s1 }]}
 				>
-					<Text variant="titleMedium">{props.label}: </Text>
+					<Text variant="titleMedium">{label}</Text>
 					{value}
 				</Button>
+			) : props.mode === 'chip' ? (
+				<Chip
+					style={props.style}
+					textStyle={Theme.fonts.bodySmall}
+					onPress={() => setVisible(!visible)}
+				>
+					{(label + value).slice(0, 16)}
+				</Chip>
 			) : (
 				<List.Item
+					style={props.style}
 					title={props.label}
 					description={value}
 					onPress={() => setVisible(!visible)}

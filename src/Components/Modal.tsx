@@ -87,9 +87,9 @@ const ToastModal = observer(function ToastModal() {
 							)}
 						</View>
 						<IconButton
-							style={{ flex: 1 }}
 							icon={'close'}
 							onPress={Toast.hide}
+							style={{ flex: 1, margin: 0, padding: 0 }}
 						/>
 					</View>
 				</Snackbar>

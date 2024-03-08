@@ -70,7 +70,7 @@ const TotalsScreenHeader = observer(function TotalsScreenHeader() {
 					data={terms}
 					value={Settings.currentTerm?.id + ''}
 					onSelect={v => Settings.save({ currentTerm: v.term })}
-					label={'Четверть'}
+					label={Settings.currentTerm ? '' : 'Четверть'}
 					mode="button"
 				/>
 			)}
