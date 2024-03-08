@@ -1,24 +1,25 @@
 // @ts-check
+import withBuildProperties from 'expo-build-properties'
 import { withGradleProperties } from 'expo/config-plugins'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
 
-/** @type {[string, any]} */
-const sentryPlugin = [
-	'@sentry/react-native/expo',
-	{
-		organization: 'leaftail1880',
-		project: 'xdnevnik',
-	},
-]
+// /** @type {[string, any]} */
+// const sentryPlugin = [
+// 	'@sentry/react-native/expo',
+// 	{
+// 		organization: 'leaftail1880',
+// 		project: 'xdnevnik',
+// 	},
+// ]
 
 /** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
 const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.13.1',
+		version: '0.13.2',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -65,7 +66,7 @@ const Config = {
 		plugins: [
 			'expo-dev-client',
 			'expo-updates',
-			sentryPlugin,
+			// sentryPlugin,
 			'expo-build-properties',
 		],
 
@@ -75,12 +76,12 @@ const Config = {
 	},
 }
 
-// Config.expo = withBuildProperties(Config.expo, {
-// android: {
-// enableProguardInReleaseBuilds: true,
-// enableShrinkResourcesInReleaseBuilds: true,
-// },
-// })
+Config.expo = withBuildProperties(Config.expo, {
+	android: {
+		enableProguardInReleaseBuilds: true,
+		enableShrinkResourcesInReleaseBuilds: true,
+	},
+})
 
 Config.expo = withGradleProperties(Config.expo, config => {
 	config.modResults.push(
