@@ -31,25 +31,28 @@ jobs:
     # env:
       # SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
-      - name: 🏗 Checkout repository
-        uses: actions/checkout@v4
-
       - name: 🏗 Set up JDK 21 for x64
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
           architecture: x64
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Enable corepack
-        run: corepack enable
   
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: yarn
+
+      - name: 🏗 UseEnable corepack
+        run: corepack enable
+
+      - name: 🏗 Use yarn v4
+        run: yarn set version berry
+
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
@@ -59,6 +62,9 @@ jobs:
 
       - name: 📦 Install dependencies
         run: yarn install --prefer-offline
+
+      - name: 📦 Install sharp cli for image processing
+        run: npm add -g sharp-cli
 
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
