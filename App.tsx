@@ -121,6 +121,7 @@ export default Sentry.wrap(
 								alignContent: 'center',
 								alignItems: 'center',
 								justifyContent: 'center',
+								backgroundColor: Theme.colors.elevation.level2,
 							}}
 							inactiveColor={Theme.colors.onSurfaceVariant}
 							activeColor={Theme.colors.onPrimaryContainer}
@@ -171,7 +172,7 @@ export default Sentry.wrap(
 							)}
 						</Tab.Navigator>
 					</NavigationContainer>
-					<Toast/>
+					<Toast />
 				</PaperProvider>
 			</SafeAreaProvider>
 		)
