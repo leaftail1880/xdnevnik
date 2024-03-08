@@ -23,15 +23,18 @@ import {
 	Button,
 	Card,
 	Chip,
+	HelperText,
 	ProgressBar,
 	Text,
 } from 'react-native-paper'
 
+import semver from 'semver'
 import { ModalAlert } from '../../Components/Modal'
 import UpdateDate from '../../Components/UpdateDate'
 import { Github, GithubRelease } from '../../GithubUpdate/update'
 import { Logger, styles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
+import { RequestError } from '../../utils/RequestError'
 import { Spacings } from '../../utils/Spacings'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
@@ -39,6 +42,29 @@ const Filename = Platform.select({
 	ios: 'XDnevnik.ipa',
 	android: __DEV__ ? 'XDnevnik.Dev.Client.apk' : 'XDnevnik.apk',
 })
+
+const minFeatureVersions = {
+	updatesScreen: [
+		'0.13.1',
+		'Старые обновления',
+		'В этой версии поддерживается обновление только до последней версии, вы не сможете выбрать версию из списка, как сейчас',
+	],
+	oldStorage: [
+		'0.12.0',
+		'Старое хранилище',
+		'В этой версии данные хранились по-другому, ваши настройки там не будут использованы. Но и удалены не будут.',
+	],
+	login: [
+		'0.0.6',
+		'Сломан вход',
+		'В этой версии сломан вход, придется перезаходить',
+	],
+	inAppUpdate: [
+		'0.0.1',
+		'Нет обновлений',
+		'В этой версии нет обновлений внутри приложения, вам нужно будет вручную скачать и установить новую версию',
+	],
+} satisfies Record<string, [string, string, string]>
 
 // eslint-disable-next-line mobx/missing-observer
 function UpdateInfo() {
@@ -55,6 +81,9 @@ function UpdateInfo() {
 		</Card>
 	)
 }
+
+// TODO Filter beta
+// TODO Toggle tips
 
 export default observer(function UpdatesScreen() {
 	if (Github.Releases.fallback)
@@ -90,7 +119,7 @@ const Release: ListRenderItem<GithubRelease> = observer(function Release(
 	props: ListRenderItemInfo<GithubRelease>
 ) {
 	if (props.item.name === Application.nativeApplicationVersion) {
-		UpdateState.currentI = props.index
+		State.currentI = props.index
 	}
 
 	const size = props.item.assets.find(e => e.name === Filename)?.size
@@ -99,42 +128,57 @@ const Release: ListRenderItem<GithubRelease> = observer(function Release(
 			<Card.Title title={props.item.name} titleVariant="headlineMedium" />
 			<Card.Content style={{ marginBottom: Spacings.s2 }}>
 				<View style={{ flexDirection: 'row', flex: 1 }}>
-					{props.item.prerelease && <Chip>Бета</Chip>}
-
-					<Chip
-						style={{
-							marginRight: Spacings.s2,
-						}}
-					>
-						{size ? `${(size / 1024 / 1024).toFixed(2)}мб` : 'Файла нет'}
-					</Chip>
-
-					{UpdateState.currentI > props.index && (
-						<Chip
-							style={{
-								backgroundColor: Theme.colors.errorContainer,
-							}}
-						>
-							Новая версия
-							<View>
-								<Badge
-									style={{
-										position: 'relative',
-										top: -8,
-										right: -2,
-									}}
-									size={6}
-								/>
-							</View>
-						</Chip>
-					)}
+					{props.item.prerelease && <BetaChip />}
+					<FilesizeChip size={size} />
+					{State.currentI > props.index && <NewVersionChip />}
 				</View>
+				<Warnings version={props.item.name} />
 			</Card.Content>
 			<Card.Content>
 				<ReleaseBody body={props.item.body} />
 			</Card.Content>
 			<Update release={props.item} i={props.index} />
 		</Card>
+	)
+})
+
+// eslint-disable-next-line mobx/missing-observer
+const Warnings = memo(function Warnings(props: { version: string }) {
+	// eslint-disable-next-line react/prop-types
+	if (!props.version) return false
+	const versionNum = semver.parse(props.version)
+
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				flexWrap: 'wrap',
+				flex: 1,
+			}}
+		>
+			{Object.entries(minFeatureVersions)
+				.filter(e => {
+					const compare = versionNum?.compare(e[1][0])
+					if (compare === -1 || compare === 0) return true
+
+					return false
+				})
+				.map(e => (
+					<Chip
+						key={e[1][1]}
+						style={{
+							marginTop: Spacings.s2,
+							marginRight: Spacings.s2,
+							backgroundColor: Theme.colors.errorContainer,
+						}}
+						onPress={() => {
+							ModalAlert.show(e[1][1], e[1][2])
+						}}
+					>
+						{e[1][1]}
+					</Chip>
+				))}
+		</View>
 	)
 })
 
@@ -179,8 +223,8 @@ const ReleaseBody = memo(function ReleaseBody(props: { body: string }) {
 	)
 })
 
-const UpdateState = new (class {
-	progress: null | { i: number; bar?: number } = null
+const State = new (class {
+	progress: null | { i: number; bar?: number; version: string } = null
 	files: { uri: string; version: string }[] = []
 	downloader?: FileSystem.DownloadResumable
 	paused = false
@@ -205,17 +249,19 @@ const Update = observer(function Update(props: {
 }) {
 	const alreadyInstalled =
 		props.release.name === Application.nativeApplicationVersion
-	const downloaded = UpdateState.files.find(
-		e => e.version === props.release.name
-	)
-	const currentDownloading = UpdateState.progress?.i === props.i
-	const progress = UpdateState.progress
+	const downloaded = State.files.find(e => e.version === props.release.name)
+	const currentDownloading = State.progress?.i === props.i
+	const progress = State.progress
 
 	return (
 		<>
 			<Card.Content>
-				{!!progress?.bar && currentDownloading && (
-					<ProgressBar progress={progress.bar} />
+				{typeof progress?.bar !== 'undefined' && currentDownloading && (
+					<ProgressBar
+						progress={progress.bar}
+						color="white"
+						style={{ marginTop: Spacings.s2 }}
+					/>
 				)}
 			</Card.Content>
 			<Card.Actions>
@@ -224,65 +270,84 @@ const Update = observer(function Update(props: {
 						Сейчас установлена
 					</Button>
 				)}
-				{downloaded && (
+				{
+					downloaded && (
+						<Button
+							mode="contained-tonal"
+							icon="delete"
+							onPress={() => {
+								// Finally bc if it fails to delete then there is no way to redownload it
+								FileSystem.deleteAsync(downloaded.uri).finally(() => {
+									runInAction(() => {
+										State.files = State.files.filter(
+											e => e.uri !== downloaded.uri
+										)
+									})
+								})
+							}}
+						>
+							Удалить
+						</Button>
+					)
+				}
+				{
+					progress && currentDownloading && !alreadyInstalled && (
+						<>
+							<Button
+								icon={'cancel'}
+								mode="contained-tonal"
+								style={{ marginRight: Spacings.s1 }}
+								onPress={() => {
+									runInAction(() => {
+										State.progress = null
+									})
+									State.downloader?.cancelAsync()
+									delete State.downloader
+								}}
+							>
+								Отменить
+							</Button>
+							<Button
+								icon={State.paused ? 'play' : 'pause'}
+								mode="contained-tonal"
+								onPress={() =>
+									runInAction(() => {
+										if (!State.paused) {
+											State.paused = true
+											State.downloader?.pauseAsync()
+										} else {
+											State.paused = false
+											performDownload()
+										}
+									})
+								}
+							>
+								{!State.paused ? 'Пауза' : 'Продолжить'}
+							</Button>
+						</>
+					)
+				}
+				{progress && !currentDownloading && !alreadyInstalled && (
 					<Button
 						mode="contained-tonal"
-						icon="delete"
-						onPress={() => {
-							// Finally bc if it fails to delete then there is no way to redownload it
-							FileSystem.deleteAsync(downloaded.uri).finally(() => {
-								runInAction(() => {
-									UpdateState.files = UpdateState.files.filter(
-										e => e.uri !== downloaded.uri
-									)
-								})
-							})
+						disabled
+						style={{
+							padding: 0,
+						}}
+						contentStyle={{
+							padding: 0,
+							alignItems: 'center',
+							justifyContent: 'center',
+							alignContent: 'center',
 						}}
 					>
-						Удалить
-					</Button>
-				)}
-				{progress && currentDownloading && !alreadyInstalled && (
-					<>
-						<Button
-							icon={'cancel'}
-							mode="contained-tonal"
-							style={{ marginRight: Spacings.s1 }}
-							onPress={() => {
-								runInAction(() => {
-									UpdateState.progress = null
-								})
-								UpdateState.downloader?.cancelAsync()
-								delete UpdateState.downloader
-							}}
-						>
-							Отменить
-						</Button>
-						<Button
-							icon={'pause'}
-							mode="contained-tonal"
-							onPress={() => {
-								UpdateState.downloader?.pauseAsync()
-								runInAction(() => {
-									UpdateState.paused = true
-								})
-							}}
-						>
-							{!UpdateState.paused ? 'Пауза' : 'Продолжить'}
-						</Button>
-					</>
-				)}
-				{progress && !currentDownloading && !alreadyInstalled && (
-					<Button mode="contained-tonal" disabled>
-						Остановите другие обновления
+						<HelperText type="info">Отмените другие загрузки</HelperText>
 					</Button>
 				)}
 				{!progress && !alreadyInstalled && (
 					<Button
 						mode="contained-tonal"
-						onPress={() =>
-							openAppInstaller(props.i, props.release, !!downloaded)
-						}
+						onPress={() => downloadUpdate(props.i, props.release, !!downloaded)}
 					>
 						{downloaded ? 'Установить' : 'Скачать'}
 					</Button>
@@ -292,62 +357,153 @@ const Update = observer(function Update(props: {
 	)
 })
 
-const openAppInstaller = async (
+// eslint-disable-next-line mobx/missing-observer
+const BetaChip = function BetaChip() {
+	return (
+		<Chip
+			style={{
+				marginRight: Spacings.s2,
+			}}
+			onPress={() =>
+				ModalAlert.show(
+					'Бета версия',
+					'Эта версия приложения может работать нестабильно, но содержит новые функции. Пробуйте на свой страх и риск.'
+				)
+			}
+		>
+			Бета
+		</Chip>
+	)
+}
+
+// eslint-disable-next-line mobx/missing-observer
+const FilesizeChip = memo(function FilesizeChip({
+	size,
+}: {
+	size: number | undefined
+}) {
+	return (
+		<Chip
+			style={{
+				marginRight: Spacings.s2,
+			}}
+			onPress={() =>
+				ModalAlert.show(
+					size ? 'Вес файла' : 'Файла нет',
+					size
+						? 'Показывает, сколько весит .APK или .IPA файл. Не является тем же весом, что вы получите после установки.'
+						: 'После публикации обновления нужно время, чтобы оно было собрано и запакованно в файл. Сборка обычно занимает 6-7 минут. Наберитесь терпения, скоро он появится!'
+				)
+			}
+		>
+			{size ? `${(size / 1024 / 1024).toFixed(2)}мб` : 'Файла нет'}
+		</Chip>
+	)
+})
+
+// eslint-disable-next-line mobx/missing-observer
+function NewVersionChip() {
+	return (
+		<Chip
+			style={{
+				backgroundColor: Theme.colors.errorContainer,
+			}}
+			onPress={() =>
+				ModalAlert.show(
+					'Новая версия!',
+					'Обновитесь скорее, чтобы получить новые функции и фиксы багов!'
+				)
+			}
+		>
+			Новая версия
+			<View>
+				<Badge
+					style={{
+						position: 'relative',
+						top: -8,
+						right: -2,
+					}}
+					size={6}
+				/>
+			</View>
+		</Chip>
+	)
+}
+
+async function handleErrorsAndDisplayInModal(task: () => Promise<void>) {
+	try {
+		await task()
+	} catch (e) {
+		ModalAlert.show('Ошибка при установке', RequestError.stringify(e), true)
+		// eslint-disable-next-line no-console
+		console.error(e)
+	}
+}
+
+function downloadUpdate(
 	i: number,
 	release: GithubRelease,
 	downloaded: boolean
-) => {
-	try {
+) {
+	handleErrorsAndDisplayInModal(async () => {
 		if (!Filename) {
-			ModalAlert.show(
-				'Ошибка',
-				'Обновление работает только в мобильном приложении',
-				true
-			)
-			return
+			throw new Error('Обновление работает только в мобильном приложении.')
 		}
 
-		const download = async (uri: string, fileUri: string) => {
-			if (downloaded) return
-			UpdateState.setProgress({ i, bar: 0 })
-			let lastProgressSet = Date.now()
-			UpdateState.downloader = FileSystem.createDownloadResumable(
-				uri,
-				fileUri,
-				{},
-				p => {
-					const percent = p.totalBytesWritten / p.totalBytesExpectedToWrite
-					if (Date.now() - lastProgressSet < 500) {
-						lastProgressSet = Date.now()
-						UpdateState.setProgress({
-							i,
-							bar: percent,
-						})
-					}
-				}
-			)
+		const version = release.name
+		const fileUrl = FileSystem.cacheDirectory + version + Filename
+		if (downloaded) return openInstaller(fileUrl)
 
-			const result = await UpdateState.downloader.downloadAsync()
-			if (!result) {
-				UpdateState.setProgress(null)
-				throw new Error('Не удалось скачать обновление')
-			} else {
-				runInAction(() => {
-					UpdateState.progress = null
-					UpdateState.files.push({ uri: result.uri, version: release.name })
-				})
-				return result
-			}
-		}
-
-		const fileUrl = FileSystem.cacheDirectory + release.name + Filename
 		const githubUrl = release.assets.find(
 			e => e.name === Filename
 		)?.browser_download_url
+
 		if (!githubUrl) throw new Error('Нет файла, обновление еще собирается!')
 
-		await download(githubUrl, fileUrl)
+		State.setProgress({ i, version, bar: 0 })
 
+		let lastProgressSet = Date.now()
+		State.downloader = FileSystem.createDownloadResumable(
+			githubUrl,
+			fileUrl,
+			{},
+			p => {
+				const percent = p.totalBytesWritten / p.totalBytesExpectedToWrite
+				if (Date.now() - lastProgressSet > 500) {
+					lastProgressSet = Date.now()
+					State.setProgress({
+						i,
+						version,
+						bar: percent,
+					})
+				}
+			}
+		)
+
+		performDownload()
+	})
+}
+
+function performDownload() {
+	handleErrorsAndDisplayInModal(async () => {
+		if (!State.downloader || !State.progress) return
+
+		const result = await State.downloader[
+			State.paused ? 'resumeAsync' : 'downloadAsync'
+		]()
+		if (result) {
+			runInAction(() => {
+				State.files.push({ uri: result.uri, version: State.progress!.version })
+				State.setProgress(null)
+
+				openInstaller(result.uri)
+			})
+		}
+	})
+}
+
+function openInstaller(fileUrl: string) {
+	return handleErrorsAndDisplayInModal(async () => {
 		if (Platform.OS === 'android') {
 			await IntentLauncherAndroid.startActivityAsync(
 				'android.intent.action.INSTALL_PACKAGE',
@@ -384,10 +540,5 @@ const openAppInstaller = async (
 			// 	)
 		}
 		Logger.info('App installer opened successfully')
-		return true
-	} catch (error) {
-		ModalAlert.show('Ошибка', error + '', true)
-		Logger.error('Failed to open the app installer', error)
-		return false
-	}
+	})
 }

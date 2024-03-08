@@ -7,6 +7,7 @@ export const SETTINGS_ROUTES = {
 	privacy: 'Политика конфиденциальности',
 	terms: 'Правила и Условия пользования',
 	notifs: 'Уведомления',
+	advanced: 'Расширенные',
 	about: 'О приложении',
 }
 
