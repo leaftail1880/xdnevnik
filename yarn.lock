@@ -10344,6 +10344,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver-compare-lite@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "semver-compare-lite@npm:0.1.0"
+  checksum: 10c0/ee972f27576598edbc259c8c9680ff9d7e8b30b829fea6581b64ad6fe2d00126f4d6eacdb05a4016df4764ae5198c2bc948a653d1ef7ca5a6a4cc7b428490a43
+  languageName: node
+  linkType: hard
+
 "semver@npm:7.3.2":
   version: 7.3.2
   resolution: "semver@npm:7.3.2"
@@ -11999,6 +12006,7 @@ __metadata:
     react-native-vector-icons: "npm:^10.0.3"
     react-native-webview: "npm:13.6.4"
     reanimated-color-picker: "npm:^3.0.3"
+    semver-compare-lite: "npm:^0.1.0"
     typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft

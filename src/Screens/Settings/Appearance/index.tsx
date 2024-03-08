@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
-import Toast from 'react-native-toast-message'
-import { Dropdown } from '../../../Components/Dropdown'
+import SelectModal from '../../../Components/SelectModal'
+import { Toast } from '../../../Components/Toast'
 import { styles } from '../../../Setup/constants'
 import { Settings } from '../../../Stores/Settings'
-import { Theme } from '../../../Stores/Theme'
+import { Theme, ThemeStore } from '../../../Stores/Theme'
 import { Spacings } from '../../../utils/Spacings'
 import { AccentColorPicker } from './AccentColorPicker'
 import { RoundnessSetting } from './RoundnessSetting'
@@ -32,21 +32,21 @@ export default observer(function Appearance() {
 	return (
 		<ScrollView>
 			<List.Section title="Общие">
-				<Dropdown
+				<SelectModal
 					label="Тема"
-					value={Theme.scheme}
+					value={ThemeStore.meta(Theme).scheme}
 					data={themes}
 					onSelect={({ value }) => Theme.setColorScheme(value)}
 				/>
 
-				<Dropdown
+				<SelectModal
 					label="Стиль оценок"
 					value={Settings.markStyle}
 					data={markStyles}
 					onSelect={({ value }) => Settings.save({ markStyle: value })}
 				/>
 
-				<Dropdown
+				<SelectModal
 					label="Порядок Фамилии Имени Отчества"
 					value={Settings.nameFormat}
 					data={nameFormat}
@@ -59,7 +59,7 @@ export default observer(function Appearance() {
 
 			<AccentColorPicker />
 			<Divider style={{ margin: Spacings.s1 }} />
-			{/* {__DEV__ && <DevSettings />} */}
+			{__DEV__ && <DevSettings />}
 		</ScrollView>
 	)
 })
@@ -68,16 +68,15 @@ export default observer(function Appearance() {
 const DevSettings = observer(function DevSettings() {
 	return (
 		<Surface elevation={1} style={{ borderRadius: Theme.roundness }}>
-			<Button onPress={() => Toast.show({ text1: 'Проверка', text2: 'Тоста' })}>
+			<Button onPress={() => Toast.show({ title: 'Проверка', body: 'Тоста' })}>
 				Проверить тост
 			</Button>
 			<Button
 				onPress={() =>
 					Toast.show({
-						text1: 'Проверка',
-						text2:
-							'Тоста с обычно очень очень очень длинным текстом что аж жесть',
-						type: 'error',
+						title: 'Проверка',
+						body: 'Тоста с обычно очень очень очень длинным текстом что аж жесть',
+						error: true,
 					})
 				}
 			>

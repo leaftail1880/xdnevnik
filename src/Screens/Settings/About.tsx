@@ -19,7 +19,7 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 				onPress={() => {
 					Linking.openURL('https://github.com/leaftail1880/xdnevnik')
 				}}
-				labelStyle={Theme.theme.fonts.titleMedium}
+				labelStyle={Theme.fonts.titleMedium}
 			>
 				Исходный код на GitHub
 			</Button>

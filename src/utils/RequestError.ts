@@ -4,20 +4,21 @@ export class RequestError extends Error implements RequestErrorOptions {
 		timeout:
 			'Долго нет ответа от сервера. Плохой интернет или сервер на техработах.',
 	} as const
+
 	static stringify(
 		e: object
 	): string | (typeof this.reasons)[keyof typeof this.reasons] {
 		let result: string
 
 		if (e instanceof Error) {
-			if (e instanceof TypeError) {
-				if (e.message.includes('Network request failed')) {
-					result = this.reasons.noConnection
-				}
-			}
-
 			if (e.name === 'AbortError') {
 				result = this.reasons.timeout
+			}
+		}
+
+		if (e instanceof TypeError) {
+			if (e.message.includes('Network request failed')) {
+				result = this.reasons.noConnection
 			}
 		}
 

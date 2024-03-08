@@ -1,12 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import {
-	ScrollView,
-	StyleProp,
-	StyleSheet,
-	View,
-	ViewStyle,
-} from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import {
 	Button,
 	Dialog,
@@ -19,36 +13,7 @@ import {
 import { Theme } from '../Stores/Theme'
 import { Spacings } from '../utils/Spacings'
 
-export function dropdownButtonStyle(): StyleProp<ViewStyle> {
-	return {
-		alignSelf: 'center',
-		width: '100%',
-		backgroundColor: Theme.colors.elevation.level2,
-		borderBottomLeftRadius: Theme.roundness,
-		elevation: 2,
-		borderBottomRightRadius: Theme.roundness,
-	}
-}
-
-export function dropdownStyle(): ViewStyle {
-	return {
-		backgroundColor: Theme.colors.background,
-		borderRadius: Theme.roundness,
-		alignContent: 'center',
-	}
-}
-
-export function dropdown() {
-	return {
-		buttonStyle: dropdownButtonStyle(),
-		dropdownStyle: dropdownStyle(),
-		rowTextStyle: { color: Theme.colors.onSurface, fontSize: 16 },
-		rowStyle: { borderColor: Theme.colors.backdrop },
-		selectedRowTextStyle: { color: Theme.colors.secondary },
-	}
-}
-
-export const Dropdown = observer(function Dropdown<
+export default observer(function SelectModal<
 	T extends string,
 	D extends { value: T; label: string }
 >(props: {
@@ -76,7 +41,8 @@ export const Dropdown = observer(function Dropdown<
 					}}
 					labelStyle={[Theme.fonts.titleMedium, { padding: Spacings.s1 }]}
 				>
-					{props.label}: {value}
+					<Text variant="titleMedium">{props.label}: </Text>
+					{value}
 				</Button>
 			) : (
 				<List.Item

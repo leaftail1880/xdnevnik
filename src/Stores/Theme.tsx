@@ -31,7 +31,6 @@ export class ThemeStore {
 			accentColor: store.accentColor,
 			accentColors: store.accentColors,
 			theme: store.theme,
-			loaded: store.loaded,
 			clearAccentColors: store.clearSelectedAccentColors,
 		}
 	}
@@ -39,12 +38,12 @@ export class ThemeStore {
 		return [this.defaultAccentColor, '#427979', '#3C639C', '#967857', '#926759']
 	}
 
-	scheme: SchemeName = ThemeStore.defaultScheme
-	accentColor = ThemeStore.defaultAccentColor
-	accentColors = ThemeStore.getDefaultAccentColors()
-	roundness = 5
-	theme = this.generateTheme(false, MD3LightTheme)
-	loaded = false
+	private scheme: SchemeName = ThemeStore.defaultScheme
+	private accentColor = ThemeStore.defaultAccentColor
+	private accentColors = ThemeStore.getDefaultAccentColors()
+	private theme = this.generateTheme(false, MD3LightTheme)
+
+	public roundness = 5
 
 	get key() {
 		return this.accentColor + this.theme
@@ -81,7 +80,6 @@ export class ThemeStore {
 				} catch (e) {
 					Logger.error(e)
 				}
-				this.loaded = true
 			})
 		)
 	}
@@ -117,7 +115,7 @@ export class ThemeStore {
 		this.setColorScheme(this.scheme)
 	}
 
-	clearSelectedAccentColors() {
+	private clearSelectedAccentColors() {
 		this.accentColors = ThemeStore.getDefaultAccentColors()
 	}
 

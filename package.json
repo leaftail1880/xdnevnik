@@ -43,7 +43,8 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-webview": "13.6.4",
-    "reanimated-color-picker": "^3.0.3"
+    "reanimated-color-picker": "^3.0.3",
+    "semver-compare-lite": "^0.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

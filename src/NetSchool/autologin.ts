@@ -1,7 +1,8 @@
 import { autorun, runInAction } from 'mobx'
 import Toast from 'react-native-toast-message'
 import { Logger } from '../Setup/constants'
-import { API, NetSchoolApi } from './api'
+import { RequestError } from '../utils/RequestError'
+import { API } from './api'
 import { ROUTES } from './routes'
 
 let requestSent = false
@@ -40,7 +41,7 @@ setTimeout(() => {
 				Toast.show({ text1: 'Вы авторизовались' })
 			})
 			.catch(e => {
-				Toast.show({ text1: NetSchoolApi.stringifyError(e), type: 'error' })
+				Toast.show({ text1: RequestError.stringify(e), type: 'error' })
 			})
 			.finally(() => {
 				requestSent = false

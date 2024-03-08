@@ -1,7 +1,8 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
-import Toast from 'react-native-toast-message'
+import { Toast } from '../Components/Toast'
 import { Logger } from '../Setup/constants'
 import { CacheableInit } from '../Stores/Async'
+import { RequestError, RequestErrorOptions } from '../utils/RequestError'
 import { makeReloadPersistable } from '../utils/makePersistable'
 import {
 	Assignment,
@@ -16,7 +17,6 @@ import {
 	Total,
 } from './classes'
 import { ROUTES } from './routes'
-import { RequestError, RequestErrorOptions } from '../utils/RequestError'
 
 // Common request options
 interface StudentId {
@@ -41,7 +41,7 @@ interface ReqInit extends RequestInit {
 export class NetSchoolError extends RequestError {
 	cacheGuide = false
 	useCache = false
-	
+
 	constructor(
 		message: string,
 		options?: {
@@ -50,6 +50,8 @@ export class NetSchoolError extends RequestError {
 		} & RequestErrorOptions
 	) {
 		super(message, options)
+		this.useCache = !!options?.useCache
+		this.cacheGuide = !!options?.cacheGuide
 	}
 }
 
@@ -289,9 +291,9 @@ export class NetSchoolApi {
 
 				if (!beforeAuth) {
 					Toast.show({
-						type: 'error',
-						text1: 'Ошибка',
-						text2: RequestError.stringify(error),
+						error: true,
+						title: 'Ошибка',
+						body: RequestError.stringify(error),
 					})
 				}
 				Logger.debug('Using cache for', url.replace(this.origin, ''), errText)

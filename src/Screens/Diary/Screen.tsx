@@ -1,49 +1,21 @@
-import { autorun, runInAction } from 'mobx'
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
-import { Dropdown } from '../../Components/Dropdown'
-import { Header } from '../../Components/Header'
-import { UpdateDate } from '../../Components/UpdateDate'
-import {
-	AssignmentsStore,
-	AttachmentsStore,
-	DiaryStore,
-} from '../../Stores/NetSchool'
-import { Settings } from '../../Stores/Settings'
+import Header from '../../Components/Header'
+import SelectModal from '../../Components/SelectModal'
+import UpdateDate from '../../Components/UpdateDate'
+import { DiaryStore } from '../../Stores/NetSchool'
+import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson, { DiaryLessonProps } from './Lesson'
-import { DiaryState } from './StateStore'
+import { DiaryState } from './State'
 
-autorun(() => {
-	const { studentId } = Settings
-	const { showHomework, weekDays } = DiaryState
-
-	DiaryStore.withParams({
-		studentId,
-		startDate: weekDays[0].toNetSchool(),
-		endDate: weekDays[6].toNetSchool(),
-	})
-
-	AssignmentsStore.withParams({
-		studentId,
-		classmeetingsIds: showHomework
-			? DiaryStore.result?.lessons.map(e => e.classmeetingId)
-			: undefined,
-	})
-
-	const withAttachments = AssignmentsStore.result
-		?.filter(e => e.attachmentsExists)
-		.map(e => e.assignmentId)
-
-	AttachmentsStore.withParams({
-		studentId,
-		assignmentIds: withAttachments?.length ? withAttachments : undefined,
-	})
-})
-
-export const DiaryScreen = observer(function DiaryScreen(props: Pick<DiaryLessonProps, 'navigation' | 'route'>) {
+export default observer(function DiaryScreen(
+	props: Pick<DiaryLessonProps, 'navigation' | 'route'>
+) {
+	Theme.key
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
@@ -61,7 +33,7 @@ export const DiaryScreen = observer(function DiaryScreen(props: Pick<DiaryLesson
 					<Filter type="showLessonTheme" label="Темы" />
 				</View>
 				<View style={{ padding: Spacings.s1 }}>
-					{DiaryStore.fallback || <DiaryDay {...props}/>}
+					{DiaryStore.fallback || <DiaryDay {...props} />}
 				</View>
 				<UpdateDate store={DiaryStore} />
 			</ScrollView>
@@ -71,7 +43,7 @@ export const DiaryScreen = observer(function DiaryScreen(props: Pick<DiaryLesson
 
 const SelectDay = observer(function SelectDay() {
 	return (
-		<Dropdown
+		<SelectModal
 			label="День"
 			mode="button"
 			data={DiaryState.weekDaysDropdown}
@@ -112,7 +84,9 @@ const Filter = observer(function Filter(props: FilterProps) {
 	)
 })
 
-const DiaryDay = observer(function DiaryDay(props: Pick<DiaryLessonProps, 'navigation' | 'route'>) {
+const DiaryDay = observer(function DiaryDay(
+	props: Pick<DiaryLessonProps, 'navigation' | 'route'>
+) {
 	if (DiaryStore.fallback) return DiaryStore.fallback
 
 	const day = DiaryStore.result.forDay(DiaryState.day)
@@ -130,6 +104,10 @@ const DiaryDay = observer(function DiaryDay(props: Pick<DiaryLessonProps, 'navig
 	return day
 		.sort((a, b) => a.order - b.order)
 		.map(lesson => (
-			<DiaryLesson key={lesson.classmeetingId.toString()} lesson={lesson} {...props} />
+			<DiaryLesson
+				key={lesson.classmeetingId.toString()}
+				lesson={lesson}
+				{...props}
+			/>
 		))
 })

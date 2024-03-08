@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Appbar } from 'react-native-paper'
 import { Theme } from '../Stores/Theme'
 
-export const Header = observer(function Header(props: {
+export default observer(function Header(props: {
 	title: string
 	children?: React.ReactNode
 }) {

@@ -10,7 +10,7 @@ interface LoadingProps {
 }
 
 // eslint-disable-next-line mobx/missing-observer
-export function Loading({ text = 'Загрузка' }: LoadingProps) {
+export default function Loading({ text = 'Загрузка' }: LoadingProps) {
 	if (!text.includes('{dots}')) text += '...'
 
 	return (

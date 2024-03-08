@@ -1,17 +1,18 @@
+import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Card, Text } from 'react-native-paper'
-import { SubjectName } from '../../Components/SubjectName'
+import { ParamListBase } from '../../../App'
 import { Lesson } from '../../NetSchool/classes'
 import { styles } from '../../Setup/constants'
 import { AssignmentsStore } from '../../Stores/NetSchool'
 import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
-import { DiaryAssignment } from './Assignment'
-import { LessonProgress, LessonProgressStore } from './Progress'
-import { DiaryState } from './StateStore'
-import { StackScreenProps } from '@react-navigation/stack'
-import { ParamListBase } from '../../../App'
+import { DiaryState } from './State'
+
+import SubjectName from '../../Components/SubjectName'
+import DiaryAssignment from './Assignment'
+import LessonProgress, { LessonProgressStore } from './Progress'
 
 export type DiaryLessonProps = {
 	lesson: Lesson
@@ -62,7 +63,7 @@ const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 				]}
 			>
 				<SubjectName
-					style={Theme.theme.fonts.titleMedium}
+					style={Theme.fonts.titleMedium}
 					viewStyle={{
 						maxWidth: '70%',
 					}}

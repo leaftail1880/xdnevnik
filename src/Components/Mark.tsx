@@ -17,7 +17,7 @@ const MarkColorsText = {
 	2: '#C00000',
 }
 
-export const Mark = observer(function Mark({
+export default observer(function Mark({
 	finalMark,
 	mark: markProp,
 	markWeight,

@@ -4,9 +4,11 @@ import { useCallback } from 'react'
 import { FlatList, ListRenderItem, View } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '..'
-import { Dropdown } from '../../../Components/Dropdown'
-import { Loading } from '../../../Components/Loading'
-import { UpdateDate } from '../../../Components/UpdateDate'
+
+import Loading from '../../../Components/Loading'
+import SelectModal from '../../../Components/SelectModal'
+import UpdateDate from '../../../Components/UpdateDate'
+
 import { Total } from '../../../NetSchool/classes'
 import {
 	EducationStore,
@@ -16,12 +18,10 @@ import {
 import { Settings } from '../../../Stores/Settings'
 import { Theme } from '../../../Stores/Theme'
 import { Spacings } from '../../../utils/Spacings'
-import { SubjectPerformanceInline } from './PeformanceInline'
+import SubjectPerformanceInline from './PeformanceInline'
 import { TermStore } from './TermStore'
 
-const keyExtractor = (total: Total): string => total.subjectId.toString()
-
-export const TotalsScreenTerm = observer(function TotalsScreenTerm({
+export default observer(function TotalsScreenTerm({
 	navigation,
 }: TotalsScreenParams) {
 	Theme.key
@@ -35,8 +35,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				subjects={SubjectsStore.result!}
 			/>
 		),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
+		[navigation]
 	)
 
 	return (
@@ -60,16 +59,19 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	)
 })
 
+const keyExtractor = (total: Total): string => total.subjectId.toString()
+
 const TotalsScreenHeader = observer(function TotalsScreenHeader() {
-	const terms = TermStore.getTerms()
+	const terms = TermStore.terms
 	return (
 		<View>
 			{terms && (
-				<Dropdown
+				<SelectModal
 					data={terms}
 					value={Settings.currentTerm?.id + ''}
 					onSelect={v => Settings.save({ currentTerm: v.term })}
-					label={'Выбери четверть'}
+					label={'Четверть'}
+					mode="button"
 				/>
 			)}
 

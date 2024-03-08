@@ -1,7 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
-import { Loading } from '../../Components/Loading'
+import Loading from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
 import { StudentsStore } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
@@ -16,14 +16,14 @@ import TermsAndConditions from './Policy/TermsAndConditions'
 import UpdatesScreen from './Update'
 
 import { Divider } from 'react-native-paper'
-import { Dropdown } from '../../Components/Dropdown'
+import Dropdown from '../../Components/SelectModal'
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,
 	SettingsRoutes,
 } from './navigation'
 
-export const SettingsScreen = observer(function SettingsScreen() {
+export default observer(function SettingsScreen() {
 	Theme.key
 	return (
 		<SettingsNavigation.Navigator

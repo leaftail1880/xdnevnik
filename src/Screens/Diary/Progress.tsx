@@ -16,7 +16,7 @@ export const LessonProgressStore = new (class {
 	}
 })()
 
-export const LessonProgress = observer(function LessonProgress({
+export default observer(function LessonProgress({
 	lesson,
 }: {
 	lesson: Lesson

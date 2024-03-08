@@ -2,7 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text, TouchableRipple } from 'react-native-paper'
-import { Mark } from '../../Components/Mark'
+
+import Mark from '../../Components/Mark'
+
 import { Assignment, Attachment } from '../../NetSchool/classes'
 import { LANG } from '../../Setup/constants'
 import { AttachmentsStore } from '../../Stores/NetSchool'
@@ -19,7 +21,7 @@ import { DiaryLessonProps } from './Lesson'
 
 // TODO support attachment
 
-export const DiaryAssignment = observer(function DiaryAssignment({
+export default observer(function DiaryAssignment({
 	assignment,
 	navigation,
 	lesson,

@@ -22,7 +22,7 @@ export type TermNavigationParamMap = {
 export const Stack = createStackNavigator<TermNavigationParamMap>()
 
 export const TotalsStateStore = new (class {
-	schoolYear?: Education['schoolyear']
+	schoolYear?: Education['schoolyear'] = undefined
 
 	constructor() {
 		makeAutoObservable(this)

@@ -19,17 +19,16 @@ import { View } from 'react-native'
 import { Icon, PaperProvider } from 'react-native-paper'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import Toast from 'react-native-toast-message'
-import { Header } from './src/Components/Header'
-import { Loading } from './src/Components/Loading'
+import Toast from './src/Components/Toast'
+import Header from './src/Components/Header'
+import Loading from './src/Components/Loading'
 import { API } from './src/NetSchool/api'
-import { DiaryScreen } from './src/Screens/Diary/Screen'
-import { LoginScreen } from './src/Screens/Login/in'
-import { LogoutScreen } from './src/Screens/Login/out'
-import { SettingsScreen } from './src/Screens/Settings/index'
+import DiaryScreen from './src/Screens/Diary/Screen'
+import LoginScreen from './src/Screens/Login/in'
+import LogoutScreen from './src/Screens/Login/out'
+import SettingsScreen from './src/Screens/Settings/index'
 import TotalsNavigation from './src/Screens/Totals/index'
 import { SENTRY_ROUTING } from './src/Setup/sentry'
-import { ToastConfig } from './src/Setup/toast'
 import { StudentsStore } from './src/Stores/NetSchool'
 import { Theme, ThemeStore } from './src/Stores/Theme'
 
@@ -98,22 +97,6 @@ export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
 		const FallbackScreen = AppStore.Fallback
-
-		if (!ThemeStore.meta(Theme).loaded)
-			return (
-				<View
-					style={{
-						height: '100%',
-						width: '100%',
-						flex: 1,
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					<Loading text="Загрузка темы" />
-				</View>
-			)
-
 		Theme.key
 
 		const theme = toJS(ThemeStore.meta(Theme).theme)
@@ -188,7 +171,7 @@ export default Sentry.wrap(
 							)}
 						</Tab.Navigator>
 					</NavigationContainer>
-					<Toast config={ToastConfig} />
+					<Toast/>
 				</PaperProvider>
 			</SafeAreaProvider>
 		)

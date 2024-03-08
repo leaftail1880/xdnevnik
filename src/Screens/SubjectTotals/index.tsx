@@ -3,11 +3,10 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { Alert, ScrollView, View } from 'react-native'
 import { Chip, Surface, Text } from 'react-native-paper'
-import { dropdownButtonStyle } from '../../Components/Dropdown'
-import { Loading } from '../../Components/Loading'
-import { Mark } from '../../Components/Mark'
-import { SubjectName } from '../../Components/SubjectName'
-import { UpdateDate } from '../../Components/UpdateDate'
+import Loading from '../../Components/Loading'
+import Mark from '../../Components/Mark'
+import SubjectName from '../../Components/SubjectName'
+import UpdateDate from '../../Components/UpdateDate'
 import { styles } from '../../Setup/constants'
 import { SubjectPerformanceStores } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
@@ -21,8 +20,7 @@ import type {
 import { AddMarkForm } from './AddMarkForm'
 import { calculateMarks } from './calculateMarks'
 
-// TODO Move custom marks to store
-export const SubjectTotals = observer(function SubjectTotals({
+export default observer(function SubjectTotals({
 	route,
 }: StackScreenProps<TermNavigationParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
@@ -58,8 +56,15 @@ export const SubjectTotals = observer(function SubjectTotals({
 			<View
 				style={[
 					styles.stretch,
-					dropdownButtonStyle(),
-					{ padding: Spacings.s2 },
+					{
+						padding: Spacings.s2,
+						alignSelf: 'center',
+						width: '100%',
+						backgroundColor: Theme.colors.elevation.level2,
+						borderBottomLeftRadius: Theme.roundness,
+						elevation: 2,
+						borderBottomRightRadius: Theme.roundness,
+					},
 				]}
 			>
 				<SubjectName

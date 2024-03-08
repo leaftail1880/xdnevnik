@@ -5,9 +5,9 @@ import { Chip } from 'react-native-paper'
 import { SubjectPerformance } from '../../NetSchool/classes'
 import { Settings } from '../../Stores/Settings'
 import { Spacings } from '../../utils/Spacings'
-import { SubjectTotals } from '../SubjectTotals/index'
-import { TotalsScreenTerm } from './Term/Screen'
-import { TotalsScreenTable } from './TotalsScreenTable'
+import SubjectTotals from '../SubjectTotals/index'
+import TotalsScreenTerm from './Term/Screen'
+import TotalsScreenTable from './TotalsScreenTable'
 import {
 	S_SUBJECT_TOTALS,
 	S_TOTALS,
@@ -30,6 +30,7 @@ export default observer(function TotalsNavigation() {
 				}
 				options={{
 					headerRight,
+					headerStyle: { elevation: 0 },
 				}}
 			/>
 			<Stack.Screen

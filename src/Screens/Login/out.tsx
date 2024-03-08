@@ -2,18 +2,20 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { Header } from '../../Components/Header'
+import Header from '../../Components/Header'
 import { API } from '../../NetSchool/api'
 import { LANG } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 
-export const LogoutScreen = observer(function LogoutScreen() {
-	function logout() {
-		runInAction(() => {
-			API.logOut()
-		})
-	}
+function logout() {
+	runInAction(() => {
+		API.logOut()
+	})
+}
+
+export default observer(function LogoutScreen() {
+	Theme.key
 
 	return (
 		<View style={{ flex: 1 }}>

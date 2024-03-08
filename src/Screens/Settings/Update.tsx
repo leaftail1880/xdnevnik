@@ -5,8 +5,10 @@ import * as IntentLauncherAndroid from 'expo-intent-launcher'
 import * as Application from 'expo-application'
 import * as ExpoSharing from 'expo-sharing'
 import * as Updates from 'expo-updates'
+
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
+
 import { memo } from 'react'
 import {
 	Alert,
@@ -25,7 +27,8 @@ import {
 	ProgressBar,
 	Text,
 } from 'react-native-paper'
-import { UpdateDate } from '../../Components/UpdateDate'
+
+import UpdateDate from '../../Components/UpdateDate'
 import { Github, GithubRelease } from '../../GithubUpdate/update'
 import { Logger, styles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'

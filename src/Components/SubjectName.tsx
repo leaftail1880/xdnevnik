@@ -6,7 +6,7 @@ import { IconButton, Text, TextInput, TextInputProps, TextProps } from 'react-na
 import { Subject } from '../NetSchool/classes'
 import { styles } from '../Setup/constants'
 import { Settings } from '../Stores/Settings'
-import { Loading } from './Loading'
+import Loading from './Loading'
 
 type SubjectNameOptions = {
 	subjectId: number
@@ -45,7 +45,7 @@ type SubjectNameProps = {
 		style?: Omit<TextStyle, 'color'> & { color?: ColorValue }
 	}
 
-export const SubjectName = observer(function SubjectName({
+export default observer(function SubjectName({
 	viewStyle,
 	...props
 }: SubjectNameProps) {
