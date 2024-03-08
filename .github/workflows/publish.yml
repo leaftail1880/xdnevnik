@@ -57,7 +57,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: yarn install --prefer-offline
+        run: yarn install
 
       - name: 📦 Install sharp cli for image processing
         run: npm add -g sharp-cli
