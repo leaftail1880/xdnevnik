@@ -11,6 +11,7 @@ import { Settings } from '../../Stores/Settings'
 import { Theme, ThemeStore } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 import NumberInputSetting from './Components/NumberInput'
+import { SwitchSetting } from './Components/SwitchSetting'
 
 const themes = [
 	{ label: 'Системная', value: 'system' as const },
@@ -42,13 +43,6 @@ export default observer(function Appearance() {
 				/>
 
 				<SelectModal
-					label="Стиль оценок"
-					value={Settings.markStyle}
-					data={markStyles}
-					onSelect={({ value }) => Settings.save({ markStyle: value })}
-				/>
-
-				<SelectModal
 					label="Порядок Фамилии Имени Отчества"
 					value={Settings.nameFormat}
 					data={nameFormat}
@@ -65,6 +59,19 @@ export default observer(function Appearance() {
 							Theme.setColorScheme()
 						})
 					}
+				/>
+			</List.Section>
+			<Divider style={{ margin: Spacings.s1 }} />
+			<List.Section title="Оценки">
+				<SelectModal
+					label="Стиль оценок"
+					value={Settings.markStyle}
+					data={markStyles}
+					onSelect={({ value }) => Settings.save({ markStyle: value })}
+				/>
+				<SwitchSetting
+					label='"Вес: " перед весом оценки'
+					setting="showMarkWeightTip"
 				/>
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />

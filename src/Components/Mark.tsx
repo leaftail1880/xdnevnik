@@ -119,7 +119,8 @@ export default observer(function Mark({
 							subTextStyle,
 						]}
 					>
-						Вес: {markWeight.current}
+						{Settings.showMarkWeightTip ? 'Вес: ' : ''}
+						{markWeight.current}
 					</Text>
 				)}
 				{!!finalMark && markProp && (

@@ -24,6 +24,8 @@ class SettingsStore {
 	currentTerm?: NSEntity = undefined
 	markStyle: 'background' | 'border' = 'background'
 	requestTimeout = 3
+	showMarkWeightTip: boolean = true
+
 	/**
 	 * Map containing per student overrides
 	 */
