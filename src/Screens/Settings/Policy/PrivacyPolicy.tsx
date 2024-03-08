@@ -84,14 +84,14 @@ export default memo(function PrivacyPolicy() {
 					>
 						Expo
 					</Link>
-					{/* <Link
+					<Link
 						href="https://sentry.io/privacy/"
 						target="_blank"
 						rel="noopener noreferrer"
 						// eslint-disable-next-line react-native/no-raw-text
 					>
 						Sentry
-					</Link> */}
+					</Link>
 				</View>
 				{/* eslint-disable-next-line react-native/no-raw-text */}
 				<Strong>Log Data</Strong>
