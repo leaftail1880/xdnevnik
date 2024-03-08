@@ -16,7 +16,7 @@
 			"distribution": "internal",
 			"android": {
 				"buildType": "apk",
-				"gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a -x lint -x lintVitalRelease -x lint -x lintVitalSourceSets"
+				"gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a -x lint -x lintVitalRelease -x lint"
 			}
 		},
 		"production-ios": {
@@ -28,7 +28,7 @@
 			"channel": "production",
 			"android": {
 				"buildType": "apk",
-				"gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a -x lint -x lintVitalRelease -x lint -x lintVitalSourceSets"
+				"gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a -x lint -x lintVitalRelease -x lint"
 			}
 		}
 	},
