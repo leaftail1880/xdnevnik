@@ -55,13 +55,13 @@ export default memo(function TermsAndConditions() {
 					>
 						<Text>Expo</Text>
 					</Link>
-					<Link
+					{/* <Link
 						href="https://sentry.io/terms/"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
 						<Text>Sentry</Text>
-					</Link>
+					</Link> */}
 				</View>
 				<Text>
 					You should be aware that there are certain things that Leaftail1880
