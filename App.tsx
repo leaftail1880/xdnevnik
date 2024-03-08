@@ -12,7 +12,7 @@ import {
 import * as Sentry from '@sentry/react-native'
 
 import { StatusBar } from 'expo-status-bar'
-import { toJS } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { View } from 'react-native'
@@ -56,9 +56,48 @@ const ScreenIcons = {
 
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 
+const AppStore = new (class {
+	constructor() {
+		makeAutoObservable(this)
+	}
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	get Fallback() {
+		let Fallback: React.FC | undefined
+		if (!API.session) {
+			// eslint-disable-next-line mobx/missing-observer
+			Fallback = function Fallback() {
+				return <Loading text="Авторизация{dots}" />
+			}
+		} else if (StudentsStore.fallback) {
+			// eslint-disable-next-line mobx/missing-observer, @typescript-eslint/no-unused-vars
+			Fallback = function Fallback() {
+				return StudentsStore.fallback
+			}
+		}
+
+		return (
+			Fallback && (() => Fallback && <AppFallback fallback={<Fallback />} />)
+		)
+	}
+})()
+
+// Show header when component's custom header is not rendered
+const AppFallback = observer(function AppFallback(props: {
+	fallback: React.ReactNode
+}) {
+	return (
+		<View>
+			<Header title="Загрузка..." />
+			{props.fallback}
+		</View>
+	)
+})
+
 export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+		const FallbackScreen = AppStore.Fallback
 
 		if (!ThemeStore.meta(Theme).loaded)
 			return (
@@ -75,33 +114,7 @@ export default Sentry.wrap(
 				</View>
 			)
 
-		let Fallback: React.FC | undefined
-		if (!API.session) {
-			// eslint-disable-next-line mobx/missing-observer
-			Fallback = function Fallback() {
-				return <Loading text="Авторизация{dots}" />
-			}
-		} else if (StudentsStore.fallback) {
-			// eslint-disable-next-line mobx/missing-observer, @typescript-eslint/no-unused-vars
-			Fallback = function Fallback() {
-				return StudentsStore.fallback
-			}
-		}
-
-		// Show header when component's custom header is not rendered
-		const FallbackScreen =
-			Fallback &&
-			// eslint-disable-next-line mobx/missing-observer
-			function AppFallback() {
-				return (
-					Fallback && (
-						<View>
-							<Header title="Загрузка..." />
-							<Fallback />
-						</View>
-					)
-				)
-			}
+		Theme.key
 
 		const theme = toJS(ThemeStore.meta(Theme).theme)
 		return (
@@ -118,7 +131,6 @@ export default Sentry.wrap(
 						<Tab.Navigator
 							sceneAnimationEnabled={true}
 							sceneAnimationType={'shifting'}
-							// shifting
 							barStyle={{
 								height: '7%',
 								padding: 0,

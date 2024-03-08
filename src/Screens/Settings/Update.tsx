@@ -72,20 +72,24 @@ export default observer(function UpdatesScreen() {
 				<UpdateDate key={'updates'} store={Github.Releases} />
 			}
 			keyExtractor={KetExtractor}
-			renderItem={Release}
+			renderItem={renderItem}
 		/>
 	)
 })
 
 // eslint-disable-next-line mobx/missing-observer
 const KetExtractor = (i: GithubRelease) => i.id + ''
-// eslint-disable-next-line mobx/missing-observer
-const Release: ListRenderItem<GithubRelease> = function Release(
+
+const renderItem: ListRenderItem<GithubRelease> = props => (
+	<Release {...props} />
+)
+const Release: ListRenderItem<GithubRelease> = observer(function Release(
 	props: ListRenderItemInfo<GithubRelease>
 ) {
 	if (props.item.name === Application.nativeApplicationVersion) {
 		UpdateState.currentI = props.index
 	}
+
 	const size = props.item.assets.find(e => e.name === Filename)?.size
 	return (
 		<Card style={{ margin: Spacings.s2 }}>
@@ -96,7 +100,7 @@ const Release: ListRenderItem<GithubRelease> = function Release(
 
 					<Chip
 						style={{
-							marginHorizontal: Spacings.s2,
+							marginRight: Spacings.s2,
 						}}
 					>
 						{size ? `${(size / 1024 / 1024).toFixed(2)}мб` : 'Файла нет'}
@@ -129,7 +133,7 @@ const Release: ListRenderItem<GithubRelease> = function Release(
 			<Update release={props.item} i={props.index} />
 		</Card>
 	)
-}
+})
 
 // eslint-disable-next-line mobx/missing-observer
 const ReleaseBody = memo(function ReleaseBody(props: { body: string }) {
