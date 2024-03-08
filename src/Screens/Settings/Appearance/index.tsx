@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
+import { ModalAlert, Toast } from '../../../Components/Modal'
 import SelectModal from '../../../Components/SelectModal'
-import { Toast } from '../../../Components/Toast'
 import { styles } from '../../../Setup/constants'
 import { Settings } from '../../../Stores/Settings'
 import { Theme, ThemeStore } from '../../../Stores/Theme'
@@ -81,6 +81,20 @@ const DevSettings = observer(function DevSettings() {
 				}
 			>
 				Проверить тост ошибку
+			</Button>
+			<Button onPress={() => ModalAlert.show('Проверка')}>
+				Проверить модал
+			</Button>
+			<Button
+				onPress={() =>
+					ModalAlert.show(
+						'Проверка',
+						'Тоста с обычно очень очень очень длинным текстом что аж жесть',
+						true
+					)
+				}
+			>
+				Проверить модал ошибку
 			</Button>
 			<ThemePreview />
 		</Surface>

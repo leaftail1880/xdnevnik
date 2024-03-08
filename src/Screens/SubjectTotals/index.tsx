@@ -1,10 +1,11 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
-import { Alert, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Chip, Surface, Text } from 'react-native-paper'
 import Loading from '../../Components/Loading'
 import Mark from '../../Components/Mark'
+import { ModalAlert } from '../../Components/Modal'
 import SubjectName from '../../Components/SubjectName'
 import UpdateDate from '../../Components/UpdateDate'
 import { styles } from '../../Setup/constants'
@@ -175,8 +176,7 @@ const MarkRow = observer(function MarkRow({
 				}}
 				textStyle={{ fontSize: 17 }}
 				onPress={() => {
-					// TODO Use modal
-					Alert.alert(
+					ModalAlert.show(
 						(mark.assignmentTypeName ?? '') +
 							' ' +
 							(mark.result ?? 'Оценки нет'),

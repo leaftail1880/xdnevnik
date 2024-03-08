@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite'
 
 import { memo } from 'react'
 import {
-	Alert,
 	FlatList,
 	Linking,
 	ListRenderItem,
@@ -28,6 +27,7 @@ import {
 	Text,
 } from 'react-native-paper'
 
+import { ModalAlert } from '../../Components/Modal'
 import UpdateDate from '../../Components/UpdateDate'
 import { Github, GithubRelease } from '../../GithubUpdate/update'
 import { Logger, styles } from '../../Setup/constants'
@@ -299,7 +299,11 @@ const openAppInstaller = async (
 ) => {
 	try {
 		if (!Filename) {
-			Alert.alert('Обновление работает только в мобильном приложении')
+			ModalAlert.show(
+				'Ошибка',
+				'Обновление работает только в мобильном приложении',
+				true
+			)
 			return
 		}
 
@@ -374,7 +378,7 @@ const openAppInstaller = async (
 			// 		mimeType: 'application/octet-stream',
 			// 	})
 			// } else
-			// 	Alert.alert(
+			// 	ModalAlert.alert(
 			// 		'Дайте разрешение',
 			// 		'XDnevnik всего-лишь скачает один файл в папку Downloads и откроет для Вас проводник чтобы Вы могли обновить XDnevnik и получить новейшие возможности.'
 			// 	)
@@ -382,7 +386,7 @@ const openAppInstaller = async (
 		Logger.info('App installer opened successfully')
 		return true
 	} catch (error) {
-		Alert.alert('Ошибка', error + '')
+		ModalAlert.show('Ошибка', error + '', true)
 		Logger.error('Failed to open the app installer', error)
 		return false
 	}

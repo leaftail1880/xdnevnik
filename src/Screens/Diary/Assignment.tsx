@@ -153,7 +153,7 @@ const AttachmentFile = observer(function AttachmentFile({
 				// )
 				// const result = await downloader.downloadAsync()
 				// if (!result) {
-				// 	Alert.alert('Не удалось сохранить вложение')
+				// 	ModalAlert.alert('Не удалось сохранить вложение')
 				// 	throw new Error('Failed to download update')
 				// }
 			}}

@@ -5,7 +5,7 @@ import notifee, {
 } from '@notifee/react-native'
 import * as Device from 'expo-device'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Alert } from 'react-native'
+import { Toast } from '../Components/Modal'
 import { getSubjectName } from '../Components/SubjectName'
 import { Lesson, LessonState } from '../NetSchool/classes'
 import { DiaryStore, HomeworkMarksStore } from '../Stores/NetSchool'
@@ -73,7 +73,7 @@ async function notificationSetup(enabled: boolean) {
 			return
 		}
 	} else {
-		Alert.alert('Уведомления недоступны вне устройства')
+		Toast.show({ title: 'Уведомления недоступны вне устройства', error: true })
 		Settings.save({ lessonNotifications: false })
 		return
 	}

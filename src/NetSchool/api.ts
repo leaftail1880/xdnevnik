@@ -1,5 +1,5 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
-import { Toast } from '../Components/Toast'
+import { Toast } from '../Components/Modal'
 import { Logger } from '../Setup/constants'
 import { CacheableInit } from '../Stores/Async'
 import { RequestError, RequestErrorOptions } from '../utils/RequestError'
