@@ -37,7 +37,6 @@ jobs:
           architecture: x64
           java-version: '21'
           distribution: 'temurin'
-          cache: 'maven'
   
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
