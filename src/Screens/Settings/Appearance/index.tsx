@@ -68,7 +68,7 @@ export default observer(function Appearance() {
 const DevSettings = observer(function DevSettings() {
 	return (
 		<Surface elevation={1} style={{ borderRadius: Theme.roundness }}>
-			<Button onPress={() => Toast.show({ title: 'Проверка', body: 'Тоста' })}>
+			<Button onPress={() => Toast.show({ title: 'Проверка', timeout: 10000 })}>
 				Проверить тост
 			</Button>
 			<Button

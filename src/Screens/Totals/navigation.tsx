@@ -23,18 +23,29 @@ export const Stack = createStackNavigator<TermNavigationParamMap>()
 
 export const TotalsStateStore = new (class {
 	schoolYear: Education['schoolyear'] | null = null
+	years: { label: string; value: string; year: Education['schoolyear'] }[] = []
 
 	constructor() {
 		makeAutoObservable(this)
 		autorun(() => {
 			const { studentId } = Settings
 			EducationStore.withParams({ studentId })
-			const education = EducationStore.result
 
-			if (!this.schoolYear && education) {
+			const education = EducationStore.result
+			if (education) {
 				runInAction(() => {
-					this.schoolYear =
+					this.years = education
+						.filter(e => !e.isAddSchool)
+						.map(e => {
+							const start = new Date(e.schoolyear.startDate).getFullYear()
+							const end = new Date(e.schoolyear.endDate).getFullYear()
+							const label = `${start}/${end}`
+							return { label, value: e.schoolyear.id + '', year: e.schoolyear }
+						})
+					if (!this.schoolYear) {
+						this.schoolYear =
 							education.find(e => !e.isAddSchool)?.schoolyear || null
+					}
 				})
 			}
 

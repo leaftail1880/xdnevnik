@@ -16,7 +16,7 @@ import TermsAndConditions from './Policy/TermsAndConditions'
 import UpdatesScreen from './Update'
 
 import { Divider } from 'react-native-paper'
-import Dropdown from '../../Components/SelectModal'
+import SelectModal from '../../Components/SelectModal'
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,
@@ -62,7 +62,7 @@ const MainSettings = observer(function MainSettings(
 			{API.session ? (
 				StudentsStore.fallback || (
 					<>
-						<Dropdown
+						<SelectModal
 							data={StudentsStore.result.map((student, index) => ({
 								value: index + '',
 								label: Settings.fullname(student.name),
