@@ -1,4 +1,4 @@
-// import * as Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
@@ -53,7 +53,7 @@ export const ErrorHandler = function ErrorHandler({
 				<Button onPress={reload} icon="reload">
 					Попробовать снова
 				</Button>
-				{/* {!beforeAuth && (
+				{!beforeAuth && (
 					<Button
 						onPress={() => {
 							Sentry.captureException(error)
@@ -61,7 +61,7 @@ export const ErrorHandler = function ErrorHandler({
 					>
 						<Text>Отправить отчет об ошибке разработчику</Text>
 					</Button>
-				)} */}
+				)}
 			</View>
 		</View>
 	)

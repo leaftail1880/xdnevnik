@@ -5,14 +5,14 @@ import { withGradleProperties } from 'expo/config-plugins'
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
 
-// /** @type {[string, any]} */
-// const sentryPlugin = [
-// 	'@sentry/react-native/expo',
-// 	{
-// 		organization: 'leaftail1880',
-// 		project: 'xdnevnik',
-// 	},
-// ]
+/** @type {[string, any]} */
+const sentryPlugin = [
+	'@sentry/react-native/expo',
+	{
+		organization: 'leaftail1880',
+		project: 'xdnevnik',
+	},
+]
 
 /** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
 const Config = {
@@ -66,7 +66,7 @@ const Config = {
 		plugins: [
 			IS_DEV ? 'expo-dev-client' : '',
 			'expo-updates',
-			// sentryPlugin,
+			sentryPlugin,
 			'expo-build-properties',
 		].filter(Boolean),
 
@@ -80,6 +80,7 @@ Config.expo = withBuildProperties(Config.expo, {
 	android: {
 		enableProguardInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
+		useLegacyPackaging: true,
 	},
 })
 
