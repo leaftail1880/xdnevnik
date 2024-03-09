@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
 import { Lesson, LessonState } from '../../NetSchool/classes'
 import { Theme } from '../../Stores/Theme'
@@ -16,26 +16,24 @@ export const LessonProgressStore = new (class {
 	}
 })()
 
-export default observer(function LessonProgress({
-	lesson,
-}: {
-	lesson: Lesson
-}) {
+export default observer(function LessonProgress(props: { lesson: Lesson }) {
 	const { total, beforeStart, beforeEnd, progress, state } = useMemo(
-		() => lesson.minutes(LessonProgressStore.now),
+		() => props.lesson.minutes(LessonProgressStore.now),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[lesson, LessonProgressStore.now]
+		[props.lesson, LessonProgressStore.now]
 	)
 
 	useEffect(() => {
 		if (state === LessonState.going)
 			runInAction(
-				() => (LessonProgressStore.currentLesson = lesson.classmeetingId)
+				() => (LessonProgressStore.currentLesson = props.lesson.classmeetingId)
 			)
-		else if (LessonProgressStore.currentLesson === lesson.classmeetingId) {
+		else if (
+			LessonProgressStore.currentLesson === props.lesson.classmeetingId
+		) {
 			runInAction(() => (LessonProgressStore.currentLesson = 0))
 		}
-	}, [state, lesson.classmeetingId])
+	}, [state, props.lesson.classmeetingId])
 
 	const textStyle = {
 		marginBottom: Spacings.s2,
@@ -49,30 +47,17 @@ export default observer(function LessonProgress({
 		}
 	} else if (state === LessonState.going) {
 		return (
-			<View
-				style={{
-					flexDirection: 'row',
-					alignSelf: 'center',
-					alignContent: 'center',
-					marginHorizontal: Spacings.s3,
-					paddingHorizontal: Spacings.s2,
-					marginBottom: Spacings.s2,
-				}}
-			>
-				<View
-					style={{
-						width: '80%',
-					}}
-				>
+			<View style={styles.row}>
+				<View style={styles.progressView}>
 					<ProgressBar
 						style={{
-							width: '100%',
-							height: 20,
+							height: 15,
+							borderRadius: Theme.roundness / 2,
 						}}
-						progress={progress}
+						progress={progress / 100}
 					/>
 				</View>
-				<Text style={{ margin: Spacings.s1 }}>
+				<Text style={styles.progressText}>
 					{beforeEnd}/{total} мин
 				</Text>
 			</View>
@@ -81,4 +66,17 @@ export default observer(function LessonProgress({
 		// Lesson is ended
 		return <Text style={textStyle}>Закончился</Text>
 	}
+})
+
+const styles = StyleSheet.create({
+	row: {
+		flexDirection: 'row',
+	},
+	progressView: {
+		flex: 5,
+		justifyContent: 'center',
+	},
+	progressText: {
+		marginLeft: Spacings.s2,
+	},
 })

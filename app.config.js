@@ -38,6 +38,7 @@ const Config = {
 				backgroundColor: '#000000',
 			},
 		},
+		notification: { icon: './assets/notification_icon.png', color: '#ffffff' },
 		assetBundlePatterns: ['**/*'],
 		ios: {
 			supportsTablet: true,

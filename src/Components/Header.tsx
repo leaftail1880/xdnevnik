@@ -7,7 +7,7 @@ export default observer(function Header(props: {
 	children?: React.ReactNode
 }) {
 	return (
-		<Appbar.Header style={{ backgroundColor: Theme.colors.elevation.level2 }}>
+		<Appbar.Header style={{ backgroundColor: Theme.colors.navigationBar }}>
 			{props.children}
 			<Appbar.Content
 				titleStyle={{

@@ -101,7 +101,7 @@ export default Sentry.wrap(
 
 		const theme = toJS(ThemeStore.meta(Theme).theme)
 		return (
-			<SafeAreaProvider>
+			<SafeAreaProvider style={{ backgroundColor: Theme.colors.background }}>
 				<PaperProvider theme={theme}>
 					<StatusBar style={Theme.dark ? 'light' : 'dark'} />
 					<NavigationContainer
@@ -121,7 +121,7 @@ export default Sentry.wrap(
 								alignContent: 'center',
 								alignItems: 'center',
 								justifyContent: 'center',
-								backgroundColor: Theme.colors.elevation.level2,
+								backgroundColor: Theme.colors.navigationBar,
 							}}
 							inactiveColor={Theme.colors.onSurfaceVariant}
 							activeColor={Theme.colors.onPrimaryContainer}

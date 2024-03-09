@@ -48,7 +48,7 @@ export default observer(function SelectModal<
 						{
 							borderTopLeftRadius: 0,
 							borderTopRightRadius: 0,
-							backgroundColor: Theme.colors.elevation.level2,
+							backgroundColor: Theme.colors.navigationBar,
 						},
 						props.style,
 					]}
