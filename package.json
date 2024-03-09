@@ -19,6 +19,7 @@
     "color": "^4.2.3",
     "expo": "^50.0.11",
     "expo-application": "~5.8.3",
+    "expo-dev-client": "^3.3.9",
     "expo-device": "~5.9.3",
     "expo-intent-launcher": "~10.11.0",
     "expo-navigation-bar": "^2.8.1",
