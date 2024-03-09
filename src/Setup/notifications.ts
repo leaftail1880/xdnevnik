@@ -130,6 +130,9 @@ autorun(function newMarksCheck() {
 			notifee.displayNotification({
 				title: `${assignment.result} - ${getSubjectName(assignment)}`,
 				subtitle: `Веc: ${assignment.weight}, ${assignment.assignmentTypeName}`,
+				android: {
+					smallIcon: 'icon_notification.png',
+				},
 			})
 		}
 	}
@@ -215,6 +218,7 @@ autorun(function notificationFromDiary() {
 						android: {
 							channelId: Notification.lessonChannelId,
 							ongoing: true,
+							smallIcon: 'icon_notification.png',
 
 							// only alert when lesson notification
 							onlyAlertOnce: Notification.currentLesson === uuid,

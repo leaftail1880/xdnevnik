@@ -61,10 +61,10 @@ export default observer(function SubjectTotals({
 						padding: Spacings.s2,
 						alignSelf: 'center',
 						width: '100%',
-						backgroundColor: Theme.colors.elevation.level2,
+						backgroundColor: Theme.colors.navigationBar,
 						borderBottomLeftRadius: Theme.roundness,
-						elevation: 2,
 						borderBottomRightRadius: Theme.roundness,
+						elevation: 2,
 					},
 				]}
 			>

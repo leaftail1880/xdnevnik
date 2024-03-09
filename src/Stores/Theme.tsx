@@ -56,7 +56,7 @@ export class ThemeStore {
 		return this.theme.dark
 	}
 
-	get colors(): MD3Colors {
+	get colors(): MD3Colors & { navigationBar: string } {
 		return this.theme.colors
 	}
 
@@ -94,6 +94,8 @@ export class ThemeStore {
 	) {
 		const navigation = dark ? NavigationDarkTheme : NavigationDefaultTheme
 
+		const card = colors.elevation.level3
+
 		return {
 			...navigation,
 			...material,
@@ -101,9 +103,10 @@ export class ThemeStore {
 			colors: {
 				...navigation.colors,
 				...colors,
+				card,
+				navigationBar: card,
 				primary: colors.primary,
 				background: colors.background,
-				card: colors.elevation.level2,
 				text: colors.onSurface,
 				border: colors.outline,
 				notification: colors.error,
