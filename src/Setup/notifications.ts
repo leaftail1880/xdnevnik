@@ -218,7 +218,7 @@ autorun(function notificationFromDiary() {
 						android: {
 							channelId: Notification.lessonChannelId,
 							ongoing: true,
-							smallIcon: 'icon_notification.png',
+							smallIcon: 'notification_icon.png',
 
 							// only alert when lesson notification
 							onlyAlertOnce: Notification.currentLesson === uuid,

@@ -101,79 +101,91 @@ export default Sentry.wrap(
 
 		const theme = toJS(ThemeStore.meta(Theme).theme)
 		return (
-			<SafeAreaProvider style={{ backgroundColor: Theme.colors.background }}>
-				<PaperProvider theme={theme}>
-					<StatusBar style={Theme.dark ? 'light' : 'dark'} />
-					<NavigationContainer
-						theme={theme}
-						ref={navigation}
-						onReady={() => {
-							SENTRY_ROUTING.registerNavigationContainer(navigation)
-						}}
-					>
-						<Tab.Navigator
-							sceneAnimationEnabled={true}
-							sceneAnimationType={'shifting'}
-							barStyle={{
-								height: '7%',
-								padding: 0,
-								margin: 0,
-								alignContent: 'center',
-								alignItems: 'center',
-								justifyContent: 'center',
-								backgroundColor: Theme.colors.navigationBar,
+			<SafeAreaProvider>
+				<View
+					style={{
+						// Force background color
+						backgroundColor: Theme.colors.background,
+						width: '100%',
+						height: '100%',
+					}}
+				>
+					<PaperProvider theme={theme}>
+						<StatusBar style={Theme.dark ? 'light' : 'dark'} />
+						<NavigationContainer
+							theme={theme}
+							ref={navigation}
+							onReady={() => {
+								SENTRY_ROUTING.registerNavigationContainer(navigation)
 							}}
-							inactiveColor={Theme.colors.onSurfaceVariant}
-							activeColor={Theme.colors.onPrimaryContainer}
-							activeIndicatorStyle={{
-								backgroundColor: Theme.colors.primaryContainer,
-								height: '120%',
-								margin: 0,
-								padding: 0,
-							}}
-							style={{
-								padding: 0,
-								margin: 0,
-							}}
-							screenOptions={({ route }) => ({
-								tabBarIcon: ({ color }) => {
-									return (
-										<Icon
-											source={ScreenIcons[route.name]}
-											color={color}
-											size={23}
-										/>
-									)
-								},
-								tabBarHideOnKeyboard: true,
-							})}
 						>
-							{!API.session && (
-								<Tab.Screen name={LANG['s_log_in']} component={LoginScreen} />
-							)}
+							<Tab.Navigator
+								sceneAnimationEnabled={true}
+								sceneAnimationType={'shifting'}
+								barStyle={{
+									height: '7%',
+									padding: 0,
+									margin: 0,
+									alignContent: 'center',
+									alignItems: 'center',
+									justifyContent: 'center',
+									backgroundColor: Theme.colors.navigationBar,
+								}}
+								inactiveColor={Theme.colors.onSurfaceVariant}
+								activeColor={Theme.colors.onPrimaryContainer}
+								activeIndicatorStyle={{
+									backgroundColor: Theme.colors.primaryContainer,
+									height: '120%',
+									margin: 0,
+									padding: 0,
+								}}
+								style={{
+									padding: 0,
+									margin: 0,
+								}}
+								screenOptions={({ route }) => ({
+									tabBarIcon: ({ color }) => {
+										return (
+											<Icon
+												source={ScreenIcons[route.name]}
+												color={color}
+												size={23}
+											/>
+										)
+									},
+									tabBarHideOnKeyboard: true,
+								})}
+							>
+								{!API.session && (
+									<Tab.Screen name={LANG['s_log_in']} component={LoginScreen} />
+								)}
 
-							<Tab.Screen
-								name={LANG['s_diary']}
-								component={FallbackScreen || DiaryScreen}
-							/>
+								<Tab.Screen
+									name={LANG['s_diary']}
+									component={FallbackScreen || DiaryScreen}
+								/>
 
-							<Tab.Screen
-								name={LANG['s_totals']}
-								component={FallbackScreen || TotalsNavigation}
-							/>
+								<Tab.Screen
+									name={LANG['s_totals']}
+									component={FallbackScreen || TotalsNavigation}
+								/>
 
-							<Tab.Screen
-								name={LANG['s_settings']}
-								component={SettingsScreen}
-							></Tab.Screen>
+								<Tab.Screen
+									name={LANG['s_settings']}
+									component={SettingsScreen}
+								></Tab.Screen>
 
-							{API.session && (
-								<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
-							)}
-						</Tab.Navigator>
-					</NavigationContainer>
-					<Toast />
-				</PaperProvider>
+								{API.session && (
+									<Tab.Screen
+										name={LANG['s_log_out']}
+										component={LogoutScreen}
+									/>
+								)}
+							</Tab.Navigator>
+						</NavigationContainer>
+						<Toast />
+					</PaperProvider>
+				</View>
 			</SafeAreaProvider>
 		)
 	})
