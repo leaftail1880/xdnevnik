@@ -18,6 +18,18 @@ const sentryPlugin = [
 	},
 ]
 
+/** @type {import("@expo/config-types/build/ExpoConfig.js").ExpoConfig['splash']} */
+const splash = {
+	image: './assets/splash.png',
+	resizeMode: 'cover',
+	backgroundColor: '#FFFFFF',
+	dark: {
+		image: './assets/splash.png',
+		resizeMode: 'cover',
+		backgroundColor: '#000000',
+	},
+}
+
 /** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
 const Config = {
 	expo: {
@@ -28,25 +40,14 @@ const Config = {
 		orientation: 'portrait',
 		icon: './assets/icon.png',
 		userInterfaceStyle: 'automatic',
-		splash: {
-			image: './assets/splash.png',
-			resizeMode: 'contain',
-			backgroundColor: '#FFFFFF',
-			dark: {
-				image: './assets/splash.png',
-				resizeMode: 'contain',
-				backgroundColor: '#000000',
-			},
-		},
 		notification: { icon: './assets/notification_icon.png', color: '#ffffff' },
 		assetBundlePatterns: ['**/*'],
 		ios: {
-			supportsTablet: true,
-			bundleIdentifier: bundle,
-
 			infoPlist: {
 				UIBackgroundModes: ['lesson-notifications'],
 			},
+			splash: splash,
+			bundleIdentifier: bundle,
 		},
 		android: {
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
@@ -54,7 +55,7 @@ const Config = {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: '#FFFFFF',
 			},
-
+			splash: splash,
 			package: bundle,
 		},
 

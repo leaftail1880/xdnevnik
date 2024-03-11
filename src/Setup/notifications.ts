@@ -131,7 +131,7 @@ autorun(function newMarksCheck() {
 				title: `${assignment.result} - ${getSubjectName(assignment)}`,
 				subtitle: `Веc: ${assignment.weight}, ${assignment.assignmentTypeName}`,
 				android: {
-					smallIcon: 'icon_notification.png',
+					smallIcon: 'notification_icon.png',
 				},
 			})
 		}
