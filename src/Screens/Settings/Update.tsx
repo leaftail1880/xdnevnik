@@ -16,6 +16,7 @@ import {
 	ListRenderItem,
 	ListRenderItemInfo,
 	Platform,
+	StyleSheet,
 	View,
 } from 'react-native'
 import {
@@ -32,7 +33,7 @@ import semver from 'semver'
 import { ModalAlert } from '../../Components/Modal'
 import UpdateDate from '../../Components/UpdateDate'
 import { Github, GithubRelease } from '../../GithubUpdate/update'
-import { Logger, styles } from '../../Setup/constants'
+import { Logger, styles as globalStyles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import { RequestError } from '../../utils/RequestError'
 import { Spacings } from '../../utils/Spacings'
@@ -66,21 +67,34 @@ const minFeatureVersions = {
 	],
 } satisfies Record<string, [string, string, string]>
 
+const buildInfo = () =>
+	ModalAlert.show(
+		'Версия сборки',
+		'Некоторые баги не требуют обновления всего дневника, для них создается небольшая сборка которую приложение устанавливает при каждом запуске.\nПолная версия сборки: ' +
+			(Updates.updateId ?? 'По умолчанию')
+	)
+
 // eslint-disable-next-line mobx/missing-observer
-function UpdateInfo() {
+const UpdateInfo = memo(function UpdateInfo() {
 	return (
-		<Card style={{ margin: Spacings.s2, marginTop: Spacings.s3 }}>
-			<Card.Content style={styles.stretch}>
+		<Card style={styles.updatesCard}>
+			<Card.Content style={globalStyles.stretch}>
 				<Text>Версия: </Text>
 				<Text variant="labelLarge">{Application.nativeApplicationVersion}</Text>
 			</Card.Content>
-			<Card.Content style={styles.stretch}>
+			<Card.Content style={globalStyles.stretch}>
 				<Text>Сборка: </Text>
-				<Text variant="labelLarge">{Updates.updateId ?? 'По умолчанию'}</Text>
+				<Text variant="labelLarge" onPress={buildInfo}>
+					{Updates.updateId?.slice(-6) ?? 'По умолчанию'}
+				</Text>
 			</Card.Content>
 		</Card>
 	)
-}
+})
+
+const styles = StyleSheet.create({
+	updatesCard: { margin: Spacings.s2, marginTop: Spacings.s3 },
+})
 
 // TODO Filter beta
 // TODO Toggle tips

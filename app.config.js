@@ -49,6 +49,9 @@ const Config = {
 			splash: splash,
 			bundleIdentifier: bundle,
 		},
+		androidStatusBar: {
+			hidden: true,
+		},
 		android: {
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
 			adaptiveIcon: {
@@ -84,7 +87,7 @@ Config.expo = withBuildProperties(Config.expo, {
 	android: {
 		enableProguardInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true,
+		useLegacyPackaging: false,
 	},
 })
 

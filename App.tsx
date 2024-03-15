@@ -111,7 +111,7 @@ export default Sentry.wrap(
 					}}
 				>
 					<PaperProvider theme={theme}>
-						<StatusBar style={Theme.dark ? 'light' : 'dark'} />
+						<StatusBar style={Theme.dark ? 'light' : 'dark'} hidden={false} />
 						<NavigationContainer
 							theme={theme}
 							ref={navigation}

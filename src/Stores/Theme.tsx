@@ -143,7 +143,7 @@ export class ThemeStore {
 			})
 		)
 
-		NavigationBar.setBackgroundColorAsync(this.theme.colors.card)
+		NavigationBar.setBackgroundColorAsync('transparent')
 		NavigationBar.setButtonStyleAsync(dark ? 'light' : 'dark')
 		SystemUI.setBackgroundColorAsync(Theme.colors.background)
 	}
