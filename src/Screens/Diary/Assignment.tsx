@@ -44,11 +44,12 @@ export default observer(function DiaryAssignment({
 		<View
 			style={{
 				borderRadius: Theme.roundness,
-				margin: Spacings.s2,
+				marginTop: Spacings.s2,
 				flexDirection: 'row',
 				justifyContent: 'space-between',
 				alignContent: 'stretch',
 				alignItems: 'center',
+				width: '92%',
 			}}
 		>
 			{assignment.assignmentTypeName && (
@@ -64,14 +65,12 @@ export default observer(function DiaryAssignment({
 						alignSelf: 'center',
 					}}
 				>
-					<Text style={{ margin: Spacings.s2 }}>
-						{assignment.assignmentTypeAbbr}
-					</Text>
+					<Text>{assignment.assignmentTypeAbbr}</Text>
 				</TouchableRipple>
 			)}
 
 			<Text
-				style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
+				style={{ alignSelf: 'center', width: '70%', margin: Spacings.s2 }}
 				selectable
 			>
 				{showHomework

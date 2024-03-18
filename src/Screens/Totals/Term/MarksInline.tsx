@@ -45,7 +45,7 @@ export default observer(function SubjectMarksInline(
 			assignments.result &&
 			calculateMarks({
 				totals: assignments.result,
-				missedLessons: TermStore.attendance,
+				attendance: TermStore.attendance,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[assignments.result, TermStore.attendance]

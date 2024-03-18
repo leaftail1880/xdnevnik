@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { Button, IconButton, Surface, TextInput } from 'react-native-paper'
+import { Button, IconButton, TextInput } from 'react-native-paper'
 import { styles } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
@@ -18,26 +18,27 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 	const addCustomMark = useCallback(() => {
 		if (addingCustomMark) {
 			// Saving
-			props.setCustomMarks(
-				props.customMarks.concat({
+			props.setCustomMarks([
+				...props.customMarks,
+				{
 					result: Number(mark),
 					weight: Number(weight),
 					comment: 'Кастомная',
 					assignmentTypeName: 'ВОЗМОЖНАЯ',
-				})
-			)
+				},
+			])
 		}
 		setAddingCustomMark(!addingCustomMark)
 	}, [addingCustomMark, mark, props, weight])
 
 	return (
-		<View style={{ padding: Spacings.s2 }}>
+		<View>
 			<View style={styles.stretch}>
 				<Button
 					onPress={addCustomMark}
 					icon={addingCustomMark ? 'content-save' : 'plus'}
 				>
-					{addingCustomMark ? 'Сохранить' : 'Добавить оценку'}
+					{addingCustomMark ? 'Добавить' : 'Добавить оценку'}
 				</Button>
 				{addingCustomMark && (
 					<IconButton
@@ -57,10 +58,7 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				)}
 			</View>
 			{addingCustomMark && (
-				<Surface
-					elevation={2}
-					style={{ borderRadius: Theme.roundness, padding: Spacings.s2 }}
-				>
+				<View style={{ padding: Spacings.s1 }}>
 					<TextInput
 						mode="outlined"
 						style={{ marginBottom: Spacings.s2 }}
@@ -76,7 +74,7 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 						keyboardType="numeric"
 						onChangeText={setWeight}
 					/>
-				</Surface>
+				</View>
 			)}
 		</View>
 	)

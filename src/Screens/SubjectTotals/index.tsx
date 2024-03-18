@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Chip, Surface, Text } from 'react-native-paper'
-import Loading from '../../Components/Loading'
 import Mark from '../../Components/Mark'
 import { ModalAlert } from '../../Components/Modal'
 import SubjectName from '../../Components/SubjectName'
@@ -35,6 +34,7 @@ export default observer(function SubjectTotals({
 	})
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
+	const [attendance, setAttendance] = useState(false)
 	const [customMarks, setCustomMarks] = useState<Partial<MarkInfo>[]>([])
 	const marks = useMemo(
 		() =>
@@ -43,13 +43,14 @@ export default observer(function SubjectTotals({
 				totals: performance.result,
 				lessonsWithoutMark,
 				customMarks,
+				attendance: attendance,
 			}),
-		[customMarks, lessonsWithoutMark, performance.result]
+		[attendance, customMarks, lessonsWithoutMark, performance.result]
 	)
 
 	if (performance.fallback) return performance.fallback
 
-	if (!marks) return <Loading text="Подсчет оценок..." />
+	if (!marks) return <Text>Ошибка при подсчете оценок</Text>
 	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } = marks
 
 	return (
@@ -74,6 +75,7 @@ export default observer(function SubjectTotals({
 					iconsSize={18}
 					style={{
 						fontSize: 20,
+						maxWidth: '70%',
 						fontWeight: 'bold',
 						margin: Spacings.s1,
 					}}
@@ -87,15 +89,25 @@ export default observer(function SubjectTotals({
 				/>
 			</View>
 			<ScrollView refreshControl={performance.refreshControl}>
-				<View style={{ padding: Spacings.s1 }}>
+				<View style={{ padding: Spacings.s2, flex: 1, flexDirection: 'row' }}>
 					<Chip
 						mode="outlined"
-						selected={!lessonsWithoutMark}
+						selected={attendance}
+						onPress={() => {
+							setAttendance(!attendance)
+						}}
+					>
+						Посещаемость
+					</Chip>
+					<Chip
+						style={{ marginLeft: Spacings.s2 }}
+						mode="outlined"
+						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
 						}}
 					>
-						Только оценки
+						Уроки без оценок
 					</Chip>
 				</View>
 				<Surface elevation={1}>
@@ -108,15 +120,24 @@ export default observer(function SubjectTotals({
 						/>
 					))}
 				</Surface>
-				<AddMarkForm
-					setCustomMarks={setCustomMarks}
-					customMarks={customMarks}
-				/>
+				<Surface
+					elevation={1}
+					style={{
+						padding: Spacings.s1,
+						margin: Spacings.s2,
+						borderRadius: Theme.roundness * 2,
+					}}
+				>
+					<AddMarkForm
+						setCustomMarks={setCustomMarks}
+						customMarks={customMarks}
+					/>
+				</Surface>
 				<Surface
 					elevation={1}
 					style={{
 						padding: Spacings.s2,
-						margin: Spacings.s2,
+						marginHorizontal: Spacings.s2,
 						borderRadius: Theme.roundness * 2,
 					}}
 				>
@@ -157,7 +178,6 @@ const MarkRow = observer(function MarkRow({
 }) {
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
-	// TODO Use placeholder if not loaded
 	return (
 		<View style={[styles.stretch, { padding: Spacings.s2 }]}>
 			<Mark
@@ -192,7 +212,7 @@ const MarkRow = observer(function MarkRow({
 					)
 				}}
 			/>
-			<Text>{mark.assignmentTypeName}</Text>
+			<Text style={{ maxWidth: '70%' }}>{mark.assignmentTypeName}</Text>
 
 			<Text>{date && new Date(date).toLocaleDateString()}</Text>
 		</View>

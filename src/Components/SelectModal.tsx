@@ -21,7 +21,7 @@ import { Theme } from '../Stores/Theme'
 import { Spacings } from '../utils/Spacings'
 
 export default observer(function SelectModal<
-	T extends string,
+	T extends string | null | undefined,
 	D extends { value: T; label: string }
 >(props: {
 	label: string

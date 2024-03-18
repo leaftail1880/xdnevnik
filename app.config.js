@@ -35,7 +35,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.14.1',
+		version: '0.14.2',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -87,7 +87,7 @@ Config.expo = withBuildProperties(Config.expo, {
 	android: {
 		enableProguardInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: false,
+		useLegacyPackaging: true,
 	},
 })
 

@@ -15,7 +15,6 @@ import { DiaryState } from './State'
 export default observer(function DiaryScreen(
 	props: Pick<DiaryLessonProps, 'navigation' | 'route'>
 ) {
-	Theme.key
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
@@ -24,6 +23,7 @@ export default observer(function DiaryScreen(
 				contentContainerStyle={{
 					justifyContent: 'center',
 					alignContent: 'center',
+					backgroundColor: Theme.colors.background,
 				}}
 				refreshControl={DiaryStore.refreshControl}
 			>

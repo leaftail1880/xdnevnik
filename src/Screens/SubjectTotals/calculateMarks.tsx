@@ -6,10 +6,10 @@ export function calculateMarks({
 	totals,
 	lessonsWithoutMark = false,
 	customMarks = [],
-	missedLessons = true,
+	attendance: missedLessons = true,
 }: {
 	totals: SubjectPerformance
-	missedLessons?: boolean
+	attendance?: boolean
 	lessonsWithoutMark?: boolean
 	customMarks?: Partial<MarkInfo>[]
 }) {
@@ -26,8 +26,6 @@ export function calculateMarks({
 				})
 			)
 		}
-
-		
 
 		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
 			(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()

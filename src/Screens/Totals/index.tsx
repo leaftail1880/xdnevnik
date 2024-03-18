@@ -36,6 +36,9 @@ export default observer(function TotalsNavigation() {
 			<Stack.Screen
 				component={SubjectTotals}
 				name={S_SUBJECT_TOTALS}
+				options={{
+					headerStyle: { elevation: 0 },
+				}}
 			></Stack.Screen>
 		</Stack.Navigator>
 	)

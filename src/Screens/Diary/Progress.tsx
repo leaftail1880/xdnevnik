@@ -36,7 +36,6 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 	}, [state, props.lesson.classmeetingId])
 
 	const textStyle = {
-		marginBottom: Spacings.s2,
 		color: Theme.colors.onSurfaceDisabled,
 	}
 

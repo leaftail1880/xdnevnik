@@ -1,9 +1,14 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { memo } from "react"
-import { ScrollView, View } from 'react-native'
+import { Appearance, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
-import ColorPicker, { HueSlider, Preview, SaturationSlider, Swatches } from "reanimated-color-picker"
+import ColorPicker, {
+	HueSlider,
+	Preview,
+	SaturationSlider,
+	Swatches,
+} from 'reanimated-color-picker'
 import { ModalAlert, Toast } from '../../Components/Modal'
 import SelectModal from '../../Components/SelectModal'
 import { styles } from '../../Setup/constants'
@@ -14,7 +19,7 @@ import NumberInputSetting from './Components/NumberInput'
 import { SwitchSetting } from './Components/SwitchSetting'
 
 const themes = [
-	{ label: 'Системная', value: 'system' as const },
+	{ label: 'Системная', value: null as null | undefined },
 	{ label: 'Темная', value: 'dark' as const },
 	{ label: 'Светлая', value: 'light' as const },
 ]
@@ -29,7 +34,7 @@ const nameFormat = [
 	{ label: 'ИФО', value: 'ifo' as const },
 ]
 
-export default observer(function Appearance() {
+export default observer(function AppearanceSettings() {
 	Theme.key
 
 	return (
@@ -37,9 +42,9 @@ export default observer(function Appearance() {
 			<List.Section title="Общие">
 				<SelectModal
 					label="Тема"
-					value={ThemeStore.meta(Theme).scheme}
 					data={themes}
-					onSelect={({ value }) => Theme.setColorScheme(value)}
+					value={Appearance.getColorScheme()}
+					onSelect={({ value }) => Appearance.setColorScheme(value)}
 				/>
 
 				<SelectModal
@@ -56,7 +61,7 @@ export default observer(function Appearance() {
 					onChange={value =>
 						runInAction(() => {
 							Theme.roundness = value
-							Theme.setColorScheme()
+							ThemeStore.meta(Theme).updateColorScheme()
 						})
 					}
 				/>

@@ -26,19 +26,22 @@ export default observer(function DiaryLesson({
 		<Card
 			style={{
 				margin: Spacings.s1,
-				padding: 0,
 				borderCurve: 'continuous',
 
 				// Display border frame only when lesson is going
 				borderWidth:
-					LessonProgressStore.currentLesson === lesson.classmeetingId ? 5 : 0,
+					LessonProgressStore.currentLesson === lesson.classmeetingId
+						? Spacings.s1
+						: 0,
 
 				borderColor: Theme.colors.primary,
 			}}
 		>
 			<TopRow lesson={lesson} {...props} />
-			<MiddleRow lesson={lesson} {...props} />
-			{DiaryState.showHomework && <Assignments lesson={lesson} {...props} />}
+			<View style={{ padding: Spacings.s2 }}>
+				<MiddleRow lesson={lesson} {...props} />
+				{DiaryState.showHomework && <Assignments lesson={lesson} {...props} />}
+			</View>
 		</Card>
 	)
 })
@@ -50,10 +53,8 @@ const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 				style={[
 					styles.stretch,
 					{
-						paddingHorizontal: Spacings.s3,
-						marginBottom: Spacings.s1,
-						margin: 0,
-
+						paddingHorizontal: Spacings.s2,
+						paddingVertical: Spacings.s1,
 						justifyContent: 'space-between',
 
 						elevation: 3,
@@ -78,25 +79,25 @@ const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 
 const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	return (
-		<View style={{ padding: Spacings.s2 }}>
+		<>
 			<Text variant="labelLarge">
 				{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 			</Text>
 
 			{DiaryState.showLessonTheme && (
-				<Text style={{ marginBottom: Spacings.s2 }}>
+				<Text style={{ paddingBottom: Spacings.s1 }}>
 					{lesson.lessonTheme ?? 'Тема урока не указана'}
 				</Text>
 			)}
 
 			<LessonProgress lesson={lesson} />
 
-			<View style={{ padding: Spacings.s2 }}>
-				{DiaryState.showAttachments && lesson.attachmentsExists && (
-					<Text>Есть прикрепленные файлы</Text>
-				)}
-			</View>
-		</View>
+			{DiaryState.showAttachments && lesson.attachmentsExists && (
+				<Text style={{ paddingBottom: Spacings.s1 }}>
+					Есть прикрепленные файлы
+				</Text>
+			)}
+		</>
 	)
 })
 
@@ -116,13 +117,17 @@ const Assignments = observer(function DiaryAssignmentList({
 	})
 
 	if (results.length) {
-		return results.map(e => (
-			<DiaryAssignment
-				assignment={e}
-				key={e.assignmentId}
-				navigation={navigation}
-				lesson={lesson}
-			/>
-		))
+		return (
+			<View style={{ padding: 0, margin: 0 }}>
+				{results.map(e => (
+					<DiaryAssignment
+						assignment={e}
+						key={e.assignmentId}
+						navigation={navigation}
+						lesson={lesson}
+					/>
+				))}
+			</View>
+		)
 	}
 })

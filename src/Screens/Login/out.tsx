@@ -15,20 +15,18 @@ function logout() {
 }
 
 export default observer(function LogoutScreen() {
-	Theme.key
-
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={{ flex: 1, backgroundColor: Theme.colors.background }}>
 			<Header title="Выход"></Header>
 			<View style={{ alignContent: 'center', padding: Spacings.s3 }}>
 				<Button
 					onPress={logout}
 					style={{
-						backgroundColor: Theme.colors.error,
+						backgroundColor: Theme.colors.errorContainer,
 					}}
 					labelStyle={{
 						fontSize: 16,
-						color: Theme.colors.onError,
+						color: Theme.colors.onErrorContainer,
 					}}
 				>
 					{LANG['log_out']}

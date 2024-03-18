@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import {
@@ -100,12 +100,15 @@ const ToastModal = observer(function ToastModal() {
 
 export const ModalAlert = new (class {
 	constructor() {
-		makeAutoObservable(this)
+		makeAutoObservable(this, {}, { autoBind: false })
 	}
 
 	state: ModalInfo | null = null
 	show(title: string, body?: string, error?: boolean) {
 		this.state = { title, body, error }
+	}
+	close() {
+		ModalAlert.state = null
 	}
 })()
 
@@ -115,6 +118,8 @@ const DialogModal = observer(function DialogModal() {
 			{ModalAlert.state && (
 				<Dialog
 					visible
+					dismissable
+					onDismiss={ModalAlert.close}
 					style={{
 						backgroundColor: ModalAlert.state.error
 							? Theme.colors.errorContainer
@@ -129,7 +134,7 @@ const DialogModal = observer(function DialogModal() {
 					)}
 					<Dialog.Actions>
 						<Button
-							onPress={() => runInAction(() => (ModalAlert.state = null))}
+							onPress={ModalAlert.close}
 							labelStyle={
 								ModalAlert.state.error && {
 									color: Theme.colors.onErrorContainer,
