@@ -12,7 +12,7 @@ import {
 import * as Sentry from '@sentry/react-native'
 
 import { StatusBar } from 'expo-status-bar'
-import { makeAutoObservable, toJS } from 'mobx'
+import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { View } from 'react-native'
@@ -55,37 +55,9 @@ const ScreenIcons = {
 
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 
-const AppStore = new (class {
-	constructor() {
-		makeAutoObservable(this)
-	}
-
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	get Fallback() {
-		let Fallback: React.FC | undefined
-		if (!API.session) {
-			// eslint-disable-next-line mobx/missing-observer
-			Fallback = function Fallback() {
-				return <Loading text="Авторизация{dots}" />
-			}
-		} else if (StudentsStore.fallback) {
-			// eslint-disable-next-line mobx/missing-observer, @typescript-eslint/no-unused-vars
-			Fallback = function Fallback() {
-				return StudentsStore.fallback
-			}
-		}
-
-		return (
-			Fallback && (() => Fallback && <AppFallback fallback={<Fallback />} />)
-		)
-	}
-})()
-
 // Show header when component's custom header is not rendered
 // eslint-disable-next-line mobx/missing-observer
-function AppFallback(props: {
-	fallback: React.ReactNode
-}) {
+function AppFallback(props: { fallback: React.ReactNode }) {
 	return (
 		<View>
 			<Header title="Загрузка..." />
@@ -97,8 +69,7 @@ function AppFallback(props: {
 export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
-		const FallbackScreen = AppStore.Fallback
-		
+
 		if (ThemeStore.meta(Theme).loading)
 			return (
 				<View
@@ -113,6 +84,23 @@ export default Sentry.wrap(
 					<Loading text="Загрузка темы" />
 				</View>
 			)
+
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		let Fallback: React.FC | undefined
+		if (!API.session) {
+			// eslint-disable-next-line mobx/missing-observer
+			Fallback = function Fallback() {
+				return <Loading text="Авторизация{dots}" />
+			}
+		} else if (StudentsStore.fallback) {
+			// eslint-disable-next-line mobx/missing-observer, @typescript-eslint/no-unused-vars
+			Fallback = function Fallback() {
+				return StudentsStore.fallback
+			}
+		}
+
+		const FallbackScreen =
+			Fallback && (() => Fallback && <AppFallback fallback={<Fallback />} />)
 
 		const theme = toJS(ThemeStore.meta(Theme).theme)
 		return (

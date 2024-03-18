@@ -85,8 +85,8 @@ export class ThemeStore {
 		).then(() =>
 			runInAction(() => {
 				try {
-					this.setAccentColor(this.accentColor)
 					this.loading = false
+					this.setAccentColor(this.accentColor)
 				} catch (e) {
 					Logger.error(e)
 				}

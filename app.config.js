@@ -35,7 +35,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.14.4',
+		version: '0.14.5',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -48,6 +48,7 @@ const Config = {
 			},
 			splash: splash,
 			bundleIdentifier: bundle,
+			userInterfaceStyle: 'automatic',
 		},
 		androidStatusBar: {
 			hidden: true,
@@ -60,6 +61,7 @@ const Config = {
 			},
 			splash: splash,
 			package: bundle,
+			userInterfaceStyle: 'automatic',
 		},
 
 		runtimeVersion: {
