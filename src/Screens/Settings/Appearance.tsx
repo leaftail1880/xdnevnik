@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { memo } from "react"
-import { Appearance, ColorSchemeName, ScrollView, View } from 'react-native'
+import { memo } from 'react'
+import { Appearance, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
 import ColorPicker, {
 	HueSlider,
@@ -24,7 +24,6 @@ const themes = [
 	{ label: 'Светлая', value: 'light' as const },
 ]
 
-const toThemes = (theme: ColorSchemeName) => (theme === null ? 'system' : theme)
 const toAppearance = (theme: 'dark' | 'light' | 'system') =>
 	theme === 'system' ? null : theme
 
@@ -38,7 +37,7 @@ const nameFormat = [
 	{ label: 'ИФО', value: 'ifo' as const },
 ]
 
-export default observer(function AppearanceSettings() {
+export default observer(function AppearanceSettings_() {
 	Theme.key
 
 	return (
@@ -47,10 +46,11 @@ export default observer(function AppearanceSettings() {
 				<SelectModal
 					label="Тема"
 					data={themes}
-					value={toThemes(Appearance.getColorScheme())}
-					onSelect={({ value }) =>
+					value={Theme.scheme}
+					onSelect={({ value }) => {
+						runInAction(() => (Theme.scheme = value))
 						Appearance.setColorScheme(toAppearance(value))
-					}
+					}}
 				/>
 
 				<SelectModal
@@ -93,7 +93,6 @@ export default observer(function AppearanceSettings() {
 		</ScrollView>
 	)
 })
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DevSettings = observer(function DevSettings() {
@@ -199,4 +198,3 @@ const ColorPickerPanel = memo(function ColorPickerPanel() {
 		</View>
 	))
 })
-

@@ -6,8 +6,8 @@ import { Theme } from '../Stores/Theme'
 
 const MarkColorsBG = {
 	5: '#007000',
-	4: '#947900',
-	3: '#8D4B00',
+	4: '#946C00',
+	3: '#8D3F00',
 	2: '#940000',
 }
 const MarkColorsText = {
@@ -90,7 +90,7 @@ export default observer(function Mark({
 				finalMark
 					? {
 							borderWidth: 1.5,
-							borderColor: Theme.colors.onSurface,
+							borderColor: bg ? Theme.colors.onSurface : color,
 							borderCurve: 'circular',
 					  }
 					: false,
@@ -128,7 +128,7 @@ export default observer(function Mark({
 						style={[
 							{
 								alignSelf: 'center',
-								fontSize: 10,
+								fontSize: 7,
 								color: textColor,
 							},
 							subTextStyle,

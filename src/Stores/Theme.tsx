@@ -28,7 +28,6 @@ export class ThemeStore {
 	static readonly defaultScheme: ThemeName = 'light'
 	static meta(store: ThemeStore) {
 		return {
-			scheme: store.scheme,
 			accentColor: store.accentColor,
 			accentColors: store.accentColors,
 			clearAccentColors: store.clearSelectedAccentColors,
@@ -41,13 +40,12 @@ export class ThemeStore {
 		return [this.defaultAccentColor, '#427979', '#3C639C', '#967857', '#926759']
 	}
 
-	/** @deprecated Use {@link Appearance.getColorScheme()} */
-	private scheme: SchemeName = ThemeStore.defaultScheme
 	private accentColor = ThemeStore.defaultAccentColor
 	private accentColors = ThemeStore.getDefaultAccentColors()
 	private theme = this.generateTheme()
 	private loading = true
 
+	public scheme: SchemeName = ThemeStore.defaultScheme
 	public roundness = 5
 
 	get key() {
@@ -121,6 +119,7 @@ export class ThemeStore {
 		NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar).catch(
 			captureException
 		)
+		NavigationBar.setVisibilityAsync('visible').catch(captureException)
 		SystemUI.setBackgroundColorAsync(Theme.colors.background).catch(
 			captureException
 		)

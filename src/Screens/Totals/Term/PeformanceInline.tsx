@@ -66,6 +66,7 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 						mark={term.avgMark}
 						onPress={openDetails}
 						textStyle={{ fontSize: 18 }}
+						subTextStyle={{ fontSize: 8 }}
 						style={{ height: 50, width: 50, alignSelf: 'center' }}
 					/>
 				</View>

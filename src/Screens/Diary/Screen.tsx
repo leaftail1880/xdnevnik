@@ -7,7 +7,6 @@ import Header from '../../Components/Header'
 import SelectModal from '../../Components/SelectModal'
 import UpdateDate from '../../Components/UpdateDate'
 import { DiaryStore } from '../../Stores/NetSchool'
-import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson, { DiaryLessonProps } from './Lesson'
 import { DiaryState } from './State'
@@ -23,7 +22,6 @@ export default observer(function DiaryScreen(
 				contentContainerStyle={{
 					justifyContent: 'center',
 					alignContent: 'center',
-					backgroundColor: Theme.colors.background,
 				}}
 				refreshControl={DiaryStore.refreshControl}
 			>

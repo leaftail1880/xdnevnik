@@ -12,7 +12,7 @@ import {
 import * as Sentry from '@sentry/react-native'
 
 import { StatusBar } from 'expo-status-bar'
-import { toJS } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { View } from 'react-native'
@@ -55,9 +55,41 @@ const ScreenIcons = {
 
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 
+export default Sentry.wrap(
+	observer(function App() {
+		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+
+		const { loading, theme } = ThemeStore.meta(Theme)
+		if (loading) return AppStore.loadingTheme
+
+		const ProvidedTheme = toJS(theme)
+		return (
+			<SafeAreaProvider>
+				<PaperProvider theme={ProvidedTheme}>
+					<StatusBar
+						style={Theme.dark ? 'light' : 'dark'}
+						hidden={false}
+						backgroundColor="transparent"
+					/>
+					<NavigationContainer
+						theme={ProvidedTheme}
+						ref={navigation}
+						onReady={() =>
+							SENTRY_ROUTING.registerNavigationContainer(navigation)
+						}
+					>
+						<Navigation />
+					</NavigationContainer>
+					<Toast />
+				</PaperProvider>
+			</SafeAreaProvider>
+		)
+	})
+)
+
 // Show header when component's custom header is not rendered
 // eslint-disable-next-line mobx/missing-observer
-function AppFallback(props: { fallback: React.ReactNode }) {
+function AppScreenFallback(props: { fallback: React.ReactNode }) {
 	return (
 		<View>
 			<Header title="Загрузка..." />
@@ -66,145 +98,88 @@ function AppFallback(props: { fallback: React.ReactNode }) {
 	)
 }
 
-export default Sentry.wrap(
-	observer(function App() {
-		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
 
-		if (ThemeStore.meta(Theme).loading)
-			return (
-				<View
-					style={{
-						height: '100%',
-						width: '100%',
-						flex: 1,
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					<Loading text="Загрузка темы" />
-				</View>
-			)
+const AppStore = new (class {
+	constructor() {
+		makeAutoObservable(this, { loadingTheme: false })
+	}
 
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		let Fallback: React.FC | undefined
+	get fallback() {
+		let Fallback: React.ReactNode | undefined
 		if (!API.session) {
-			// eslint-disable-next-line mobx/missing-observer
-			Fallback = function Fallback() {
-				return <Loading text="Авторизация{dots}" />
-			}
+			Fallback = <Loading text="Авторизация{dots}" />
 		} else if (StudentsStore.fallback) {
-			// eslint-disable-next-line mobx/missing-observer, @typescript-eslint/no-unused-vars
-			Fallback = function Fallback() {
-				return StudentsStore.fallback
-			}
+			Fallback = StudentsStore.fallback
 		}
 
-		const FallbackScreen =
-			Fallback && (() => Fallback && <AppFallback fallback={<Fallback />} />)
+		return Fallback && (() => <AppScreenFallback fallback={Fallback} />)
+	}
 
-		const theme = toJS(ThemeStore.meta(Theme).theme)
-		return (
-			// Force background color
+	loadingTheme = (
+		<View
+			style={{
+				height: '100%',
+				width: '100%',
+				flex: 1,
+				justifyContent: 'center',
+				alignItems: 'center',
+			}}
+		>
+			<Loading text="Загрузка темы" />
+		</View>
+	)
+})()
 
-			<View
-				style={{
-					// Force background color
-					backgroundColor: Theme.colors.navigationBar,
-					width: '100%',
-					height: '100%',
-					flex: 1,
-				}}
-			>
-				<SafeAreaProvider>
-					<View
-						style={{
-							// Force background color
-							backgroundColor: Theme.colors.background,
-							width: '100%',
-							height: '100%',
-						}}
-					>
-						<PaperProvider theme={theme}>
-							<StatusBar style={Theme.dark ? 'light' : 'dark'} hidden={false} />
-							<NavigationContainer
-								theme={theme}
-								ref={navigation}
-								onReady={() => {
-									SENTRY_ROUTING.registerNavigationContainer(navigation)
-								}}
-							>
-								<Tab.Navigator
-									sceneAnimationEnabled={true}
-									sceneAnimationType={'shifting'}
-									barStyle={{
-										height: '7%',
-										padding: 0,
-										margin: 0,
-										alignContent: 'center',
-										alignItems: 'center',
-										justifyContent: 'center',
-										backgroundColor: Theme.colors.navigationBar,
-									}}
-									inactiveColor={Theme.colors.onSurfaceVariant}
-									activeColor={Theme.colors.onPrimaryContainer}
-									activeIndicatorStyle={{
-										backgroundColor: Theme.colors.primaryContainer,
-										height: '120%',
-										margin: 0,
-										padding: 0,
-									}}
-									style={{
-										padding: 0,
-										margin: 0,
-									}}
-									screenOptions={({ route }) => ({
-										tabBarIcon: ({ color }) => {
-											return (
-												<Icon
-													source={ScreenIcons[route.name]}
-													color={color}
-													size={23}
-												/>
-											)
-										},
-										tabBarHideOnKeyboard: true,
-									})}
-								>
-									{!API.session && (
-										<Tab.Screen
-											name={LANG['s_log_in']}
-											component={LoginScreen}
-										/>
-									)}
+const Navigation = observer(function Navigation() {
+	const FallbackScreen = AppStore.fallback
 
-									<Tab.Screen
-										name={LANG['s_diary']}
-										component={FallbackScreen || DiaryScreen}
-									/>
+	return (
+		<Tab.Navigator
+			theme={toJS(ThemeStore.meta(Theme).theme)}
+			sceneAnimationEnabled={true}
+			sceneAnimationType={'shifting'}
+			barStyle={{
+				height: '7%',
+				alignContent: 'center',
+				alignItems: 'center',
+				justifyContent: 'center',
+				backgroundColor: Theme.colors.navigationBar,
+			}}
+			activeColor={Theme.colors.onPrimaryContainer}
+			activeIndicatorStyle={{
+				height: '120%',
+			}}
+			style={{
+				backgroundColor: Theme.colors.primary,
+			}}
+			screenOptions={({ route }) => ({
+				tabBarIcon: ({ color }) => (
+					<Icon source={ScreenIcons[route.name]} color={color} size={23} />
+				),
+			})}
+		>
+			{!API.session && (
+				<Tab.Screen name={LANG['s_log_in']} component={LoginScreen} />
+			)}
 
-									<Tab.Screen
-										name={LANG['s_totals']}
-										component={FallbackScreen || TotalsNavigation}
-									/>
+			<Tab.Screen
+				name={LANG['s_diary']}
+				component={FallbackScreen || DiaryScreen}
+			/>
 
-									<Tab.Screen
-										name={LANG['s_settings']}
-										component={SettingsScreen}
-									></Tab.Screen>
+			<Tab.Screen
+				name={LANG['s_totals']}
+				component={FallbackScreen || TotalsNavigation}
+			/>
 
-									{API.session && (
-										<Tab.Screen
-											name={LANG['s_log_out']}
-											component={LogoutScreen}
-										/>
-									)}
-								</Tab.Navigator>
-							</NavigationContainer>
-							<Toast />
-						</PaperProvider>
-					</View>
-				</SafeAreaProvider>
-			</View>
-		)
-	})
-)
+			<Tab.Screen
+				name={LANG['s_settings']}
+				component={SettingsScreen}
+			></Tab.Screen>
+
+			{API.session && (
+				<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
+			)}
+		</Tab.Navigator>
+	)
+})
