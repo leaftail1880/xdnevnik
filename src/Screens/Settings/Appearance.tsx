@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { memo } from "react"
-import { Appearance, ScrollView, View } from 'react-native'
+import { Appearance, ColorSchemeName, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
 import ColorPicker, {
 	HueSlider,
@@ -19,10 +19,14 @@ import NumberInputSetting from './Components/NumberInput'
 import { SwitchSetting } from './Components/SwitchSetting'
 
 const themes = [
-	{ label: 'Системная', value: null as null | undefined },
+	{ label: 'Системная', value: 'system' as const },
 	{ label: 'Темная', value: 'dark' as const },
 	{ label: 'Светлая', value: 'light' as const },
 ]
+
+const toThemes = (theme: ColorSchemeName) => (theme === null ? 'system' : theme)
+const toAppearance = (theme: 'dark' | 'light' | 'system') =>
+	theme === 'system' ? null : theme
 
 const markStyles = [
 	{ label: 'Линия', value: 'border' as const },
@@ -43,8 +47,10 @@ export default observer(function AppearanceSettings() {
 				<SelectModal
 					label="Тема"
 					data={themes}
-					value={Appearance.getColorScheme()}
-					onSelect={({ value }) => Appearance.setColorScheme(value)}
+					value={toThemes(Appearance.getColorScheme())}
+					onSelect={({ value }) =>
+						Appearance.setColorScheme(toAppearance(value))
+					}
 				/>
 
 				<SelectModal
