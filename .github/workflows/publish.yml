@@ -78,24 +78,24 @@ jobs:
           name: XDnevnik.apk
           path: XDnevnik.apk
 
-      - name: 📦 Install expo-dev-client
-        run: yarn add expo-dev-client
+      # - name: 📦 Install expo-dev-client
+      #   run: yarn add expo-dev-client
 
-      - name: 📦 Build dev client
-        run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
+      # - name: 📦 Build dev client
+      #   run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
-      - name: 🚀 Upload dev client
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: XDnevnik Dev Client.apk
+      # - name: 🚀 Upload dev client
+      #   uses: softprops/action-gh-release@v1
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: XDnevnik Dev Client.apk
 
-      - name: 🚀 Upload main apk
-        uses: actions/upload-artifact@v4
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        with:
-          name: XDnevnik Dev Client.apk
-          path: XDnevnik Dev Client.apk
+      # - name: 🚀 Upload main apk
+      #   uses: actions/upload-artifact@v4
+      #   if: ${{ github.event_name == 'workflow_dispatch' }}
+      #   with:
+      #     name: XDnevnik Dev Client.apk
+      #     path: XDnevnik Dev Client.apk
   # ios:
   #   name: EAS Build IOS
   #   runs-on: macos-latest
