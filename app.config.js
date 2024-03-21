@@ -22,8 +22,8 @@ const sentryPlugin = [
 	},
 ]
 
-const splashBackgroundDark = '#000000'
-const splashBackgroundLight = '#FFFFFF'
+const splashBackgroundDark = '#252525'
+const splashBackgroundLight = '#EBEAEA'
 
 /** @type {import("@expo/config-types/build/ExpoConfig.js").ExpoConfig['splash']} */
 const splash = {
@@ -73,6 +73,7 @@ const Config = {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: splashBackgroundLight,
 			},
+			versionCode: 10,
 		},
 		androidNavigationBar: {
 			visible: 'immersive',
@@ -107,13 +108,24 @@ Config.expo = withBuildProperties(Config.expo, {
 	},
 })
 
-// Archs armeabi-v7a arm64-v8a x86 x86_64
 Config.expo = withGradleProperties(Config.expo, config => {
-	config.modResults.push({
-		type: 'property',
-		key: 'org.gradle.jvmargs',
-		value: '-Xmx3096m -XX:MaxMetaspaceSize=512m',
-	})
+	config.modResults.push(
+		{
+			type: 'property',
+			key: 'reactNativeArchitectures',
+			value: 'armeabi-v7a,arm64-v8a', //,x86,x86_64
+		},
+		{
+			type: 'property',
+			key: 'org.gradle.jvmargs',
+			value: '-Xmx3096m -XX:MaxMetaspaceSize=512m',
+		},
+		{
+			type: 'property',
+			key: 'gradle',
+			value: 'build -x lint -x lintVitalRelease',
+		}
+	)
 
 	return config
 })
