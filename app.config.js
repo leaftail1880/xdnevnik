@@ -13,14 +13,10 @@ const id = IS_DEV
 	? 'com.leaftail1880.xdnevnik.dev'
 	: 'com.leaftail1880.xdnevnik'
 
-/** @type {[string, any]} */
-const sentryPlugin = [
-	'@sentry/react-native/expo',
-	{
-		organization: 'leaftail1880',
-		project: 'xdnevnik',
-	},
-]
+const sentry = {
+	organization: 'leaftail1880',
+	project: 'xdnevnik',
+}
 
 const splashBackgroundDark = '#252525'
 const splashBackgroundLight = '#EBEAEA'
@@ -44,14 +40,10 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.14.7',
+		version: '0.14.8',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
-		notification: {
-			icon: './assets/notification_icon.png',
-			color: splashBackgroundLight,
-		},
 		assetBundlePatterns: ['**/*'],
 		userInterfaceStyle: 'automatic',
 
@@ -73,22 +65,26 @@ const Config = {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: splashBackgroundLight,
 			},
-			versionCode: 10,
 		},
-		androidNavigationBar: {
-			visible: 'immersive',
-		},
+
+		plugins: [
+			IS_DEV ? 'expo-dev-client' : '',
+			'expo-updates',
+			'expo-build-properties',
+			['@sentry/react-native/expo', sentry],
+			[
+				'expo-navigation-bar',
+				{
+					position: 'relative',
+					visibility: 'hidden',
+					behavior: 'inset-swipe',
+				},
+			],
+		],
 
 		runtimeVersion: {
 			policy: 'appVersion',
 		},
-		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
-			sentryPlugin,
-			'expo-updates',
-			'expo-build-properties',
-		].filter(Boolean),
-
 		updates: {
 			url: `https://u.expo.dev/${projectId}`,
 		},
@@ -99,6 +95,8 @@ const Config = {
 		},
 	},
 }
+
+Config.expo.plugins = Config.expo.plugins?.filter(Boolean)
 
 Config.expo = withBuildProperties(Config.expo, {
 	android: {
