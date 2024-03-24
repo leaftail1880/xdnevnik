@@ -1,20 +1,31 @@
 import { runInAction } from 'mobx'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, TextInput } from 'react-native-paper'
-import { styles } from '../../../Setup/constants'
-import { Theme } from '../../../Stores/Theme'
 import { Spacings } from '../../../utils/Spacings'
 
-export const RoundnessSetting = observer(function RoundnessSetting() {
+type NumberInputSettingProps = {
+	value: number
+	defaultValue: number
+	onChange: (value: number) => void
+	label: string
+}
+
+// eslint-disable-next-line mobx/missing-observer
+export default function NumberInputSetting(props: NumberInputSettingProps) {
 	const [error, setError] = useState(false)
-	const [value, setValue] = useState(Theme.roundness.toString())
+	const [value, setValue] = useState(props.value.toString())
 	return (
-		<View style={styles.stretch}>
+		<View
+			style={{
+				flexDirection: 'row',
+				alignItems: 'center',
+				alignContent: 'center',
+			}}
+		>
 			<TextInput
 				keyboardType="numeric"
-				label={'Округлость'}
+				label={props.label}
 				mode="outlined"
 				value={value}
 				error={error}
@@ -29,22 +40,19 @@ export const RoundnessSetting = observer(function RoundnessSetting() {
 						} else {
 							setError(false)
 							setValue(num + '')
-							Theme.roundness = num
-							Theme.setColorScheme()
+							props.onChange(num)
 						}
 					})
 				}}
-				style={{ margin: Spacings.s2, flex: 2 }}
+				style={{ margin: Spacings.s2, flex: 2, maxWidth: '50%' }}
 			/>
 			<Button
 				onPress={() =>
-					runInAction(
-						() => ((Theme.roundness = 5), Theme.setColorScheme(), setValue('5'))
-					)
+					runInAction(() => (props.onChange(props.defaultValue), setValue('5')))
 				}
 			>
 				Сбросить...
 			</Button>
 		</View>
 	)
-})
+}

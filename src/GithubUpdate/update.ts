@@ -56,25 +56,11 @@ class GithubApi {
 		return (await this.fetch(
 			'https://api.github.com/repos/leaftail1880/xdnevnik/releases'
 		)) as GithubRelease[]
-
-		// const release = releases[0]
-		// if (!release) return () => Alert.alert('Не удалось найти релиз')
-
-		// if (release.tag_name === Application.nativeApplicationVersion)
-		// 	return () => Alert.alert('Уже последняя')
-
-		// const asset = release.assets.find(e => e.name === filename)
-		// if (!asset)
-		// 	return Alert.alert(
-		// 		'Обновление еще собирается, попробуйте через пару минут!'
-		// 	)
-
-		// return asset?.browser_download_url
 	}
 }
 
 const API = new GithubApi()
 
 export const Github = {
-	Releases: new AsyncStore(API, 'getReleases', 'список версий', {}),
+	Releases: new AsyncStore(API, 'getReleases', 'списка версий', {}, () => []),
 }

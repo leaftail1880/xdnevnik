@@ -131,6 +131,9 @@ export class Lesson {
 	}
 
 	minutes(now = Date.now()) {
+		// const date = new Date()
+		// date.setHours(12, 10)
+		// now = date.getTime()
 		const start = this.start.getTime()
 		const end = this.end.getTime()
 		const toMin = (n: number) => Math.ceil(n / (1000 * 60))

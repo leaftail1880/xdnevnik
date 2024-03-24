@@ -7,8 +7,8 @@ import {
 	toJS,
 } from 'mobx'
 import { RefreshControl } from 'react-native'
-import { ErrorHandler } from '../Components/ErrorHandler'
-import { Loading } from '../Components/Loading'
+import ErrorHandler from '../Components/ErrorHandler'
+import Loading from '../Components/Loading'
 import { API as NSApi, NetSchoolError } from '../NetSchool/api'
 import { Logger } from '../Setup/constants'
 
@@ -60,10 +60,6 @@ export class AsyncStore<
 	FnParams = Fn extends AsyncMethod ? Optional<Parameters<Fn>[0]> : never,
 	DefaultParams = Record<string, never>
 > {
-	log(...data: unknown[]) {
-		if (this.debug)
-			Logger.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
-	}
 	constructor(
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		private readonly API: Source,
@@ -73,7 +69,6 @@ export class AsyncStore<
 		private readonly additionalDeps: () => AdditionalDeps = () => [
 			NSApi.session,
 			NSApi.reload,
-			this.reloadTimes,
 		],
 		public debug = false
 	) {
@@ -91,6 +86,7 @@ export class AsyncStore<
 			| 'params'
 			| 'method'
 			| 'API'
+			| 'log'
 		>(
 			this,
 			{
@@ -128,6 +124,11 @@ export class AsyncStore<
 			() => this.additionalDeps(),
 			() => this.update(this.params)
 		)
+	}
+
+	private log(...data: unknown[]) {
+		if (this.debug)
+			Logger.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
 	}
 
 	private reload() {
@@ -213,10 +214,12 @@ export class AsyncStore<
 		}
 		this.log('Params', params)
 
-		// Some of the params arent loaded, skipping...
+		// Subscribe to reloads
+		this.reloadTimes
 		const deps = Object.values(params).concat(this.additionalDeps())
 		this.log('deps', deps)
 
+		// Some of the params arent loaded, skipping...
 		if (deps.some(e => typeof e === 'undefined' || e === null)) {
 			this.log(
 				'Undefined values in params, additional ' + this.additionalDeps()

@@ -2,7 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text, TouchableRipple } from 'react-native-paper'
-import { Mark } from '../../Components/Mark'
+
+import Mark from '../../Components/Mark'
+
 import { Assignment, Attachment } from '../../NetSchool/classes'
 import { LANG } from '../../Setup/constants'
 import { AttachmentsStore } from '../../Stores/NetSchool'
@@ -19,7 +21,7 @@ import { DiaryLessonProps } from './Lesson'
 
 // TODO support attachment
 
-export const DiaryAssignment = observer(function DiaryAssignment({
+export default observer(function DiaryAssignment({
 	assignment,
 	navigation,
 	lesson,
@@ -42,11 +44,12 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 		<View
 			style={{
 				borderRadius: Theme.roundness,
-				margin: Spacings.s2,
+				marginTop: Spacings.s2,
 				flexDirection: 'row',
 				justifyContent: 'space-between',
 				alignContent: 'stretch',
 				alignItems: 'center',
+				width: '92%',
 			}}
 		>
 			{assignment.assignmentTypeName && (
@@ -62,14 +65,12 @@ export const DiaryAssignment = observer(function DiaryAssignment({
 						alignSelf: 'center',
 					}}
 				>
-					<Text style={{ margin: Spacings.s2 }}>
-						{assignment.assignmentTypeAbbr}
-					</Text>
+					<Text>{assignment.assignmentTypeAbbr}</Text>
 				</TouchableRipple>
 			)}
 
 			<Text
-				style={{ alignSelf: 'center', width: '60%', margin: Spacings.s2 }}
+				style={{ alignSelf: 'center', width: '70%', margin: Spacings.s2 }}
 				selectable
 			>
 				{showHomework
@@ -151,7 +152,7 @@ const AttachmentFile = observer(function AttachmentFile({
 				// )
 				// const result = await downloader.downloadAsync()
 				// if (!result) {
-				// 	Alert.alert('Не удалось сохранить вложение')
+				// 	ModalAlert.alert('Не удалось сохранить вложение')
 				// 	throw new Error('Failed to download update')
 				// }
 			}}

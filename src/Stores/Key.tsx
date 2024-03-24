@@ -6,47 +6,49 @@ interface KeyStoreOptions {
 }
 
 interface StoredValue<T> {
-	sid: string
+	id: string
 	store: T
 	canDispose: boolean
 	dispose: () => () => void
 }
 
-export class KeyStore<ID = object, T = object> {
-	stores: Record<string, StoredValue<T>> = {}
+export class KeyStore<Key = object, T = object> {
+	private stores: Record<string, StoredValue<T>> = {}
 	private readonly options: KeyStoreOptions
 
 	constructor(
-		private readonly stringifyId: (id: ID) => string,
-		private readonly createStore: (id: ID) => T,
+		private readonly getId: (id: Key) => string,
+		private readonly createStore: (id: Key) => T,
 		{ maxUnusedStores = 3 }: Partial<KeyStoreOptions> = {}
 	) {
-		makeAutoObservable<this, 'options' | 'create'>(this, {
+		makeAutoObservable<this, 'options' | 'create' | 'stores'>(this, {
+			create: action,
+			stores: true,
 			options: false,
 			use: false,
 			get: false,
-			create: action,
 		})
 		this.options = { maxUnusedStores }
 	}
 
 	get(
-		id: ID,
+		key: Key,
 		setCanDispose = true
 	): Omit<StoredValue<T>, 'canDispose' | 'sid'> {
-		const sid = this.stringifyId(id)
-		if (this.stores[sid]) {
+		const id = this.getId(key)
+		if (this.stores[id]) {
 			if (setCanDispose)
 				runInAction(() => {
-					this.stores[sid].canDispose = false
+					this.stores[id].canDispose = false
 				})
-			return this.stores[sid]
+
+			return this.stores[id]
 		}
 
-		return this.create(id, sid)
+		return this.create(key, id)
 	}
 
-	use(id: ID) {
+	use(id: Key) {
 		const { store, dispose } = this.get(id)
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
@@ -54,16 +56,18 @@ export class KeyStore<ID = object, T = object> {
 		return store
 	}
 
-	private create(id: ID, sid: string) {
+	private create(id: Key, sid: string) {
 		const store = this.createStore(id)
 
 		const unusedStores = Object.values(this.stores).filter(e => e.canDispose)
 		if (unusedStores.length > this.options.maxUnusedStores) {
-			delete this.stores[unusedStores[0].sid]
+			runInAction(() => {
+				delete this.stores[unusedStores[0].id]
+			})
 		}
 
 		return (this.stores[sid] = {
-			sid,
+			id: sid,
 			store,
 			canDispose: false,
 			dispose: () => () => {

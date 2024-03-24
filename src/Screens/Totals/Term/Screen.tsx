@@ -1,12 +1,14 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import { FlatList, ListRenderItem, View } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '..'
-import { Dropdown } from '../../../Components/Dropdown'
-import { Loading } from '../../../Components/Loading'
-import { UpdateDate } from '../../../Components/UpdateDate'
+
+import Loading from '../../../Components/Loading'
+import SelectModal from '../../../Components/SelectModal'
+import UpdateDate from '../../../Components/UpdateDate'
+
 import { Total } from '../../../NetSchool/classes'
 import {
 	EducationStore,
@@ -16,12 +18,69 @@ import {
 import { Settings } from '../../../Stores/Settings'
 import { Theme } from '../../../Stores/Theme'
 import { Spacings } from '../../../utils/Spacings'
-import { SubjectPerformanceInline } from './PeformanceInline'
+import SubjectPerformanceInline from './PeformanceInline'
 import { TermStore } from './TermStore'
 
-const keyExtractor = (total: Total): string => total.subjectId.toString()
+// eslint-disable-next-line mobx/missing-observer
+export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
+	return (
+		<>
+			<StickyHeader />
+			<TermTotalsList {...props} />
+		</>
+	)
+})
 
-export const TotalsScreenTerm = observer(function TotalsScreenTerm({
+const StickyHeader = observer(function StickyHeader() {
+	const terms = TermStore.terms
+	return (
+		<View>
+			{terms && (
+				<SelectModal
+					data={terms}
+					value={Settings.currentTerm?.id + ''}
+					onSelect={v => Settings.save({ currentTerm: v.term })}
+					label={Settings.currentTerm ? '' : 'Четверть'}
+					mode="button"
+				/>
+			)}
+		</View>
+	)
+})
+
+const Header = observer(function Header() {
+	return (
+		<View
+			style={{
+				flex: 1,
+				flexDirection: 'row',
+				paddingVertical: Spacings.s2,
+			}}
+		>
+			<Chip
+				mode="outlined"
+				selected={TermStore.sort}
+				onPress={() => {
+					runInAction(() => (TermStore.sort = !TermStore.sort))
+				}}
+				style={{ marginHorizontal: Spacings.s2 }}
+			>
+				Плохие оценки вверху
+			</Chip>
+			<Chip
+				mode="outlined"
+				selected={TermStore.attendance}
+				onPress={() => {
+					runInAction(() => (TermStore.attendance = !TermStore.attendance))
+				}}
+			>
+				Пропуски
+			</Chip>
+		</View>
+	)
+})
+
+const TermTotalsList = observer(function TermTotalsList({
 	navigation,
 }: TotalsScreenParams) {
 	Theme.key
@@ -35,8 +94,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 				subjects={SubjectsStore.result!}
 			/>
 		),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
+		[navigation]
 	)
 
 	return (
@@ -47,7 +105,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 			<Loading text="Загрузка из кэша{dots}" />
 		) : (
 			<FlatList
-				ListHeaderComponent={<TotalsScreenHeader />}
+				ListHeaderComponent={Header}
 				initialNumToRender={5}
 				maxToRenderPerBatch={3}
 				data={TermStore.totalsResult}
@@ -60,46 +118,7 @@ export const TotalsScreenTerm = observer(function TotalsScreenTerm({
 	)
 })
 
-const TotalsScreenHeader = observer(function TotalsScreenHeader() {
-	const terms = TermStore.getTerms()
-	return (
-		<View>
-			{terms && (
-				<Dropdown
-					data={terms}
-					value={Settings.currentTerm?.id + ''}
-					onSelect={v => Settings.save({ currentTerm: v.term })}
-					label={'Выбери четверть'}
-				/>
-			)}
+const keyExtractor = (total: Total): string => total.subjectId.toString()
 
-			<View
-				style={{
-					flex: 1,
-					flexDirection: 'row',
-					paddingVertical: Spacings.s2,
-				}}
-			>
-				<Chip
-					mode="outlined"
-					selected={TermStore.sort}
-					onPress={() => {
-						runInAction(() => (TermStore.sort = !TermStore.sort))
-					}}
-					style={{ marginHorizontal: Spacings.s2 }}
-				>
-					Плохие оценки вверху
-				</Chip>
-				<Chip
-					mode="outlined"
-					selected={TermStore.attendance}
-					onPress={() => {
-						runInAction(() => (TermStore.attendance = !TermStore.attendance))
-					}}
-				>
-					Пропуски
-				</Chip>
-			</View>
-		</View>
-	)
-})
+
+

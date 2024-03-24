@@ -13,7 +13,7 @@ interface ErrorHandlerProps {
 }
 
 // eslint-disable-next-line mobx/missing-observer
-export const ErrorHandler = function ErrorHandler({
+export default function ErrorHandler({
 	error,
 	reload,
 	name,

@@ -1,5 +1,11 @@
-import { makeAutoObservable } from 'mobx'
+import { autorun, makeAutoObservable } from 'mobx'
 import { LANG } from '../../Setup/constants'
+import {
+	AssignmentsStore,
+	AttachmentsStore,
+	DiaryStore,
+} from '../../Stores/NetSchool'
+import { Settings } from '../../Stores/Settings'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
 export const DiaryState = new (class {
@@ -58,3 +64,30 @@ export const DiaryState = new (class {
 		]
 	}
 })()
+
+autorun(() => {
+	const { studentId } = Settings
+	const { showHomework, weekDays } = DiaryState
+
+	DiaryStore.withParams({
+		studentId,
+		startDate: weekDays[0].toNetSchool(),
+		endDate: weekDays[6].toNetSchool(),
+	})
+
+	AssignmentsStore.withParams({
+		studentId,
+		classmeetingsIds: showHomework
+			? DiaryStore.result?.lessons.map(e => e.classmeetingId)
+			: undefined,
+	})
+
+	const withAttachments = AssignmentsStore.result
+		?.filter(e => e.attachmentsExists)
+		.map(e => e.assignmentId)
+
+	AttachmentsStore.withParams({
+		studentId,
+		assignmentIds: withAttachments?.length ? withAttachments : undefined,
+	})
+})

@@ -3,7 +3,7 @@ import { Text } from 'react-native-paper'
 import { Theme } from '../Stores/Theme'
 import { Spacings } from '../utils/Spacings'
 
-export const UpdateDate = observer(function UpdateDate(props: {
+export default observer(function UpdateDate(props: {
 	store: { updateDate: string }
 }) {
 	return (

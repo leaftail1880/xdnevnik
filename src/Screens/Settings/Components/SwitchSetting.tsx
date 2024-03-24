@@ -1,18 +1,22 @@
 import { Observer } from 'mobx-react-lite'
 import { List, Switch } from 'react-native-paper'
 import { Settings } from '../../../Stores/Settings'
-import { BaseSetting } from './Base'
+import { Falsy } from 'react-native'
 
-type SwitchSettingProps = BaseSetting &
-	(
-		| {
-				setting: keyof FilterObject<typeof Settings, true | false>
-		  }
-		| {
-				onChange(): void
-				value: boolean
-		  }
-	)
+type SwitchSettingProps = {
+	/**
+	 * Label that will be displayed in the right
+	 */
+	label?: string | React.JSX.Element | Falsy
+} & (
+	| {
+			setting: keyof FilterObject<typeof Settings, true | false>
+	  }
+	| {
+			onChange(): void
+			value: boolean
+	  }
+)
 
 // eslint-disable-next-line mobx/missing-observer
 export const SwitchSetting = function SwitchSetting(props: SwitchSettingProps) {

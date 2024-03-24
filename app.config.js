@@ -1,77 +1,97 @@
 // @ts-check
 import withBuildProperties from 'expo-build-properties'
-import { withGradleProperties } from 'expo/config-plugins'
+import {
+	AndroidConfig,
+	withAndroidColorsNight,
+	withGradleProperties,
+} from 'expo/config-plugins'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
 
-/** @type {[string, any]} */
-const sentryPlugin = [
-	'@sentry/react-native/expo',
-	{
-		organization: 'leaftail1880',
-		project: 'xdnevnik',
+const id = IS_DEV
+	? 'com.leaftail1880.xdnevnik.dev'
+	: 'com.leaftail1880.xdnevnik'
+
+const sentry = {
+	organization: 'leaftail1880',
+	project: 'xdnevnik',
+}
+
+const splashBackgroundDark = '#252525'
+const splashBackgroundLight = '#EBEAEA'
+
+/** @type {import("@expo/config-types/build/ExpoConfig.js").ExpoConfig['splash']} */
+const splash = {
+	image: './assets/splash.png',
+	resizeMode: 'cover',
+	backgroundColor: splashBackgroundLight,
+	dark: {
+		image: './assets/splash.png',
+		resizeMode: 'cover',
+		backgroundColor: splashBackgroundDark,
 	},
-]
+}
+
+const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
 
 /** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
 const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.13.2',
+		version: '0.14.8',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
-		userInterfaceStyle: 'automatic',
-		splash: {
-			image: './assets/splash.png',
-			resizeMode: 'contain',
-			backgroundColor: '#ffffff',
-			dark: {
-				image: './assets/splash.png',
-				resizeMode: 'contain',
-				backgroundColor: '#000000',
-			},
-		},
 		assetBundlePatterns: ['**/*'],
+		userInterfaceStyle: 'automatic',
+
 		ios: {
-			supportsTablet: true,
-			bundleIdentifier: IS_DEV
-				? 'com.leaftail1880.xdnevnik.dev'
-				: 'com.leaftail1880.xdnevnik',
+			bundleIdentifier: id,
+			splash: splash,
+			userInterfaceStyle: 'automatic',
 			infoPlist: {
 				UIBackgroundModes: ['lesson-notifications'],
 			},
 		},
+
 		android: {
+			package: id,
+			splash: splash,
+			userInterfaceStyle: 'automatic',
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
 			adaptiveIcon: {
 				foregroundImage: './assets/adaptive-icon.png',
-				backgroundColor: '#FFFFFF00',
+				backgroundColor: splashBackgroundLight,
 			},
+		},
 
-			package: IS_DEV
-				? 'com.leaftail1880.xdnevnik.dev'
-				: 'com.leaftail1880.xdnevnik',
-		},
-		extra: {
-			eas: {
-				projectId: '97163afe-5c7e-4856-ba8f-348e00aa7c04',
-			},
-		},
-		runtimeVersion: {
-			policy: 'appVersion',
-		},
 		plugins: [
 			'expo-dev-client',
 			'expo-updates',
-			sentryPlugin,
 			'expo-build-properties',
-		].filter(Boolean),
+			['@sentry/react-native/expo', sentry],
+			[
+				'expo-navigation-bar',
+				{
+					position: 'relative',
+					visibility: 'hidden',
+					behavior: 'inset-swipe',
+				},
+			],
+		],
 
+		runtimeVersion: {
+			policy: 'appVersion',
+		},
 		updates: {
-			url: 'https://u.expo.dev/97163afe-5c7e-4856-ba8f-348e00aa7c04',
+			url: `https://u.expo.dev/${projectId}`,
+		},
+		extra: {
+			eas: {
+				projectId: projectId,
+			},
 		},
 	},
 }
@@ -103,6 +123,16 @@ Config.expo = withGradleProperties(Config.expo, config => {
 		}
 	)
 
+	return config
+})
+
+// Adjust color of the android status bar during splash screen
+const { assignColorValue } = AndroidConfig.Colors
+Config.expo = withAndroidColorsNight(Config.expo, async config => {
+	config.modResults = assignColorValue(config.modResults, {
+		name: 'colorPrimaryDark',
+		value: splashBackgroundDark,
+	})
 	return config
 })
 

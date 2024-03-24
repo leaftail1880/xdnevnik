@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import {
 	Button,
+	Chip,
 	Dialog,
 	List,
 	Portal,
@@ -19,67 +20,54 @@ import {
 import { Theme } from '../Stores/Theme'
 import { Spacings } from '../utils/Spacings'
 
-export function dropdownButtonStyle(): StyleProp<ViewStyle> {
-	return {
-		alignSelf: 'center',
-		width: '100%',
-		backgroundColor: Theme.colors.elevation.level2,
-		borderBottomLeftRadius: Theme.roundness,
-		elevation: 2,
-		borderBottomRightRadius: Theme.roundness,
-	}
-}
-
-export function dropdownStyle(): ViewStyle {
-	return {
-		backgroundColor: Theme.colors.background,
-		borderRadius: Theme.roundness,
-		alignContent: 'center',
-	}
-}
-
-export function dropdown() {
-	return {
-		buttonStyle: dropdownButtonStyle(),
-		dropdownStyle: dropdownStyle(),
-		rowTextStyle: { color: Theme.colors.onSurface, fontSize: 16 },
-		rowStyle: { borderColor: Theme.colors.backdrop },
-		selectedRowTextStyle: { color: Theme.colors.secondary },
-	}
-}
-
-export const Dropdown = observer(function Dropdown<
-	T extends string,
+export default observer(function SelectModal<
+	T extends string | null | undefined,
 	D extends { value: T; label: string }
 >(props: {
 	label: string
 	value: T
 	data: D[]
 	onSelect: (v: D) => void
-	mode?: 'button' | 'list.item'
+	mode?: 'button' | 'list.item' | 'chip'
+	style?: StyleProp<ViewStyle>
 	description?: string
 }) {
 	Theme.key
 	const [visible, setVisible] = useState(false)
 	const value =
 		props.data.find(e => e.value === props.value)?.label ?? 'Выбери...'
+	let label = props.label
+	if (label !== '') label += ': '
 
 	return (
 		<>
 			{props.mode === 'button' ? (
 				<Button
 					onPress={() => setVisible(!visible)}
-					style={{
-						borderTopLeftRadius: 0,
-						borderTopRightRadius: 0,
-						backgroundColor: Theme.colors.elevation.level2,
-					}}
+					style={[
+						{
+							borderTopLeftRadius: 0,
+							borderTopRightRadius: 0,
+							backgroundColor: Theme.colors.navigationBar,
+						},
+						props.style,
+					]}
 					labelStyle={[Theme.fonts.titleMedium, { padding: Spacings.s1 }]}
 				>
-					{props.label}: {value}
+					<Text variant="titleMedium">{label}</Text>
+					{value}
 				</Button>
+			) : props.mode === 'chip' ? (
+				<Chip
+					style={props.style}
+					textStyle={Theme.fonts.bodySmall}
+					onPress={() => setVisible(!visible)}
+				>
+					{(label + value).slice(0, 16)}
+				</Chip>
 			) : (
 				<List.Item
+					style={props.style}
 					title={props.label}
 					description={value}
 					onPress={() => setVisible(!visible)}

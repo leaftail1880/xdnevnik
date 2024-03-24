@@ -5,8 +5,8 @@ import { BackHandler, RefreshControl, ScrollView, View } from 'react-native'
 import { Appbar, Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 import WebView from 'react-native-webview'
-import { Header } from '../../Components/Header'
-import { Loading } from '../../Components/Loading'
+import Header from '../../Components/Header'
+import Loading from '../../Components/Loading'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
 import { Logger } from '../../Setup/constants'
@@ -36,8 +36,9 @@ const EndpointsStore = new AsyncStore(
 	() => [LoginStore.loading]
 )
 
-export const LoginScreen = observer(function LoginScreen() {
+export default observer(function LoginScreen() {
 	Theme.key
+	
 	return (
 		<View
 			style={{

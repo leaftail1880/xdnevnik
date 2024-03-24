@@ -2,8 +2,8 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
 import { Text } from 'react-native-paper'
-import { Loading } from '../../../Components/Loading'
-import { Mark } from '../../../Components/Mark'
+import Loading from '../../../Components/Loading'
+import Mark from '../../../Components/Mark'
 import { Total } from '../../../NetSchool/classes'
 import { SubjectPerformanceStores } from '../../../Stores/NetSchool'
 import { Settings } from '../../../Stores/Settings'
@@ -12,7 +12,7 @@ import { Spacings } from '../../../utils/Spacings'
 import { calculateMarks } from '../../SubjectTotals/calculateMarks'
 import { SubjectInfo, TermStore } from './TermStore'
 
-export const SubjectMarksInline = observer(function SubjectMarksInline(
+export default observer(function SubjectMarksInline(
 	props: Omit<SubjectInfo, 'attendance'> & {
 		term: Total['termTotals'][number]
 		openDetails: () => void
@@ -45,7 +45,7 @@ export const SubjectMarksInline = observer(function SubjectMarksInline(
 			assignments.result &&
 			calculateMarks({
 				totals: assignments.result,
-				missedLessons: TermStore.attendance,
+				attendance: TermStore.attendance,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[assignments.result, TermStore.attendance]

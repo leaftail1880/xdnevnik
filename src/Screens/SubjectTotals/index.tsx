@@ -1,13 +1,12 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
-import { Alert, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Chip, Surface, Text } from 'react-native-paper'
-import { dropdownButtonStyle } from '../../Components/Dropdown'
-import { Loading } from '../../Components/Loading'
-import { Mark } from '../../Components/Mark'
-import { SubjectName } from '../../Components/SubjectName'
-import { UpdateDate } from '../../Components/UpdateDate'
+import Mark from '../../Components/Mark'
+import { ModalAlert } from '../../Components/Modal'
+import SubjectName from '../../Components/SubjectName'
+import UpdateDate from '../../Components/UpdateDate'
 import { styles } from '../../Setup/constants'
 import { SubjectPerformanceStores } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
@@ -21,8 +20,7 @@ import type {
 import { AddMarkForm } from './AddMarkForm'
 import { calculateMarks } from './calculateMarks'
 
-// TODO Move custom marks to store
-export const SubjectTotals = observer(function SubjectTotals({
+export default observer(function SubjectTotals({
 	route,
 }: StackScreenProps<TermNavigationParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
@@ -36,6 +34,7 @@ export const SubjectTotals = observer(function SubjectTotals({
 	})
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
+	const [attendance, setAttendance] = useState(false)
 	const [customMarks, setCustomMarks] = useState<Partial<MarkInfo>[]>([])
 	const marks = useMemo(
 		() =>
@@ -44,13 +43,14 @@ export const SubjectTotals = observer(function SubjectTotals({
 				totals: performance.result,
 				lessonsWithoutMark,
 				customMarks,
+				attendance: attendance,
 			}),
-		[customMarks, lessonsWithoutMark, performance.result]
+		[attendance, customMarks, lessonsWithoutMark, performance.result]
 	)
 
 	if (performance.fallback) return performance.fallback
 
-	if (!marks) return <Loading text="Подсчет оценок..." />
+	if (!marks) return <Text>Ошибка при подсчете оценок</Text>
 	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } = marks
 
 	return (
@@ -58,8 +58,15 @@ export const SubjectTotals = observer(function SubjectTotals({
 			<View
 				style={[
 					styles.stretch,
-					dropdownButtonStyle(),
-					{ padding: Spacings.s2 },
+					{
+						padding: Spacings.s2,
+						alignSelf: 'center',
+						width: '100%',
+						backgroundColor: Theme.colors.navigationBar,
+						borderBottomLeftRadius: Theme.roundness,
+						borderBottomRightRadius: Theme.roundness,
+						elevation: 2,
+					},
 				]}
 			>
 				<SubjectName
@@ -68,6 +75,7 @@ export const SubjectTotals = observer(function SubjectTotals({
 					iconsSize={18}
 					style={{
 						fontSize: 20,
+						maxWidth: '70%',
 						fontWeight: 'bold',
 						margin: Spacings.s1,
 					}}
@@ -81,15 +89,25 @@ export const SubjectTotals = observer(function SubjectTotals({
 				/>
 			</View>
 			<ScrollView refreshControl={performance.refreshControl}>
-				<View style={{ padding: Spacings.s1 }}>
+				<View style={{ padding: Spacings.s2, flex: 1, flexDirection: 'row' }}>
 					<Chip
 						mode="outlined"
-						selected={!lessonsWithoutMark}
+						selected={attendance}
+						onPress={() => {
+							setAttendance(!attendance)
+						}}
+					>
+						Посещаемость
+					</Chip>
+					<Chip
+						style={{ marginLeft: Spacings.s2 }}
+						mode="outlined"
+						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
 						}}
 					>
-						Только оценки
+						Уроки без оценок
 					</Chip>
 				</View>
 				<Surface elevation={1}>
@@ -102,15 +120,24 @@ export const SubjectTotals = observer(function SubjectTotals({
 						/>
 					))}
 				</Surface>
-				<AddMarkForm
-					setCustomMarks={setCustomMarks}
-					customMarks={customMarks}
-				/>
+				<Surface
+					elevation={1}
+					style={{
+						padding: Spacings.s1,
+						margin: Spacings.s2,
+						borderRadius: Theme.roundness * 2,
+					}}
+				>
+					<AddMarkForm
+						setCustomMarks={setCustomMarks}
+						customMarks={customMarks}
+					/>
+				</Surface>
 				<Surface
 					elevation={1}
 					style={{
 						padding: Spacings.s2,
-						margin: Spacings.s2,
+						marginHorizontal: Spacings.s2,
 						borderRadius: Theme.roundness * 2,
 					}}
 				>
@@ -151,7 +178,6 @@ const MarkRow = observer(function MarkRow({
 }) {
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
-	// TODO Use placeholder if not loaded
 	return (
 		<View style={[styles.stretch, { padding: Spacings.s2 }]}>
 			<Mark
@@ -170,8 +196,7 @@ const MarkRow = observer(function MarkRow({
 				}}
 				textStyle={{ fontSize: 17 }}
 				onPress={() => {
-					// TODO Use modal
-					Alert.alert(
+					ModalAlert.show(
 						(mark.assignmentTypeName ?? '') +
 							' ' +
 							(mark.result ?? 'Оценки нет'),
@@ -187,7 +212,7 @@ const MarkRow = observer(function MarkRow({
 					)
 				}}
 			/>
-			<Text>{mark.assignmentTypeName}</Text>
+			<Text style={{ maxWidth: '70%' }}>{mark.assignmentTypeName}</Text>
 
 			<Text>{date && new Date(date).toLocaleDateString()}</Text>
 		</View>

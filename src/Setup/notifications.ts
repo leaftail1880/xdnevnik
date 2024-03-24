@@ -4,8 +4,14 @@ import notifee, {
 	AuthorizationStatus,
 } from '@notifee/react-native'
 import * as Device from 'expo-device'
-import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Alert } from 'react-native'
+import {
+	ObservableSet,
+	autorun,
+	makeAutoObservable,
+	runInAction,
+	toJS,
+} from 'mobx'
+import { Toast } from '../Components/Modal'
 import { getSubjectName } from '../Components/SubjectName'
 import { Lesson, LessonState } from '../NetSchool/classes'
 import { DiaryStore, HomeworkMarksStore } from '../Stores/NetSchool'
@@ -51,7 +57,7 @@ async function notificationSetup(enabled: boolean) {
 	const marksChannelId = await notifee.createChannel({
 		id: 'marks',
 		name: 'Новые оценки',
-		importance: AndroidImportance.HIGH,
+		importance: AndroidImportance.DEFAULT,
 		visibility: AndroidVisibility.PUBLIC,
 		description: 'Уведомления о новых оценках',
 	})
@@ -73,7 +79,7 @@ async function notificationSetup(enabled: boolean) {
 			return
 		}
 	} else {
-		Alert.alert('Уведомления недоступны вне устройства')
+		Toast.show({ title: 'Уведомления недоступны вне устройства', error: true })
 		Settings.save({ lessonNotifications: false })
 		return
 	}
@@ -89,7 +95,7 @@ let fetchMarksInterval: ReturnType<typeof setBackgroundInterval>
 
 autorun(function fetchMarks() {
 	if (fetchMarksInterval) clearBackgroundInterval(fetchMarksInterval)
-	if (!Settings.lessonNotifications || !Notification.marksChannelId) {
+	if (!Settings.marksNotifications || !Notification.marksChannelId) {
 		return
 	}
 
@@ -107,7 +113,7 @@ autorun(function fetchMarks() {
 })
 
 const marksValueStore = new (class {
-	notified = new Set<string>()
+	notified = new ObservableSet<string>()
 	constructor() {
 		makeAutoObservable(this)
 	}
@@ -128,8 +134,14 @@ autorun(function newMarksCheck() {
 				marksValueStore.notified.add(assignment.assignmentId + '')
 			})
 			notifee.displayNotification({
-				title: `${assignment.result} - ${getSubjectName(assignment)}`,
-				subtitle: `Веc: ${assignment.weight}, ${assignment.assignmentTypeName}`,
+				title: `${assignment.result} - ${getSubjectName(assignment)}, ${
+					assignment.assignmentTypeAbbr
+				}, Веc: ${assignment.weight}`,
+				body: `${assignment.assignmentName}`,
+				android: {
+					channelId: Notification.marksChannelId,
+					smallIcon: 'notification_icon',
+				},
 			})
 		}
 	}
@@ -215,6 +227,7 @@ autorun(function notificationFromDiary() {
 						android: {
 							channelId: Notification.lessonChannelId,
 							ongoing: true,
+							smallIcon: 'notification_icon',
 
 							// only alert when lesson notification
 							onlyAlertOnce: Notification.currentLesson === uuid,
