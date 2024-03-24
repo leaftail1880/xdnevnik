@@ -61,7 +61,7 @@ const Config = {
 			policy: 'appVersion',
 		},
 		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
+			'expo-dev-client',
 			sentryPlugin,
 			'expo-updates',
 			'expo-build-properties',
@@ -78,13 +78,13 @@ const Config = {
 	},
 }
 
-Config.expo = withBuildProperties(Config.expo, {
-	android: {
-		enableProguardInReleaseBuilds: true,
-		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true,
-	},
-})
+// Config.expo = withBuildProperties(Config.expo, {
+// 	android: {
+// 		enableProguardInReleaseBuilds: true,
+// 		enableShrinkResourcesInReleaseBuilds: true,
+// 		useLegacyPackaging: true,
+// 	},
+// })
 
 // Archs armeabi-v7a arm64-v8a x86 x86_64
 

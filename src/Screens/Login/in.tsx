@@ -3,10 +3,10 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 import { BackHandler, RefreshControl, ScrollView, View } from 'react-native'
 import { Appbar, Button } from 'react-native-paper'
-import Toast from 'react-native-toast-message'
 import WebView from 'react-native-webview'
 import Header from '../../Components/Header'
 import Loading from '../../Components/Loading'
+import { Toast } from '../../Components/Modal'
 import { API, NetSchoolApi } from '../../NetSchool/api'
 import { ROUTES } from '../../NetSchool/routes'
 import { Logger } from '../../Setup/constants'
@@ -38,7 +38,7 @@ const EndpointsStore = new AsyncStore(
 
 export default observer(function LoginScreen() {
 	Theme.key
-	
+
 	return (
 		<View
 			style={{
@@ -144,13 +144,13 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 								try {
 									await API.getToken(ROUTES.getTokenTemplate(pincode))
 
-									Toast.show({ text1: 'Успешная авторизация!' })
+									Toast.show({ title: 'Успешная авторизация!' })
 								} catch (e) {
 									Logger.error(e)
 									Toast.show({
-										text1: 'Не удалось получить токен авторизации',
-										text2: e + '',
-										type: 'error',
+										title: 'Не удалось получить токен авторизации',
+										body: e + '',
+										error: true,
 									})
 								} finally {
 									runInAction(() => (LoginStore.loggingIn = false))
@@ -159,10 +159,9 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 							return false
 						} else {
 							Toast.show({
-								text1: 'Код не получен!',
-								text2:
-									'Такое иногда происходит в конце четвертей, когда журнал перегружен. Попробуйте снова',
-								type: 'error',
+								title: 'Код не получен!',
+								body: 'Такое иногда происходит в конце четвертей, когда журнал перегружен. Попробуйте снова',
+								error: true,
 							})
 							runInAction(() => (LoginStore.regionName = ''))
 
