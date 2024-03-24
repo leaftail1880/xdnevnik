@@ -64,7 +64,7 @@ const Config = {
 			policy: 'appVersion',
 		},
 		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
+			'expo-dev-client',
 			'expo-updates',
 			sentryPlugin,
 			'expo-build-properties',
@@ -76,13 +76,13 @@ const Config = {
 	},
 }
 
-Config.expo = withBuildProperties(Config.expo, {
-	android: {
-		enableProguardInReleaseBuilds: true,
-		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true,
-	},
-})
+// Config.expo = withBuildProperties(Config.expo, {
+// 	android: {
+// 		enableProguardInReleaseBuilds: true,
+// 		enableShrinkResourcesInReleaseBuilds: true,
+// 		useLegacyPackaging: true,
+// 	},
+// })
 
 Config.expo = withGradleProperties(Config.expo, config => {
 	config.modResults.push(
