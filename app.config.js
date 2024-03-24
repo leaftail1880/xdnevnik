@@ -1,5 +1,4 @@
 // @ts-check
-import withBuildProperties from 'expo-build-properties'
 import {
 	AndroidConfig,
 	withAndroidColorsNight,
@@ -40,7 +39,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.14.8',
+		version: '0.14.9',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -68,7 +67,7 @@ const Config = {
 		},
 
 		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
+			'expo-dev-client',
 			'expo-updates',
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
@@ -96,15 +95,13 @@ const Config = {
 	},
 }
 
-Config.expo.plugins = Config.expo.plugins?.filter(Boolean)
-
-Config.expo = withBuildProperties(Config.expo, {
-	android: {
-		enableProguardInReleaseBuilds: true,
-		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true,
-	},
-})
+// Config.expo = withBuildProperties(Config.expo, {
+// 	android: {
+// 		enableProguardInReleaseBuilds: true,
+// 		enableShrinkResourcesInReleaseBuilds: true,
+// 		useLegacyPackaging: true,
+// 	},
+// })
 
 Config.expo = withGradleProperties(Config.expo, config => {
 	config.modResults.push(
