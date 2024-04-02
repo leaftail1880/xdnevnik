@@ -3,12 +3,12 @@ import { createStackNavigator } from '@react-navigation/stack'
 export const SETTINGS_ROUTES = {
 	main: 'Настройки ',
 	update: 'Обновления',
-	colors: 'Тема, акцент и другой внешний вид',
+	colors: 'Тема',
 	privacy: 'Политика конфиденциальности',
 	terms: 'Правила и Условия пользования',
 	notifs: 'Уведомления',
 	advanced: 'Расширенные',
-	about: 'О приложении',
+	support: 'Поддержка',
 }
 
 export type SettingsRoutes = Record<keyof typeof SETTINGS_ROUTES, undefined>

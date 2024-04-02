@@ -1,12 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import { autorun, makeAutoObservable, runInAction } from 'mobx'
+import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Education } from '../../NetSchool/classes'
 import { LANG } from '../../Setup/constants'
-import {
-	EducationStore,
-	SubjectsStore,
-	TotalsStore,
-} from '../../Stores/NetSchool'
+import { EducationStore } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
 
 export const S_SUBJECT_TOTALS = LANG['s_subject_totals']
@@ -31,8 +27,8 @@ export const TotalsStateStore = new (class {
 			const { studentId } = Settings
 			EducationStore.withParams({ studentId })
 
+			const education = EducationStore.result
 			runInAction(() => {
-				const education = EducationStore.result
 				if (education) {
 					this.years = education
 						.filter(e => !e.isAddSchool)
@@ -40,24 +36,19 @@ export const TotalsStateStore = new (class {
 							const start = new Date(e.schoolyear.startDate).getFullYear()
 							const end = new Date(e.schoolyear.endDate).getFullYear()
 							const label = `${start}/${end}`
-							return { label, value: e.schoolyear.id + '', year: e.schoolyear }
+							return {
+								label,
+								value: e.schoolyear.id + '',
+								year: e.schoolyear,
+							}
 						})
 					if (!this.schoolYear) {
-						this.schoolYear =
+						this.schoolYear = toJS(
 							education.find(e => !e.isAddSchool)?.schoolyear || null
+						)
 					}
 				}
 			})
-
-			if (this.schoolYear) {
-				const schoolYearId = this.schoolYear.id
-
-				SubjectsStore.withParams({ studentId, schoolYearId })
-				TotalsStore.withParams({
-					schoolYearId,
-					studentId,
-				})
-			}
 		})
 	}
 })()

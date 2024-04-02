@@ -141,6 +141,9 @@ autorun(function newMarksCheck() {
 				android: {
 					channelId: Notification.marksChannelId,
 					smallIcon: 'notification_icon',
+					pressAction: {
+						id: 'default',
+					},
 				},
 			})
 		}
@@ -239,6 +242,9 @@ autorun(function notificationFromDiary() {
 											max: 100,
 									  }
 									: void 0,
+							pressAction: {
+								id: 'default',
+							},
 						},
 						ios: {},
 					})

@@ -1,14 +1,9 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { memo } from 'react'
+import { Suspense, lazy } from 'react'
 import { Appearance, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
-import ColorPicker, {
-	HueSlider,
-	Preview,
-	SaturationSlider,
-	Swatches,
-} from 'reanimated-color-picker'
+import Loading from '../../Components/Loading'
 import { ModalAlert, Toast } from '../../Components/Modal'
 import SelectModal from '../../Components/SelectModal'
 import { styles } from '../../Setup/constants'
@@ -87,7 +82,9 @@ export default observer(function AppearanceSettings_() {
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />
 
-			<AccentColorPicker />
+			<Suspense fallback={<Loading />}>
+				<AsyncAccentColorPicker />
+			</Suspense>
 			<Divider style={{ margin: Spacings.s1 }} />
 			{/* {__DEV__ && <DevSettings />} */}
 		</ScrollView>
@@ -167,34 +164,6 @@ const ThemePreview = observer(function ThemePreview() {
 	)
 })
 
-const AccentColorPicker = observer(function AccentColorPicker() {
-	const meta = ThemeStore.meta(Theme)
-	return (
-		<List.Section title="Акценты">
-			<List.Item title="Цвет акцентов"></List.Item>
-			<ColorPicker
-				style={{ width: '90%', alignSelf: 'center' }}
-				value={meta.accentColor}
-				onComplete={color => Theme.setAccentColor(color.hex)}
-			>
-				<ColorPickerPanel />
-				<Swatches colors={meta.accentColors} />
-			</ColorPicker>
-			<List.Item
-				title={'Очистить использованные цвета'}
-				onPress={meta.clearAccentColors}
-				left={props => <List.Icon icon="delete" {...props}></List.Icon>}
-			></List.Item>
-		</List.Section>
-	)
-})
-// eslint-disable-next-line mobx/missing-observer
-const ColorPickerPanel = memo(function ColorPickerPanel() {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	return [Preview, HueSlider, SaturationSlider].map((Element, i) => (
-		<View key={i.toString()}>
-			<Element />
-			<Divider style={{ margin: 8 }} />
-		</View>
-	))
-})
+const AsyncAccentColorPicker = lazy(() => import('./AccentColorPicker'))
+
+

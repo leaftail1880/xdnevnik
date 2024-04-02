@@ -37,9 +37,6 @@ setTimeout(() => {
 			ROUTES.refreshTokenTemplate(API.session.refresh_token),
 			'Ошибка при авторизации, перезайдите.'
 		)
-			.then(() => {
-				Toast.show({ title: 'Вы авторизовались', timeout: 3000 })
-			})
 			.catch(e => {
 				Toast.show({ title: RequestError.stringify(e), error: true })
 			})

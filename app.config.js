@@ -3,6 +3,7 @@ import withBuildProperties from 'expo-build-properties'
 import {
 	AndroidConfig,
 	withAndroidColorsNight,
+	withAndroidStyles,
 	withGradleProperties,
 } from 'expo/config-plugins'
 
@@ -137,5 +138,20 @@ Config.expo = withAndroidColorsNight(Config.expo, async config => {
 	})
 	return config
 })
+
+// Make dark theme properly work on Xiaomi devices
+Config.expo = withAndroidStyles(Config.expo, config => {
+	config.modResults = AndroidConfig.Styles.assignStylesValue(
+		config.modResults,
+		{
+			add: true,
+			parent: AndroidConfig.Styles.getAppThemeLightNoActionBarGroup(),
+			name: `android:forceDarkAllowed`,
+			value: 'false',
+		}
+	)
+	return config
+})
+
 
 export default Config

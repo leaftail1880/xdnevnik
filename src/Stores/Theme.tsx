@@ -134,7 +134,7 @@ export class ThemeStore {
 			type: dark ? 'dark' : 'light',
 		})
 
-		const card = colors.elevation.level3
+		const card = colors.elevation.level2
 
 		return {
 			...navigation,

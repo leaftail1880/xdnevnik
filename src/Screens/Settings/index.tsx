@@ -1,20 +1,22 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Loading from '../../Components/Loading'
 import { API } from '../../NetSchool/api'
 import { Settings } from '../../Stores/Settings'
 import { Theme } from '../../Stores/Theme'
 import { SettingsJumpNavigation } from './Components/Navigate'
 
-import About from './About'
 import Advanced from './Advanced'
 import Appearance from './Appearance'
 import Notifications from './Notifications'
 import PrivacyPolicy from './Policy/PrivacyPolicy'
 import TermsAndConditions from './Policy/TermsAndConditions'
-import UpdatesScreen from './Update'
+import Support from './Support'
+import UpdatesScreen, { getUpdateIdShort } from './Update'
 
+import * as Application from 'expo-application'
+import { HelperText } from 'react-native-paper'
 import SelectModal from '../../Components/SelectModal'
 import { StudentsStore } from '../../Stores/NetSchool'
 import {
@@ -38,7 +40,7 @@ export default observer(function SettingsScreen() {
 			<SettingsNavigation.Screen name="colors" component={Appearance} />
 			<SettingsNavigation.Screen name="update" component={UpdatesScreen} />
 			<SettingsNavigation.Screen name="advanced" component={Advanced} />
-			<SettingsNavigation.Screen name="about" component={About} />
+			<SettingsNavigation.Screen name="support" component={Support} />
 
 			<SettingsNavigation.Screen name="privacy" component={PrivacyPolicy} />
 			<SettingsNavigation.Screen name="terms" component={TermsAndConditions} />
@@ -54,16 +56,44 @@ const MainSettings = observer(function MainSettings(
 		<ScrollView
 			contentContainerStyle={{
 				flex: 1,
-				alignContent: 'flex-start',
-				justifyContent: 'flex-start',
 			}}
 		>
 			<SelectStudent />
-			<SettingsJumpNavigation navigation={props} target={'notifs'} />
-			<SettingsJumpNavigation navigation={props} target={'colors'} />
-			<SettingsJumpNavigation navigation={props} target={'update'} />
-			<SettingsJumpNavigation navigation={props} target={'advanced'} />
-			<SettingsJumpNavigation navigation={props} target={'about'} />
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'notifs'}
+				description="О текущих уроках"
+			/>
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'colors'}
+				description="Цвет акцента и другой внешний вид"
+			/>
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'update'}
+				description="Обновления приложения"
+			/>
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'advanced'}
+				description="Настройки для разработчиков"
+			/>
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'support'}
+				description={'Тех поддержка и юр. сведения'}
+			/>
+			<View
+				style={{
+					alignItems: 'center',
+				}}
+			>
+				<HelperText type="info">
+					{Application.applicationName} {Application.nativeApplicationVersion}{' '}
+					{getUpdateIdShort()}
+				</HelperText>
+			</View>
 		</ScrollView>
 	)
 })

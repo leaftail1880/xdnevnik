@@ -86,7 +86,7 @@ const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 
 			{DiaryState.showLessonTheme && (
 				<Text style={{ paddingBottom: Spacings.s1 }}>
-					{lesson.lessonTheme ?? 'Тема урока не указана'}
+					{lesson.lessonTheme ?? 'Темы нет'}
 				</Text>
 			)}
 

@@ -1,4 +1,4 @@
-import { runInAction } from 'mobx'
+import { runInAction, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { DataTable } from 'react-native-paper'
@@ -95,7 +95,9 @@ const SchoolYear = observer(function SchoolYear() {
 			label={'Год'}
 			value={schoolYear.id + ''}
 			data={TotalsStateStore.years}
-			onSelect={v => runInAction(() => (TotalsStateStore.schoolYear = v.year))}
+			onSelect={v =>
+				runInAction(() => (TotalsStateStore.schoolYear = toJS(v.year)))
+			}
 		/>
 	)
 })

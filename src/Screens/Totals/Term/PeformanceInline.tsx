@@ -17,7 +17,7 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 		e => e.term.id === props.selectedTerm.id
 	)
 
-	if (!term) return <Loading text="Загрузка четверти{dots}" />
+	if (!term) return false
 
 	const openDetails = () =>
 		props.navigation.navigate(LANG['s_subject_totals'], {
