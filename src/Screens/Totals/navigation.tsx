@@ -31,9 +31,9 @@ export const TotalsStateStore = new (class {
 			const { studentId } = Settings
 			EducationStore.withParams({ studentId })
 
-			const education = EducationStore.result
-			if (education) {
-				runInAction(() => {
+			runInAction(() => {
+				const education = EducationStore.result
+				if (education) {
 					this.years = education
 						.filter(e => !e.isAddSchool)
 						.map(e => {
@@ -46,8 +46,8 @@ export const TotalsStateStore = new (class {
 						this.schoolYear =
 							education.find(e => !e.isAddSchool)?.schoolyear || null
 					}
-				})
-			}
+				}
+			})
 
 			if (this.schoolYear) {
 				const schoolYearId = this.schoolYear.id
