@@ -1,5 +1,6 @@
+import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
 	ScrollView,
 	StyleProp,
@@ -20,22 +21,42 @@ import {
 import { Theme } from '../Stores/Theme'
 import { Spacings } from '../utils/Spacings'
 
-export default observer(function SelectModal<
-	T extends string | null | undefined,
-	D extends { value: T; label: string }
->(props: {
-	label: string
+class Store {
+	constructor() {
+		makeAutoObservable(this, {}, { autoBind: true })
+	}
+
+	visible = false
+
+	toggleVisibility() {
+		this.visible = !this.visible
+	}
+}
+
+type Item<T extends string> = {
 	value: T
-	data: D[]
-	onSelect: (v: D) => void
+	label: string
+}
+
+type Props<V extends string = string, I extends Item<V> = Item<V>> = {
+	label: string
+	value: V
+	data: I[]
+	onSelect: (v: I) => void
 	mode?: 'button' | 'list.item' | 'chip'
 	style?: StyleProp<ViewStyle>
 	description?: string
-}) {
+}
+
+export default observer(function SelectModal<
+	V extends string,
+	I extends Item<V>
+>(props: Props<V, I>) {
 	Theme.key
-	const [visible, setVisible] = useState(false)
+	const [store] = useState(() => new Store())
 	const value =
 		props.data.find(e => e.value === props.value)?.label ?? 'Выбери...'
+
 	let label = props.label
 	if (label !== '') label += ': '
 
@@ -43,7 +64,7 @@ export default observer(function SelectModal<
 		<>
 			{props.mode === 'button' ? (
 				<Button
-					onPress={() => setVisible(!visible)}
+					onPress={store.toggleVisibility}
 					style={[
 						{
 							borderTopLeftRadius: 0,
@@ -61,7 +82,7 @@ export default observer(function SelectModal<
 				<Chip
 					style={props.style}
 					textStyle={Theme.fonts.bodySmall}
-					onPress={() => setVisible(!visible)}
+					onPress={store.toggleVisibility}
 				>
 					{(label + value).slice(0, 16)}
 				</Chip>
@@ -70,38 +91,60 @@ export default observer(function SelectModal<
 					style={props.style}
 					title={props.label}
 					description={value}
-					onPress={() => setVisible(!visible)}
+					onPress={store.toggleVisibility}
 				></List.Item>
 			)}
-			<Portal>
-				<Dialog onDismiss={() => setVisible(!visible)} visible={visible}>
-					<Dialog.Title>{props.label}</Dialog.Title>
-					<ScrollView>
-						{props.data.map(item => (
-							<TouchableRipple
-								onPress={() => props.onSelect(item)}
-								key={item.value}
-							>
-								<View style={styles.row}>
-									<View pointerEvents="none">
-										<RadioButton
-											value="normal"
-											status={
-												item.value === props.value ? 'checked' : 'unchecked'
-											}
-										/>
-									</View>
-									<Text style={styles.text}>{item.label}</Text>
-								</View>
-							</TouchableRipple>
-						))}
-					</ScrollView>
-					<Dialog.Actions>
-						<Button onPress={() => setVisible(!visible)}>Свернуть</Button>
-					</Dialog.Actions>
-				</Dialog>
-			</Portal>
+			<Modal {...props} store={store} />
 		</>
+	)
+})
+
+const Modal = observer(function Modal(props: Props & { store: Store }) {
+	return (
+		<Portal>
+			<Dialog
+				onDismiss={props.store.toggleVisibility}
+				visible={props.store.visible}
+			>
+				<Dialog.Title>{props.label}</Dialog.Title>
+				<ScrollView>
+					{props.data.map(item => (
+						<Option {...props} item={item} key={item.value} />
+					))}
+				</ScrollView>
+				<Dialog.Actions>
+					<Button onPress={props.store.toggleVisibility}>Свернуть</Button>
+				</Dialog.Actions>
+			</Dialog>
+		</Portal>
+	)
+})
+
+const Option = observer(function Option<T extends string = string>(
+	props: Props<T> & {
+		item: Item<T>
+		store: Store
+	}
+) {
+	Theme.key
+	const { item, onSelect, store } = props
+	const onPress = useCallback(() => {
+		onSelect(item)
+		store.toggleVisibility()
+	}, [item, onSelect, store])
+
+	return (
+		<TouchableRipple onPress={onPress}>
+			<View style={styles.row}>
+				<View pointerEvents="none">
+					<RadioButton
+						value="normal"
+						status={props.item.value === props.value ? 'checked' : 'unchecked'}
+					/>
+				</View>
+				<Text style={styles.text}>{props.item.label}</Text>
+			</View>
+		</TouchableRipple>
 	)
 })
 

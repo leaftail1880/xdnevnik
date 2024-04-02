@@ -74,6 +74,10 @@ const buildInfo = () =>
 			(Updates.updateId ?? 'По умолчанию')
 	)
 
+export function getUpdateIdShort() {
+	return Updates.updateId?.slice(-6)
+}
+
 // eslint-disable-next-line mobx/missing-observer
 const UpdateInfo = memo(function UpdateInfo() {
 	return (
@@ -85,7 +89,7 @@ const UpdateInfo = memo(function UpdateInfo() {
 			<Card.Content style={globalStyles.stretch}>
 				<Text>Сборка: </Text>
 				<Text variant="labelLarge" onPress={buildInfo}>
-					{Updates.updateId?.slice(-6) ?? 'По умолчанию'}
+					{getUpdateIdShort() ?? 'По умолчанию'}
 				</Text>
 			</Card.Content>
 		</Card>

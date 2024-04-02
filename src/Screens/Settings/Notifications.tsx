@@ -18,10 +18,14 @@ export default observer(function Notifications(
 					label={'Уведомления об уроках'}
 					setting="lessonNotifications"
 				/>
-				<SwitchSetting
+
+				{
+					// Bugged
+				}
+				{/* <SwitchSetting
 					label={'Уведомления об оценках'}
 					setting="marksNotifications"
-				/>
+				/> */}
 			</List.Section>
 		</ScrollView>
 	)

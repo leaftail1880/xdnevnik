@@ -1,8 +1,10 @@
 import { StackScreenProps } from '@react-navigation/stack'
+import { autorun } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { SubjectPerformance } from '../../NetSchool/classes'
+import { SubjectsStore, TotalsStore } from '../../Stores/NetSchool'
 import { Settings } from '../../Stores/Settings'
 import { Spacings } from '../../utils/Spacings'
 import SubjectTotals from '../SubjectTotals/index'
@@ -13,9 +15,27 @@ import {
 	S_TOTALS,
 	Stack,
 	TermNavigationParamMap,
+	TotalsStateStore,
 } from './navigation'
 
+let autorunStarted = false
+
 export default observer(function TotalsNavigation() {
+	
+	if (!autorunStarted) {
+		autorun(() => {
+			const { studentId } = Settings
+
+			if (TotalsStateStore.schoolYear && studentId) {
+				const schoolYearId = TotalsStateStore.schoolYear.id
+
+				SubjectsStore.withParams({ studentId, schoolYearId })
+				TotalsStore.withParams({ schoolYearId, studentId })
+			}
+		})
+		autorunStarted = true
+	}
+
 	return (
 		<Stack.Navigator
 			screenOptions={{

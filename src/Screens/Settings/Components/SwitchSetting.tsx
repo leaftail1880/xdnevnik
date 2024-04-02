@@ -1,7 +1,7 @@
-import { Observer } from 'mobx-react-lite'
+import { useCallback } from 'react'
+import { Falsy } from 'react-native'
 import { List, Switch } from 'react-native-paper'
 import { Settings } from '../../../Stores/Settings'
-import { Falsy } from 'react-native'
 
 type SwitchSettingProps = {
 	/**
@@ -20,37 +20,20 @@ type SwitchSettingProps = {
 
 // eslint-disable-next-line mobx/missing-observer
 export const SwitchSetting = function SwitchSetting(props: SwitchSettingProps) {
-	const onChange = () => {
+	const onChange = useCallback(() => {
 		if ('onChange' in props) {
 			props.onChange()
 		} else {
 			Settings.save({ [props.setting]: !Settings[props.setting] })
 		}
-	}
+	}, [props])
 
-	return (
-		<>
-			<List.Item
-				title={props.label}
-				onPress={onChange}
-				right={() => (
-					<Observer>
-						{
-							// eslint-disable-next-line mobx/missing-observer
-							function SwitchInternal() {
-								return (
-									<Switch
-										value={
-											'setting' in props ? Settings[props.setting] : props.value
-										}
-										onChange={onChange}
-									/>
-								)
-							}
-						}
-					</Observer>
-				)}
-			/>
-		</>
+	const value = 'setting' in props ? Settings[props.setting] : props.value
+
+	const right = useCallback(
+		() => <Switch value={value} onChange={onChange} />,
+		[value, onChange]
 	)
+
+	return <List.Item title={props.label} onPress={onChange} right={right} />
 }
