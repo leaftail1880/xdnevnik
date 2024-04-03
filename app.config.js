@@ -47,7 +47,12 @@ const Config = {
 		icon: './assets/icon.png',
 		assetBundlePatterns: ['**/*'],
 		userInterfaceStyle: 'automatic',
+		notification: {
+			icon: './assets/notification_icon.png',
+			color: splashBackgroundLight,
+		},
 
+		
 		ios: {
 			bundleIdentifier: id,
 			splash: splash,
