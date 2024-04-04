@@ -84,7 +84,7 @@ function Accordion(props: {
 			<div
 				className="ud-single-faq"
 				data-aos="fade-up"
-				data-aos-delay={props.i * 200 + 2000}
+				data-aos-delay={props.i * 200 + 100}
 			>
 				<div className="accordion">
 					<button
