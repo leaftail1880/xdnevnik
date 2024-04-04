@@ -18,6 +18,8 @@
 	--primary-color: #578059;
 	--white: #ffffff;
 	--whitegray: #f5fef3;
+	--box-shadow: rgba(0, 0, 0, 0.1);
+	--box-shadow-dark: rgba(0, 0, 0, 0.2);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -197,8 +199,8 @@ p {
 	height: 40px;
 	line-height: 40px;
 	background: var(--primary-color);
-	-webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0px 0px 5px var(--box-shadow-dark);
+	box-shadow: 0px 0px 5px var(--box-shadow-dark);
 	text-align: center;
 	-webkit-box-pack: center;
 	-ms-flex-pack: center;
@@ -236,8 +238,8 @@ p {
 	background-color: rgba(255, 255, 255, 0.8);
 	-webkit-backdrop-filter: blur(5px);
 	backdrop-filter: blur(5px);
-	-webkit-box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-	box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: inset 0 -1px 0 0 var(--box-shadow);
+	box-shadow: inset 0 -1px 0 0 var(--box-shadow);
 	-webkit-transition: all 0.3s ease-out 0s;
 	transition: all 0.3s ease-out 0s;
 }
@@ -310,8 +312,8 @@ p {
 		width: 100%;
 		background-color: var(--white);
 		z-index: 9;
-		-webkit-box-shadow: 0px 15px 20px 0px rgba(0, 0, 0, 0.1);
-		box-shadow: 0px 15px 20px 0px rgba(0, 0, 0, 0.1);
+		-webkit-box-shadow: 0px 15px 20px 0px var(--box-shadow);
+		box-shadow: 0px 15px 20px 0px var(--box-shadow);
 		padding: 0px;
 		display: none;
 		border-radius: 5px;
@@ -639,8 +641,8 @@ p {
 }
 
 .ud-hero-buttons .ud-white-btn:hover {
-	-webkit-box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
-	box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0px 0px 25px var(--box-shadow-dark);
+	box-shadow: 0px 0px 25px var(--box-shadow-dark);
 	background: var(--whitegray);
 	color: var(--primary-color);
 }
@@ -822,13 +824,14 @@ p {
 
 @media (max-width: 767px) {
 	.ud-about {
-		padding: 80px 0;
+		padding: 20px 0;
 	}
 }
 
 .ud-about-wrapper {
 	background: var(--white);
-	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 5px;
+	border: 1px solid transparent;
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
@@ -846,17 +849,18 @@ p {
 
 .ud-about-content-wrapper {
 	padding: 70px;
+	
 }
 
 @media (max-width: 767px) {
 	.ud-about-content-wrapper {
-		padding: 50px 30px;
+		padding: 25px 16px;
 	}
 }
 
 @media only screen and (min-width: 576px) and (max-width: 767px) {
 	.ud-about-content-wrapper {
-		padding: 50px;
+		padding: 25px;
 	}
 }
 
@@ -927,8 +931,8 @@ p {
 .ud-single-faq {
 	background: var(--white);
 	border: 1px solid var(--whitegray);
-	-webkit-box-shadow: 0px 20px 95px rgba(201, 203, 204, 0.3);
-	box-shadow: 0px 20px 95px rgba(201, 203, 204, 0.3);
+	-webkit-box-shadow: 0px 20px 95px rgba(201, 204, 202, 0.3);
+	box-shadow: 0px 20px 95px rgba(201, 204, 201, 0.3);
 	border-radius: 10px;
 	margin-bottom: 30px;
 }
@@ -975,7 +979,7 @@ p {
 	justify-content: center;
 	width: 42px;
 	height: 42px;
-	background: rgba(48, 86, 211, 0.06);
+	background: rgba(48, 211, 61, 0.06);
 	border-radius: 10px;
 	color: var(--primary-color);
 	margin-right: 24px;
@@ -991,13 +995,13 @@ p {
 }
 
 .ud-single-faq .ud-faq-body {
-	padding: 0px 30px 40px 95px;
+	padding: 0px 30px 40px 16px;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px),
 	(max-width: 767px) {
 	.ud-single-faq .ud-faq-body {
-		padding: 0px 16px 20px 82px;
+		padding: 0px 16px 20px 16px;
 	}
 }
 
@@ -1129,7 +1133,7 @@ p {
 
 .ud-footer-bottom {
 	padding: 35px 0;
-	border-top: 1px solid rgba(136, 144, 164, 0.43);
+	border-top: 1px solid rgba(136, 164, 142, 0.43);
 }
 
 .ud-footer-bottom .ud-footer-bottom-left {
@@ -1245,8 +1249,8 @@ p {
 	margin: 0px auto;
 	background: var(--white);
 	padding: 100px 60px;
-	-webkit-box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1);
-	box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0px 0px 25px var(--box-shadow);
+	box-shadow: 0px 0px 25px var(--box-shadow);
 	border-radius: 10px;
 	position: relative;
 	overflow: hidden;
@@ -1329,7 +1333,7 @@ p {
 	font-weight: 500;
 	padding: 12px 24px;
 	color: var(--heading-color);
-	background: rgba(48, 86, 211, 0.06);
+	background: rgba(48, 211, 83, 0.06);
 	border-radius: 5px;
 	margin: 5px 10px;
 }

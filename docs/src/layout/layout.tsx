@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { Outlet } from "react-router-dom";
-import NotFoundPage from "../sections/404";
-import Client from "../client";
+import NotFoundPage from '../sections/404'
 import Footer from "./footer";
 import HeadMeta from "./head-meta";
 import Header from "./header";
@@ -25,10 +24,9 @@ function Layout() {
 				<Header />
 				<Router />
 				<Footer />
-				<Client />
 			</ErrorBoundary>
 		</>
-	);
+	)
 }
 
 function Router() {

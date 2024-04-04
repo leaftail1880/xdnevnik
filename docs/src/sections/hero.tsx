@@ -1,6 +1,7 @@
 import dottedShape from "../../assets/images/hero/dotted-shape.svg";
 import hero from "../../assets/images/hero/hero-image.png";
 import { githubDownloadLatestApk } from "../constants";
+
 function Hero() {
 	return (
 		<section className="ud-hero" id="home">
