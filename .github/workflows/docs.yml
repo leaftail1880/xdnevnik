@@ -39,10 +39,10 @@ jobs:
           cache: yarn
 
       - name: 🏗 Install dependencies
-        run: yarn install
+        run: cd docs && yarn install
 
       - name: 📦 Build project
-        run: yarn build-docs
+        run: cd docs && yarn vite-react-ssg build
 
       - name: 📦 Setup Pages
         uses: actions/configure-pages@v4
