@@ -41,7 +41,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.15.0',
+		version: '0.15.1',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
