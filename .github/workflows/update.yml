@@ -1,4 +1,4 @@
-name: Build & Publish Expo Update
+name: Expo Update
 on: 
   push:
     branches:

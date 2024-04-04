@@ -1,4 +1,4 @@
-name: Build & Upload APK for Android
+name: Build APK for Android
 on:
   push:
     tags: '*'
