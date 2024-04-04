@@ -42,7 +42,7 @@ jobs:
         run: yarn install
 
       - name: 📦 Build project
-        run: yarn build
+        run: yarn build-docs
 
       - name: 📦 Setup Pages
         uses: actions/configure-pages@v4
