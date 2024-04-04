@@ -7,7 +7,7 @@ function About() {
 				<div
 					className="ud-about-wrapper"
 					data-aos="fade-up"
-					data-aos-delay="1000"
+					data-aos-delay="500"
 				>
 					<div className="ud-about-content-wrapper">
 						<div className="ud-about-content">
