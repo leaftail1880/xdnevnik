@@ -9,7 +9,10 @@
 		"build-dev-client": "eas build -p android --profile development",
 		"update": "eas update --channel production --auto",
 		"android": "expo run:android",
-		"ios": "expo run:ios"
+		"ios": "expo run:ios",
+		"docs": "cd docs && yarn vite-react-ssg dev",
+		"docs-build": "cd docs && yarn vite-react-ssg build",
+		"docs-preview": "cd docs && yarn vite preview"
 	},
 	"dependencies": {
 		"@material/material-color-utilities": "^0.2.7",
@@ -55,6 +58,7 @@
 		"@babel/plugin-transform-shorthand-properties": "^7.23.3",
 		"@babel/plugin-transform-template-literals": "^7.23.3",
 		"@types/color": "^3.0.6",
+		"@types/eslint": "^8.56.7",
 		"@types/lodash": "^4.14.202",
 		"@types/react": "~18.2.55",
 		"@types/react-native-background-timer": "^2.0.2",
@@ -75,5 +79,8 @@
 	"packageManager": "yarn@4.1.1",
 	"resolutions": {
 		"@react-native-community/cli-server-api@npm:12.3.2": "patch:@react-native-community/cli-server-api@npm%3A12.3.2#~/.yarn/patches/@react-native-community-cli-server-api-npm-12.3.0-7465574591.patch"
-	}
+	},
+	"workspaces": [
+		"docs/"
+	]
 }

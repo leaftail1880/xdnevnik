@@ -90,4 +90,5 @@ module.exports = {
 		],
 	},
 	root: true,
+	ignorePatterns: ['docs/*'],
 }

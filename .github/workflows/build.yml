@@ -62,9 +62,6 @@ jobs:
       - name: 🏗 Install sharp cli for image processing
         run: npm add -g sharp-cli
 
-      # - name: 🏗 Remove dev client
-      #   run: yarn remove expo-dev-client
-
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
@@ -80,9 +77,6 @@ jobs:
         with:
           name: XDnevnik.apk
           path: XDnevnik.apk
-
-      # - name: 🏗 Install expo-dev-client
-      #   run: yarn add expo-dev-client
 
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
