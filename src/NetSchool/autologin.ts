@@ -20,12 +20,14 @@ setTimeout(() => {
 
 		// Session is still active
 		if (API.session.expires.getTime() > Date.now()) {
-			Logger.debug(
-				'Session is still active, expires: ',
-				API.session.expires.toReadable(),
-				'now is',
-				new Date().toReadable()
-			)
+			if (!__DEV__)
+				Logger.debug(
+					'Session is still active, expires: ',
+					API.session.expires.toReadable(),
+					'now is',
+					new Date().toReadable(),
+				)
+
 			runInAction(() => {
 				API.authorized = true
 			})

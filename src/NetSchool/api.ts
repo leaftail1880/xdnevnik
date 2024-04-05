@@ -296,7 +296,8 @@ export class NetSchoolApi {
 						body: RequestError.stringify(error),
 					})
 				}
-				Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
+				if (!__DEV__)
+					Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(

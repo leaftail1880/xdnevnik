@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { List } from 'react-native-paper'
 import { Theme } from '../../Stores/Theme'
-import { SwitchSetting } from './Components/SwitchSetting'
+import SwitchSetting from './Components/SwitchSetting'
 import { SettingsRoutes } from './navigation'
 
 export default observer(function Notifications(

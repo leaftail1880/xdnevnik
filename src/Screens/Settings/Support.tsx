@@ -2,7 +2,6 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
 import { Linking, ScrollView, View } from 'react-native'
 import { Divider, List, Text } from 'react-native-paper'
-import { LANG } from '../../Setup/constants'
 import { Spacings } from '../../utils/Spacings'
 import { SettingsJumpNavigation } from './Components/Navigate'
 import { SettingsRoutes } from './navigation'
@@ -21,6 +20,15 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 				target={'terms'}
 				description={''}
 			/>
+
+			<List.Item
+				onPress={() => {
+					Linking.openURL('https://leaftail1880.github.io/xndevnik')
+				}}
+				title="Официальный сайт"
+				left={props => <List.Icon {...props} icon="web" />}
+			/>
+			<Divider />
 
 			<List.Item
 				onPress={() => {
@@ -52,7 +60,7 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 				<Text>Название: {Application.applicationName}</Text>
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
-				<Text>{LANG['made_by']}</Text>
+				<Text>Сделано с ❤️ Leaftail и Milk_Cool</Text>
 			</View>
 		</ScrollView>
 	)

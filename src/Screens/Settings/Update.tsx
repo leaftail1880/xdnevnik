@@ -9,7 +9,7 @@ import * as Updates from 'expo-updates'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import {
 	FlatList,
 	Linking,
@@ -46,22 +46,22 @@ const Filename = Platform.select({
 
 const minFeatureVersions = {
 	updatesScreen: [
-		'0.13.1',
+		'0.13.0',
 		'Старые обновления',
 		'В этой версии поддерживается обновление только до последней версии, вы не сможете выбрать версию из списка, как сейчас',
 	],
 	oldStorage: [
-		'0.12.0',
+		'0.11.6',
 		'Старое хранилище',
 		'В этой версии данные хранились по-другому, ваши настройки там не будут использованы. Но и удалены не будут.',
 	],
 	login: [
-		'0.0.6',
+		'0.0.5',
 		'Сломан вход',
 		'В этой версии сломан вход, придется перезаходить',
 	],
 	inAppUpdate: [
-		'0.0.1',
+		'0.0.0',
 		'Нет обновлений',
 		'В этой версии нет обновлений внутри приложения, вам нужно будет вручную скачать и установить новую версию',
 	],
@@ -71,7 +71,7 @@ const buildInfo = () =>
 	ModalAlert.show(
 		'Версия сборки',
 		'Некоторые баги не требуют обновления всего дневника, для них создается небольшая сборка которую приложение устанавливает при каждом запуске.\nПолная версия сборки: ' +
-			(Updates.updateId ?? 'По умолчанию')
+			(Updates.updateId ?? 'По умолчанию'),
 	)
 
 export function getUpdateIdShort() {
@@ -98,6 +98,14 @@ const UpdateInfo = memo(function UpdateInfo() {
 
 const styles = StyleSheet.create({
 	updatesCard: { margin: Spacings.s2, marginTop: Spacings.s3 },
+	row: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		flex: 1,
+	},
+	chip: {
+		marginRight: Spacings.s2,
+	},
 })
 
 // TODO Filter beta
@@ -134,7 +142,7 @@ const renderItem: ListRenderItem<GithubRelease> = props => (
 	<Release {...props} />
 )
 const Release: ListRenderItem<GithubRelease> = observer(function Release(
-	props: ListRenderItemInfo<GithubRelease>
+	props: ListRenderItemInfo<GithubRelease>,
 ) {
 	if (props.item.name === Application.nativeApplicationVersion) {
 		State.currentI = props.index
@@ -167,13 +175,7 @@ const Warnings = memo(function Warnings(props: { version: string }) {
 	const versionNum = semver.parse(props.version)
 
 	return (
-		<View
-			style={{
-				flexDirection: 'row',
-				flexWrap: 'wrap',
-				flex: 1,
-			}}
-		>
+		<View style={styles.row}>
 			{Object.entries(minFeatureVersions)
 				.filter(e => {
 					const compare = versionNum?.compare(e[1][0])
@@ -213,12 +215,14 @@ const ReleaseBody = memo(function ReleaseBody(props: { body: string }) {
 
 	let fullchangelog: { versions: string; link: string } | undefined
 	const footerR = body.match(
-		/(\*\*Full Changelog\*\*: (https:\/\/github\.com\/[^/]+\/[^/]+\/compare\/([\d.]+...[\d.]+)))/
+		/(\*\*Full Changelog\*\*: (https:\/\/github\.com\/[^/]+\/[^/]+\/compare\/([\d.]+...[\d.]+)))/,
 	)
 	if (footerR?.[1]) {
 		fullchangelog = { versions: footerR[3], link: footerR[2] }
 		body = body.replace(footerR[1], '')
 	}
+
+	body = body.replace(/\n\*\s/g, '\n- ')
 
 	return (
 		<Text variant="bodyMedium">
@@ -256,7 +260,7 @@ const State = new (class {
 		makeAutoObservable(
 			this,
 			{ downloader: false, currentI: false },
-			{ autoBind: true }
+			{ autoBind: true },
 		)
 		makeReloadPersistable(this, { name: 'updates', properties: ['files'] })
 	}
@@ -277,7 +281,6 @@ const Update = observer(function Update(props: {
 				{typeof progress?.bar !== 'undefined' && currentDownloading && (
 					<ProgressBar
 						progress={progress.bar}
-						color="white"
 						style={{ marginTop: Spacings.s2 }}
 					/>
 				)}
@@ -288,63 +291,59 @@ const Update = observer(function Update(props: {
 						Сейчас установлена
 					</Button>
 				)}
-				{
-					downloaded && (
-						<Button
-							mode="contained-tonal"
-							icon="delete"
-							onPress={() => {
-								// Finally bc if it fails to delete then there is no way to redownload it
-								FileSystem.deleteAsync(downloaded.uri).finally(() => {
-									runInAction(() => {
-										State.files = State.files.filter(
-											e => e.uri !== downloaded.uri
-										)
-									})
+				{downloaded && (
+					<Button
+						mode="contained-tonal"
+						icon="delete"
+						onPress={() => {
+							// Finally bc if it fails to delete then there is no way to redownload it
+							FileSystem.deleteAsync(downloaded.uri).finally(() => {
+								runInAction(() => {
+									State.files = State.files.filter(
+										e => e.uri !== downloaded.uri,
+									)
 								})
+							})
+						}}
+					>
+						Удалить
+					</Button>
+				)}
+				{progress && currentDownloading && !alreadyInstalled && (
+					<>
+						<Button
+							icon={'cancel'}
+							mode="contained-tonal"
+							style={styles.chip}
+							onPress={() => {
+								runInAction(() => {
+									State.progress = null
+								})
+								State.downloader?.cancelAsync()
+								delete State.downloader
 							}}
 						>
-							Удалить
+							Отменить
 						</Button>
-					)
-				}
-				{
-					progress && currentDownloading && !alreadyInstalled && (
-						<>
-							<Button
-								icon={'cancel'}
-								mode="contained-tonal"
-								style={{ marginRight: Spacings.s1 }}
-								onPress={() => {
-									runInAction(() => {
-										State.progress = null
-									})
-									State.downloader?.cancelAsync()
-									delete State.downloader
-								}}
-							>
-								Отменить
-							</Button>
-							<Button
-								icon={State.paused ? 'play' : 'pause'}
-								mode="contained-tonal"
-								onPress={() =>
-									runInAction(() => {
-										if (!State.paused) {
-											State.paused = true
-											State.downloader?.pauseAsync()
-										} else {
-											State.paused = false
-											performDownload()
-										}
-									})
-								}
-							>
-								{!State.paused ? 'Пауза' : 'Продолжить'}
-							</Button>
-						</>
-					)
-				}
+						<Button
+							icon={State.paused ? 'play' : 'pause'}
+							mode="contained-tonal"
+							onPress={() =>
+								runInAction(() => {
+									if (!State.paused) {
+										State.paused = true
+										State.downloader?.pauseAsync()
+									} else {
+										State.paused = false
+										performDownload()
+									}
+								})
+							}
+						>
+							{!State.paused ? 'Пауза' : 'Продолжить'}
+						</Button>
+					</>
+				)}
 				{progress && !currentDownloading && !alreadyInstalled && (
 					<Button
 						mode="contained-tonal"
@@ -374,21 +373,16 @@ const Update = observer(function Update(props: {
 		</>
 	)
 })
+const betaChipWarning = () =>
+	ModalAlert.show(
+		'Бета версия',
+		'Эта версия приложения может работать нестабильно, но содержит новые функции. Пробуйте на свой страх и риск.',
+	)
 
 // eslint-disable-next-line mobx/missing-observer
 const BetaChip = function BetaChip() {
 	return (
-		<Chip
-			style={{
-				marginRight: Spacings.s2,
-			}}
-			onPress={() =>
-				ModalAlert.show(
-					'Бета версия',
-					'Эта версия приложения может работать нестабильно, но содержит новые функции. Пробуйте на свой страх и риск.'
-				)
-			}
-		>
+		<Chip style={styles.chip} onPress={betaChipWarning}>
 			Бета
 		</Chip>
 	)
@@ -400,38 +394,36 @@ const FilesizeChip = memo(function FilesizeChip({
 }: {
 	size: number | undefined
 }) {
+	const onPress = useCallback(
+		() =>
+			ModalAlert.show(
+				size ? 'Вес файла' : 'Файла нет',
+				size
+					? 'Показывает, сколько весит .APK или .IPA файл. Не является тем же весом, что вы получите после установки.'
+					: 'После публикации обновления нужно время, чтобы оно было собрано и запакованно в файл. Сборка обычно занимает 6-7 минут. Наберитесь терпения, скоро он появится!',
+			),
+		[size],
+	)
+
 	return (
-		<Chip
-			style={{
-				marginRight: Spacings.s2,
-			}}
-			onPress={() =>
-				ModalAlert.show(
-					size ? 'Вес файла' : 'Файла нет',
-					size
-						? 'Показывает, сколько весит .APK или .IPA файл. Не является тем же весом, что вы получите после установки.'
-						: 'После публикации обновления нужно время, чтобы оно было собрано и запакованно в файл. Сборка обычно занимает 6-7 минут. Наберитесь терпения, скоро он появится!'
-				)
-			}
-		>
+		<Chip style={styles.chip} onPress={onPress}>
 			{size ? `${(size / 1024 / 1024).toFixed(2)}мб` : 'Файла нет'}
 		</Chip>
 	)
 })
+const newVersionChipModal = () =>
+	ModalAlert.show(
+		'Новая версия!',
+		'Обновитесь скорее, чтобы получить новые функции и фиксы багов!',
+	)
 
-// eslint-disable-next-line mobx/missing-observer
-function NewVersionChip() {
+const NewVersionChip = observer(function NewVersionChip() {
 	return (
 		<Chip
 			style={{
 				backgroundColor: Theme.colors.errorContainer,
 			}}
-			onPress={() =>
-				ModalAlert.show(
-					'Новая версия!',
-					'Обновитесь скорее, чтобы получить новые функции и фиксы багов!'
-				)
-			}
+			onPress={newVersionChipModal}
 		>
 			Новая версия
 			<View>
@@ -446,7 +438,7 @@ function NewVersionChip() {
 			</View>
 		</Chip>
 	)
-}
+})
 
 async function handleErrorsAndDisplayInModal(task: () => Promise<void>) {
 	try {

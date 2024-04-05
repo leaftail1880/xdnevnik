@@ -42,7 +42,7 @@ yarn install
 
 Start the development server:
 ```bash
-yarn dev
+yarn start
 ```
 
 Make changes, test them live

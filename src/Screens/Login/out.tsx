@@ -1,10 +1,9 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
 import Header from '../../Components/Header'
 import { API } from '../../NetSchool/api'
-import { LANG } from '../../Setup/constants'
 import { Theme } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 
@@ -18,7 +17,7 @@ export default observer(function LogoutScreen() {
 	return (
 		<View style={{ flex: 1, backgroundColor: Theme.colors.background }}>
 			<Header title="Выход"></Header>
-			<View style={{ alignContent: 'center', padding: Spacings.s3 }}>
+			<View style={styles.container}>
 				<Button
 					onPress={logout}
 					style={{
@@ -29,12 +28,18 @@ export default observer(function LogoutScreen() {
 						color: Theme.colors.onErrorContainer,
 					}}
 				>
-					{LANG['log_out']}
+					Выйти
 				</Button>
-				<Text style={{ alignSelf: 'center', marginTop: Spacings.s2 }}>
-					{LANG['log_out_info']}
+				<Text style={styles.subtitle}>
+					Если вы выйдете, то ваши логин и пароль будут удалены, и вы не сможете
+					входить автоматически. Также, вы не сможете получать уведомления.
 				</Text>
 			</View>
 		</View>
 	)
+})
+
+const styles = StyleSheet.create({
+	subtitle: { alignSelf: 'center', marginTop: Spacings.s2 },
+	container: { alignContent: 'center', padding: Spacings.s3 },
 })

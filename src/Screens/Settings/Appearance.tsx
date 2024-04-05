@@ -11,7 +11,7 @@ import { Settings } from '../../Stores/Settings'
 import { Theme, ThemeStore } from '../../Stores/Theme'
 import { Spacings } from '../../utils/Spacings'
 import NumberInputSetting from './Components/NumberInput'
-import { SwitchSetting } from './Components/SwitchSetting'
+import SwitchSetting from './Components/SwitchSetting'
 
 const themes = [
 	{ label: 'Системная', value: 'system' as const },

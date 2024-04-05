@@ -16,6 +16,7 @@ import Support from './Support'
 import UpdatesScreen, { getUpdateIdShort } from './Update'
 
 import * as Application from 'expo-application'
+import { memo } from 'react'
 import { HelperText } from 'react-native-paper'
 import SelectModal from '../../Components/SelectModal'
 import { StudentsStore } from '../../Stores/NetSchool'
@@ -30,9 +31,10 @@ export default observer(function SettingsScreen() {
 	return (
 		<SettingsNavigation.Navigator
 			initialRouteName="main"
-			screenOptions={a => {
-				return { title: SETTINGS_ROUTES[a.route.name] }
-			}}
+			screenOptions={a => ({
+				title: SETTINGS_ROUTES[a.route.name],
+				presentation: 'modal',
+			})}
 		>
 			<SettingsNavigation.Screen name="main" component={MainSettings} />
 
@@ -48,10 +50,10 @@ export default observer(function SettingsScreen() {
 	)
 })
 
-const MainSettings = observer(function MainSettings(
-	props: StackScreenProps<SettingsRoutes>
+// eslint-disable-next-line mobx/missing-observer
+const MainSettings = memo(function MainSettings(
+	props: StackScreenProps<SettingsRoutes>,
 ) {
-	Theme.key
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -67,7 +69,7 @@ const MainSettings = observer(function MainSettings(
 			<SettingsJumpNavigation
 				navigation={props}
 				target={'colors'}
-				description="Цвет акцента и другой внешний вид"
+				description="Тема, цвет акцента и т.д."
 			/>
 			<SettingsJumpNavigation
 				navigation={props}

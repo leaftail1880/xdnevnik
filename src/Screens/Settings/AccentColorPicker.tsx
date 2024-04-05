@@ -5,7 +5,6 @@ import { Divider, List } from 'react-native-paper'
 import ColorPicker, {
 	HueSlider,
 	Preview,
-	SaturationSlider,
 	Swatches,
 } from 'reanimated-color-picker'
 import { Theme, ThemeStore } from '../../Stores/Theme'
@@ -34,7 +33,7 @@ export default observer(function AccentColorPicker() {
 // eslint-disable-next-line mobx/missing-observer
 const ColorPickerPanel = memo(function ColorPickerPanel() {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	return [Preview, HueSlider, SaturationSlider].map((Element, i) => (
+	return [Preview, HueSlider].map((Element, i) => (
 		<View key={i.toString()}>
 			<Element />
 			<Divider style={{ margin: 8 }} />

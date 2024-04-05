@@ -1,11 +1,17 @@
 import { configure as configureMobx } from 'mobx'
 import { configurePersistable } from 'mobx-persist-store'
 import { StyleSheet } from 'react-native'
-import { logger, mapConsoleTransport } from 'react-native-logs'
+import { logger, mapConsoleTransport, sentryTransport } from 'react-native-logs'
 import { MMKV } from 'react-native-mmkv'
+
+import * as Sentry from '@sentry/react-native'
+
 export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
 	printLevel: false,
-	transport: mapConsoleTransport,
+	transport: __DEV__ ? mapConsoleTransport : sentryTransport,
+	transportOptions: {
+		SENTRY: Sentry,
+	},
 })
 
 configureMobx({
@@ -47,10 +53,6 @@ export const LANG = {
 		'Суббота',
 		'Воскресенье',
 	],
-	log_out: 'Выйти',
-	log_out_info:
-		'Если вы выйдете, то ваши логин и пароль будут удалены, и вы не сможете входить автоматически. Также, вы не сможете получать уведомления.',
-	made_by: 'Сделано с ❤️ Leaftail и Milk_Cool',
 	s_log_out: 'Выход',
 	s_log_in: 'Вход',
 	s_diary: 'Дневник',
@@ -58,5 +60,4 @@ export const LANG = {
 	s_totalsN: 'Оценки ',
 	s_settings: 'Настройки',
 	s_subject_totals: 'Итоги по предмету',
-	notification: 'Уведомления',
 } as const

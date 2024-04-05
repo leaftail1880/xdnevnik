@@ -50,8 +50,8 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 				<View style={styles.progressView}>
 					<ProgressBar
 						style={{
-							height: 15,
-							borderRadius: Theme.roundness / 2,
+							height: 10,
+							borderRadius: Theme.roundness,
 						}}
 						progress={progress / 100}
 					/>
