@@ -1,7 +1,7 @@
 # Diary for russian schools. 
 
 <a href="/releases">
-<img src="/docs/assets/images/logo.svg"/>
+<img src="/docs/assets/images/logo.svg" style="width: 40px;"/>
 
 <img src="https://img.shields.io/github/commits-since/leaftail1880/xdnevnik/latest?style=for-the-badge"/>
 <img src="https://img.shields.io/github/downloads/leaftail1880/xdnevnik/total?style=for-the-badge"/>
