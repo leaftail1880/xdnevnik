@@ -5,7 +5,7 @@
   </a>
   <h1 align="center">XDnevnik</h1>
   <h3 align="center">Alternative NetSchool Diary Mobile App</h3>
-  <a href="/releases">
+  <a href="https://github.com/leaftail1880/xdnevnik/releases">
     <img src="https://img.shields.io/github/downloads/leaftail1880/xdnevnik/total?style=for-the-badge"/>
     <img src="https://img.shields.io/github/commits-since/leaftail1880/xdnevnik/latest?style=for-the-badge"/>
     <img src="https://img.shields.io/github/actions/workflow/status/leaftail1880/xdnevnik/build.yml?style=for-the-badge"/>
