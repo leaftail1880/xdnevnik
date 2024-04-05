@@ -41,7 +41,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.15.1',
+		version: '0.15.2',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -52,7 +52,6 @@ const Config = {
 			color: splashBackgroundLight,
 		},
 
-		
 		ios: {
 			bundleIdentifier: id,
 			splash: splash,
