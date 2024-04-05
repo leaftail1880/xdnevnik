@@ -72,8 +72,7 @@ export class AsyncStore<
 		],
 		public debug = false
 	) {
-		// Initial run
-		this.log('API store created')
+		this.log('Store created')
 
 		makeAutoObservable<
 			this,
@@ -102,14 +101,13 @@ export class AsyncStore<
 				params: observable.struct,
 				withParams: action,
 				loading: true,
-				state: false,
 				log: false,
 				debug: false,
 				name: false,
 				method: false,
 				API: false,
 			},
-			{ autoBind: true, name: this.name }
+			{ autoBind: true, name: this.name },
 		)
 
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -127,13 +125,13 @@ export class AsyncStore<
 	}
 
 	private log(...data: unknown[]) {
-		if (this.debug)
+		if (this.debug) {
 			Logger.debug('\u001b[36mДля ' + this.name + '\u001b[0m', ...data)
+		}
 	}
 
 	private reload() {
-		this.log('RELOADING')
-		if (!this.params) return
+		this.log('Reloading')
 		this.reloadTimes++
 		this.update(this.params)
 	}
@@ -179,11 +177,6 @@ export class AsyncStore<
 		this.params = params
 	}
 
-	state(): AsyncState<FnReturn> {
-		// @ts-expect-error Uh huh
-		return this
-	}
-
 	private *update(params: FnParams | undefined) {
 		this.log(
 			'Request update, params:',
@@ -214,8 +207,6 @@ export class AsyncStore<
 		}
 		this.log('Params', params)
 
-		// Subscribe to reloads
-		this.reloadTimes
 		const deps = Object.values(params).concat(this.additionalDeps())
 		this.log('deps', deps)
 
