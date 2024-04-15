@@ -41,7 +41,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.15.4',
+		version: '0.15.5',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -72,9 +72,6 @@ const Config = {
 			},
 		},
 		
-    androidStatusBar: {
-      translucent: true
-    },
 		plugins: [
 			IS_DEV ? 'expo-dev-client' : '',
 			'expo-updates',
@@ -84,7 +81,7 @@ const Config = {
 				'expo-navigation-bar',
 				{
 					position: 'relative',
-					visibility: 'hidden',
+					visibility: 'visible',
 					behavior: 'inset-swipe',
 				},
 			],
