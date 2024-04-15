@@ -71,7 +71,10 @@ const Config = {
 				backgroundColor: splashBackgroundLight,
 			},
 		},
-
+		
+    androidStatusBar: {
+      translucent: true
+    },
 		plugins: [
 			IS_DEV ? 'expo-dev-client' : '',
 			'expo-updates',
