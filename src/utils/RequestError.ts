@@ -1,24 +1,25 @@
-export class RequestError extends Error implements RequestErrorOptions {
-	static reasons = {
-		noConnection: 'Нет сети.',
-		timeout:
-			'Долго нет ответа от сервера. Плохой интернет или сервер на техработах.',
-	} as const
+export interface RequestErrorOptions {
+	loggerIgnore?: boolean
+}
 
-	static stringify(
-		e: object
-	): string | (typeof this.reasons)[keyof typeof this.reasons] {
+export enum RequestErrorReason {
+	noConnection = 'Нет сети.',
+	timeout = 'Сервер не отвечает. Медленный интернет или сервер на техработах.',
+}
+
+export class RequestError extends Error implements RequestErrorOptions {
+	static stringify(e: object): string | RequestErrorReason {
 		let result: string
 
 		if (e instanceof Error) {
 			if (e.name === 'AbortError') {
-				result = this.reasons.timeout
+				result = RequestErrorReason.timeout
 			}
 		}
 
 		if (e instanceof TypeError) {
 			if (e.message.includes('Network request failed')) {
-				result = this.reasons.noConnection
+				result = RequestErrorReason.noConnection
 			}
 		}
 
@@ -34,8 +35,4 @@ export class RequestError extends Error implements RequestErrorOptions {
 		super(message)
 		Object.assign(this, options ?? {})
 	}
-}
-
-export interface RequestErrorOptions {
-	loggerIgnore?: boolean
 }

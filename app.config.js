@@ -41,7 +41,7 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.15.5',
+		version: '0.15.6',
 		owner: 'leaftail1880',
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -71,7 +71,7 @@ const Config = {
 				backgroundColor: splashBackgroundLight,
 			},
 		},
-		
+
 		plugins: [
 			IS_DEV ? 'expo-dev-client' : '',
 			'expo-updates',

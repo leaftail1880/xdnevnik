@@ -4,7 +4,7 @@ import {
 } from '@material/material-color-utilities'
 import camelCase from 'camelcase'
 import Color from 'color'
-import {
+import type {
 	MD3Colors,
 	MD3ElevationColors,
 } from 'react-native-paper/lib/typescript/types'

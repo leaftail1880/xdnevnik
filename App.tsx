@@ -1,16 +1,18 @@
-import './src/Setup/logbox'
+// Initial setup & polyfills & monitoring
+import './src/utils/polyfill'
 
-import './src/Setup/date'
-import './src/Setup/sentry'
+import './src/services/sentry'
 
-import { LANG } from './src/Setup/constants'
+import './src/utils/configure'
 
+import { LANG } from './src/constants'
+
+// External dependencies
 import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
 import * as Sentry from '@sentry/react-native'
-
 import { StatusBar } from 'expo-status-bar'
 import { makeAutoObservable, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -19,21 +21,27 @@ import { View } from 'react-native'
 import { Icon, PaperProvider } from 'react-native-paper'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import Header from './src/Components/Header'
-import Loading from './src/Components/Loading'
-import Toast from './src/Components/Modal'
-import { API } from './src/NetSchool/api'
-import DiaryScreen from './src/Screens/Diary/Screen'
-import LoginScreen from './src/Screens/Login/in'
-import LogoutScreen from './src/Screens/Login/out'
-import SettingsScreen from './src/Screens/Settings/index'
-import TotalsNavigation from './src/Screens/Totals/index'
-import { SENTRY_ROUTING } from './src/Setup/sentry'
-import { StudentsStore } from './src/Stores/NetSchool'
-import { Theme, ThemeStore } from './src/Stores/Theme'
 
-import './src/NetSchool/autologin'
-import './src/Setup/notifications'
+// Components
+import Header from './src/components/Header'
+import Loading from './src/components/Loading'
+import Toast from './src/components/Modal'
+
+// Services
+import { API } from './src/services/NetSchool/api'
+import './src/services/notifications/setup'
+import { SENTRY_ROUTING } from './src/services/sentry'
+
+// State
+import { Theme, ThemeStore } from './src/models/theme'
+import { StudentsStore } from './src/services/NetSchool/store'
+
+// Screens
+import DiaryScreen from './src/screens/day/screen'
+import LoginScreen from './src/screens/login/in'
+import LogoutScreen from './src/screens/login/out'
+import SettingsScreen from './src/screens/settings/screen'
+import TotalsNavigation from './src/screens/totals/screen'
 
 export type ParamListBase = Record<
 	(typeof LANG)[
@@ -84,7 +92,7 @@ export default Sentry.wrap(
 				</PaperProvider>
 			</SafeAreaProvider>
 		)
-	})
+	}),
 )
 
 // Show header when component's custom header is not rendered
@@ -98,8 +106,7 @@ function AppScreenFallback(props: { fallback: React.ReactNode }) {
 	)
 }
 
-
-const AppStore = new (class {
+const AppStore = new (class AppStore {
 	constructor() {
 		makeAutoObservable(this, { loadingTheme: false })
 	}

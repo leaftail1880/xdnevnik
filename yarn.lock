@@ -2698,6 +2698,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hh.ru/babel-plugin-react-displayname@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@hh.ru/babel-plugin-react-displayname@npm:1.1.1"
+  checksum: 10c0/e3f4a4a4e9f94e2ea1aa46dcb9189cfd84c500425172033cdf700062dd485400dc5fbe5703db28d5ac64f29740bec8e2d65a23193d45fe83151916b3330b25d4
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.13":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -7453,6 +7460,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-background-fetch@npm:~11.8.1":
+  version: 11.8.1
+  resolution: "expo-background-fetch@npm:11.8.1"
+  dependencies:
+    expo-task-manager: "npm:~11.7.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/4e4aa32b1b144fa9e22ae1259f9d657367e0cf8cb438d60158a47a5f8e4eb62ccb42a60a46eda6782b070455283d912b8ca8b3a9af40f4bba783a628c7342d81
+  languageName: node
+  linkType: hard
+
 "expo-build-properties@npm:~0.11.1":
   version: 0.11.1
   resolution: "expo-build-properties@npm:0.11.1"
@@ -7691,6 +7709,17 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10c0/145427e8c097db5d9735224eda9496aa1f9ac3d4ee081c44714272d4f29a27649c0dd3fccc0fc62063850b034e5dfcc0042a71ee4de0a3cebfacf68fbca567ae
+  languageName: node
+  linkType: hard
+
+"expo-task-manager@npm:~11.7.2, expo-task-manager@npm:~11.7.3":
+  version: 11.7.3
+  resolution: "expo-task-manager@npm:11.7.3"
+  dependencies:
+    unimodules-app-loader: "npm:~4.5.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/9dd3b70f6812757c7b80e4165d110e398d3689d2efea4774c3b3738870f8f275fce3b29dccf4b3888a3e17228744cc304b6f03a2d4540f7afad53a6b95226813
   languageName: node
   linkType: hard
 
@@ -12100,16 +12129,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-toast-message@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "react-native-toast-message@npm:2.2.0"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/02c2507efba0875a85cecde616e60144daea4ea6b9e7f153f23b3f513a8f3c6c90181ee2d10aeb8093605957ba5bd415c4fa3ae8ed06691810c2f4b9599ea0c8
-  languageName: node
-  linkType: hard
-
 "react-native-vector-icons@npm:^10.0.3":
   version: 10.0.3
   resolution: "react-native-vector-icons@npm:10.0.3"
@@ -14155,6 +14174,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unimodules-app-loader@npm:~4.5.0":
+  version: 4.5.1
+  resolution: "unimodules-app-loader@npm:4.5.1"
+  checksum: 10c0/f020dd3fc7992f33bfade2e1cd817b228398c890847a8ff4c8eba3f2f6352e9fc3bf47758fa6c86d27b29c16dd792bed6609909457d5bbab5b63ef077a51071b
+  languageName: node
+  linkType: hard
+
 "unique-filename@npm:^1.1.1":
   version: 1.1.1
   resolution: "unique-filename@npm:1.1.1"
@@ -14896,6 +14922,7 @@ __metadata:
     "@babel/plugin-transform-arrow-functions": "npm:^7.23.3"
     "@babel/plugin-transform-shorthand-properties": "npm:^7.23.3"
     "@babel/plugin-transform-template-literals": "npm:^7.23.3"
+    "@hh.ru/babel-plugin-react-displayname": "npm:^1.1.1"
     "@material/material-color-utilities": "npm:^0.2.7"
     "@notifee/react-native": "npm:^7.8.2"
     "@react-navigation/native": "npm:^6.1.9"
@@ -14919,6 +14946,7 @@ __metadata:
     eslint-plugin-react-native: "npm:^4.1.0"
     expo: "npm:^50.0.11"
     expo-application: "npm:~5.8.3"
+    expo-background-fetch: "npm:~11.8.1"
     expo-build-properties: "npm:~0.11.1"
     expo-dev-client: "npm:^3.3.9"
     expo-device: "npm:~5.9.3"
@@ -14928,6 +14956,7 @@ __metadata:
     expo-splash-screen: "npm:^0.26.4"
     expo-status-bar: "npm:~1.11.1"
     expo-system-ui: "npm:~2.9.3"
+    expo-task-manager: "npm:~11.7.3"
     expo-updates: "npm:~0.24.11"
     mobx: "npm:^6.12.0"
     mobx-persist-store: "npm:^1.1.3"
@@ -14942,7 +14971,6 @@ __metadata:
     react-native-reanimated: "npm:~3.6.2"
     react-native-safe-area-context: "npm:4.8.2"
     react-native-screens: "npm:~3.29.0"
-    react-native-toast-message: "npm:^2.2.0"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-webview: "npm:13.6.4"
     reanimated-color-picker: "npm:^3.0.3"
