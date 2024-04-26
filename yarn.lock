@@ -2698,13 +2698,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hh.ru/babel-plugin-react-displayname@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@hh.ru/babel-plugin-react-displayname@npm:1.1.1"
-  checksum: 10c0/e3f4a4a4e9f94e2ea1aa46dcb9189cfd84c500425172033cdf700062dd485400dc5fbe5703db28d5ac64f29740bec8e2d65a23193d45fe83151916b3330b25d4
-  languageName: node
-  linkType: hard
-
 "@humanwhocodes/config-array@npm:^0.11.13":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -14922,7 +14915,6 @@ __metadata:
     "@babel/plugin-transform-arrow-functions": "npm:^7.23.3"
     "@babel/plugin-transform-shorthand-properties": "npm:^7.23.3"
     "@babel/plugin-transform-template-literals": "npm:^7.23.3"
-    "@hh.ru/babel-plugin-react-displayname": "npm:^1.1.1"
     "@material/material-color-utilities": "npm:^0.2.7"
     "@notifee/react-native": "npm:^7.8.2"
     "@react-navigation/native": "npm:^6.1.9"
