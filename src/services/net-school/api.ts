@@ -443,16 +443,16 @@ export class NetSchoolApi {
 					(a, b) => parseInt(a.term.name) - parseInt(b.term.name),
 				)
 
-				if (total.termTotals.length < 4) {
-					total.termTotals.length = 4
-					for (const [i, term] of total.termTotals.entries()) {
-						total.termTotals[i] = term ?? {
-							avgMark: null,
-							mark: null,
-							term: { id: 0, name: '0' },
-						}
-					}
-				}
+				// if (total.termTotals.length < 4) {
+				// 	total.termTotals.length = 4
+				// 	for (const [i, term] of total.termTotals.entries()) {
+				// 		total.termTotals[i] = term ?? {
+				// 			avgMark: null,
+				// 			mark: null,
+				// 			term: { id: 0, name: '0' },
+				// 		}
+				// 	}
+				// }
 
 				const visitedIds = new Set<number>()
 				total.yearTotals = total.yearTotals.filter(e =>
