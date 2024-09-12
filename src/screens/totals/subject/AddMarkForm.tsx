@@ -2,9 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { Button, IconButton, TextInput } from 'react-native-paper'
+import { Theme } from '~models/theme'
+import type { PartialAssignment } from '~services/net-school/entities'
 import { styles } from '../../../constants'
-import { Theme } from '../../../models/theme'
-import type { PartialAssignment } from '../../../services/NetSchool/entities'
 import { Spacings } from '../../../utils/Spacings'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {

@@ -3,14 +3,14 @@ import notifee, {
 	AndroidVisibility,
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { getSubjectName } from '../../components/SubjectName'
-import { Settings } from '../../models/settings'
+import { getSubjectName } from '~components/SubjectName'
+import { Settings } from '~models/settings'
 import {
 	clearBackgroundInterval,
 	setBackgroundInterval,
 } from '../../utils/backgroundIntervals'
-import { Lesson, LessonState } from '../NetSchool/entities'
-import { DiaryStore } from '../NetSchool/store'
+import { Lesson, LessonState } from '../net-school/entities'
+import { DiaryStore } from '../net-school/store'
 
 export const NotificationStore = new (class {
 	constructor() {

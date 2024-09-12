@@ -2,8 +2,8 @@ import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { Theme } from '../models/theme'
-import { NetSchoolError } from '../services/NetSchool/api'
+import { Theme } from '~models/theme'
+import { NetSchoolError } from '~services/net-school/api'
 import { RequestError, RequestErrorReason } from '../utils/RequestError'
 
 interface ErrorHandlerProps {

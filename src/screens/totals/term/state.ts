@@ -1,10 +1,10 @@
 import { makeAutoObservable } from 'mobx'
-import { Settings } from '../../../models/settings'
-import { NSEntity, Subject, Total } from '../../../services/NetSchool/entities'
+import { Settings } from '~models/settings'
+import { NSEntity, Subject, Total } from '~services/net-school/entities'
 import {
 	SubjectPerformanceStores,
 	TotalsStore,
-} from '../../../services/NetSchool/store'
+} from '~services/net-school/store'
 import { TotalsScreenParams } from '../navigation'
 
 export const TermStore = new (class {

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Text } from 'react-native-paper'
-import { Theme } from '../models/theme'
+import { Theme } from '~models/theme'
 import { Spacings } from '../utils/Spacings'
 
 export default observer(function UpdateDate(props: {

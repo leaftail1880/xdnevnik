@@ -16,7 +16,12 @@
 
 		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true,
+		"paths": {
+			"~*": ["./*"]
+		},
+		"baseUrl": "./src"
 	},
 	"include": ["App.tsx", "src/*"],
 	"exclude": [

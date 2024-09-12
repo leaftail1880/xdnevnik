@@ -10,11 +10,11 @@ import {
 import * as TaskManager from 'expo-task-manager'
 import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { makePersistable } from 'mobx-persist-store'
-import { getSubjectName } from '../../components/SubjectName'
+import { getSubjectName } from '~components/SubjectName'
+import { Settings } from '~models/settings'
 import { Logger } from '../../constants'
-import { Settings } from '../../models/settings'
-import { API } from '../NetSchool/api'
-import { Assignment } from '../NetSchool/entities'
+import { API } from '../net-school/api'
+import { Assignment } from '../net-school/entities'
 
 const NotificationStore = new (class {
 	notified: string[] = []

@@ -2,9 +2,9 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import Header from '../../components/Header'
-import { Theme } from '../../models/theme'
-import { API } from '../../services/NetSchool/api'
+import Header from '~components/Header'
+import { Theme } from '~models/theme'
+import { API } from '~services/net-school/api'
 import { Spacings } from '../../utils/Spacings'
 
 function logout() {

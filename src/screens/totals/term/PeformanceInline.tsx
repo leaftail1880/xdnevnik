@@ -2,13 +2,13 @@ import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Surface } from 'react-native-paper'
 
-import Loading from '../../../components/Loading'
-import Mark from '../../../components/Mark'
-import SubjectName from '../../../components/SubjectName'
+import Loading from '~components/Loading'
+import Mark from '~components/Mark'
+import SubjectName from '~components/SubjectName'
 import SubjectMarksInline from './MarksInline'
 
+import { Theme } from '~models/theme'
 import { LANG } from '../../../constants'
-import { Theme } from '../../../models/theme'
 import { Spacings } from '../../../utils/Spacings'
 import { SubjectInfo } from './state'
 

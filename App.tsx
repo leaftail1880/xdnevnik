@@ -28,13 +28,13 @@ import Loading from './src/components/Loading'
 import Toast from './src/components/Modal'
 
 // Services
-import { API } from './src/services/NetSchool/api'
+import { API } from './src/services/net-school/api'
 import './src/services/notifications/setup'
 import { SENTRY_ROUTING } from './src/services/sentry'
 
 // State
 import { Theme, ThemeStore } from './src/models/theme'
-import { StudentsStore } from './src/services/NetSchool/store'
+import { StudentsStore } from './src/services/net-school/store'
 
 // Screens
 import DiaryScreen from './src/screens/day/screen'

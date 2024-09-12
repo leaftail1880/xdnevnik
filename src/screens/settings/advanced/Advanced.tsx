@@ -2,9 +2,9 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { List } from 'react-native-paper'
-import NumberInput from '../../../components/NumberInput'
-import { Theme } from '../../../models/theme'
-import { API } from '../../../services/NetSchool/api'
+import NumberInput from '~components/NumberInput'
+import { Theme } from '~models/theme'
+import { API } from '~services/net-school/api'
 
 export default observer(function Appearance() {
 	Theme.key

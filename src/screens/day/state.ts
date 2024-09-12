@@ -1,11 +1,11 @@
 import { autorun, makeAutoObservable } from 'mobx'
-import { LANG } from '../../constants'
-import { Settings } from '../../models/settings'
+import { Settings } from '~models/settings'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
 	DiaryStore,
-} from '../../services/NetSchool/store'
+} from '~services/net-school/store'
+import { LANG } from '../../constants'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
 export const DiaryState = new (class {

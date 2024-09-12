@@ -2,7 +2,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
 import { Linking, ScrollView, View } from 'react-native'
 import { Divider, List, Text } from 'react-native-paper'
-import { SettingsJumpNavigation } from '../../../components/Navigate'
+import { SettingsJumpNavigation } from '~components/Navigate'
 import { Spacings } from '../../../utils/Spacings'
 import { SettingsRoutes } from '../navigation'
 

@@ -4,9 +4,9 @@
 import { observer } from 'mobx-react-lite'
 import { FlatList, ListRenderItem, View } from 'react-native'
 
-import UpdateDate from '../../../components/UpdateDate'
-import { Github } from '../../../services/Github/api'
-import { GithubRelease } from '../../../services/Github/entities'
+import UpdateDate from '~components/UpdateDate'
+import { Github } from '~services/github/api'
+import { GithubRelease } from '~services/github/entities'
 
 import Release from './Release'
 import UpdateInfo from './UpdateInfo'

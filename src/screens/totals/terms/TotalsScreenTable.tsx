@@ -2,17 +2,17 @@ import { runInAction, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { ScrollView } from 'react-native'
 import { DataTable } from 'react-native-paper'
-import Loading from '../../../components/Loading'
-import Mark from '../../../components/Mark'
-import SelectModal from '../../../components/SelectModal'
-import SubjectName from '../../../components/SubjectName'
-import UpdateDate from '../../../components/UpdateDate'
-import { LANG } from '../../../constants'
+import Loading from '~components/Loading'
+import Mark from '~components/Mark'
+import SelectModal from '~components/SelectModal'
+import SubjectName from '~components/SubjectName'
+import UpdateDate from '~components/UpdateDate'
 import {
 	EducationStore,
 	SubjectsStore,
 	TotalsStore,
-} from '../../../services/NetSchool/store'
+} from '~services/net-school/store'
+import { LANG } from '../../../constants'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 
 export default observer(function TotalsScreenTable({

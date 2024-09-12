@@ -1,9 +1,9 @@
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
+import { Settings } from '~models/settings'
+import { Education } from '~services/net-school/entities'
+import { EducationStore } from '~services/net-school/store'
 import { LANG } from '../../constants'
-import { Settings } from '../../models/settings'
-import { Education } from '../../services/NetSchool/entities'
-import { EducationStore } from '../../services/NetSchool/store'
 
 export const S_SUBJECT_TOTALS = LANG['s_subject_totals']
 export const S_TOTALS = LANG['s_totalsN']

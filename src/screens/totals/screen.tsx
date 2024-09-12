@@ -2,8 +2,8 @@ import { autorun } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
 import { Chip } from 'react-native-paper'
-import { Settings } from '../../models/settings'
-import { SubjectsStore, TotalsStore } from '../../services/NetSchool/store'
+import { Settings } from '~models/settings'
+import { SubjectsStore, TotalsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import {
 	S_SUBJECT_TOTALS,

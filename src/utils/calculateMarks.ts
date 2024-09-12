@@ -1,6 +1,6 @@
+import type { PartialAssignment } from '~services/net-school/entities'
+import { SubjectPerformance } from '~services/net-school/entities'
 import { Logger } from '../constants'
-import type { PartialAssignment } from '../services/NetSchool/entities'
-import { SubjectPerformance } from '../services/NetSchool/entities'
 
 export function calculateMarks({
 	totals,

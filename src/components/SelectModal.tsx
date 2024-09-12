@@ -18,7 +18,7 @@ import {
 	Text,
 	TouchableRipple,
 } from 'react-native-paper'
-import { Theme } from '../models/theme'
+import { Theme } from '~models/theme'
 import { Spacings } from '../utils/Spacings'
 
 class Store {
@@ -50,7 +50,7 @@ type Props<V extends string = string, I extends Item<V> = Item<V>> = {
 
 export default observer(function SelectModal<
 	V extends string,
-	I extends Item<V>
+	I extends Item<V>,
 >(props: Props<V, I>) {
 	Theme.key
 	const [store] = useState(() => new Store())
@@ -124,7 +124,7 @@ const Option = observer(function Option<T extends string = string>(
 	props: Props<T> & {
 		item: Item<T>
 		store: Store
-	}
+	},
 ) {
 	Theme.key
 	const { item, onSelect, store } = props

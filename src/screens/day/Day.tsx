@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
-import { DiaryStore } from '../../services/NetSchool/store'
+import { DiaryStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson from './Lesson'
-import { DiaryState } from './state'
 import { DiaryLessonProps } from './screen'
+import { DiaryState } from './state'
 
 export default observer(function DiaryDay(
 	props: Pick<DiaryLessonProps, 'navigation' | 'route'>,

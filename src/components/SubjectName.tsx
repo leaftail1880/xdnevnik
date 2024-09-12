@@ -9,9 +9,9 @@ import {
 	TextInputProps,
 	TextProps,
 } from 'react-native-paper'
-import { styles } from '../constants'
-import { Settings } from '../models/settings'
-import { Subject } from '../services/NetSchool/entities'
+import { styles } from '~constants'
+import { Settings } from '~models/settings'
+import { Subject } from '~services/net-school/entities'
 import Loading from './Loading'
 
 type SubjectNameOptions = {

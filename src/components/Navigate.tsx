@@ -1,8 +1,8 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { Divider, List } from 'react-native-paper'
-import { Theme } from '../models/theme'
-import { SETTINGS_ROUTES, SettingsRoutes } from '../screens/settings/navigation'
+import { Theme } from '~models/theme'
+import { SETTINGS_ROUTES, SettingsRoutes } from '~screens/settings/navigation'
 
 export const SettingsJumpNavigation = observer(
 	function SettingsJumpNavigation(props: {

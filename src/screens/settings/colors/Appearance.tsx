@@ -3,13 +3,13 @@ import { observer } from 'mobx-react-lite'
 import { Suspense, lazy } from 'react'
 import { Appearance, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
-import Loading from '../../../components/Loading'
-import NumberInputSetting from '../../../components/NumberInput'
-import SelectModal from '../../../components/SelectModal'
-import SwitchSetting from '../../../components/SwitchSetting'
+import Loading from '~components/Loading'
+import NumberInputSetting from '~components/NumberInput'
+import SelectModal from '~components/SelectModal'
+import SwitchSetting from '~components/SwitchSetting'
+import { Settings } from '~models/settings'
+import { Theme, ThemeStore } from '~models/theme'
 import { styles } from '../../../constants'
-import { Settings } from '../../../models/settings'
-import { Theme, ThemeStore } from '../../../models/theme'
 import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert, Toast } from '../../../utils/Toast'
 
@@ -74,7 +74,7 @@ export default observer(function AppearanceSettings_() {
 					onSelect={({ value }) => Settings.save({ markStyle: value })}
 				/>
 				<SwitchSetting
-					label='"Вес: " перед весом оценки'
+					title='"Вес: " перед весом оценки'
 					setting="showMarkWeightTip"
 				/>
 			</List.Section>

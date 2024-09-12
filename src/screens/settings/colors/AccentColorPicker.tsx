@@ -7,7 +7,7 @@ import ColorPicker, {
 	Preview,
 	Swatches,
 } from 'reanimated-color-picker'
-import { Theme, ThemeStore } from '../../../models/theme'
+import { Theme, ThemeStore } from '~models/theme'
 
 export default observer(function AccentColorPicker() {
 	const meta = ThemeStore.meta(Theme)

@@ -3,21 +3,21 @@ import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Divider, Text } from 'react-native-paper'
 
-import Mark from '../../components/Mark'
+import Mark from '~components/Mark'
 
+import { Settings } from '~models/settings'
+import { Theme } from '~models/theme'
+import { Assignment, Attachment } from '~services/net-school/entities'
+import { AttachmentsStore } from '~services/net-school/store'
 import { LANG } from '../../constants'
-import { Settings } from '../../models/settings'
-import { Theme } from '../../models/theme'
-import { Assignment, Attachment } from '../../services/NetSchool/entities'
-import { AttachmentsStore } from '../../services/NetSchool/store'
 import { Spacings } from '../../utils/Spacings'
 import { TermNavigationParamMap } from '../totals/navigation'
 import { DiaryLessonProps } from './screen'
 // import * as FileSystem from 'expo-file-system'
 // import * as ExpoSharing from 'expo-sharing'
 // import { Alert } from 'react-native'
-// import { API } from '../services/NetSchool/api'
-// import { ROUTES } from '../NetSchool/routes'
+// import { API } from '~services/net-school/api'
+// import { ROUTES } from '../net-school/routes'
 
 // TODO support attachment
 

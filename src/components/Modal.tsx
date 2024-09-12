@@ -10,7 +10,7 @@ import {
 } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
 import { styles } from '../constants'
-import { Theme } from '../models/theme'
+import { Theme } from '~models/theme'
 import { ModalAlert, Toast } from '../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer

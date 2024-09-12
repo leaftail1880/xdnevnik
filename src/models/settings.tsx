@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
-import { NSEntity } from '../services/NetSchool/entities'
-import { StudentsStore } from '../services/NetSchool/store'
+import { NSEntity } from '~services/net-school/entities'
+import { StudentsStore } from '~services/net-school/store'
 import { makeReloadPersistable } from '../utils/makePersistable'
 
 type StudentOverride = {

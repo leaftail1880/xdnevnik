@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { memo, useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Badge, Chip } from 'react-native-paper'
-import { Theme } from '../../../models/theme'
+import { Theme } from '~models/theme'
 import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert } from '../../../utils/Toast'
 

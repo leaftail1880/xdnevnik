@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { Falsy, TextStyle, TouchableOpacityProps, View } from 'react-native'
 import { Text, TouchableRipple } from 'react-native-paper'
-import { Settings } from '../models/settings'
-import { Theme } from '../models/theme'
+import { Settings } from '~models/settings'
+import { Theme } from '~models/theme'
 
 const MarkColorsBG = {
 	5: '#007000',
