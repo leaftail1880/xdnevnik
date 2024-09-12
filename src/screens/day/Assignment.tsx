@@ -66,11 +66,9 @@ export default observer(function DiaryAssignment({
 				<Mark
 					mark={assignment.result ?? 'Нет'}
 					duty={assignment.duty}
-					markWeight={{
-						max: assignment.weight,
-						min: assignment.weight,
-						current: assignment.weight,
-					}}
+					weight={assignment.weight}
+					maxWeight={assignment.weight}
+					minWeight={assignment.weight}
 					style={{ padding: Spacings.s1 }}
 					onPress={() => {
 						Settings.currentTerm &&

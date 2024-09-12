@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Falsy, TextStyle, TouchableOpacityProps, View } from 'react-native'
+import { TextStyle, TouchableOpacityProps, View } from 'react-native'
 import { Text, TouchableRipple } from 'react-native-paper'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
@@ -17,33 +17,40 @@ const MarkColorsText = {
 	2: '#C00000',
 }
 
+interface Weight {
+	maxWeight: number
+	minWeight: number
+	weight: number | undefined
+}
+
 export default observer(function Mark({
 	finalMark,
-	mark: markProp,
-	markWeight,
+	mark: rawMark,
 	style,
 	textStyle,
 	subTextStyle,
+	weight,
+	maxWeight,
+	minWeight,
 	duty,
 	noColor = '#7A7A7A',
 	...props
 }: TouchableOpacityProps & {
 	finalMark?: number | null | string
 	mark: number | null | string
-	markWeight?: { max: number; min: number; current: number } | Falsy
 	duty: boolean
 	noColor?: string
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
-}) {
+} & (Weight | Partial<Weight>)) {
 	const bg = Settings.markStyle === 'background'
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
-	if (duty) markProp = 2
-	const mark = finalMark ? Number(finalMark) : markProp
-	if (duty) markProp = '.'
+	if (duty) rawMark = 2
+	const mark = finalMark ? Number(finalMark) : rawMark
+	if (duty) rawMark = '.'
 
-	let color: string = noColor + (markWeight ? '' : '55')
+	let color = noColor + (typeof weight === 'number' ? '' : '55')
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = colors[5]
@@ -58,13 +65,17 @@ export default observer(function Mark({
 
 	const textColor = bg ? 'white' : color
 
-	if (markWeight) {
+	if (
+		typeof weight === 'number' &&
+		typeof minWeight === 'number' &&
+		typeof maxWeight === 'number'
+	) {
 		const minAlpha = 100
 		const maxAlpha = 16 * 16 - 1 - minAlpha
-		const min = markWeight.min - 1
+		const min = minWeight - 1
 
-		const cur = markWeight.current - min
-		const max = markWeight.max - min
+		const cur = weight - min
+		const max = maxWeight - min
 		/** 255 / x = max / cur */
 		const alphaPercent = minAlpha + ~~((maxAlpha * cur) / max)
 		if (alphaPercent > 0) {
@@ -107,34 +118,22 @@ export default observer(function Mark({
 				}}
 			>
 				<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
-					{duty ? '.' : finalMark ?? markProp}
+					{duty ? '.' : finalMark ?? rawMark}
 				</Text>
-				{markWeight && (
-					<Text
-						style={[
-							{
-								fontSize: 12,
-								color: textColor,
-							},
-							subTextStyle,
-						]}
-					>
+				{typeof weight === 'number' && (
+					<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>
 						{Settings.showMarkWeightTip ? 'Вес: ' : ''}
-						{markWeight.current}
+						{weight}
 					</Text>
 				)}
-				{!!finalMark && markProp && (
+				{!!finalMark && rawMark && (
 					<Text
 						style={[
-							{
-								alignSelf: 'center',
-								fontSize: 7,
-								color: textColor,
-							},
+							{ alignSelf: 'center', fontSize: 7, color: textColor },
 							subTextStyle,
 						]}
 					>
-						Балл: {markProp}
+						Балл: {rawMark}
 					</Text>
 				)}
 			</View>

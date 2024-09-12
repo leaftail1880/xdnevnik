@@ -1,12 +1,20 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { ColorValue, StyleProp, TextStyle, View, ViewStyle } from 'react-native'
 import {
+	ColorValue,
+	StyleProp,
+	TextStyle,
+	TouchableOpacity,
+	ViewStyle,
+} from 'react-native'
+import {
+	Button,
+	Dialog,
 	IconButton,
+	Portal,
 	Text,
 	TextInput,
-	TextInputProps,
 	TextProps,
 } from 'react-native-paper'
 import { styles } from '~constants'
@@ -30,7 +38,6 @@ export function getSubjectName(props: SubjectNameOptions) {
 	if (!studentId) return 'Загрузка'
 
 	const overriden = Settings.forStudent(studentId).subjectNames[props.subjectId]
-
 	if (overriden) return overriden
 
 	return 'subjectName' in props
@@ -41,7 +48,6 @@ export function getSubjectName(props: SubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
-	textInputStyle?: TextInputProps['style']
 	iconsSize?: number
 } & SubjectNameOptions &
 	Omit<
@@ -66,52 +72,57 @@ export default observer(function SubjectName({
 	const name = getSubjectName(props)
 
 	return (
-		<View style={[styles.stretch, { margin: 0, padding: 0 }, viewStyle]}>
-			{!isEditing ? (
-				<Text {...props}>{name}</Text>
-			) : (
-				<TextInput
-					{...props}
-					style={[
-						props.style,
-						props.textInputStyle,
-						// eslint-disable-next-line react-native/no-color-literals
-						{ backgroundColor: '#00000000' },
-					]}
-					mode="outlined"
-					defaultValue={name}
-					onChangeText={setNewName}
-					placeholder="По умолчанию"
-				/>
+		<TouchableOpacity
+			style={[styles.stretch, { margin: 0, padding: 0 }, viewStyle]}
+			onPress={() => setIsEditing(true)}
+		>
+			<Text {...props}>{name}</Text>
+			{isEditing && (
+				<Portal>
+					<Dialog visible onDismiss={() => setIsEditing(false)}>
+						<Dialog.Title>Отображаемое имя</Dialog.Title>
+						<Dialog.Content>
+							<TextInput
+								{...props}
+								mode="outlined"
+								defaultValue={name}
+								onChangeText={setNewName}
+								placeholder="По умолчанию"
+							/>
+						</Dialog.Content>
+						<Dialog.Actions>
+							<Button
+								onPress={() => {
+									setNewName('')
+									setIsEditing(false)
+								}}
+								icon="undo"
+								style={props.style}
+							>
+								Отмена
+							</Button>
+							<Button
+								icon={'content-save'}
+								style={props.style}
+								onPress={() => {
+									if (newName) {
+										runInAction(() => {
+											const overrides = Settings.forStudent(studentId)
+											overrides.subjectNames[props.subjectId] = newName
+										})
+									}
+									setIsEditing(false)
+								}}
+							>
+								Сохранить
+							</Button>
+						</Dialog.Actions>
+					</Dialog>
+				</Portal>
 			)}
 
 			{/* <View style={[styles.stretch, { padding: 0 }]}> */}
-			<IconButton
-				icon={isEditing ? 'content-save' : 'pencil'}
-				size={props.iconsSize}
-				style={props.style}
-				onPress={() => {
-					if (isEditing && newName) {
-						runInAction(() => {
-							const overrides = Settings.forStudent(studentId)
-							overrides.subjectNames[props.subjectId] = newName
-						})
-					}
-					setIsEditing(!isEditing)
-				}}
-			/>
-			{isEditing && (
-				<IconButton
-					onPress={() => {
-						setNewName('')
-						setIsEditing(false)
-					}}
-					icon="undo"
-					size={props.iconsSize}
-					style={props.style}
-				/>
-			)}
-			{/* </View> */}
-		</View>
+			<IconButton icon={'pencil'} size={props.iconsSize} style={props.style} />
+		</TouchableOpacity>
 	)
 })

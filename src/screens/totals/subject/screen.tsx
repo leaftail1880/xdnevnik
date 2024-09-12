@@ -182,13 +182,9 @@ const MarkRow = observer(function MarkRow({
 			<Mark
 				duty={mark.duty ?? false}
 				mark={mark.result ?? null}
-				markWeight={
-					typeof mark.weight === 'number' && {
-						current: mark.weight,
-						max: maxWeight,
-						min: minWeight,
-					}
-				}
+				weight={mark.weight}
+				minWeight={minWeight}
+				maxWeight={maxWeight}
 				style={{
 					height: 50,
 					width: 50,

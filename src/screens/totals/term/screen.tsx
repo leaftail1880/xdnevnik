@@ -54,7 +54,8 @@ const Header = observer(function Header() {
 			style={{
 				flex: 1,
 				flexDirection: 'row',
-				paddingVertical: Spacings.s2,
+				gap: Spacings.s2,
+				padding: Spacings.s2,
 			}}
 		>
 			<Chip
@@ -63,7 +64,6 @@ const Header = observer(function Header() {
 				onPress={() => {
 					runInAction(() => (TermStore.sort = !TermStore.sort))
 				}}
-				style={{ marginHorizontal: Spacings.s2 }}
 			>
 				Плохие оценки вверху
 			</Chip>

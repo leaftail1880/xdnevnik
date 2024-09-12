@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
-import { Text } from 'react-native-paper'
 import Loading from '~components/Loading'
 import Mark from '~components/Mark'
 import { Settings } from '~models/settings'
@@ -11,6 +10,11 @@ import { SubjectPerformanceStores } from '~services/net-school/store'
 import { Spacings } from '../../../utils/Spacings'
 import { calculateMarks } from '../../../utils/calculateMarks'
 import { SubjectInfo, TermStore } from './state'
+
+const containerStyle: StyleProp<ViewStyle> = {
+	padding: Spacings.s1,
+	alignItems: 'center',
+}
 
 export default observer(function SubjectMarksInline(
 	props: Omit<SubjectInfo, 'attendance'> & {
@@ -28,17 +32,15 @@ export default observer(function SubjectMarksInline(
 		termId: props.selectedTerm.id,
 	})
 
-	const viewStyle: StyleProp<ViewStyle> = {
-		margin: 0,
-		flex: 1,
-		alignSelf: 'center',
-		backgroundColor: Theme.colors.elevation.level1,
-	}
+	const backgroundColor = Theme.colors.elevation.level1
+	const [viewStyle, viewContainerStyle] = useMemo(() => {
+		const viewStyle: StyleProp<ViewStyle> = {
+			flex: 1,
+			backgroundColor,
+		}
 
-	const containerStyle: StyleProp<ViewStyle> = {
-		padding: Spacings.s1,
-		alignItems: 'center',
-	}
+		return [viewStyle, [viewStyle, containerStyle]]
+	}, [backgroundColor])
 
 	const marks = useMemo(
 		() =>
@@ -52,25 +54,18 @@ export default observer(function SubjectMarksInline(
 	)
 
 	if (assignments.fallback)
-		return (
-			<View style={[viewStyle, containerStyle]}>{assignments.fallback}</View>
-		)
+		return <View style={viewContainerStyle}>{assignments.fallback}</View>
 
 	if (!marks)
 		return (
-			<View style={[viewStyle, containerStyle]}>
+			<View style={viewContainerStyle}>
 				<Loading />
 			</View>
 		)
 
 	const { totalsAndSheduledTotals, maxWeight, minWeight } = marks
 
-	if (totalsAndSheduledTotals.length === 0)
-		return (
-			<View style={[viewStyle, containerStyle, { alignContent: 'center' }]}>
-				<Text>Оценок нет</Text>
-			</View>
-		)
+	if (totalsAndSheduledTotals.length === 0) return
 
 	return (
 		<ScrollView
@@ -83,20 +78,10 @@ export default observer(function SubjectMarksInline(
 				<Mark
 					duty={e.duty ?? false}
 					mark={e.result ?? 'Нет'}
-					markWeight={
-						e.weight
-							? {
-									max: maxWeight,
-									min: minWeight,
-									current: e.weight,
-								}
-							: void 0
-					}
-					style={{
-						padding: Spacings.s1,
-						paddingHorizontal: Spacings.s2 + 4,
-						marginHorizontal: 2,
-					}}
+					weight={e.weight}
+					maxWeight={minWeight}
+					minWeight={maxWeight}
+					style={markStyle}
 					key={e.assignmentId}
 					onPress={props.openDetails}
 				/>
@@ -104,3 +89,9 @@ export default observer(function SubjectMarksInline(
 		</ScrollView>
 	)
 })
+
+const markStyle: StyleProp<ViewStyle> = {
+	padding: Spacings.s1,
+	paddingHorizontal: Spacings.s2 + 4,
+	marginHorizontal: 2,
+}
