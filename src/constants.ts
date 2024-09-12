@@ -8,7 +8,7 @@ export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
 	transport: __DEV__ ? mapConsoleTransport : sentryTransport,
 	transportOptions: {
 		SENTRY: Sentry,
-		errorLeves: 'error',
+		errorLevels: 'error',
 	},
 })
 
