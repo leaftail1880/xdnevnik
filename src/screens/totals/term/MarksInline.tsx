@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
 import Loading from '~components/Loading'
 import Mark from '~components/Mark'
@@ -8,7 +8,7 @@ import { Theme } from '~models/theme'
 import { Total } from '~services/net-school/entities'
 import { SubjectPerformanceStores } from '~services/net-school/store'
 import { Spacings } from '../../../utils/Spacings'
-import { calculateMarks } from '../../../utils/calculateMarks'
+import { calculateMarks, CalculateTotals } from '../../../utils/calculateMarks'
 import { SubjectInfo, TermStore } from './state'
 
 const containerStyle: StyleProp<ViewStyle> = {
@@ -23,14 +23,53 @@ export default observer(function SubjectMarksInline(
 	},
 ) {
 	const { studentId } = Settings
+
+	let result:
+		| { totals?: undefined; fallback: React.JSX.Element }
+		| { totals: CalculateTotals; fallback?: undefined }
+		| undefined
+
+	// TODO Investigate why Homework store does not returns assignments with marks
+	// const homework = HomeworkMarksStore.result
+	// if (homework) {
+	// 	const allAssignments = homework.filter(
+	// 		e => e.subjectId === props.total.subjectId,
+	// 	)
+	// 	const results = allAssignments // allAssignments
+	// 		.filter(e => typeof e.result === 'number')
+	// 		.map(e => ({ date: e.dueDate, ...e }))
+
+	// 	if (results.length) {
+	// 		result = {
+	// 			totals: {
+	// 				results,
+	// 				averageMark: props.term.avgMark ?? 0,
+	// 				classmeetingsStats: { passed: results.length, scheduled: 0 },
+	// 			},
+	// 		}
+	// 	}
+	// }
+
 	const assignments = SubjectPerformanceStores.use({
 		studentId,
 		subjectId: props.total.subjectId,
 	})
 
-	assignments.withParams({
-		termId: props.selectedTerm.id,
-	})
+	if (!result) {
+		assignments.withParams({
+			termId: props.selectedTerm.id,
+		})
+
+		if (assignments.result) {
+			result = {
+				totals: assignments.result,
+			}
+		} else {
+			result = {
+				fallback: assignments.fallback,
+			}
+		}
+	}
 
 	const backgroundColor = Theme.colors.elevation.level1
 	const [viewStyle, viewContainerStyle] = useMemo(() => {
@@ -44,17 +83,17 @@ export default observer(function SubjectMarksInline(
 
 	const marks = useMemo(
 		() =>
-			assignments.result &&
+			result.totals &&
 			calculateMarks({
-				totals: assignments.result,
+				totals: result.totals,
 				attendance: TermStore.attendance,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[assignments.result, TermStore.attendance],
+		[result.totals, TermStore.attendance],
 	)
 
-	if (assignments.fallback)
-		return <View style={viewContainerStyle}>{assignments.fallback}</View>
+	if (result.fallback)
+		return <View style={viewContainerStyle}>{result.fallback}</View>
 
 	if (!marks)
 		return (
