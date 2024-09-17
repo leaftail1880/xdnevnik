@@ -1,6 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { TextStyle, TouchableOpacityProps, View } from 'react-native'
-import { Text, TouchableRipple } from 'react-native-paper'
+import {
+	TextStyle,
+	TouchableOpacity,
+	TouchableOpacityProps,
+	View,
+} from 'react-native'
+import { Text } from 'react-native-paper'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 
@@ -85,7 +90,7 @@ export default observer(function Mark({
 	}
 
 	return (
-		<TouchableRipple
+		<TouchableOpacity
 			{...props}
 			style={[
 				{
@@ -137,6 +142,6 @@ export default observer(function Mark({
 					</Text>
 				)}
 			</View>
-		</TouchableRipple>
+		</TouchableOpacity>
 	)
 })

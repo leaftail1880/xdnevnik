@@ -11,7 +11,6 @@ import {
 import {
 	Button,
 	Dialog,
-	IconButton,
 	Portal,
 	Text,
 	TextInput,
@@ -33,13 +32,19 @@ type SubjectNameOptions = {
 	  }
 )
 
-export function getSubjectName(props: SubjectNameOptions) {
+
+
+export function getSubjectName(from: SubjectNameOptions) {
 	const { studentId } = Settings
 	if (!studentId) return 'Загрузка'
 
-	const overriden = Settings.forStudent(studentId).subjectNames[props.subjectId]
+	const overriden = Settings.forStudent(studentId).subjectNames[from.subjectId]
 	if (overriden) return overriden
 
+	return getRealName(from)
+}
+
+function getRealName(props: SubjectNameOptions) {
 	return 'subjectName' in props
 		? props.subjectName
 		: props.subjects.find(subject => props.subjectId === subject.id)?.name ??
@@ -80,14 +85,17 @@ export default observer(function SubjectName({
 			{isEditing && (
 				<Portal>
 					<Dialog visible onDismiss={() => setIsEditing(false)}>
-						<Dialog.Title>Отображаемое имя</Dialog.Title>
-						<Dialog.Content>
+						<Dialog.Title>Изменить имя</Dialog.Title>
+						<Dialog.Content style={{ gap: 10 }}>
+							<Text>
+								Имя в журнале:{' '}
+								<Text style={{ fontWeight: 'bold' }}>{getRealName(props)}</Text>
+							</Text>
 							<TextInput
-								{...props}
-								mode="outlined"
+								mode="flat"
 								defaultValue={name}
 								onChangeText={setNewName}
-								placeholder="По умолчанию"
+								placeholder="Как в журнале"
 							/>
 						</Dialog.Content>
 						<Dialog.Actions>
@@ -96,7 +104,6 @@ export default observer(function SubjectName({
 									setNewName('')
 									setIsEditing(false)
 								}}
-								icon="undo"
 								style={props.style}
 							>
 								Отмена
@@ -105,12 +112,14 @@ export default observer(function SubjectName({
 								icon={'content-save'}
 								style={props.style}
 								onPress={() => {
-									if (newName) {
-										runInAction(() => {
-											const overrides = Settings.forStudent(studentId)
+									runInAction(() => {
+										const overrides = Settings.forStudent(studentId)
+										if (newName) {
 											overrides.subjectNames[props.subjectId] = newName
-										})
-									}
+										} else {
+											delete overrides.subjectNames[props.subjectId]
+										}
+									})
 									setIsEditing(false)
 								}}
 							>
@@ -120,9 +129,7 @@ export default observer(function SubjectName({
 					</Dialog>
 				</Portal>
 			)}
-
-			{/* <View style={[styles.stretch, { padding: 0 }]}> */}
-			<IconButton icon={'pencil'} size={props.iconsSize} style={props.style} />
 		</TouchableOpacity>
 	)
 })
+
