@@ -14,6 +14,7 @@ import { Theme } from '~models/theme'
 import { Total } from '~services/net-school/entities'
 import {
 	EducationStore,
+	HomeworkMarksStore,
 	SubjectsStore,
 	TotalsStore,
 } from '~services/net-school/store'
@@ -84,6 +85,11 @@ const TermTotalsList = observer(function TermTotalsList({
 	navigation,
 }: TotalsScreenParams) {
 	Theme.key
+
+	HomeworkMarksStore.withParams({
+		studentId: Settings.studentId,
+	})
+
 	const renderItem = useCallback<ListRenderItem<Total>>(
 		total => (
 			<SubjectPerformanceInline

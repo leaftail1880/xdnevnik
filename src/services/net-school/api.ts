@@ -120,6 +120,11 @@ export class NetSchoolApi {
 					},
 				},
 				{ key: 'timeoutLimit', serialize: e => e, deserialize: e => e },
+				{
+					key: 'useCacheOnMoreThenReqs',
+					serialize: e => e,
+					deserialize: e => e,
+				},
 			],
 		})
 	}
@@ -149,6 +154,10 @@ export class NetSchoolApi {
 		this.endpoint = b
 		this.origin = url.origin
 		this.base = url.pathname
+	}
+
+	public async clearCache() {
+		this.cache = {}
 	}
 
 	public async logOut() {
@@ -211,6 +220,10 @@ export class NetSchoolApi {
 			.join('')
 	}
 
+	useCacheOnMoreThenReqs = 5
+
+	private reqs = 0
+
 	async request<T extends object | null | undefined>(
 		url: string,
 		init: ReqInit & CacheableInit = {},
@@ -257,6 +270,10 @@ export class NetSchoolApi {
 						`Bearer ${this.session.access_token}`
 				}
 			}
+
+			if (this.reqs > this.useCacheOnMoreThenReqs && url in this.cache)
+				return this.cache[url][1] as T
+			this.reqs = Math.max(0, this.reqs + 1)
 
 			const signal = AbortSignal.timeout(this.timeoutLimit * 1000)
 			const response = await fetchFn(url, { signal, ...init, ...request })
@@ -308,6 +325,8 @@ export class NetSchoolApi {
 					{ useCache: error.useCache, loggerIgnore: true },
 				)
 			} else throw error
+		} finally {
+			this.reqs = Math.max(0, this.reqs - 1)
 		}
 	}
 
@@ -404,8 +423,8 @@ export class NetSchoolApi {
 		return this.get<Assignment[]>(ROUTES.assignmentsForCurrentTerm, {
 			params: {
 				studentId,
-				withoutMarks: withoutMarks ?? true,
-				withExpiredClassAssign: withExpiredClassAssign ?? false,
+				withoutMarks: withoutMarks ?? false,
+				withExpiredClassAssign: withExpiredClassAssign ?? true,
 			},
 		})
 	}

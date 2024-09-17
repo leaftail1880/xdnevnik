@@ -1,6 +1,15 @@
 import type { PartialAssignment } from '~services/net-school/entities'
 import { SubjectPerformance } from '~services/net-school/entities'
 import { Logger } from '../constants'
+export type CalculateTotals = Partial<Pick<SubjectPerformance, 'attendance'>> &
+	Pick<SubjectPerformance, 'averageMark' | 'classmeetingsStats'> & {
+		results: (Omit<
+			SubjectPerformance['results'][number],
+			'classMeetingDate' | 'classMeetingId' | 'result'
+		> & {
+			result: string | number | null
+		})[]
+	}
 
 export function calculateMarks({
 	totals,
@@ -8,7 +17,7 @@ export function calculateMarks({
 	customMarks = [],
 	attendance: missedLessons = true,
 }: {
-	totals: SubjectPerformance
+	totals: CalculateTotals
 	attendance?: boolean
 	lessonsWithoutMark?: boolean
 	customMarks?: Partial<PartialAssignment>[]
@@ -52,15 +61,11 @@ export function calculateMarks({
 			let totalWeight = 0
 			let totalMark = 0
 
-			for (const mark of [
-				...totals.results,
-				...(customMarks as {
-					weight: number
-					result: number
-				}[]),
-			]) {
-				totalWeight += mark.weight
-				totalMark += mark.weight * mark.result
+			for (const mark of [...totals.results, ...customMarks]) {
+				if (mark && mark.weight && typeof mark.result === 'number') {
+					totalWeight += mark.weight
+					totalMark += mark.weight * mark.result
+				}
 			}
 
 			avgMark = Number((totalMark / totalWeight).toFixed(2))
