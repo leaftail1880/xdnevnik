@@ -5,6 +5,7 @@ import {
 	ScrollView,
 	StyleProp,
 	StyleSheet,
+	TouchableOpacity,
 	View,
 	ViewStyle,
 } from 'react-native'
@@ -16,7 +17,6 @@ import {
 	Portal,
 	RadioButton,
 	Text,
-	TouchableRipple,
 } from 'react-native-paper'
 import { Theme } from '~models/theme'
 import { Spacings } from '../utils/Spacings'
@@ -134,7 +134,7 @@ const Option = observer(function Option<T extends string = string>(
 	}, [item, onSelect, store])
 
 	return (
-		<TouchableRipple onPress={onPress}>
+		<TouchableOpacity onPress={onPress}>
 			<View style={styles.row}>
 				<View pointerEvents="none">
 					<RadioButton
@@ -144,7 +144,7 @@ const Option = observer(function Option<T extends string = string>(
 				</View>
 				<Text style={styles.text}>{props.item.label}</Text>
 			</View>
-		</TouchableRipple>
+		</TouchableOpacity>
 	)
 })
 
