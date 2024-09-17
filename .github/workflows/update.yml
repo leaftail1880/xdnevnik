@@ -8,6 +8,9 @@ on:
       - 'src/**.tsx'
   workflow_dispatch:
 
+env:
+  SENTRY_URL: 'https://sentry.io'
+
 jobs:
   update:
     name: EAS Update
