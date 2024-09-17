@@ -68,25 +68,36 @@ export default observer(function SubjectMarksInline(
 	if (totalsAndSheduledTotals.length === 0) return
 
 	return (
-		<ScrollView
-			horizontal
-			style={viewStyle}
-			contentContainerStyle={containerStyle}
-			fadingEdgeLength={5}
-		>
-			{totalsAndSheduledTotals.map(e => (
-				<Mark
-					duty={e.duty ?? false}
-					mark={e.result ?? 'Нет'}
-					weight={e.weight}
-					maxWeight={maxWeight}
-					minWeight={minWeight}
-					style={markStyle}
-					key={e.assignmentId}
-					onPress={props.openDetails}
-				/>
-			))}
-		</ScrollView>
+		<>
+			<ScrollView
+				horizontal
+				style={viewStyle}
+				contentContainerStyle={containerStyle}
+				fadingEdgeLength={5}
+			>
+				{totalsAndSheduledTotals.map(e => (
+					<Mark
+						duty={e.duty ?? false}
+						mark={e.result ?? 'Нет'}
+						weight={e.weight}
+						maxWeight={maxWeight}
+						minWeight={minWeight}
+						style={markStyle}
+						key={e.assignmentId}
+						onPress={props.openDetails}
+					/>
+				))}
+			</ScrollView>
+			<Mark
+				duty={false}
+				finalMark={props.term?.mark}
+				mark={props.term.avgMark}
+				onPress={props.openDetails}
+				textStyle={{ fontSize: 18 }}
+				subTextStyle={{ fontSize: 8 }}
+				style={{ padding: Spacings.s2, alignSelf: 'center' }}
+			/>
+		</>
 	)
 })
 

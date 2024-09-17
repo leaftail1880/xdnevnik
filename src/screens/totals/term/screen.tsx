@@ -59,7 +59,7 @@ const Header = observer(function Header() {
 			}}
 		>
 			<Chip
-				mode="outlined"
+				mode="flat"
 				selected={TermStore.sort}
 				onPress={() => {
 					runInAction(() => (TermStore.sort = !TermStore.sort))
@@ -68,7 +68,7 @@ const Header = observer(function Header() {
 				Плохие оценки вверху
 			</Chip>
 			<Chip
-				mode="outlined"
+				mode="flat"
 				selected={TermStore.attendance}
 				onPress={() => {
 					runInAction(() => (TermStore.attendance = !TermStore.attendance))

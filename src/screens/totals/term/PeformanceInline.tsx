@@ -3,7 +3,6 @@ import { View } from 'react-native'
 import { Surface } from 'react-native-paper'
 
 import Loading from '~components/Loading'
-import Mark from '~components/Mark'
 import SubjectName from '~components/SubjectName'
 import SubjectMarksInline from './MarksInline'
 
@@ -59,15 +58,6 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 						{...props}
 						openDetails={openDetails}
 						term={term}
-					/>
-					<Mark
-						duty={false}
-						finalMark={term?.mark}
-						mark={term.avgMark}
-						onPress={openDetails}
-						textStyle={{ fontSize: 18 }}
-						subTextStyle={{ fontSize: 8 }}
-						style={{ padding: Spacings.s2, alignSelf: 'center' }}
 					/>
 				</View>
 			) : (
