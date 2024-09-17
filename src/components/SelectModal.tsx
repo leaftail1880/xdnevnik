@@ -80,6 +80,7 @@ export default observer(function SelectModal<
 				</Button>
 			) : props.mode === 'chip' ? (
 				<Chip
+					mode="flat"
 					style={props.style}
 					textStyle={Theme.fonts.bodySmall}
 					onPress={store.toggleVisibility}
