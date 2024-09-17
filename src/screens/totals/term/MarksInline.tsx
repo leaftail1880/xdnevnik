@@ -79,8 +79,8 @@ export default observer(function SubjectMarksInline(
 					duty={e.duty ?? false}
 					mark={e.result ?? 'Нет'}
 					weight={e.weight}
-					maxWeight={minWeight}
-					minWeight={maxWeight}
+					maxWeight={maxWeight}
+					minWeight={minWeight}
 					style={markStyle}
 					key={e.assignmentId}
 					onPress={props.openDetails}
