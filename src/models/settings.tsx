@@ -18,12 +18,11 @@ type StudentOverride = {
 class SettingsStore {
 	studentIndex = 0
 
-	notificationsEnabled =
-		Platform.select({
-			ios: false,
-			macos: false,
-			windows: false,
-		}) ?? true
+	notificationsEnabled = Platform.select({
+		android: true,
+
+		default: false,
+	})
 
 	lessonNotifications = true
 	marksNotifications = true
@@ -32,7 +31,6 @@ class SettingsStore {
 	currentTotalsOnly = false
 	currentTerm?: NSEntity = undefined
 	markStyle: 'background' | 'border' = 'background'
-	requestTimeout = 3
 	showMarkWeightTip: boolean = true
 
 	/**
