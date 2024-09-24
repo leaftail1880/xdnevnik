@@ -117,7 +117,8 @@ const TermTotalsList = observer(function TermTotalsList({
 			<FlatList
 				ListHeaderComponent={Header}
 				initialNumToRender={5}
-				maxToRenderPerBatch={3}
+				maxToRenderPerBatch={1}
+				scrollEventThrottle={2000}
 				data={TermStore.totalsResult}
 				refreshControl={TotalsStore.refreshControl}
 				renderItem={renderItem}
