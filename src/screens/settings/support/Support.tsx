@@ -23,7 +23,7 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 
 			<List.Item
 				onPress={() => {
-					Linking.openURL('https://leaftail1880.github.io/xndevnik')
+					Linking.openURL('https://leaftail1880.github.io/xdnevnik')
 				}}
 				title="Официальный сайт"
 				left={props => <List.Icon {...props} icon="web" />}
