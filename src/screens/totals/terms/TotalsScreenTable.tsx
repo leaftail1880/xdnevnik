@@ -22,7 +22,10 @@ export default observer(function TotalsScreenTable({
 		EducationStore.fallback ||
 		SubjectsStore.fallback ||
 		TotalsStore.fallback || (
-			<ScrollView contentContainerStyle={{ flex: 0 }}>
+			<ScrollView
+				contentContainerStyle={{ flex: 0 }}
+				refreshControl={TotalsStore.refreshControl}
+			>
 				<DataTable style={{ alignSelf: 'center' }}>
 					<DataTable.Header>
 						<DataTable.Title style={{ flex: 3, padding: 0, margin: 0 }}>
