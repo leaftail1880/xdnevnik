@@ -33,19 +33,22 @@ export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
 })
 
 const StickyHeader = observer(function StickyHeader() {
+	if (!Settings.studentId) return
+
 	const terms = TermStore.terms
+	const studentSettings = Settings.forStudent(Settings.studentId)
 	return (
-		<View>
-			{terms && (
-				<SelectModal
-					data={terms}
-					value={Settings.currentTerm?.id + ''}
-					onSelect={v => Settings.save({ currentTerm: v.term })}
-					label={Settings.currentTerm ? '' : 'Четверть'}
-					mode="button"
-				/>
-			)}
-		</View>
+		terms && (
+			<SelectModal
+				data={terms}
+				mode="button"
+				value={String(TermStore.currentTerm?.id)}
+				label={''}
+				onSelect={v =>
+					runInAction(() => (studentSettings.currentTerm = v.term))
+				}
+			/>
+		)
 	)
 })
 
@@ -91,15 +94,16 @@ const TermTotalsList = observer(function TermTotalsList({
 	})
 
 	const renderItem = useCallback<ListRenderItem<Total>>(
-		total => (
-			<SubjectPerformanceInline
-				attendance
-				navigation={navigation}
-				total={total.item}
-				selectedTerm={Settings.currentTerm!}
-				subjects={SubjectsStore.result!}
-			/>
-		),
+		total =>
+			TermStore?.currentTerm ? (
+				<SubjectPerformanceInline
+					attendance
+					navigation={navigation}
+					total={total.item}
+					selectedTerm={TermStore.currentTerm}
+					subjects={SubjectsStore.result!}
+				/>
+			) : null,
 		[navigation],
 	)
 

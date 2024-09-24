@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import { Logger } from '~constants'
 import { Settings } from '~models/settings'
 import { NSEntity, Subject, Total } from '~services/net-school/entities'
 import {
@@ -19,12 +20,20 @@ export const TermStore = new (class {
 		}))
 	}
 
+	get currentTerm() {
+		return (
+			Settings.studentSettings?.currentTerm ??
+			TotalsStore.result?.[0]?.termTotals[0].term
+		)
+	}
+
 	get totalsResult() {
 		if (
 			!TotalsStore.result ||
 			!TotalsStore.result.length ||
-			!Settings.currentTerm
+			!this.currentTerm
 		) {
+			Logger.debug('ABC', this.currentTerm)
 			return []
 		}
 
@@ -39,7 +48,7 @@ export const TermStore = new (class {
 
 	private getOrder(
 		total: Total,
-		term = total.termTotals.find(e => e.term.id === Settings.currentTerm!.id),
+		term = total.termTotals.find(e => e.term.id === this.currentTerm!.id),
 	) {
 		if (!term) return 0
 

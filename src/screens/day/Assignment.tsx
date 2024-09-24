@@ -5,8 +5,8 @@ import { Button, Divider, Text } from 'react-native-paper'
 
 import Mark from '~components/Mark'
 
-import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
+import { TermStore } from '~screens/totals/term/state'
 import { Assignment, Attachment } from '~services/net-school/entities'
 import { AttachmentsStore } from '~services/net-school/store'
 import { LANG } from '../../constants'
@@ -71,13 +71,15 @@ export default observer(function DiaryAssignment({
 					minWeight={assignment.weight}
 					style={{ padding: Spacings.s1 }}
 					onPress={() => {
-						Settings.currentTerm &&
+						const currentTerm = TermStore.currentTerm
+
+						currentTerm &&
 							// @ts-expect-error Huh
 							navigation.navigate(LANG['s_totals'], {
 								screen: LANG['s_subject_totals'],
 								params: {
 									subjectId: lesson.subjectId,
-									termId: Settings.currentTerm.id,
+									termId: currentTerm.id,
 									finalMark: null,
 								} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
 							})
