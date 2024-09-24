@@ -4,14 +4,13 @@ import notifee, {
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { getSubjectName } from '~components/SubjectName'
-import { Logger } from '~constants'
 import { Settings } from '~models/settings'
+import { Lesson, LessonState } from '~services/net-school/entities'
+import { DiaryStore } from '~services/net-school/store'
 import {
 	clearBackgroundInterval,
 	setBackgroundInterval,
-} from '../../utils/backgroundIntervals'
-import { Lesson, LessonState } from '../net-school/entities'
-import { DiaryStore } from '../net-school/store'
+} from '~utils/backgroundIntervals'
 
 export const NotificationStore = new (class {
 	constructor() {
@@ -181,8 +180,6 @@ async function showNotification(
 		},
 		ios: {},
 	})
-
-	Logger.debug('Sent notificaion with id', notificationId)
 
 	runInAction(() => {
 		NotificationStore.id = notificationId

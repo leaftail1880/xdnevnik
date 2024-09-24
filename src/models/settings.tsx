@@ -13,6 +13,11 @@ type StudentOverride = {
 	 * Map containing new information about subject
 	 */
 	subjects: Record<string, object>
+
+	/**
+	 * Current term of the student
+	 */
+	currentTerm?: NSEntity
 }
 
 class SettingsStore {
@@ -29,7 +34,6 @@ class SettingsStore {
 
 	nameFormat: 'fio' | 'ifo' = 'ifo'
 	currentTotalsOnly = false
-	currentTerm?: NSEntity = undefined
 	markStyle: 'background' | 'border' = 'background'
 	showMarkWeightTip: boolean = true
 
@@ -70,9 +74,16 @@ class SettingsStore {
 		}
 	}
 
+	get studentSettings() {
+		if (!this.studentId) return
+
+		return this.forStudent(this.studentId)
+	}
+
 	constructor() {
 		makeAutoObservable(this, {
 			forStudent: false,
+			studentSettings: false,
 			fullname: false,
 			studentId: false,
 		})
