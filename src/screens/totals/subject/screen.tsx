@@ -74,7 +74,6 @@ export default observer(function SubjectTotals({
 					iconsSize={18}
 					style={{
 						fontSize: 20,
-						maxWidth: '70%',
 						fontWeight: 'bold',
 						margin: Spacings.s1,
 					}}
@@ -83,14 +82,14 @@ export default observer(function SubjectTotals({
 					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
-					style={{ height: 60, width: 60 }}
+					style={{ height: 40, width: 40 }}
 					textStyle={{ fontSize: 22 }}
 				/>
 			</View>
 			<ScrollView refreshControl={performance.refreshControl}>
 				<View style={{ padding: Spacings.s2, flex: 1, flexDirection: 'row' }}>
 					<Chip
-						mode="outlined"
+						mode="flat"
 						selected={attendance}
 						onPress={() => {
 							setAttendance(!attendance)
@@ -100,7 +99,7 @@ export default observer(function SubjectTotals({
 					</Chip>
 					<Chip
 						style={{ marginLeft: Spacings.s2 }}
-						mode="outlined"
+						mode="flat"
 						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
@@ -143,7 +142,9 @@ export default observer(function SubjectTotals({
 					<Text>
 						Учитель:{' '}
 						<Text variant="labelLarge">
-							{Settings.fullname(performance.result.teachers[0].name)}
+							{performance.result.teachers
+								.map(e => Settings.fullname(e.name))
+								.join(', ')}
 						</Text>
 					</Text>
 					<Text>
@@ -152,13 +153,32 @@ export default observer(function SubjectTotals({
 							{performance.result.classmeetingsStats.passed}/
 							{performance.result.classmeetingsStats.scheduled}
 						</Text>
-					</Text>
-					<Text>
-						Средний бал класса:{' '}
+						, осталось:{' '}
 						<Text variant="labelLarge">
-							{performance.result.classAverageMark}
+							{performance.result.classmeetingsStats.scheduled -
+								performance.result.classmeetingsStats.passed}
 						</Text>
 					</Text>
+					<Text>
+						Суммарный вес всех оценок:{' '}
+						<Text variant="labelLarge">
+							{performance.result.results.reduce((p, c) => p + c.weight, 0)}
+						</Text>
+					</Text>
+					<View
+						style={{
+							flexDirection: 'row',
+							flex: 1,
+							alignItems: 'center',
+						}}
+					>
+						<Text>Средний балл класса: </Text>
+						<Mark
+							mark={performance.result.classAverageMark}
+							duty={false}
+							style={{ padding: Spacings.s1 }}
+						/>
+					</View>
 				</Surface>
 				<UpdateDate store={performance} />
 			</ScrollView>
@@ -185,10 +205,7 @@ const MarkRow = observer(function MarkRow({
 				weight={mark.weight}
 				minWeight={minWeight}
 				maxWeight={maxWeight}
-				style={{
-					height: 50,
-					width: 50,
-				}}
+				style={{ paddingHorizontal: Spacings.s3, paddingVertical: 2 }}
 				textStyle={{ fontSize: 17 }}
 				onPress={() => {
 					ModalAlert.show(
