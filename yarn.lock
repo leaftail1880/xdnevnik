@@ -1715,6 +1715,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@boterop/react-native-background-timer@npm:^2.4.1":
+  version: 2.5.2
+  resolution: "@boterop/react-native-background-timer@npm:2.5.2"
+  peerDependencies:
+    react-native: ">=0.47.0"
+  checksum: 10c0/c1dcb599c18770e087e039c5f7baa7d490f7dcb6118839766a5beaa53b1e336f7c96725cd1e1ad97f5f922533a8b8010e6b0b45d386048ddfd8d1f2049187968
+  languageName: node
+  linkType: hard
+
 "@callstack/react-theme-provider@npm:^3.0.9":
   version: 3.0.9
   resolution: "@callstack/react-theme-provider@npm:3.0.9"
@@ -4124,13 +4133,6 @@ __metadata:
   dependencies:
     "@types/react": "npm:*"
   checksum: 10c0/9ec38e5ab4727c56ef17bd8e938ead88748ba19db314b8d9807714a5cae430f5b799514667b221b4f2dc8d9b4ca17dd1c3da8c41c083c2de9eddcc31bec6b8ff
-  languageName: node
-  linkType: hard
-
-"@types/react-native-background-timer@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@types/react-native-background-timer@npm:2.0.2"
-  checksum: 10c0/5e146e433e5bf87b89466b6ddd171b7880a147d4a452a77c7eacec57f16d30d0249a2661e12cb6bcb8ae1e43d0442a70289e1db9a9ba8536b97a36e6a1e5ebdc
   languageName: node
   linkType: hard
 
@@ -11631,15 +11633,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-background-timer@npm:^2.4.1":
-  version: 2.4.1
-  resolution: "react-native-background-timer@npm:2.4.1"
-  peerDependencies:
-    react-native: ">=0.47.0"
-  checksum: 10c0/beb0b45e138bdb0e0083ada6aa7c841f031670d655e915673cae11112788a219a232ed556a33e11253698f00045b71f40b5e31c88743825379b91f38125e03f7
-  languageName: node
-  linkType: hard
-
 "react-native-gesture-handler@npm:~2.14.1":
   version: 2.14.1
   resolution: "react-native-gesture-handler@npm:2.14.1"
@@ -14468,6 +14461,7 @@ __metadata:
     "@babel/plugin-transform-arrow-functions": "npm:^7.23.3"
     "@babel/plugin-transform-shorthand-properties": "npm:^7.23.3"
     "@babel/plugin-transform-template-literals": "npm:^7.23.3"
+    "@boterop/react-native-background-timer": "npm:^2.4.1"
     "@material/material-color-utilities": "npm:^0.2.7"
     "@notifee/react-native": "npm:^7.8.2"
     "@react-navigation/native": "npm:^6.1.9"
@@ -14477,7 +14471,6 @@ __metadata:
     "@types/eslint": "npm:^8.56.7"
     "@types/lodash": "npm:^4.14.202"
     "@types/react": "npm:~18.2.55"
-    "@types/react-native-background-timer": "npm:^2.0.2"
     "@types/react-native-vector-icons": "npm:^6.4.18"
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
@@ -14508,7 +14501,6 @@ __metadata:
     mobx-react-lite: "npm:^4.0.5"
     react: "npm:18.2.0"
     react-native: "npm:0.73.6"
-    react-native-background-timer: "npm:^2.4.1"
     react-native-gesture-handler: "npm:~2.14.1"
     react-native-logs: "npm:^5.0.1"
     react-native-mmkv: "npm:^2.11.0"
