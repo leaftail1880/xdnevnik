@@ -11,6 +11,7 @@
 		"noEmit": true,
 		"resolveJsonModule": true,
 
+		"strictBindCallApply": true,
 		"strictNullChecks": true,
 		"noImplicitAny": true,
 
