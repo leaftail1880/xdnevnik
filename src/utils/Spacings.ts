@@ -4,4 +4,4 @@ export const Spacings = {
 	s3: 16,
 	s4: 24,
 	s5: 28,
-}
+} as const
