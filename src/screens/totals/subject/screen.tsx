@@ -71,9 +71,8 @@ export default observer(function SubjectTotals({
 				<SubjectName
 					subjectName={performance.result.subject.name}
 					subjectId={performance.result.subject.id}
-					iconsSize={18}
 					style={{
-						fontSize: 20,
+						fontSize: 18,
 						fontWeight: 'bold',
 						margin: Spacings.s1,
 					}}
@@ -82,8 +81,8 @@ export default observer(function SubjectTotals({
 					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
-					style={{ height: 40, width: 40 }}
-					textStyle={{ fontSize: 22 }}
+					style={{ padding: Spacings.s2 }}
+					textStyle={{ fontSize: 20 }}
 				/>
 			</View>
 			<ScrollView refreshControl={performance.refreshControl}>
