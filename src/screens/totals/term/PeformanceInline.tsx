@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { Surface } from 'react-native-paper'
 
 import Loading from '~components/Loading'
@@ -34,34 +34,35 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 				flex: 1,
 			}}
 		>
-			<SubjectName
-				subjectId={props.total.subjectId}
-				subjects={props.subjects}
-				style={{
-					fontSize: 16,
-					fontWeight: 'bold',
-					margin: 0,
-					marginHorizontal: Spacings.s2,
-				}}
-			/>
-			{term ? (
-				<View
+			<TouchableOpacity onPress={openDetails}>
+				<SubjectName
+					subjectId={props.total.subjectId}
+					subjects={props.subjects}
 					style={{
-						width: '100%',
-						flexDirection: 'row',
-						paddingHorizontal: Spacings.s1,
-						paddingBottom: Spacings.s1,
+						fontSize: 16,
+						fontWeight: 'bold',
+						marginHorizontal: Spacings.s2,
 					}}
-				>
-					<SubjectMarksInline
-						{...props}
-						openDetails={openDetails}
-						term={term}
-					/>
-				</View>
-			) : (
-				<Loading />
-			)}
+				/>
+				{term ? (
+					<View
+						style={{
+							width: '100%',
+							flexDirection: 'row',
+							paddingHorizontal: Spacings.s1,
+							paddingBottom: Spacings.s1,
+						}}
+					>
+						<SubjectMarksInline
+							{...props}
+							openDetails={openDetails}
+							term={term}
+						/>
+					</View>
+				) : (
+					<Loading />
+				)}
+			</TouchableOpacity>
 		</Surface>
 	)
 })

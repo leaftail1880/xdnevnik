@@ -69,7 +69,7 @@ export default observer(function DiaryAssignment({
 					weight={assignment.weight}
 					maxWeight={assignment.weight}
 					minWeight={assignment.weight}
-					style={{ padding: Spacings.s1 }}
+					style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
 					onPress={() => {
 						const currentTerm = TermStore.currentTerm
 

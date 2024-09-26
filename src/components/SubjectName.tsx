@@ -16,7 +16,6 @@ import {
 	TextInput,
 	TextProps,
 } from 'react-native-paper'
-import { styles } from '~constants'
 import { Settings } from '~models/settings'
 import { Subject } from '~services/net-school/entities'
 import Loading from './Loading'
@@ -31,8 +30,6 @@ type SubjectNameOptions = {
 			subjectName: string
 	  }
 )
-
-
 
 export function getSubjectName(from: SubjectNameOptions) {
 	const { studentId } = Settings
@@ -75,7 +72,7 @@ export default observer(function SubjectName({
 
 	return (
 		<TouchableOpacity
-			style={[styles.stretch, { margin: 0, padding: 0 }, viewStyle]}
+			style={[{ margin: 0, padding: 0 }, viewStyle]}
 			onPress={() => setIsEditing(true)}
 		>
 			<Text {...props}>{name}</Text>

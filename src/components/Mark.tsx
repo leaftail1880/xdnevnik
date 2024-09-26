@@ -55,7 +55,7 @@ export default observer(function Mark({
 	const mark = finalMark ? Number(finalMark) : rawMark
 	if (duty) rawMark = '.'
 
-	let color = noColor + (typeof weight === 'number' ? '' : '55')
+	let color = noColor + (typeof weight === 'number' ? '' : '7A')
 	if (typeof mark === 'number' && !isNaN(mark)) {
 		if (mark >= 4.6) {
 			color = colors[5]
@@ -123,7 +123,7 @@ export default observer(function Mark({
 				}}
 			>
 				<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
-					{duty ? '.' : finalMark ?? rawMark}
+					{duty ? '.' : finalMark ?? rawMark ?? ' '}
 				</Text>
 				{typeof weight === 'number' && (
 					<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>

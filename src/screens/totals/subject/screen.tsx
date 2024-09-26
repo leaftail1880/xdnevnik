@@ -58,9 +58,8 @@ export default observer(function SubjectTotals({
 				style={[
 					styles.stretch,
 					{
+						flexDirection: 'row',
 						padding: Spacings.s2,
-						alignSelf: 'center',
-						width: '100%',
 						backgroundColor: Theme.colors.navigationBar,
 						borderBottomLeftRadius: Theme.roundness,
 						borderBottomRightRadius: Theme.roundness,
@@ -75,6 +74,7 @@ export default observer(function SubjectTotals({
 						fontSize: 18,
 						fontWeight: 'bold',
 						margin: Spacings.s1,
+						maxWidth: '90%',
 					}}
 				/>
 				<Mark

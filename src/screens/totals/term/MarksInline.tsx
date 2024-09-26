@@ -114,15 +114,15 @@ export default observer(function SubjectMarksInline(
 				contentContainerStyle={containerStyle}
 				fadingEdgeLength={5}
 			>
-				{totalsAndSheduledTotals.map(e => (
+				{totalsAndSheduledTotals.map((e, i) => (
 					<Mark
 						duty={e.duty ?? false}
-						mark={e.result ?? 'Нет'}
+						mark={e.result ?? null}
 						weight={e.weight}
 						maxWeight={maxWeight}
 						minWeight={minWeight}
 						style={markStyle}
-						key={e.assignmentId}
+						key={i.toString()}
 						onPress={props.openDetails}
 					/>
 				))}
