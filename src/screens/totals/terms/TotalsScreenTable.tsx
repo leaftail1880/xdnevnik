@@ -55,7 +55,6 @@ export default observer(function TotalsScreenTable({
 								viewStyle={{ width: '100%' }}
 								subjectId={total.subjectId}
 								subjects={SubjectsStore.result!}
-								iconsSize={14}
 							/>
 						</DataTable.Cell>
 

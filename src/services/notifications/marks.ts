@@ -57,7 +57,9 @@ autorun(function registerMarksFetchInterval() {
 	if (enabled()) {
 		registerTaskAsync(TASK_ID, { startOnBoot: true, stopOnTerminate: false })
 	} else {
-		unregisterTaskAsync(TASK_ID)
+		unregisterTaskAsync(TASK_ID).catch(() =>
+			Logger.debug(`Unregistering task ${TASK_ID} failed`),
+		)
 	}
 })
 

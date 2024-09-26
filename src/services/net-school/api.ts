@@ -1,5 +1,4 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
-import { CacheableInit } from '~models/async.store'
 import { Logger } from '../../constants'
 import { RequestError, RequestErrorOptions } from '../../utils/RequestError'
 import { Toast } from '../../utils/Toast'
@@ -17,6 +16,10 @@ import {
 	Total,
 } from './entities'
 import { ROUTES } from './routes'
+
+// TODO! WARNING This code can cause anxiety
+// TODO Create separated HttpSessionAgent class with cache support and leave here only
+// TODO Api implemenation
 
 setTimeout(() => {
 	import('./session')
@@ -226,7 +229,7 @@ export class NetSchoolApi {
 
 	async request<T extends object | null | undefined>(
 		url: string,
-		init: ReqInit & CacheableInit = {},
+		init: ReqInit = {},
 		fetchFn: (
 			url: string,
 			init: RequestInit,

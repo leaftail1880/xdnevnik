@@ -37,7 +37,6 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 			<SubjectName
 				subjectId={props.total.subjectId}
 				subjects={props.subjects}
-				iconsSize={16}
 				style={{
 					fontSize: 16,
 					fontWeight: 'bold',

@@ -12,12 +12,9 @@ import Loading from '~components/Loading'
 import { API as NSApi, NetSchoolError } from '~services/net-school/api'
 import { Logger } from '../constants'
 
-const useCache = Symbol('useCache')
-export type CacheableInit = { [useCache]?: boolean }
-
 export type AsyncMethod = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	arg: Record<string, any> & CacheableInit,
+	arg: Record<string, any>,
 ) => Promise<unknown>
 
 /**
@@ -224,7 +221,9 @@ export class AsyncStore<
 			this.loading = false
 			this.log('Loaded')
 		} catch (error) {
-			const canIgnore = error instanceof NetSchoolError && error.loggerIgnore
+			const canIgnore =
+				(error instanceof Error && error.message === 'Aborted') ||
+				(error instanceof NetSchoolError && error.loggerIgnore)
 
 			if (!canIgnore) {
 				Logger.error(

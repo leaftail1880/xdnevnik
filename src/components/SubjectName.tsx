@@ -53,7 +53,6 @@ function getRealName(props: SubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
-	iconsSize?: number
 } & SubjectNameOptions &
 	Omit<
 		TextProps<string>,
@@ -71,8 +70,6 @@ export default observer(function SubjectName({
 	const { studentId } = Settings
 
 	if (!studentId) return <Loading />
-
-	props.iconsSize ??= props.style?.fontSize
 
 	const name = getSubjectName(props)
 
