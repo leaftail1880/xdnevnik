@@ -55,13 +55,18 @@ TaskManager.defineTask(TASK_ID, backgroundFetchTask)
 // Register task for background fetch interval
 autorun(function registerMarksFetchInterval() {
 	if (enabled()) {
-		registerTaskAsync(TASK_ID, { startOnBoot: true, stopOnTerminate: false })
+		registerTaskAsync(TASK_ID, {
+			startOnBoot: true,
+			stopOnTerminate: false,
+		}).catch(onError)
 	} else {
-		unregisterTaskAsync(TASK_ID).catch(() =>
-			Logger.debug(`Unregistering task ${TASK_ID} failed`),
-		)
+		unregisterTaskAsync(TASK_ID).catch(onError)
 	}
 })
+
+function onError(reason: unknown) {
+	Logger.debug(`Unregistering task ${TASK_ID} failed:`, reason)
+}
 
 async function backgroundFetchTask() {
 	Logger.debug(
