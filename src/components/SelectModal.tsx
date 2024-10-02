@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
 	ScrollView,
 	StyleProp,
@@ -35,7 +35,7 @@ class Store {
 
 type Item<T extends string> = {
 	value: T
-	label: string
+	label: React.ReactNode
 }
 
 type Props<V extends string = string, I extends Item<V> = Item<V>> = {
@@ -73,10 +73,22 @@ export default observer(function SelectModal<
 						},
 						props.style,
 					]}
-					labelStyle={[Theme.fonts.titleMedium, { padding: Spacings.s1 }]}
 				>
-					<Text variant="titleMedium">{label}</Text>
-					{value}
+					<View
+						style={{
+							flexDirection: 'row',
+							padding: 0,
+							margin: 0,
+							alignItems: 'center',
+						}}
+					>
+						<Text variant="titleMedium">{label}</Text>
+						{typeof value !== 'object' ? (
+							<Text variant="titleMedium">{value}</Text>
+						) : (
+							value
+						)}
+					</View>
 				</Button>
 			) : props.mode === 'chip' ? (
 				<Chip
@@ -143,7 +155,11 @@ const Option = observer(function Option<T extends string = string>(
 						status={props.item.value === props.value ? 'checked' : 'unchecked'}
 					/>
 				</View>
-				<Text style={styles.text}>{props.item.label}</Text>
+				{typeof props.item.label === 'object' ? (
+					props.item.label
+				) : (
+					<Text>{props.item.label}</Text>
+				)}
 			</View>
 		</TouchableOpacity>
 	)
@@ -159,8 +175,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: Spacings.s2,
 		paddingVertical: Spacings.s1,
-	},
-	text: {
-		paddingLeft: 8,
+		gap: Spacings.s1,
 	},
 })

@@ -1,8 +1,9 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, observable } from 'mobx'
+import React from 'react'
 
 type ModalInfo = {
 	title: string
-	body?: string
+	body?: React.ReactNode
 	error?: boolean
 }
 
@@ -38,13 +39,15 @@ export const Toast = new (class {
 
 export const ModalAlert = new (class {
 	constructor() {
-		makeAutoObservable(this, {}, { autoBind: false })
+		makeAutoObservable(this, { state: observable.shallow }, { autoBind: false })
 	}
 
 	state: ModalInfo | null = null
-	show(title: string, body?: string, error?: boolean) {
+
+	show(title: string, body?: React.ReactNode, error?: boolean) {
 		this.state = { title, body, error }
 	}
+
 	close() {
 		ModalAlert.state = null
 	}

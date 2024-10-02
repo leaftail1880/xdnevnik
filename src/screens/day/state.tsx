@@ -1,11 +1,15 @@
 import { autorun, makeAutoObservable } from 'mobx'
+import { View } from 'react-native'
+import { Text } from 'react-native-paper'
 import { Settings } from '~models/settings'
+import { Theme } from '~models/theme'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
 	DiaryStore,
 } from '~services/net-school/store'
-import { LANG } from '../../constants'
+import { Spacings } from '~utils/Spacings'
+import { LANG, styles } from '../../constants'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
 export const DiaryState = new (class {
@@ -49,10 +53,30 @@ export const DiaryState = new (class {
 			},
 			...this.weekDays.map((day, i) => {
 				const today = new Date().toYYYYMMDD() === day.toYYYYMMDD()
+				const dayName = LANG.days[i]
 				return {
-					label: `${LANG.days[i]}${
-						today ? ', cегодня' : ` ${day.toYYYYMMDD()}`
-					}`,
+					label: today ? (
+						<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+							{dayName}, cегодня
+						</Text>
+					) : (
+						<View
+							style={[
+								{
+									margin: Spacings.s1,
+									width: '90%',
+									flex: 1,
+								},
+								styles.stretch,
+							]}
+						>
+							<Text style={{ fontWeight: 'bold' }}>{dayName}</Text>
+							<Text>
+								{'  '}
+								{day.toYYYYMMDD()}
+							</Text>
+						</View>
+					),
 					value: day.toYYYYMMDD(),
 				}
 			}),
