@@ -9,8 +9,8 @@ import {
 	Text,
 } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
-import { styles } from '../constants'
 import { Theme } from '~models/theme'
+import { styles } from '../constants'
 import { ModalAlert, Toast } from '../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -79,7 +79,11 @@ const DialogModal = observer(function DialogModal() {
 					<Dialog.Title>{ModalAlert.state.title}</Dialog.Title>
 					{ModalAlert.state.body && (
 						<Dialog.Content>
-							<Text>{ModalAlert.state.body}</Text>
+							{typeof ModalAlert.state.body === 'object' ? (
+								ModalAlert.state.body
+							) : (
+								<Text>{ModalAlert.state.body}</Text>
+							)}
 						</Dialog.Content>
 					)}
 					<Dialog.Actions>

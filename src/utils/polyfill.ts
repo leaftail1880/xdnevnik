@@ -10,7 +10,7 @@ declare global {
 		toHHMM(): string
 		weekStartDay: number
 		toReadable(): string
-		getDayMon(): number
+		getDayFromMonday(): number
 	}
 }
 
@@ -20,7 +20,7 @@ Date.prototype.toNetSchool = function (this: Date) {
 	return this.toJSON().split('T')[0]
 }
 
-Date.prototype.getDayMon = function (this: Date) {
+Date.prototype.getDayFromMonday = function (this: Date) {
 	return [6, 0, 1, 2, 3, 4, 5][this.getDay()]
 }
 Date.prototype.toYYYYMMDD = function (this: Date) {
@@ -42,7 +42,7 @@ Date.week = date =>
 	new Array(7)
 		.fill('')
 		.map(
-			(_, i) => new Date(date.getTime() - (date.getDayMon() - i) * dayInMs)
+			(_, i) => new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs)
 		) as ReturnType<typeof Date.week>
 
 AbortSignal.timeout = ms => {

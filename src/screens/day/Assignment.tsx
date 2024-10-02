@@ -1,25 +1,25 @@
+import * as FileSystem from 'expo-file-system'
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
-import { View } from 'react-native'
-import { Button, Divider, Text } from 'react-native-paper'
-
+import React, { useEffect, useState } from 'react'
+import { Image, View } from 'react-native'
+import { Chip, Divider, Text } from 'react-native-paper'
 import Mark from '~components/Mark'
 
+import { shareAsync } from 'expo-sharing'
+import { Size } from '~components/Size'
 import { Theme } from '~models/theme'
 import { TermStore } from '~screens/totals/term/state'
+import { API } from '~services/net-school/api'
 import { Assignment, Attachment } from '~services/net-school/entities'
+import { ROUTES } from '~services/net-school/routes'
 import { AttachmentsStore } from '~services/net-school/store'
-import { LANG } from '../../constants'
+import { ModalAlert } from '~utils/Toast'
+import { LANG, Logger } from '../../constants'
 import { Spacings } from '../../utils/Spacings'
 import { TermNavigationParamMap } from '../totals/navigation'
 import { DiaryLessonProps } from './screen'
-// import * as FileSystem from 'expo-file-system'
-// import * as ExpoSharing from 'expo-sharing'
-// import { Alert } from 'react-native'
-// import { API } from '~services/net-school/api'
-// import { ROUTES } from '../net-school/routes'
 
-// TODO support attachment
+// TODO support adding attachment
 
 export default observer(function DiaryAssignment({
 	assignment,
@@ -85,14 +85,16 @@ export default observer(function DiaryAssignment({
 							})
 					}}
 				/>
-
-				{showHomework &&
-					((assignment.attachmentsExists && attachments.fallback) ||
-						(attachment &&
-							attachment.map(e => (
-								<AttachmentFile attachment={e} key={e.attachmentId} />
-							))))}
 			</View>
+			{showHomework &&
+				((assignment.attachmentsExists && attachments.fallback) ||
+					(attachment && (
+						<View style={{ width: '100%' }}>
+							{attachment.map(e => (
+								<AttachmentFile attachment={e} key={e.attachmentId} />
+							))}
+						</View>
+					)))}
 		</>
 	)
 })
@@ -102,45 +104,112 @@ const AttachmentFile = observer(function AttachmentFile({
 }: {
 	attachment: Attachment
 }) {
+	const fileUri = `${FileSystem.cacheDirectory}${attachment.attachmentId}-${attachment.fileName}`
+	const isImage = /\.(jpeg|png|jpg)$/.test(attachment.fileName)
+
+	const [progress, setProgress] = useState<null | string>(null)
+	const [size, setSize] = useState<false | number>(false)
+
+	useEffect(() => {
+		checkSize(fileUri, setSize)
+	}, [fileUri])
+
 	return (
-		<Button
+		<Chip
+			mode="flat"
+			icon={isImage ? 'camera' : 'file'}
 			style={{
 				margin: Spacings.s1,
-				padding: Spacings.s2,
-				elevation: 2,
+				padding: Spacings.s1,
 			}}
 			onPress={async () => {
-				// const fileUri = FileSystem.cacheDirectory + 'update.apk'
-				// const file = await API.get(ROUTES.getAttachment + '/' + attachment.attachmentId, {
-				// 	auth: true,
-				// })
-				// const downloader = FileSystem.createDownloadResumable(
-				// 	API.en,
-				// 	fileUri,
-				// 	{
-				// 		headers: {
-				// 			Authorization: 'Bearer ' + API.session?.access_token,
-				// 		},
-				// 	},
-				// 	p => {
-				// 		setProgress(
-				// 			'Скачивание: ' +
-				// 				(
-				// 					(p.totalBytesWritten / p.totalBytesExpectedToWrite) *
-				// 					100
-				// 				).toFixed(2) +
-				// 				'%'
-				// 		)
-				// 	}
-				// )
-				// const result = await downloader.downloadAsync()
-				// if (!result) {
-				// 	ModalAlert.alert('Не удалось сохранить вложение')
-				// 	throw new Error('Failed to download update')
-				// }
+				if (!size) {
+					const result = await downloadAttachment(
+						attachment,
+						fileUri,
+						setProgress,
+					)
+					checkSize(result.uri, setSize)
+				} else {
+					Logger.debug('File already downloaded. Size is', size)
+				}
+
+				setProgress(null)
+				const share = () => shareAsync(fileUri, { dialogTitle: 'Файл' })
+				Logger.debug('Sharing', fileUri)
+
+				if (isImage) {
+					ModalAlert.show(
+						'Вложение',
+						<View
+							style={{
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: Spacings.s1,
+							}}
+						>
+							<Text>{attachment.fileName}</Text>
+							<Image source={{ uri: fileUri, width: 200, height: 400 }}></Image>
+							<Chip mode="flat" onPress={share}>
+								Отправить
+							</Chip>
+						</View>,
+					)
+				} else share()
 			}}
 		>
-			<Text>{attachment.fileName}</Text>
-		</Button>
+			<View style={{ flex: 1, gap: Spacings.s1, flexDirection: 'row' }}>
+				<Text>{attachment.fileName}</Text>
+				{size && <Size t={size} />}
+				<Text>{progress}</Text>
+			</View>
+		</Chip>
 	)
 })
+
+async function downloadAttachment(
+	attachment: Attachment,
+	fileUri: string,
+	setProgress: React.Dispatch<string | null>,
+) {
+	const httpUri = API.join(ROUTES.getAttachment, attachment.attachmentId + '')
+	Logger.debug('Saving', attachment.fileName, 'from the', httpUri)
+	const downloader = FileSystem.createDownloadResumable(
+		httpUri,
+		fileUri,
+		{
+			headers: {
+				Authorization: 'Bearer ' + API.session?.access_token,
+			},
+		},
+		p => {
+			setProgress(
+				'Скачивание: ' +
+					((p.totalBytesWritten / p.totalBytesExpectedToWrite) * 100).toFixed(
+						2,
+					) +
+					'%',
+			)
+		},
+	)
+
+	const result = await downloader.downloadAsync()
+	if (!result || result.status !== 200) {
+		ModalAlert.show(
+			'Не удалось сохранить вложение',
+			'С аккаунта родителя можно скачать только некоторые вложения',
+			true,
+		)
+		throw new Error('Failed to download file')
+	}
+
+	return result
+}
+
+function checkSize(fileUri: string, setSize: React.Dispatch<number | false>) {
+	FileSystem.getInfoAsync(fileUri).then(info => {
+		if (info.exists && !info.isDirectory) {
+			setSize(info.size)
+		}
+	})
+}

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { List, Text } from 'react-native-paper'
 import NumberInput from '~components/NumberInput'
+import { Size } from '~components/Size'
 import { Theme } from '~models/theme'
 import { API } from '~services/net-school/api'
 
@@ -105,33 +106,4 @@ const Store = observer(function Store({
 	)
 })
 
-// eslint-disable-next-line mobx/missing-observer
-function Size({ t }: { t: unknown }) {
-	if (typeof t === 'undefined') return 'empty'
 
-	const length =
-		typeof t === 'number'
-			? t
-			: typeof t === 'string'
-				? t.length
-				: JSON.stringify(t ?? '').length
-
-	for (const [size, chars] of (
-		[
-			['byte', 1],
-			['KB', 1024],
-			['MB', 1024 * 1024],
-			['GB', 1024 * 1024 * 1024],
-		] as [string, number][]
-	).reverse()) {
-		if (length / chars < 0.01) continue
-		return (
-			<Text style={{ fontWeight: 'bold' }}>
-				{(length / chars).toFixed(2)}
-				{size}
-			</Text>
-		)
-	}
-
-	return <Text style={{ fontWeight: 'bold' }}>{length}chars</Text>
-}
