@@ -35,7 +35,8 @@ class SettingsStore {
 	nameFormat: 'fio' | 'ifo' = 'ifo'
 	currentTotalsOnly = false
 	markStyle: 'background' | 'border' = 'background'
-	showMarkWeightTip: boolean = true
+	showMarkWeightTip = true
+	collapseLongAssignmentText = false
 
 	/**
 	 * Map containing per student overrides

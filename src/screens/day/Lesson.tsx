@@ -1,12 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
-import { Card, Chip, Divider, Text } from 'react-native-paper'
+import { Card, Chip, Text } from 'react-native-paper'
 import { Theme } from '~models/theme'
 import { AssignmentsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
-import { getSubjectName } from '~components/SubjectName'
+import SubjectName from '~components/SubjectName'
 import { styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
@@ -42,16 +42,17 @@ export default observer(function DiaryLesson({
 
 const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 	return (
-		<View>
-			<Text style={Theme.fonts.titleMedium}>{getSubjectName(lesson)}</Text>
-			<Divider style={{ marginVertical: Spacings.s1 }} />
-			<View style={[styles.row, { marginBottom: Spacings.s1 }]}>
-				<Chip compact style={styles.chip}>
+		<>
+			<SubjectName {...lesson} style={Theme.fonts.titleMedium} />
+			<View
+				style={[styles.row, { marginVertical: Spacings.s1, gap: Spacings.s1 }]}
+			>
+				<Chip compact>
 					{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 				</Chip>
 				<Chip compact>{lesson.roomName ?? '?'}</Chip>
 			</View>
-		</View>
+		</>
 	)
 })
 
@@ -59,15 +60,11 @@ const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	return (
 		<>
 			{DiaryState.showLessonTheme && (
-				<Text style={{ paddingBottom: Spacings.s1 }}>
-					{lesson.lessonTheme ?? 'Темы нет'}
-				</Text>
+				<Text selectable>{lesson.lessonTheme ?? 'Темы нет'}</Text>
 			)}
 
 			{DiaryState.showAttachments && lesson.attachmentsExists && (
-				<Text style={{ paddingBottom: Spacings.s1 }}>
-					Есть прикрепленные файлы
-				</Text>
+				<Text>Есть прикрепленные файлы</Text>
 			)}
 		</>
 	)

@@ -7,6 +7,7 @@ import Mark from '~components/Mark'
 
 import { shareAsync } from 'expo-sharing'
 import { Size } from '~components/Size'
+import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import { TermStore } from '~screens/totals/term/state'
 import { API } from '~services/net-school/api'
@@ -30,7 +31,10 @@ export default observer(function DiaryAssignment({
 } & Pick<DiaryLessonProps, 'navigation' | 'lesson'>) {
 	const [showHomework, setShowHomework] = useState(
 		// Do not show long homework by default
-		assignment.assignmentName.length < 40,
+		!(
+			Settings.collapseLongAssignmentText &&
+			assignment.assignmentName.length > 40
+		),
 	)
 
 	const attachments = AttachmentsStore
@@ -56,7 +60,11 @@ export default observer(function DiaryAssignment({
 				<Text
 					style={{ alignSelf: 'center', flex: 1 }}
 					selectable
-					onPress={() => setShowHomework(!showHomework)}
+					onPress={
+						Settings.collapseLongAssignmentText
+							? () => setShowHomework(!showHomework)
+							: undefined
+					}
 				>
 					{showHomework
 						? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`

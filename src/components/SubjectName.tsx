@@ -83,7 +83,9 @@ export default observer(function SubjectName({
 						<Dialog.Content style={{ gap: 10 }}>
 							<Text>
 								Имя в журнале:{' '}
-								<Text style={{ fontWeight: 'bold' }}>{getRealName(props)}</Text>
+								<Text style={{ fontWeight: 'bold' }} selectable>
+									{getRealName(props)}
+								</Text>
 							</Text>
 							<TextInput
 								mode="flat"

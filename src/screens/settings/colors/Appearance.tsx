@@ -80,6 +80,14 @@ export default observer(function AppearanceSettings_() {
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />
 
+			<List.Section title="Дневник">
+				<SwitchSetting
+					title="Сворачивать длинный текст заданий"
+					setting="collapseLongAssignmentText"
+				/>
+			</List.Section>
+			<Divider style={{ margin: Spacings.s1 }} />
+
 			<Suspense fallback={<Loading />}>
 				<AsyncAccentColorPicker />
 			</Suspense>

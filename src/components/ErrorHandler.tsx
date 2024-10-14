@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
@@ -45,13 +44,13 @@ export default function ErrorHandler({
 			{errorString === RequestErrorReason.noConnection && <Text>Нет сети</Text>}
 			{more && <Text>{errorString}</Text>}
 			<View>
-				<Button onPress={() => setMore(!more)}>
+				<Button onPress={() => setMore(!more)} mode="contained">
 					<Text>{!more ? 'Подробнее' : 'Свернуть'}</Text>
 				</Button>
-				<Button onPress={reload} icon="reload">
+				<Button onPress={reload} icon="reload" mode="contained">
 					Попробовать снова
 				</Button>
-				{!beforeAuth && (
+				{/* {!beforeAuth && (
 					<Button
 						onPress={() => {
 							Sentry.captureException(error)
@@ -59,7 +58,7 @@ export default function ErrorHandler({
 					>
 						<Text>Отправить отчет об ошибке разработчику</Text>
 					</Button>
-				)}
+				)} */}
 			</View>
 		</View>
 	)
