@@ -1,11 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { memo, useCallback, useMemo } from 'react'
-import { StyleProp, View, ViewStyle } from 'react-native'
+import { StyleProp, ViewStyle } from 'react-native'
 import { Chip } from 'react-native-paper'
 import semver from 'semver'
 import { Theme } from '~models/theme'
-import { styles } from '../../../constants'
-import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert } from '../../../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -13,20 +11,14 @@ export default memo(function Warnings(props: { version: string }) {
 	if (!props.version) return false
 	const versionNum = semver.parse(props.version)
 
-	return (
-		<View style={styles.row}>
-			{Object.entries(minFeatureVersions)
-				.filter(e => {
-					const compare = versionNum?.compare(e[1][0])
-					if (compare === -1 || compare === 0) return true
+	return Object.entries(minFeatureVersions)
+		.filter(e => {
+			const compare = versionNum?.compare(e[1][0])
+			if (compare === -1 || compare === 0) return true
 
-					return false
-				})
-				.map(e => (
-					<WarningChip key={e[1][1]} title={e[1][1]} body={e[1][2]} />
-				))}
-		</View>
-	)
+			return false
+		})
+		.map(e => <WarningChip key={e[1][1]} title={e[1][1]} body={e[1][2]} />)
 })
 
 const WarningChip = observer(function WarningChip(props: {
@@ -39,8 +31,6 @@ const WarningChip = observer(function WarningChip(props: {
 
 	const style = useMemo<StyleProp<ViewStyle>>(
 		() => ({
-			marginTop: Spacings.s2,
-			marginRight: Spacings.s2,
 			backgroundColor: Theme.colors.errorContainer,
 		}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,7 +38,7 @@ const WarningChip = observer(function WarningChip(props: {
 	)
 
 	return (
-		<Chip style={style} onPress={onPress}>
+		<Chip style={style} onPress={onPress} compact>
 			{props.title}
 		</Chip>
 	)

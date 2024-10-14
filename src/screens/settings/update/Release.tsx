@@ -2,8 +2,10 @@ import * as Application from 'expo-application'
 import * as FileSystem from 'expo-file-system'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import { memo } from 'react'
 import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
 import { Button, Card, HelperText, ProgressBar } from 'react-native-paper'
+import { Logger } from '~constants'
 import { GithubRelease } from '~services/github/entities'
 import { Spacings } from '../../../utils/Spacings'
 import { BetaChip, FilesizeChip, NewVersionChip } from './Chips'
@@ -23,12 +25,19 @@ export default observer<ListRenderItemInfo<GithubRelease>>(
 			<Card style={{ margin: Spacings.s2 }}>
 				<Card.Title title={props.item.name} titleVariant="headlineMedium" />
 				<Card.Content style={{ marginBottom: Spacings.s2 }}>
-					<View style={{ flexDirection: 'row', flex: 1 }}>
+					<View
+						style={{
+							flexDirection: 'row',
+							flex: 1,
+							gap: Spacings.s2,
+							flexWrap: 'wrap',
+						}}
+					>
 						{props.item.prerelease && <BetaChip />}
 						<FilesizeChip size={size} />
 						{State.currentI > props.index && <NewVersionChip />}
+						<Warnings version={props.item.name} />
 					</View>
-					<Warnings version={props.item.name} />
 				</Card.Content>
 				<Card.Content>
 					<ReleaseBody body={props.item.body} />
@@ -38,6 +47,30 @@ export default observer<ListRenderItemInfo<GithubRelease>>(
 		)
 	},
 )
+
+// eslint-disable-next-line mobx/missing-observer
+const AlreadyInstalled = memo(function AlreadyInstalled() {
+	return (
+		<Button disabled mode="contained-tonal">
+			Сейчас установлена
+		</Button>
+	)
+})
+
+const InstallOrDownload = observer(function InstallOrDownload(props: {
+	release: GithubRelease
+	i: number
+	downloaded: boolean
+}) {
+	return (
+		<Button
+			mode="contained-tonal"
+			onPress={() => downloadUpdate(props.i, props.release, props.downloaded)}
+		>
+			{props.downloaded ? 'Установить' : 'Скачать'}
+		</Button>
+	)
+})
 
 const ReleaseActions = observer(function ReleaseActions(props: {
 	release: GithubRelease
@@ -58,22 +91,13 @@ const ReleaseActions = observer(function ReleaseActions(props: {
 					/>
 				)}
 			</Card.Content>
-			<Card.Actions>
-				{installed && (
-					<Button disabled mode="contained-tonal">
-						Сейчас установлена
-					</Button>
-				)}
+			<Card.Actions style={{ gap: Spacings.s2 }}>
+				{installed && <AlreadyInstalled />}
 				{downloaded && <Delete downloaded={downloaded}></Delete>}
 				{progress && downloading && !installed && <Cancel />}
 				{progress && !downloading && !installed && <CancelDisabled />}
 				{!progress && !installed && (
-					<Button
-						mode="contained-tonal"
-						onPress={() => downloadUpdate(props.i, props.release, !!downloaded)}
-					>
-						{downloaded ? 'Установить' : 'Скачать'}
-					</Button>
+					<InstallOrDownload downloaded={!!downloaded} {...props} />
 				)}
 			</Card.Actions>
 		</>
@@ -86,7 +110,6 @@ export const Cancel = function Cancel() {
 		<Button
 			icon={'cancel'}
 			mode="contained-tonal"
-			style={styles.chip}
 			onPress={() => {
 				runInAction(() => {
 					State.progress = null
@@ -123,13 +146,17 @@ export const Delete = observer(function Delete(props: {
 			icon="delete"
 			onPress={() => {
 				// Finally bc if it fails to delete then there is no way to redownload it
-				FileSystem.deleteAsync(props.downloaded.uri).finally(() => {
-					runInAction(() => {
-						State.files = State.files.filter(
-							e => e.uri !== props.downloaded.uri,
-						)
+				FileSystem.deleteAsync(props.downloaded.uri)
+					.finally(() => {
+						runInAction(() => {
+							State.files = State.files.filter(
+								e => e.uri !== props.downloaded.uri,
+							)
+						})
 					})
-				})
+					.catch(() => {
+						Logger.debug('No file found to be deleted:', props.downloaded.uri)
+					})
 			}}
 		>
 			Удалить
@@ -137,9 +164,6 @@ export const Delete = observer(function Delete(props: {
 	)
 })
 const styles = StyleSheet.create({
-	chip: {
-		marginRight: Spacings.s2,
-	},
 	contentStyleCancelDisabled: {
 		padding: 0,
 		alignItems: 'center',

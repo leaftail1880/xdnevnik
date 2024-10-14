@@ -30,6 +30,7 @@ module.exports = {
 		'react-native/sort-styles': 'off',
 		'react-native/no-inline-styles': 'off',
 		'react-native/no-raw-text': 'off',
+		'react/prop-types': 'off',
 
 		// Disabling allowSyntheticalDefaultExport in tsconfig will cause
 		// untyped components

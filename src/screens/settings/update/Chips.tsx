@@ -3,13 +3,12 @@ import { memo, useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Badge, Chip } from 'react-native-paper'
 import { Theme } from '~models/theme'
-import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert } from '../../../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer, react/display-name
 export const BetaChip = memo(() => {
 	return (
-		<Chip style={styles.chip} onPress={betaChipWarning}>
+		<Chip compact onPress={betaChipWarning}>
 			Бета
 		</Chip>
 	)
@@ -35,7 +34,7 @@ export const FilesizeChip = memo(({ size }: { size: number | undefined }) => {
 	)
 
 	return (
-		<Chip style={styles.chip} onPress={onPress}>
+		<Chip onPress={onPress} compact>
 			{size ? `${(size / 1024 / 1024).toFixed(2)}мб` : 'Файла нет'}
 		</Chip>
 	)
@@ -48,6 +47,7 @@ export const NewVersionChip = observer(function NewVersionChip() {
 				backgroundColor: Theme.colors.errorContainer,
 			}}
 			onPress={newVersionChipModal}
+			compact
 		>
 			Новая версия
 			<View>
@@ -64,9 +64,6 @@ const newVersionChipModal = () =>
 	)
 
 const styles = StyleSheet.create({
-	chip: {
-		marginRight: Spacings.s2,
-	},
 	badge: {
 		position: 'relative',
 		top: -8,
