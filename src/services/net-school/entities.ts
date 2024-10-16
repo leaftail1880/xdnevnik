@@ -286,4 +286,5 @@ export type PartialAssignment = Partial<
 	date: string
 	result: 'Нет' | number | string
 	assignmentId: string | number
+	custom?: boolean
 }

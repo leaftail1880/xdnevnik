@@ -4,11 +4,12 @@ export const SETTINGS_ROUTES = {
 	main: 'Настройки ',
 	update: 'Обновления',
 	colors: 'Внешний вид',
-	privacy: 'Политика конфиденциальности',
-	terms: 'Правила и Условия пользования',
+	marks: 'Оценки',
 	notifs: 'Уведомления',
 	advanced: 'Расширенные',
 	support: 'О приложении',
+	privacy: 'Политика конфиденциальности',
+	terms: 'Правила и Условия пользования',
 }
 
 export type SettingsRoutes = Record<keyof typeof SETTINGS_ROUTES, undefined>

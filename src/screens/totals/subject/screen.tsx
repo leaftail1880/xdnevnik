@@ -2,18 +2,19 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import { Chip, Surface, Text } from 'react-native-paper'
+import { Chip, IconButton, Surface, Text } from 'react-native-paper'
 import Mark from '~components/Mark'
+import { RoundedSurface } from '~components/RoundedSurface'
 import SubjectName from '~components/SubjectName'
 import UpdateDate from '~components/UpdateDate'
+import { styles } from '~constants'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import type { PartialAssignment } from '~services/net-school/entities'
 import { SubjectPerformanceStores } from '~services/net-school/store'
-import { styles } from '../../../constants'
-import { Spacings } from '../../../utils/Spacings'
-import { ModalAlert } from '../../../utils/Toast'
-import { calculateMarks } from '../../../utils/calculateMarks'
+import { Spacings } from '~utils/Spacings'
+import { ModalAlert } from '~utils/Toast'
+import { calculateMarks } from '~utils/calculateMarks'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
 import { AddMarkForm } from './AddMarkForm'
 
@@ -58,7 +59,7 @@ export default observer(function SubjectTotals({
 				style={[
 					styles.stretch,
 					{
-						flexDirection: 'row',
+						flexWrap: 'wrap',
 						padding: Spacings.s2,
 						backgroundColor: Theme.colors.navigationBar,
 						borderBottomLeftRadius: Theme.roundness,
@@ -74,7 +75,6 @@ export default observer(function SubjectTotals({
 						fontSize: 18,
 						fontWeight: 'bold',
 						margin: Spacings.s1,
-						maxWidth: '90%',
 					}}
 				/>
 				<Mark
@@ -85,8 +85,18 @@ export default observer(function SubjectTotals({
 					textStyle={{ fontSize: 20 }}
 				/>
 			</View>
-			<ScrollView refreshControl={performance.refreshControl}>
-				<View style={{ padding: Spacings.s2, flex: 1, flexDirection: 'row' }}>
+			<ScrollView
+				refreshControl={performance.refreshControl}
+				contentContainerStyle={{ gap: Spacings.s2 }}
+			>
+				<View
+					style={{
+						padding: Spacings.s2,
+						flex: 1,
+						flexDirection: 'row',
+						gap: Spacings.s1,
+					}}
+				>
 					<Chip
 						mode="flat"
 						selected={attendance}
@@ -97,7 +107,6 @@ export default observer(function SubjectTotals({
 						Посещаемость
 					</Chip>
 					<Chip
-						style={{ marginLeft: Spacings.s2 }}
 						mode="flat"
 						selected={lessonsWithoutMark}
 						onPress={() => {
@@ -113,31 +122,26 @@ export default observer(function SubjectTotals({
 							mark={e}
 							maxWeight={maxWeight}
 							minWeight={minWeight}
+							onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
 							key={e.assignmentId ?? i.toString()}
 						/>
 					))}
 				</Surface>
-				<Surface
-					elevation={1}
-					style={{
-						padding: Spacings.s1,
-						margin: Spacings.s2,
-						borderRadius: Theme.roundness * 2,
-					}}
-				>
+				<RoundedSurface elevation={1}>
 					<AddMarkForm
 						setCustomMarks={setCustomMarks}
 						customMarks={customMarks}
 					/>
-				</Surface>
-				<Surface
-					elevation={1}
-					style={{
-						padding: Spacings.s2,
-						marginHorizontal: Spacings.s2,
-						borderRadius: Theme.roundness * 2,
-					}}
-				>
+				</RoundedSurface>
+				<RoundedSurface elevation={1}>
+					{customMarks.length ? (
+						<Text>
+							Возможных оценок:{' '}
+							<Text variant="labelLarge">{customMarks.length}</Text>
+						</Text>
+					) : (
+						false
+					)}
 					<Text>
 						Учитель:{' '}
 						<Text variant="labelLarge">
@@ -159,6 +163,13 @@ export default observer(function SubjectTotals({
 						</Text>
 					</Text>
 					<Text>
+						Всего оценок:{' '}
+						<Text variant="labelLarge">
+							{performance.result.results.length}
+						</Text>
+					</Text>
+
+					<Text>
 						Суммарный вес всех оценок:{' '}
 						<Text variant="labelLarge">
 							{performance.result.results.reduce((p, c) => p + c.weight, 0)}
@@ -167,6 +178,7 @@ export default observer(function SubjectTotals({
 					<View
 						style={{
 							flexDirection: 'row',
+							marginVertical: Spacings.s1,
 							flex: 1,
 							alignItems: 'center',
 						}}
@@ -178,7 +190,7 @@ export default observer(function SubjectTotals({
 							style={{ padding: Spacings.s1 }}
 						/>
 					</View>
-				</Surface>
+				</RoundedSurface>
 				<UpdateDate store={performance} />
 			</ScrollView>
 		</View>
@@ -189,10 +201,12 @@ const MarkRow = observer(function MarkRow({
 	mark,
 	maxWeight,
 	minWeight,
+	onDelete,
 }: {
 	mark: Partial<PartialAssignment>
 	maxWeight: number
 	minWeight: number
+	onDelete: VoidFunction
 }) {
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
@@ -207,25 +221,29 @@ const MarkRow = observer(function MarkRow({
 				style={{ paddingHorizontal: Spacings.s3, paddingVertical: 2 }}
 				textStyle={{ fontSize: 17 }}
 				onPress={() => {
+					const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
 					ModalAlert.show(
-						(mark.assignmentTypeName ?? '') +
-							' ' +
-							(mark.result ?? 'Оценки нет'),
-						`${mark.weight ? `Вес: ${mark.weight}` : 'Отсутствие'}${
-							mark.comment ? `, Комментарий: ${mark.comment}` : ''
-						}${
-							mark.date
-								? `, Выставлена: ${new Date(
-										mark.date,
-									).toLocaleDateString()} ${new Date(mark.date).toHHMM()}`
-								: ''
-						}`,
+						title,
+						<Text>
+							{mark.weight ? `Вес: ${mark.weight}` : 'Отсутствие'}
+							{mark.comment && <Text>, Комментарий: {mark.comment}</Text>}
+							{mark.date && (
+								<Text>
+									, Выставлена: {new Date(mark.date).toLocaleDateString()}{' '}
+									{new Date(mark.date).toHHMM()}
+								</Text>
+							)}
+						</Text>,
 					)
 				}}
 			/>
 			<Text style={{ maxWidth: '70%' }}>{mark.assignmentTypeName}</Text>
 
-			<Text>{date && new Date(date).toLocaleDateString()}</Text>
+			{mark.custom ? (
+				<IconButton icon="delete" onPress={onDelete} />
+			) : (
+				<Text>{date && new Date(date).toLocaleDateString()}</Text>
+			)}
 		</View>
 	)
 })

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { Button, IconButton, TextInput } from 'react-native-paper'
+import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import type { PartialAssignment } from '~services/net-school/entities'
 import { styles } from '../../../constants'
@@ -12,8 +13,16 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 	customMarks: Partial<PartialAssignment>[]
 }) {
 	Theme.key
-	const [weight, setWeight] = useState('')
-	const [mark, setMark] = useState('')
+
+	const student = Settings.studentId
+		? Settings.forStudent(Settings.studentId)
+		: undefined
+
+	const [weight, setWeight] = useState(
+		student?.defaultMarkWeight?.toString() ?? '',
+	)
+
+	const [mark, setMark] = useState(student?.defaultMark?.toString() ?? '')
 	const [addingCustomMark, setAddingCustomMark] = useState(false)
 	const addCustomMark = useCallback(() => {
 		if (addingCustomMark) {
@@ -21,6 +30,7 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 			props.setCustomMarks([
 				...props.customMarks,
 				{
+					custom: true,
 					result: Number(mark),
 					weight: Number(weight),
 					comment: 'Кастомная',

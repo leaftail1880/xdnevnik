@@ -109,11 +109,11 @@ export default observer(function SubjectName({
 								style={props.style}
 								onPress={() => {
 									runInAction(() => {
-										const overrides = Settings.forStudent(studentId)
+										const studentSettings = Settings.forStudent(studentId)
 										if (newName) {
-											overrides.subjectNames[props.subjectId] = newName
+											studentSettings.subjectNames[props.subjectId] = newName
 										} else {
-											delete overrides.subjectNames[props.subjectId]
+											delete studentSettings.subjectNames[props.subjectId]
 										}
 									})
 									setIsEditing(false)

@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react-native'
 import { StyleSheet } from 'react-native'
 import { logger, mapConsoleTransport, sentryTransport } from 'react-native-logs'
-import { Spacings } from './utils/Spacings'
 
 export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
 	printLevel: false,
@@ -27,7 +26,6 @@ export const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		flex: 1,
 	},
-	chip: { marginRight: Spacings.s1 },
 })
 
 export const LANG = {

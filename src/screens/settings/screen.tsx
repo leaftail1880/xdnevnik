@@ -9,12 +9,11 @@ import { API } from '~services/net-school/api'
 
 import Advanced from './advanced/Advanced'
 import Appearance from './colors/Appearance'
+import Marks from './marks/Marks'
 import Notifications from './notifications/Notifications'
+import PrivacyPolicy from './support/PrivacyPolicy'
 import Support from './support/Support'
-import {
-	default as PrivacyPolicy,
-	default as TermsAndConditions,
-} from './support/TermsAndConditions'
+import TermsAndConditions from './support/TermsAndConditions'
 import UpdatesScreen from './update/screen'
 import { getUpdateIdShort } from './update/utils'
 
@@ -46,6 +45,7 @@ export default observer(function SettingsScreen() {
 			<SettingsNavigation.Screen name="update" component={UpdatesScreen} />
 			<SettingsNavigation.Screen name="advanced" component={Advanced} />
 			<SettingsNavigation.Screen name="support" component={Support} />
+			<SettingsNavigation.Screen name="marks" component={Marks} />
 
 			<SettingsNavigation.Screen name="privacy" component={PrivacyPolicy} />
 			<SettingsNavigation.Screen name="terms" component={TermsAndConditions} />
@@ -67,12 +67,18 @@ const MainSettings = memo(function MainSettings(
 			<SettingsJumpNavigation
 				navigation={props}
 				target={'notifs'}
-				description="О текущих уроках"
+				description="О текущих уроках, о новых оценках"
+			/>
+
+			<SettingsJumpNavigation
+				navigation={props}
+				target={'marks'}
+				description={'Вид, оценка по умолчанию и др.'}
 			/>
 			<SettingsJumpNavigation
 				navigation={props}
 				target={'colors'}
-				description="Тема, цвет акцента и т.д."
+				description="Тема, цвет акцента и др."
 			/>
 			<SettingsJumpNavigation
 				navigation={props}

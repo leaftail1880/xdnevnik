@@ -1,57 +1,80 @@
 import { runInAction } from 'mobx'
-import { useState } from 'react'
-import { View } from 'react-native'
-import { Button, Text, TextInput } from 'react-native-paper'
+import React, { useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { Button, HelperText, IconButton, TextInput } from 'react-native-paper'
 import { Spacings } from '../utils/Spacings'
 
-type NumberInputSettingProps = {
-	value: number
-	defaultValue: number
-	onChange: (value: number) => void
+interface NumberInputSettingProps<T extends number | undefined = number> {
+	value: T
+	defaultValue: T
+	onChange: (value: T) => void
 	label: string
 	description?: string
 }
 
 // eslint-disable-next-line mobx/missing-observer
-export default function NumberInputSetting(props: NumberInputSettingProps) {
+export default function NumberInputSetting<
+	T extends number | undefined = number,
+>(props: NumberInputSettingProps<T>) {
 	const [error, setError] = useState(false)
-	const [value, setValue] = useState(props.value.toString())
+	const [value, setValue] = useState<string | undefined>(
+		props.value?.toString(),
+	)
+
 	return (
 		<>
-			<View
-				style={{
-					flexDirection: 'row',
-					alignItems: 'center',
-					alignContent: 'center',
-				}}
-			>
+			<View style={styles.view}>
 				<TextInput
 					keyboardType="numeric"
 					label={props.label}
 					mode="outlined"
 					value={value}
 					error={error}
-					onChangeText={text => {
-						setValue(text)
-					}}
+					onChangeText={setValue}
 					onBlur={() => {
 						runInAction(() => {
+							if (typeof value === 'undefined' || value === '') {
+								if (typeof props.defaultValue === 'undefined') {
+									setError(false)
+									setValue(value)
+									return props.onChange(value as T)
+								} else return setError(true)
+							}
+
 							const num = parseInt(value)
 							if (isNaN(num)) {
 								setError(true)
 							} else {
 								setError(false)
 								setValue(num + '')
-								props.onChange(num)
+								props.onChange(num as T)
 							}
 						})
 					}}
-					style={{ margin: Spacings.s2, flex: 2, maxWidth: '50%' }}
+					style={styles.textInput}
 				/>
+				<FastChange
+					{...props}
+					modifier={-1}
+					setValue={setValue}
+					value={value}
+					icon="minus"
+				/>
+				<FastChange
+					{...props}
+					modifier={+1}
+					setValue={setValue}
+					value={value}
+					icon="plus"
+				/>
+
 				<Button
 					onPress={() =>
 						runInAction(
-							() => (props.onChange(props.defaultValue), setValue('5')),
+							() => (
+								props.onChange(props.defaultValue),
+								setValue(props.defaultValue?.toString() ?? '')
+							),
 						)
 					}
 				>
@@ -60,12 +83,42 @@ export default function NumberInputSetting(props: NumberInputSettingProps) {
 			</View>
 
 			{props.description && (
-				<Text
-					style={{ marginHorizontal: Spacings.s2, marginBottom: Spacings.s2 }}
-				>
-					{props.description}
-				</Text>
+				<HelperText type="info">{props.description}</HelperText>
 			)}
 		</>
 	)
 }
+
+// eslint-disable-next-line mobx/missing-observer
+function FastChange(
+	props: Omit<NumberInputSettingProps<number | undefined>, 'value'> & {
+		value: string | undefined
+		setValue: React.Dispatch<string | undefined>
+		modifier: number
+		icon: string
+	},
+) {
+	return (
+		<IconButton
+			icon={props.icon}
+			onPress={() => {
+				const num = props.value
+					? parseInt(props.value)
+					: props.defaultValue ?? 0
+				const changed = num + props.modifier
+				runInAction(
+					() => (props.onChange(changed), props.setValue(changed.toString())),
+				)
+			}}
+		/>
+	)
+}
+
+const styles = StyleSheet.create({
+	view: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		alignContent: 'center',
+	},
+	textInput: { margin: Spacings.s2, flex: 2, maxWidth: '50%' },
+})

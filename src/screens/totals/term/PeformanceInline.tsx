@@ -1,14 +1,15 @@
 import { observer } from 'mobx-react-lite'
-import { TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import { Surface } from 'react-native-paper'
 
 import Loading from '~components/Loading'
 import SubjectName from '~components/SubjectName'
 import SubjectMarksInline from './MarksInline'
 
+import { useCallback } from 'react'
+import { LANG } from '~constants'
 import { Theme } from '~models/theme'
-import { LANG } from '../../../constants'
-import { Spacings } from '../../../utils/Spacings'
+import { Spacings } from '~utils/Spacings'
 import { SubjectInfo } from './state'
 
 export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
@@ -16,14 +17,18 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 		e => e.term.id === props.selectedTerm.id,
 	)
 
-	if (!term) return false
+	const openDetails = useCallback(
+		() =>
+			term &&
+			props.navigation.navigate(LANG['s_subject_totals'], {
+				termId: props.selectedTerm.id,
+				finalMark: term.mark,
+				subjectId: props.total.subjectId,
+			}),
+		[props.navigation, props.selectedTerm.id, props.total.subjectId, term],
+	)
 
-	const openDetails = () =>
-		props.navigation.navigate(LANG['s_subject_totals'], {
-			termId: props.selectedTerm.id,
-			finalMark: term.mark,
-			subjectId: props.total.subjectId,
-		})
+	if (!term) return false
 
 	return (
 		<Surface
@@ -45,20 +50,11 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 					}}
 				/>
 				{term ? (
-					<View
-						style={{
-							width: '100%',
-							flexDirection: 'row',
-							paddingHorizontal: Spacings.s1,
-							paddingBottom: Spacings.s1,
-						}}
-					>
-						<SubjectMarksInline
-							{...props}
-							openDetails={openDetails}
-							term={term}
-						/>
-					</View>
+					<SubjectMarksInline
+						{...props}
+						openDetails={openDetails}
+						term={term}
+					/>
 				) : (
 					<Loading />
 				)}

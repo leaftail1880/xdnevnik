@@ -1,10 +1,11 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { isObservable, makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
+import { Logger } from '~constants'
 import { NSEntity } from '~services/net-school/entities'
 import { StudentsStore } from '~services/net-school/store'
 import { makeReloadPersistable } from '../utils/makePersistable'
 
-type StudentOverride = {
+export interface StudentSettings {
 	/**
 	 * Map containing subjectIds as keys and overrided subjectName as value
 	 */
@@ -18,7 +19,13 @@ type StudentOverride = {
 	 * Current term of the student
 	 */
 	currentTerm?: NSEntity
+
+	targetMark?: number
+	defaultMark?: number
+	defaultMarkWeight?: number
 }
+
+export type StudentSettingsWithSave = ReturnType<SettingsStore['forStudent']>
 
 class SettingsStore {
 	studentIndex = 0
@@ -41,7 +48,7 @@ class SettingsStore {
 	/**
 	 * Map containing per student overrides
 	 */
-	studentOverrides: Record<string, StudentOverride | undefined> = {}
+	studentOverrides: Record<string, StudentSettings | undefined> = {}
 
 	get studentId() {
 		const student =
@@ -50,28 +57,24 @@ class SettingsStore {
 	}
 
 	forStudent(id: number) {
-		const defaultValue = Object.assign(
-			{
+		const overrides = this.studentOverrides[id]
+
+		if (overrides) {
+			return overrides
+		} else {
+			const defaultValue: StudentSettings = {
 				subjectNames: {},
 				subjects: {},
-			} satisfies StudentOverride as StudentOverride,
-			{
-				save(value: Partial<StudentOverride>) {
-					runInAction(() => {
-						Object.assign(this, value)
-					})
-				},
-			},
-		)
+			}
+			runInAction(() => (this.studentOverrides[id] = defaultValue))
 
-		const overrides = this.studentOverrides[id]
-		if (overrides) {
-			return { ...defaultValue, ...overrides }
-		} else {
-			runInAction(() => {
-				this.studentOverrides[id] = defaultValue
-			})
-			return defaultValue
+			const overrides = this.studentOverrides[id]
+			if (overrides) {
+				return overrides
+			} else {
+				Logger.warn(new Error('Overrides are UNDEFINED.'))
+				return defaultValue
+			}
 		}
 	}
 
@@ -129,3 +132,13 @@ class SettingsStore {
 }
 
 export const Settings = new SettingsStore() as Readonly<SettingsStore>
+
+export function changeSettings<T extends object>(
+	settings: T,
+	toChange: Partial<T>,
+) {
+	if (!isObservable(settings)) Logger.warn(new Error('Non-observable settings'))
+	runInAction(() => {
+		Object.assign(settings, toChange)
+	})
+}

@@ -1,8 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import React, { useMemo } from 'react'
 import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
+import { Text } from 'react-native-paper'
 import Loading from '~components/Loading'
 import Mark from '~components/Mark'
+import { styles } from '~constants'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import { Total } from '~services/net-school/entities'
@@ -71,6 +73,7 @@ export default observer(function SubjectMarksInline(
 		}
 	}
 
+	const student = studentId ? Settings.forStudent(studentId) : undefined
 	const backgroundColor = Theme.colors.elevation.level1
 	const [viewStyle, viewContainerStyle] = useMemo(() => {
 		const viewStyle: StyleProp<ViewStyle> = {
@@ -87,9 +90,18 @@ export default observer(function SubjectMarksInline(
 			calculateMarks({
 				totals: result.totals,
 				attendance: TermStore.attendance,
+				defaultMark: student?.defaultMark,
+				defaultMarkWeight: student?.defaultMarkWeight,
+				targetMark: student?.targetMark,
 			}),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[result.totals, TermStore.attendance],
+		[
+			result.totals,
+			TermStore.attendance,
+			student?.defaultMark,
+			student?.defaultMarkWeight,
+			student?.targetMark,
+		],
 	)
 
 	if (result.fallback)
@@ -102,40 +114,76 @@ export default observer(function SubjectMarksInline(
 			</View>
 		)
 
-	const { totalsAndSheduledTotals, maxWeight, minWeight } = marks
+	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetTarget } = marks
 
 	if (totalsAndSheduledTotals.length === 0) return
-
 	return (
 		<>
-			<ScrollView
-				horizontal
-				style={viewStyle}
-				contentContainerStyle={containerStyle}
-				fadingEdgeLength={5}
+			<View
+				style={{
+					flexDirection: 'row',
+					paddingHorizontal: Spacings.s1,
+					paddingBottom: Spacings.s1,
+				}}
 			>
-				{totalsAndSheduledTotals.map((e, i) => (
-					<Mark
-						duty={e.duty ?? false}
-						mark={e.result ?? null}
-						weight={e.weight}
-						maxWeight={maxWeight}
-						minWeight={minWeight}
-						style={markStyle}
-						key={i.toString()}
-						onPress={props.openDetails}
-					/>
-				))}
-			</ScrollView>
-			<Mark
-				duty={false}
-				finalMark={props.term?.mark}
-				mark={props.term.avgMark}
-				onPress={props.openDetails}
-				textStyle={{ fontSize: 18 }}
-				subTextStyle={{ fontSize: 8 }}
-				style={{ padding: Spacings.s2, alignSelf: 'center' }}
-			/>
+				<ScrollView
+					horizontal
+					style={viewStyle}
+					contentContainerStyle={containerStyle}
+					fadingEdgeLength={5}
+				>
+					{totalsAndSheduledTotals.map((e, i) => (
+						<Mark
+							duty={e.duty ?? false}
+							mark={e.result ?? null}
+							weight={e.weight}
+							maxWeight={maxWeight}
+							minWeight={minWeight}
+							style={markStyle}
+							key={i.toString()}
+							onPress={props.openDetails}
+						/>
+					))}
+				</ScrollView>
+				<Mark
+					duty={false}
+					finalMark={props.term?.mark}
+					mark={props.term.avgMark}
+					onPress={props.openDetails}
+					textStyle={{ fontSize: 18 }}
+					subTextStyle={{ fontSize: 8 }}
+					style={{ padding: Spacings.s2, alignSelf: 'center' }}
+				/>
+			</View>
+			<View
+				style={{
+					flex: 1,
+					flexDirection: 'row',
+					flexWrap: 'wrap',
+					padding: Spacings.s2,
+				}}
+			>
+				{toGetTarget && (
+					<View style={[styles.stretch, { gap: Spacings.s1 }]}>
+						<Text>До </Text>
+						<Mark
+							mark={student?.targetMark}
+							duty={false}
+							style={{ padding: Spacings.s1 }}
+						/>
+						<Text>нужно {toGetTarget}x</Text>
+
+						<Mark
+							duty={false}
+							style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
+							textStyle={{ fontSize: 10 }}
+							subTextStyle={{ fontSize: 8 }}
+							weight={student?.defaultMarkWeight}
+							mark={student?.defaultMark}
+						/>
+					</View>
+				)}
+			</View>
 		</>
 	)
 })

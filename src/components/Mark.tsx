@@ -28,6 +28,10 @@ interface Weight {
 	weight: number | undefined
 }
 
+export function roundMark(mark: number) {
+	return Math.floor(mark + 0.1)
+}
+
 export default observer(function Mark({
 	finalMark,
 	mark: rawMark,
@@ -42,7 +46,7 @@ export default observer(function Mark({
 	...props
 }: TouchableOpacityProps & {
 	finalMark?: number | null | string
-	mark: number | null | string
+	mark: number | null | undefined | string
 	duty: boolean
 	noColor?: string
 	textStyle?: TextStyle
@@ -57,14 +61,15 @@ export default observer(function Mark({
 
 	let color = noColor + (typeof weight === 'number' ? '' : '7A')
 	if (typeof mark === 'number' && !isNaN(mark)) {
-		if (mark >= 4.6) {
-			color = colors[5]
-		} else if (mark >= 3.6) {
-			color = colors[4]
-		} else if (mark >= 2.6) {
-			color = colors[3]
-		} else if (mark >= 1.6) {
-			color = colors[2]
+		const rounded = roundMark(mark)
+		if (rounded in colors) color = colors[rounded as keyof typeof colors]
+		else {
+			const keys = Object.keys(colors).map(Number)
+			const min = Math.min(...keys)
+			const max = Math.max(...keys)
+
+			if (rounded > max) color = colors[max as keyof typeof colors]
+			if (rounded < min) color = colors[min as keyof typeof colors]
 		}
 	}
 

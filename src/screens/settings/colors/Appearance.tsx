@@ -22,11 +22,6 @@ const themes = [
 const toAppearance = (theme: 'dark' | 'light' | 'system') =>
 	theme === 'system' ? null : theme
 
-const markStyles = [
-	{ label: 'Линия', value: 'border' as const },
-	{ label: 'Фон', value: 'background' as const },
-]
-
 const nameFormat = [
 	{ label: 'ФИО', value: 'fio' as const },
 	{ label: 'ИФО', value: 'ifo' as const },
@@ -63,19 +58,6 @@ export default observer(function AppearanceSettings_() {
 							ThemeStore.meta(Theme).updateColorScheme()
 						})
 					}
-				/>
-			</List.Section>
-			<Divider style={{ margin: Spacings.s1 }} />
-			<List.Section title="Оценки">
-				<SelectModal
-					label="Стиль оценок"
-					value={Settings.markStyle}
-					data={markStyles}
-					onSelect={({ value }) => Settings.save({ markStyle: value })}
-				/>
-				<SwitchSetting
-					title='"Вес: " перед весом оценки'
-					setting="showMarkWeightTip"
 				/>
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />
