@@ -29,7 +29,7 @@ interface Weight {
 }
 
 export function roundMark(mark: number) {
-	return Math.round(mark + 0.1)
+	return Math.round(mark - 0.1)
 }
 
 export default observer(function Mark({
