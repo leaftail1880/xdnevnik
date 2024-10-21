@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { Button, IconButton, TextInput } from 'react-native-paper'
+import { Button, IconButton } from 'react-native-paper'
+import Mark from '~components/Mark'
+import NumberInputSetting from '~components/NumberInput'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import type { PartialAssignment } from '~services/net-school/entities'
+import { Spacings } from '~utils/Spacings'
 import { styles } from '../../../constants'
-import { Spacings } from '../../../utils/Spacings'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {
 	setCustomMarks: (p: Partial<PartialAssignment>[]) => void
@@ -18,11 +20,11 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 		? Settings.forStudent(Settings.studentId)
 		: undefined
 
-	const [weight, setWeight] = useState(
-		student?.defaultMarkWeight?.toString() ?? '',
-	)
+	const defaultWeight = student?.defaultMarkWeight ?? 0
+	const [weight, setWeight] = useState(defaultWeight)
 
-	const [mark, setMark] = useState(student?.defaultMark?.toString() ?? '')
+	const defaultMark = student?.defaultMark ?? 0
+	const [mark, setMark] = useState(defaultMark)
 	const [addingCustomMark, setAddingCustomMark] = useState(false)
 	const addCustomMark = useCallback(() => {
 		if (addingCustomMark) {
@@ -38,18 +40,32 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				},
 			])
 		}
-		setAddingCustomMark(!addingCustomMark)
 	}, [addingCustomMark, mark, props, weight])
+
+	const addCustomMarkAndCloseForm = useCallback(() => {
+		addCustomMark()
+		setAddingCustomMark(v => !v)
+	}, [addCustomMark, setAddingCustomMark])
 
 	return (
 		<View>
 			<View style={styles.stretch}>
 				<Button
-					onPress={addCustomMark}
+					onPress={addCustomMarkAndCloseForm}
 					icon={addingCustomMark ? 'content-save' : 'plus'}
 				>
 					{addingCustomMark ? 'Добавить' : 'Добавить оценку'}
 				</Button>
+				{addingCustomMark && (
+					<Mark
+						weight={weight}
+						mark={mark}
+						duty={false}
+						style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
+						onPress={addCustomMark}
+					/>
+				)}
+
 				{addingCustomMark && (
 					<IconButton
 						icon="undo"
@@ -68,21 +84,18 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				)}
 			</View>
 			{addingCustomMark && (
-				<View style={{ padding: Spacings.s1 }}>
-					<TextInput
-						mode="outlined"
-						style={{ marginBottom: Spacings.s2 }}
-						placeholder="Оценка"
-						defaultValue={mark}
-						keyboardType="numeric"
-						onChangeText={setMark}
+				<View>
+					<NumberInputSetting<number>
+						value={mark}
+						defaultValue={defaultMark}
+						onChange={setMark}
+						label="Оценка"
 					/>
-					<TextInput
-						mode="outlined"
-						placeholder="Вес"
-						defaultValue={weight}
-						keyboardType="numeric"
-						onChangeText={setWeight}
+					<NumberInputSetting<number>
+						value={weight}
+						defaultValue={defaultWeight}
+						onChange={setWeight}
+						label="Вес"
 					/>
 				</View>
 			)}
