@@ -44,6 +44,7 @@ class SettingsStore {
 	markStyle: 'background' | 'border' = 'background'
 	showMarkWeightTip = true
 	collapseLongAssignmentText = false
+	targetMarkCompact = false
 
 	/**
 	 * Map containing per student overrides

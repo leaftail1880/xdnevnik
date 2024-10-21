@@ -42,6 +42,11 @@ export default observer(function Notifications(
 					title='"Вес: " перед весом оценки'
 					setting="showMarkWeightTip"
 				/>
+				<SwitchSetting
+					title="Компактное отображение"
+					description="Компактное отображение целевой оценки"
+					setting="targetMarkCompact"
+				/>
 			</List.Section>
 			{student && (
 				<List.Section title="Для ученика">

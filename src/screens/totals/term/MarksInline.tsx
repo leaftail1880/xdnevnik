@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import React, { useMemo } from 'react'
 import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Chip, Text } from 'react-native-paper'
 import Loading from '~components/Loading'
 import Mark from '~components/Mark'
 import { styles } from '~constants'
@@ -155,35 +155,53 @@ export default observer(function SubjectMarksInline(
 					style={{ padding: Spacings.s2, alignSelf: 'center' }}
 				/>
 			</View>
-			<View
-				style={{
-					flex: 1,
-					flexDirection: 'row',
-					flexWrap: 'wrap',
-					padding: Spacings.s2,
-				}}
-			>
-				{toGetTarget && (
-					<View style={[styles.stretch, { gap: Spacings.s1 }]}>
-						<Text>До </Text>
-						<Mark
-							mark={student?.targetMark}
-							duty={false}
-							style={{ padding: Spacings.s1 }}
-						/>
-						<Text>нужно {toGetTarget}x</Text>
+			{toGetTarget && (
+				<View
+					style={{
+						flex: 1,
+						flexDirection: 'row',
+						flexWrap: 'wrap',
+						padding: Spacings.s2,
+						gap: Spacings.s2,
+					}}
+				>
+					{Settings.targetMarkCompact && (
+						<Chip mode="flat" compact>
+							<Text>
+								<Text>Нужно </Text>
+								<Text
+									style={{ fontWeight: 'bold', color: Theme.colors.primary }}
+								>
+									{toGetTarget}x
+								</Text>
+							</Text>
+						</Chip>
+					)}
+					{!Settings.targetMarkCompact && (
+						<View style={[styles.stretch, { gap: Spacings.s1 }]}>
+							<Text>До</Text>
+							<Mark
+								mark={student?.targetMark}
+								duty={false}
+								style={{ padding: Spacings.s1 }}
+							/>
+							<Text>нужно </Text>
+							<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+								{toGetTarget}x
+							</Text>
 
-						<Mark
-							duty={false}
-							style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
-							textStyle={{ fontSize: 10 }}
-							subTextStyle={{ fontSize: 8 }}
-							weight={student?.defaultMarkWeight}
-							mark={student?.defaultMark}
-						/>
-					</View>
-				)}
-			</View>
+							<Mark
+								duty={false}
+								style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
+								textStyle={{ fontSize: 10 }}
+								subTextStyle={{ fontSize: 8 }}
+								weight={student?.defaultMarkWeight}
+								mark={student?.defaultMark}
+							/>
+						</View>
+					)}
+				</View>
+			)}
 		</>
 	)
 })
