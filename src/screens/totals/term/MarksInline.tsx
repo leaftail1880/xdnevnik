@@ -134,7 +134,7 @@ export default observer(function SubjectMarksInline(
 					contentContainerStyle={containerStyle}
 					fadingEdgeLength={5}
 				>
-					{totalsAndSheduledTotals.map((e, i) => (
+					{totalsAndSheduledTotals.reverse().map((e, i) => (
 						<Mark
 							duty={e.duty ?? false}
 							mark={e.result ?? null}
