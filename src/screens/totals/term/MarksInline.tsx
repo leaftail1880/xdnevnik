@@ -79,6 +79,8 @@ export default observer(function SubjectMarksInline(
 		const viewStyle: StyleProp<ViewStyle> = {
 			flex: 1,
 			backgroundColor,
+      flexGrow: 1,
+      transform: [{scaleX: -1}]
 		}
 
 		return [viewStyle, [viewStyle, containerStyle]]
@@ -86,7 +88,7 @@ export default observer(function SubjectMarksInline(
 
 	const marks = useMemo(
 		() =>
-			result.totals &&
+			result?.totals &&
 			calculateMarks({
 				totals: result.totals,
 				attendance: TermStore.attendance,
@@ -210,4 +212,5 @@ const markStyle: StyleProp<ViewStyle> = {
 	padding: Spacings.s1,
 	paddingHorizontal: Spacings.s2 + 4,
 	marginHorizontal: 2,
+  transform: [{scaleX: -1}]
 }
