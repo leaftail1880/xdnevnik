@@ -14,9 +14,7 @@ import { Spacings } from '../../utils/Spacings'
 import Day from './Day'
 import { DiaryState } from './state'
 
-export default observer(function DiaryScreen(
-	props: Pick<DiaryLessonProps, 'navigation' | 'route'>,
-) {
+export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
@@ -91,4 +89,7 @@ const styles = StyleSheet.create({
 
 export type DiaryLessonProps = {
 	lesson: Lesson
-} & StackScreenProps<ParamListBase>
+	navigateToLessonMarks: VoidFunction
+} 
+
+export type DiaryLessonNavigation = StackScreenProps<ParamListBase>

@@ -4,12 +4,10 @@ import { Text } from 'react-native-paper'
 import { DiaryStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson from './Lesson'
-import { DiaryLessonProps } from './screen'
+import { DiaryLessonNavigation } from './screen'
 import { DiaryState } from './state'
 
-export default observer(function DiaryDay(
-	props: Pick<DiaryLessonProps, 'navigation' | 'route'>,
-) {
+export default observer(function DiaryDay(props: DiaryLessonNavigation) {
 	if (DiaryStore.fallback) return DiaryStore.fallback
 
 	const day = DiaryStore.result.forDay(DiaryState.day)

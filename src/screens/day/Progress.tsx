@@ -18,7 +18,7 @@ export const LessonProgressStore = new (class {
 const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
-	const { total, beforeStart, beforeEnd, progress, state, remaining } = useMemo(
+	const { elapsed, before, beforeStart, progress, state, remaining } = useMemo(
 		() => Lesson.status(props.lesson),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[props.lesson, store.now],
@@ -39,7 +39,7 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 	if (state === LessonState.notStarted) {
 		// Do not show time above 15 mins
 		if (beforeStart < 15) {
-			return <Text style={textStyle}>Начнется через {beforeStart} мин</Text>
+			return <Text style={textStyle}>Начнется через {before}</Text>
 		}
 	} else if (state === LessonState.going) {
 		return (
@@ -53,9 +53,7 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 						progress={progress / 100}
 					/>
 				</View>
-				<Text>
-					{beforeEnd}/{total + 1}
-				</Text>
+				<Text>{elapsed}</Text>
 				<Text>{remaining}</Text>
 			</View>
 		)

@@ -117,7 +117,7 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 			beforeLessonNotifTime
 	) {
 		date = new Date(previous.end.getTime())
-		date.setMinutes(date.getMinutes() + 1)
+		// date.setMinutes(date.getMinutes() + 1)
 		period = new Date(current.start.getTime() - previous.end.getTime())
 	} else {
 		// Send before lesson
@@ -135,11 +135,11 @@ async function showNotification(
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
 	const lessonName = getSubjectName(lesson)
 
-	// Lesson can be plain object for some reason? Need to investigate that shit here
-	const { state, beforeEnd, beforeStart, progress, total, remaining } =
-		Lesson.status(lesson)
+	const { state, before, progress, elapsed, remaining } = Lesson.status(
+		lesson,
+		now,
+	)
 
-	// TODO Custom format support
 	let title = ''
 	title += lessonName
 	title += ' | '
@@ -149,10 +149,10 @@ async function showNotification(
 
 	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 	if (state === LessonState.notStarted) {
-		body += `До начала ${beforeStart} мин `
+		body += `До начала ${before} `
 		if (period) body += `Перемена ${period.getMinutes()} мин.`
 	} else if (state === LessonState.going) {
-		body += `Прошло ${beforeEnd}/${total} мин, осталось ${remaining}`
+		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
 	const notificationId = await notifee.displayNotification({

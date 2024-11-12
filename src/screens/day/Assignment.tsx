@@ -9,26 +9,23 @@ import { shareAsync } from 'expo-sharing'
 import { Size } from '~components/Size'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
-import { TermStore } from '~screens/totals/term/state'
 import { API } from '~services/net-school/api'
 import { Assignment, Attachment } from '~services/net-school/entities'
 import { ROUTES } from '~services/net-school/routes'
 import { AttachmentsStore } from '~services/net-school/store'
 import { ModalAlert } from '~utils/Toast'
-import { LANG, Logger } from '../../constants'
+import { Logger } from '../../constants'
 import { Spacings } from '../../utils/Spacings'
-import { TermNavigationParamMap } from '../totals/navigation'
 import { DiaryLessonProps } from './screen'
 
 // TODO support adding attachment
 
 export default observer(function DiaryAssignment({
 	assignment,
-	navigation,
-	lesson,
+	navigateToLessonMarks,
 }: {
 	assignment: Assignment
-} & Pick<DiaryLessonProps, 'navigation' | 'lesson'>) {
+} & DiaryLessonProps) {
 	const [showHomework, setShowHomework] = useState(
 		// Do not show long homework by default
 		!(
@@ -78,20 +75,7 @@ export default observer(function DiaryAssignment({
 					maxWeight={assignment.weight}
 					minWeight={assignment.weight}
 					style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
-					onPress={() => {
-						const currentTerm = TermStore.currentTerm
-
-						currentTerm &&
-							// @ts-expect-error Huh
-							navigation.navigate(LANG['s_totals'], {
-								screen: LANG['s_subject_totals'],
-								params: {
-									subjectId: lesson.subjectId,
-									termId: currentTerm.id,
-									finalMark: null,
-								} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
-							})
-					}}
+					onPress={navigateToLessonMarks}
 				/>
 			</View>
 			{showHomework &&

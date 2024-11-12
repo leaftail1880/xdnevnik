@@ -130,12 +130,9 @@ export class Lesson {
 	}
 
 	static status(lesson: Lesson, now = Date.now()) {
-		// const date = new Date()
-		// date.setHours(12, 10)
-		// now = date.getTime()
 		const start = lesson.start.getTime()
 		const end = lesson.end.getTime()
-		const beforeStart = toMinutes(start - now)
+		const beforeStart = toSecondsAndMinutes(start - now)
 		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
 			toSecondsAndMinutes(now - start)
 		const { minutes: total, seconds: totalSeconds } = toSecondsAndMinutes(
@@ -144,14 +141,10 @@ export class Lesson {
 		const progress = 100 - Math.ceil(((end - now) * 100) / (end - start))
 
 		return {
-			start,
-			end,
-			total,
-			totalSeconds,
-			beforeEnd,
-			beforeStart,
-			beforeEndSeconds,
-			remaining: `${(total - beforeEnd).toString().padStart(2, '0')}:${(totalSeconds - beforeEndSeconds).toString().padStart(2, '0')}`,
+			beforeStart: beforeStart.minutes,
+			before: toTime(beforeStart.minutes, beforeStart.minutes),
+			elapsed: `${beforeEnd}/${total + 1}`,
+			remaining: toTime(total - beforeEnd, totalSeconds - beforeEndSeconds),
 			progress,
 			state:
 				now < start
@@ -161,6 +154,10 @@ export class Lesson {
 						: LessonState.ended,
 		}
 	}
+}
+
+function toTime(...args: number[]) {
+	return args.map(e => e.toString().padStart(2, '0')).join(':')
 }
 
 function toMinutes(ms: number) {

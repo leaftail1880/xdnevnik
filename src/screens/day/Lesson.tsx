@@ -6,16 +6,36 @@ import { AssignmentsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
+import { useCallback } from 'react'
 import SubjectName from '~components/SubjectName'
-import { styles } from '../../constants'
+import { TermNavigationParamMap } from '~screens/totals/navigation'
+import { TermStore } from '~screens/totals/term/state'
+import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
-import { DiaryLessonProps } from './screen'
+import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
 
 export default observer(function DiaryLesson({
 	lesson,
+	navigation,
 	...props
-}: DiaryLessonProps) {
+}: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & DiaryLessonNavigation) {
+	const currentTerm = TermStore.currentTerm
+	const navigateToLessonMarks = useCallback(() => {
+		currentTerm &&
+			// @ts-expect-error Huh
+			navigation.navigate(LANG['s_totals'], {
+				screen: LANG['s_subject_totals'],
+				params: {
+					subjectId: lesson.subjectId,
+					termId: currentTerm.id,
+					finalMark: null,
+				} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
+			})
+	}, [currentTerm, lesson, navigation])
+
+	const newProps: DiaryLessonProps = { lesson, navigateToLessonMarks, ...props }
+
 	return (
 		<Card
 			style={{
@@ -32,9 +52,9 @@ export default observer(function DiaryLesson({
 				padding: Spacings.s2,
 			}}
 		>
-			<TopRow lesson={lesson} {...props} />
-			<MiddleRow lesson={lesson} {...props} />
-			{DiaryState.showHomework && <Assignments lesson={lesson} {...props} />}
+			<TopRow {...newProps} />
+			<MiddleRow {...newProps} />
+			{DiaryState.showHomework && <Assignments {...newProps} />}
 			<LessonProgress lesson={lesson} />
 		</Card>
 	)
@@ -56,11 +76,16 @@ const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 	)
 })
 
-const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
+const MiddleRow = observer(function MiddleRow({
+	lesson,
+	navigateToLessonMarks,
+}: DiaryLessonProps) {
 	return (
 		<>
 			{DiaryState.showLessonTheme && (
-				<Text selectable>{lesson.lessonTheme ?? 'Темы нет'}</Text>
+				<Text selectable onPress={navigateToLessonMarks}>
+					{lesson.lessonTheme ?? 'Темы нет'}
+				</Text>
 			)}
 
 			{DiaryState.showAttachments && lesson.attachmentsExists && (
@@ -70,29 +95,22 @@ const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	)
 })
 
-const Assignments = observer(function Assignments({
-	lesson,
-	navigation,
-}: DiaryLessonProps) {
+const Assignments = observer(function Assignments(props: DiaryLessonProps) {
 	if (AssignmentsStore.fallback) return AssignmentsStore.fallback
 
 	const results = AssignmentsStore.result.filter(e => {
-		const sameLesson = e.classmeetingId === lesson.classmeetingId
+		const sameLesson = e.classmeetingId === props.lesson.classmeetingId
 		const sameDay =
 			!e.weight &&
-			new Date(e.assignmentDate).toYYYYMMDD() === lesson.start.toYYYYMMDD()
+			new Date(e.assignmentDate).toYYYYMMDD() ===
+				props.lesson.start.toYYYYMMDD()
 
 		return sameLesson || sameDay
 	})
 
 	if (results.length) {
 		return results.map(e => (
-			<DiaryAssignment
-				assignment={e}
-				key={e.assignmentId}
-				navigation={navigation}
-				lesson={lesson}
-			/>
+			<DiaryAssignment key={e.assignmentId} assignment={e} {...props} />
 		))
 	}
 })
