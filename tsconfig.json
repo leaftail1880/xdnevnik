@@ -9,7 +9,6 @@
 		"allowJs": true,
 		"forceConsistentCasingInFileNames": true,
 		"noEmit": true,
-    "strict": true,
 		"resolveJsonModule": true,
 
 		"strictBindCallApply": true,

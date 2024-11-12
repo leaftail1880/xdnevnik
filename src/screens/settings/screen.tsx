@@ -14,8 +14,8 @@ import Notifications from './notifications/Notifications'
 import PrivacyPolicy from './support/PrivacyPolicy'
 import Support from './support/Support'
 import TermsAndConditions from './support/TermsAndConditions'
+import MicroUpdate from './update/micro-update'
 import UpdatesScreen from './update/screen'
-import { getUpdateIdShort } from './update/utils'
 
 import * as Application from 'expo-application'
 import { memo } from 'react'
@@ -102,7 +102,7 @@ const MainSettings = memo(function MainSettings(
 			>
 				<HelperText type="info">
 					{Application.applicationName} {Application.nativeApplicationVersion}{' '}
-					{getUpdateIdShort()}
+					<MicroUpdate />
 				</HelperText>
 			</View>
 		</ScrollView>
