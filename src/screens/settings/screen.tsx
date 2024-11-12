@@ -22,6 +22,7 @@ import { memo } from 'react'
 import { HelperText } from 'react-native-paper'
 import SelectModal from '~components/SelectModal'
 import { StudentsStore } from '~services/net-school/store'
+import { Spacings } from '~utils/Spacings'
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,
@@ -95,11 +96,7 @@ const MainSettings = memo(function MainSettings(
 				target={'support'}
 				description={'Тех поддержка и юр. сведения'}
 			/>
-			<View
-				style={{
-					alignItems: 'center',
-				}}
-			>
+			<View style={{ alignItems: 'center', margin: Spacings.s2 }}>
 				<HelperText type="info">
 					{Application.applicationName} {Application.nativeApplicationVersion}{' '}
 					<MicroUpdate />

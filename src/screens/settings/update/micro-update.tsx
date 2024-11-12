@@ -1,8 +1,8 @@
 import * as Updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { Button, HelperText, IconButton, Text } from 'react-native-paper'
+import { Button, HelperText, Text } from 'react-native-paper'
 import { Theme } from '~models/theme'
 import { Spacings } from '~utils/Spacings'
 import { ModalAlert } from '~utils/Toast'
@@ -11,10 +11,23 @@ export default observer(function MicroUpdateId() {
 	const updateId = Updates.updateId?.slice(-6) ?? 'из сборки'
 	const { isUpdateAvailable } = Updates.useUpdates()
 
+	const update = isUpdateAvailable
+
 	return (
-		<Text onPress={openModal}>
+		<Text
+			onPress={openModal}
+			// eslint-disable-next-line react-native/no-color-literals
+			style={{
+				backgroundColor: update
+					? Theme.colors.errorContainer
+					: Theme.colors.background,
+
+				color: update ? Theme.colors.error : Theme.colors.onSecondaryContainer,
+
+				fontWeight: update ? 'bold' : 'normal',
+			}}
+		>
 			{updateId}
-			{isUpdateAvailable && <IconButton icon="reload" />}
 		</Text>
 	)
 })
@@ -37,14 +50,35 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		? 'Запущено из сборки'
 		: 'Запущено из микрообновления'
 
-	const [found, setFound] = useState(false)
+	const [found, setFound] = useState(true)
+
+	const timeout = useRef<number>()
+	useEffect(() => {
+		clearTimeout(timeout.current)
+		if (!found) {
+			timeout.current = setTimeout(
+				() => setFound(true),
+				5000,
+			) as unknown as number
+		}
+	}, [found])
+
+	async function wrap<T>(promise: Promise<T>, onResolve: (t: T) => void) {
+		try {
+			onResolve(await promise)
+		} catch (e) {
+			setFound(false)
+		}
+	}
 
 	return (
 		<View style={{ gap: Spacings.s2 }}>
 			<Text>{runTypeMessage}</Text>
 			{!isUpdateAvailable ? (
 				<Button
-					onPress={() => Updates.checkForUpdateAsync()}
+					onPress={() =>
+						wrap(Updates.checkForUpdateAsync(), () => setFound(true))
+					}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}
 				>
 					<HelperText type="info">
@@ -55,8 +89,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 				<Button
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}
 					onPress={() =>
-						Updates.fetchUpdateAsync().then(e => {
-							if (e.isNew || e.isRollBackToEmbedded) {
+						wrap(Updates.fetchUpdateAsync(), result => {
+							if (result.isNew || result.isRollBackToEmbedded) {
 								Updates.reloadAsync()
 								setFound(true)
 							} else setFound(false)
