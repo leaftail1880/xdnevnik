@@ -79,8 +79,8 @@ export default observer(function SubjectMarksInline(
 		const viewStyle: StyleProp<ViewStyle> = {
 			flex: 1,
 			backgroundColor,
-      flexGrow: 1,
-      transform: [{scaleX: -1}]
+			flexGrow: 1,
+			transform: [{ scaleX: -1 }],
 		}
 
 		return [viewStyle, [viewStyle, containerStyle]]
@@ -134,18 +134,21 @@ export default observer(function SubjectMarksInline(
 					contentContainerStyle={containerStyle}
 					fadingEdgeLength={5}
 				>
-					{totalsAndSheduledTotals.reverse().map((e, i) => (
-						<Mark
-							duty={e.duty ?? false}
-							mark={e.result ?? null}
-							weight={e.weight}
-							maxWeight={maxWeight}
-							minWeight={minWeight}
-							style={markStyle}
-							key={i.toString()}
-							onPress={props.openDetails}
-						/>
-					))}
+					{totalsAndSheduledTotals
+						.slice()
+						.reverse()
+						.map((e, i) => (
+							<Mark
+								duty={e.duty ?? false}
+								mark={e.result ?? null}
+								weight={e.weight}
+								maxWeight={maxWeight}
+								minWeight={minWeight}
+								style={markStyle}
+								key={i.toString()}
+								onPress={props.openDetails}
+							/>
+						))}
 				</ScrollView>
 				<Mark
 					duty={false}
@@ -212,5 +215,5 @@ const markStyle: StyleProp<ViewStyle> = {
 	padding: Spacings.s1,
 	paddingHorizontal: Spacings.s2 + 4,
 	marginHorizontal: 2,
-  transform: [{scaleX: -1}]
+	transform: [{ scaleX: -1 }],
 }

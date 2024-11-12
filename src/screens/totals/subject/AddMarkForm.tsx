@@ -67,20 +67,10 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 				)}
 
 				{addingCustomMark && (
-					<IconButton
-						icon="undo"
-						onPress={() => {
-							setAddingCustomMark(false)
-						}}
-					/>
+					<IconButton icon="minus" onPress={() => setAddingCustomMark(false)} />
 				)}
 				{!addingCustomMark && !!props.customMarks.length && (
-					<IconButton
-						icon="delete"
-						onPress={() => {
-							props.setCustomMarks([])
-						}}
-					/>
+					<IconButton icon="delete" onPress={() => props.setCustomMarks([])} />
 				)}
 			</View>
 			{addingCustomMark && (

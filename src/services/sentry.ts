@@ -2,8 +2,7 @@ import * as Sentry from '@sentry/react-native'
 import * as updates from 'expo-updates'
 
 // Construct a new instrumentation instance. This is needed to communicate between the integration and React
-export const SENTRY_ROUTING =
-	new Sentry.ReactNavigationInstrumentation()
+export const SENTRY_ROUTING = new Sentry.ReactNavigationInstrumentation()
 
 const manifest = updates.manifest
 const metadata =
@@ -23,7 +22,7 @@ Sentry.configureScope(scope => {
 		const slug = extra?.expoClient?.slug ?? '[project]'
 		scope.setTag(
 			'expo-update-debug-url',
-			`https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`
+			`https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`,
 		)
 	} else if (updates.isEmbeddedLaunch) {
 		// This will be `true` if the update is the one embedded in the build, and not one downloaded from the updates server.

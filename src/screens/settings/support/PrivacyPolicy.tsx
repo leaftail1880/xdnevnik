@@ -17,7 +17,7 @@ export function Strong(props: TextProps<string>) {
 
 // eslint-disable-next-line mobx/missing-observer
 export function Link(
-	props: TextProps<string> & AnchorHTMLAttributes<never> & { href: string }
+	props: TextProps<string> & AnchorHTMLAttributes<never> & { href: string },
 ) {
 	return (
 		<Text

@@ -128,4 +128,3 @@ export default observer(function SubjectName({
 		</TouchableOpacity>
 	)
 })
-

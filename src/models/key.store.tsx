@@ -19,7 +19,7 @@ export class KeyStore<Key = object, T = object> {
 	constructor(
 		private readonly getId: (id: Key) => string,
 		private readonly createStore: (id: Key) => T,
-		{ maxUnusedStores = 3 }: Partial<KeyStoreOptions> = {}
+		{ maxUnusedStores = 3 }: Partial<KeyStoreOptions> = {},
 	) {
 		makeAutoObservable<this, 'options' | 'create' | 'stores'>(this, {
 			create: action,
@@ -33,7 +33,7 @@ export class KeyStore<Key = object, T = object> {
 
 	get(
 		key: Key,
-		setCanDispose = true
+		setCanDispose = true,
 	): Omit<StoredValue<T>, 'canDispose' | 'sid'> {
 		const id = this.getId(key)
 		if (this.stores[id]) {

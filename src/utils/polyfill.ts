@@ -42,7 +42,8 @@ Date.week = date =>
 	new Array(7)
 		.fill('')
 		.map(
-			(_, i) => new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs)
+			(_, i) =>
+				new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs),
 		) as ReturnType<typeof Date.week>
 
 AbortSignal.timeout = ms => {

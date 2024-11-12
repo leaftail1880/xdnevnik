@@ -105,5 +105,3 @@ const Store = observer(function Store({
 		/>
 	)
 })
-
-

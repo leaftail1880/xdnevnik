@@ -186,4 +186,3 @@ async function showNotification(
 		NotificationStore.currentLesson = lessonId
 	})
 }
-

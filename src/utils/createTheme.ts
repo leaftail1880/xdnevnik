@@ -39,7 +39,7 @@ function argbThemeToRgbTheme(theme: ARGBTheme) {
 		Object.entries(theme).map(([key, value]) => [
 			key,
 			Color(value).rgb().string(),
-		])
+		]),
 	) as RGBTheme
 }
 
@@ -102,7 +102,7 @@ export function getMatchingColor(colorName: keyof MD3Colors, theme: MD3Colors) {
 
 function prepareCustomColors(
 	type: 'light' | 'dark',
-	custom?: [string, string][]
+	custom?: [string, string][],
 ) {
 	if (!custom?.length) {
 		return {}
