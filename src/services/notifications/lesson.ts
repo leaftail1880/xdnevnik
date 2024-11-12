@@ -113,7 +113,7 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 		previous &&
 		current.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
 		// Only when delay between lessons is less then 15
-		(current.start.getTime() - previous.end.getTime()) / minute <
+		(current.start.getTime() - previous.end.getTime()) / minute <=
 			beforeLessonNotifTime
 	) {
 		date = new Date(previous.end.getTime())
@@ -149,8 +149,8 @@ async function showNotification(
 
 	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 	if (state === LessonState.notStarted) {
+		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter
-		if (period) body += `Перемена ${period.getMinutes()} мин.`
 	} else if (state === LessonState.going) {
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
