@@ -12,26 +12,23 @@ export const LessonProgressStore = new (class {
 	currentLesson = 0
 	constructor() {
 		makeAutoObservable(this)
-		setInterval(() => runInAction(() => (this.now = Date.now())), 1000 * 3)
+		setInterval(() => runInAction(() => (this.now = Date.now())), 1000)
 	}
 })()
+const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
-	const { total, beforeStart, beforeEnd, progress, state } = useMemo(
-		() => props.lesson.status(LessonProgressStore.now),
+	const { total, beforeStart, beforeEnd, progress, state, remaining } = useMemo(
+		() => Lesson.status(props.lesson),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[props.lesson, LessonProgressStore.now],
+		[props.lesson, store.now],
 	)
 
 	useEffect(() => {
 		if (state === LessonState.going)
-			runInAction(
-				() => (LessonProgressStore.currentLesson = props.lesson.classmeetingId),
-			)
-		else if (
-			LessonProgressStore.currentLesson === props.lesson.classmeetingId
-		) {
-			runInAction(() => (LessonProgressStore.currentLesson = 0))
+			runInAction(() => (store.currentLesson = props.lesson.classmeetingId))
+		else if (store.currentLesson === props.lesson.classmeetingId) {
+			runInAction(() => (store.currentLesson = 0))
 		}
 	}, [state, props.lesson.classmeetingId])
 
@@ -56,9 +53,10 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 						progress={progress / 100}
 					/>
 				</View>
-				<Text style={styles.progressText}>
-					{beforeEnd}/{total} мин
+				<Text>
+					{beforeEnd}/{total + 1}
 				</Text>
+				<Text>{remaining}</Text>
 			</View>
 		)
 	} else {
@@ -70,12 +68,10 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 const styles = StyleSheet.create({
 	row: {
 		flexDirection: 'row',
+		gap: Spacings.s2,
 	},
 	progressView: {
-		flex: 5,
+		flex: 4,
 		justifyContent: 'center',
-	},
-	progressText: {
-		marginLeft: Spacings.s2,
 	},
 })

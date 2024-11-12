@@ -6,7 +6,7 @@ import { Card, Text } from 'react-native-paper'
 import { styles as globalStyles } from '../../../constants'
 import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert } from '../../../utils/Toast'
-import { getUpdateIdShort } from './utils'
+import MicroUpdate from './micro-update'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function UpdateInfo() {
@@ -19,7 +19,7 @@ export default memo(function UpdateInfo() {
 			<Card.Content style={globalStyles.stretch}>
 				<Text>Сборка: </Text>
 				<Text variant="labelLarge" onPress={buildInfo}>
-					{getUpdateIdShort() ?? 'По умолчанию'}
+					<MicroUpdate />
 				</Text>
 			</Card.Content>
 		</Card>

@@ -126,28 +126,32 @@ export class Lesson {
 		 */
 		this.day = new Date(day)
 
-		makeAutoObservable(this, { status: false })
+		makeAutoObservable(this)
 	}
 
-	status(now = Date.now()) {
+	static status(lesson: Lesson, now = Date.now()) {
 		// const date = new Date()
 		// date.setHours(12, 10)
 		// now = date.getTime()
-		const start = this.start.getTime()
-		const end = this.end.getTime()
-		const toMin = (n: number) => Math.ceil(n / (1000 * 60))
-
-		const beforeStart = toMin(start - now)
-		const beforeEnd = toMin(now - start)
-		const total = toMin(end - start)
+		const start = lesson.start.getTime()
+		const end = lesson.end.getTime()
+		const beforeStart = toMinutes(start - now)
+		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
+			toSecondsAndMinutes(now - start)
+		const { minutes: total, seconds: totalSeconds } = toSecondsAndMinutes(
+			end - start,
+		)
 		const progress = 100 - Math.ceil(((end - now) * 100) / (end - start))
 
 		return {
 			start,
 			end,
 			total,
+			totalSeconds,
 			beforeEnd,
 			beforeStart,
+			beforeEndSeconds,
+			remaining: `${(total - beforeEnd).toString().padStart(2, '0')}:${(totalSeconds - beforeEndSeconds).toString().padStart(2, '0')}`,
 			progress,
 			state:
 				now < start
@@ -156,6 +160,18 @@ export class Lesson {
 						? LessonState.going
 						: LessonState.ended,
 		}
+	}
+}
+
+function toMinutes(ms: number) {
+	return Math.ceil(ms / (1000 * 60))
+}
+
+function toSecondsAndMinutes(ms: number) {
+	const minutes = toMinutes(ms)
+	return {
+		minutes: minutes - 1,
+		seconds: 60 - (minutes * 60 - Math.ceil(ms / 1000)) - 1,
 	}
 }
 

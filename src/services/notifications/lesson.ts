@@ -77,7 +77,7 @@ autorun(function notificationFromDiary() {
 		() =>
 			runInAction(async () => {
 				// const date = new Date()
-				// date.setHours(8, 41)
+				// date.setHours(7, 32)
 				// const now = date.getTime()
 				const now = Date.now()
 
@@ -96,7 +96,7 @@ autorun(function notificationFromDiary() {
 				// Nothing to show
 				NotificationStore.remove()
 			}),
-		3000,
+		1000,
 	)
 })
 
@@ -105,16 +105,16 @@ const minute = 60 * 1000
 function getLessonPeriod(previous: Lesson, current: Lesson) {
 	let period: Date | undefined
 	let date: Date
-	// TODO Support custom beforeLessonNotifTime
+	// TODO Support custom
 	const beforeLessonNotifTime = 15
-	const minutesBetween = 15
 
 	// If previous lesson is in the same day, send notification in the end of the lesson
 	if (
 		previous &&
 		current.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
 		// Only when delay between lessons is less then 15
-		(current.start.getTime() - previous.end.getTime()) / minute < minutesBetween
+		(current.start.getTime() - previous.end.getTime()) / minute <
+			beforeLessonNotifTime
 	) {
 		date = new Date(previous.end.getTime())
 		date.setMinutes(date.getMinutes() + 1)
@@ -133,13 +133,11 @@ async function showNotification(
 	period: Date | undefined,
 ) {
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
-	const lessonName = getSubjectName({
-		subjectId: lesson.subjectId,
-		subjectName: lesson.subjectName,
-	})
+	const lessonName = getSubjectName(lesson)
 
-	const { state, beforeEnd, beforeStart, progress, total } =
-		Lesson.prototype.status.call(lesson, now) as ReturnType<Lesson['status']>
+	// Lesson can be plain object for some reason? Need to investigate that shit here
+	const { state, beforeEnd, beforeStart, progress, total, remaining } =
+		Lesson.status(lesson)
 
 	// TODO Custom format support
 	let title = ''
@@ -154,7 +152,7 @@ async function showNotification(
 		body += `До начала ${beforeStart} мин `
 		if (period) body += `Перемена ${period.getMinutes()} мин.`
 	} else if (state === LessonState.going) {
-		body += `Прошло ${beforeEnd}/${total} мин, осталось ${total - beforeEnd}`
+		body += `Прошло ${beforeEnd}/${total} мин, осталось ${remaining}`
 	}
 
 	const notificationId = await notifee.displayNotification({

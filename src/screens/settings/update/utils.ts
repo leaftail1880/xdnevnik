@@ -1,7 +1,6 @@
 import * as FileSystem from 'expo-file-system'
 import * as IntentLauncherAndroid from 'expo-intent-launcher'
 import * as ExpoSharing from 'expo-sharing'
-import * as Updates from 'expo-updates'
 import { runInAction } from 'mobx'
 import { Platform } from 'react-native'
 import { GithubRelease } from '~services/github/entities'
@@ -14,10 +13,6 @@ export const Filename = Platform.select({
 	ios: 'XDnevnik.ipa',
 	android: __DEV__ ? 'XDnevnik.Dev.Client.apk' : 'XDnevnik.apk',
 })
-
-export function getUpdateIdShort() {
-	return Updates.updateId?.slice(-6)
-}
 
 async function handleErrorsAndDisplayInModal(task: () => Promise<void>) {
 	try {
@@ -72,6 +67,7 @@ export function downloadUpdate(
 		performDownload()
 	})
 }
+
 export function performDownload() {
 	handleErrorsAndDisplayInModal(async () => {
 		if (!State.downloader || !State.progress) return
@@ -88,6 +84,7 @@ export function performDownload() {
 		}
 	})
 }
+
 function openInstaller(fileUrl: string) {
 	return handleErrorsAndDisplayInModal(async () => {
 		if (Platform.OS === 'android') {

@@ -3,6 +3,8 @@ import type { PartialAssignment } from '~services/net-school/entities'
 import { SubjectPerformance } from '~services/net-school/entities'
 import { Logger } from '../constants'
 
+// TODO: Refactor and use class MarksCalculator instead of one big shitty function
+
 export type CalculateTotals = Partial<Pick<SubjectPerformance, 'attendance'>> &
 	Pick<SubjectPerformance, 'averageMark' | 'classmeetingsStats'> & {
 		results: (Omit<

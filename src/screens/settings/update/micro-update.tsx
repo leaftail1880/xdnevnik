@@ -1,6 +1,6 @@
 import * as Updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Button, HelperText, IconButton, Text } from 'react-native-paper'
 import { Theme } from '~models/theme'
@@ -37,6 +37,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		? 'Запущено из сборки'
 		: 'Запущено из микрообновления'
 
+	const [found, setFound] = useState(false)
+
 	return (
 		<View style={{ gap: Spacings.s2 }}>
 			<Text>{runTypeMessage}</Text>
@@ -45,7 +47,9 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 					onPress={() => Updates.checkForUpdateAsync()}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}
 				>
-					<HelperText type="info">Проверить наличие микрообновлений</HelperText>
+					<HelperText type="info">
+						{found ? 'Проверить наличие микрообновлений' : 'Не удалось найти'}
+					</HelperText>
 				</Button>
 			) : (
 				<Button
@@ -54,7 +58,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 						Updates.fetchUpdateAsync().then(e => {
 							if (e.isNew || e.isRollBackToEmbedded) {
 								Updates.reloadAsync()
-							}
+								setFound(true)
+							} else setFound(false)
 						})
 					}
 				>
