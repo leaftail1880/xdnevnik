@@ -142,7 +142,7 @@ export class Lesson {
 
 		return {
 			beforeStart: beforeStart.minutes,
-			before: toTime(beforeStart.minutes, beforeStart.minutes),
+			startsAfter: `Начнется через ${toTime(beforeStart.minutes, beforeStart.seconds)}`,
 			elapsed: `${beforeEnd}/${total + 1}`,
 			remaining: toTime(total - beforeEnd, totalSeconds - beforeEndSeconds),
 			progress,

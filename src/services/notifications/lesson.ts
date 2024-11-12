@@ -135,7 +135,7 @@ async function showNotification(
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
 	const lessonName = getSubjectName(lesson)
 
-	const { state, before, progress, elapsed, remaining } = Lesson.status(
+	const { state, startsAfter, progress, elapsed, remaining } = Lesson.status(
 		lesson,
 		now,
 	)
@@ -149,7 +149,7 @@ async function showNotification(
 
 	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 	if (state === LessonState.notStarted) {
-		body += `До начала ${before} `
+		body += startsAfter
 		if (period) body += `Перемена ${period.getMinutes()} мин.`
 	} else if (state === LessonState.going) {
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
