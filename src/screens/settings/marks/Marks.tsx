@@ -42,31 +42,33 @@ export default observer(function Notifications(
 					title='"Вес: " перед весом оценки'
 					setting="showMarkWeightTip"
 				/>
+			</List.Section>
+			<List.Section title="Целевая оценка">
+				{student && (
+					<>
+						<MarkInput
+							label="Целевая оценка"
+							description="Та оценка, к которой вы стремитесь. Будет использоваться при подсчете, сколько
+						оценок нужно для достижения целевой оценки."
+							markSetting="targetMark"
+						/>
+
+						<MarkInput
+							label="Обычная оценка"
+							description="Оценка, которую вы обычно получаете. Будет использоваться как оценка
+						по умолчанию на экране добавления оценки и при подсчете, сколько
+						оценок нужно для достижения целевой оценки."
+							markSetting="defaultMark"
+							weightSetting="defaultMarkWeight"
+						/>
+					</>
+				)}
 				<SwitchSetting
 					title="Компактное отображение"
 					description="Компактное отображение целевой оценки"
 					setting="targetMarkCompact"
 				/>
 			</List.Section>
-			{student && (
-				<List.Section title="Для ученика">
-					<MarkInput
-						label="Целевая оценка"
-						description="Та оценка, к которой вы стремитесь. Будет использоваться при подсчете, сколько
-						оценок нужно для достижения целевой оценки."
-						markSetting="targetMark"
-					/>
-
-					<MarkInput
-						label="Обычная оценка"
-						description="Оценка, которую вы обычно получаете. Будет использоваться как оценка
-						по умолчанию на экране добавления оценки и при подсчете, сколько
-						оценок нужно для достижения целевой оценки."
-						markSetting="defaultMark"
-						weightSetting="defaultMarkWeight"
-					/>
-				</List.Section>
-			)}
 		</ScrollView>
 	)
 })
