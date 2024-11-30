@@ -153,6 +153,13 @@ export class ThemeStore {
 			},
 		}
 	}
+
+	get destructiveButton() {
+		return {
+			style: { backgroundColor: this.colors.errorContainer },
+			labelStyle: { color: this.colors.onErrorContainer },
+		}
+	}
 }
 
 export const Theme = new ThemeStore()

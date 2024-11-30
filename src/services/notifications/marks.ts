@@ -2,13 +2,10 @@ import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
 } from '@notifee/react-native'
-import {
-	BackgroundFetchResult,
-	registerTaskAsync,
-	unregisterTaskAsync,
-} from 'expo-background-fetch'
+import * as BackgroundFetch from 'expo-background-fetch'
+import { BackgroundFetchResult } from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
-import { autorun, makeAutoObservable, runInAction } from 'mobx'
+import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
 import { makePersistable } from 'mobx-persist-store'
 import { getSubjectName } from '~components/SubjectName'
 import { Settings } from '~models/settings'
@@ -16,16 +13,36 @@ import { Logger } from '../../constants'
 import { API } from '../net-school/api'
 import { Assignment } from '../net-school/entities'
 
-const NotificationStore = new (class {
+export const MarksNotificationStore = new (class {
 	notified: string[] = []
+	logs: string[] = []
 	marksChannelId = ''
 
 	constructor() {
-		makeAutoObservable(this)
+		makeAutoObservable(
+			this,
+			{ log: action, clearLogs: action },
+			{ autoBind: true },
+		)
 		makePersistable(this, {
 			name: 'marksNotifications',
-			properties: ['notified'],
+			properties: ['notified', 'logs'],
 		})
+	}
+
+	log(level: 'info' | 'error', ...messages: unknown[]) {
+		this.logs.unshift(
+			`${level.toUpperCase()}   ${new Date().toReadable().split(' ').reverse().join(' ')}  ${messages.map(e => (e instanceof Error ? e.stack : String(e))).join(' ')}`,
+		)
+		Logger[level]('[BACKGROUND MARKS NOTIFICATIONS FETCH]', ...messages)
+		if (this.logs.length >= 100) this.logs.pop()
+		return level === 'error'
+			? BackgroundFetchResult.Failed
+			: BackgroundFetchResult.NoData
+	}
+
+	clearLogs() {
+		this.logs = []
 	}
 })()
 
@@ -38,29 +55,28 @@ export async function setupMarksChannel() {
 		description: 'Уведомления о новых оценках',
 	})
 
-	runInAction(() => {
-		NotificationStore.marksChannelId = marksChannelId
-	})
+	runInAction(() => (MarksNotificationStore.marksChannelId = marksChannelId))
 }
 
 function enabled() {
-	return Settings.marksNotifications && NotificationStore.marksChannelId
+	return Settings.marksNotifications && MarksNotificationStore.marksChannelId
 }
 
 const TASK_ID = 'background-fetch'
 
-// Register task in general
-TaskManager.defineTask(TASK_ID, backgroundFetchTask)
+TaskManager.defineTask(TASK_ID, checkForNewMarksAndNotify)
 
-// Register task for background fetch interval
-autorun(function registerMarksFetchInterval() {
+autorun(function registerTask() {
 	if (enabled()) {
-		registerTaskAsync(TASK_ID, {
+		MarksNotificationStore.log('info', 'Состояние: Включено')
+		BackgroundFetch.registerTaskAsync(TASK_ID, {
 			startOnBoot: true,
 			stopOnTerminate: false,
+			minimumInterval: 10,
 		}).catch(onError)
 	} else {
-		unregisterTaskAsync(TASK_ID).catch(onError)
+		MarksNotificationStore.log('info', 'Состояние: Выключено')
+		BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(onError)
 	}
 })
 
@@ -68,53 +84,50 @@ function onError(reason: unknown) {
 	Logger.debug(`Unregistering task ${TASK_ID} failed:`, reason)
 }
 
-async function backgroundFetchTask() {
-	Logger.debug(
-		`Got background fetch new marks call at: ${new Date().toReadable()}`,
-	)
+export async function checkForNewMarksAndNotify(): Promise<BackgroundFetchResult> {
+	MarksNotificationStore.log('info', `Запрос новых оценок...`)
 
-	if (!Settings.studentId)
-		return Logger.debug('No student id for fetch bg call')
-
-	if (!enabled()) {
-		return Logger.debug('Bg fetch disabled')
-	}
+	const { studentId } = Settings
+	if (!studentId) return MarksNotificationStore.log('error', 'Не выбран учени')
+	if (!enabled())
+		return MarksNotificationStore.log(
+			'error',
+			'Уведомления об оценках выключены',
+		)
 
 	try {
-		const marks = await API.homework({
-			studentId: Settings.studentId!,
-			withoutMarks: false,
-		})
-
+		const marks = await API.homework({ studentId, withoutMarks: false })
 		const newMarks = checkForNewMarks(marks)
+		MarksNotificationStore.log(
+			'info',
+			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`,
+		)
 
 		return newMarks
 			? BackgroundFetchResult.NewData
 			: BackgroundFetchResult.NoData
 	} catch (e) {
-		return BackgroundFetchResult.Failed
+		return MarksNotificationStore.log('error', 'Unable to fetch:', e)
 	}
 }
 
 function checkForNewMarks(marks: Assignment[]) {
-	let newMarks = false
+	let newMarks = 0
 
 	for (const assignment of marks.filter(e => typeof e.result === 'number')) {
-		if (!NotificationStore.notified.includes(assignment.assignmentId + '')) {
-			runInAction(() => {
-				NotificationStore.notified.push(assignment.assignmentId + '')
-				newMarks = true
-			})
+		const id = assignment.assignmentId + ''
 
+		if (!MarksNotificationStore.notified.includes(id)) {
+			runInAction(() => MarksNotificationStore.notified.push(id))
+
+			newMarks++
 			notifee.displayNotification({
 				title: `${assignment.result} - ${getSubjectName(assignment)}, ${assignment.assignmentTypeAbbr}, Веc: ${assignment.weight}`,
 				body: `${assignment.assignmentName}`,
 				android: {
-					channelId: NotificationStore.marksChannelId,
+					channelId: MarksNotificationStore.marksChannelId,
 					smallIcon: 'notification_icon',
-					pressAction: {
-						id: 'default',
-					},
+					pressAction: { id: 'default' },
 				},
 			})
 		}

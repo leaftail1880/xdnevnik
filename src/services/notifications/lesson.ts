@@ -12,7 +12,7 @@ import {
 	setBackgroundInterval,
 } from '~utils/backgroundIntervals'
 
-export const NotificationStore = new (class {
+export const LessonNotifStore = new (class {
 	constructor() {
 		makeAutoObservable(this)
 	}
@@ -26,12 +26,12 @@ export const NotificationStore = new (class {
 
 	currentLesson: undefined | string = undefined
 
-	async remove(id = NotificationStore.id) {
+	async remove(id = LessonNotifStore.id) {
 		if (!id) return
 
 		await notifee.cancelDisplayedNotification(id)
 		runInAction(() => {
-			if (NotificationStore.id) NotificationStore.id = undefined
+			if (LessonNotifStore.id) LessonNotifStore.id = undefined
 		})
 	}
 })()
@@ -52,21 +52,21 @@ export async function setupLessonChannel(enabled: boolean) {
 
 	if (!enabled) {
 		return runInAction(() => {
-			NotificationStore.remove(NotificationStore.id || oldNotification?.id)
+			LessonNotifStore.remove(LessonNotifStore.id || oldNotification?.id)
 		})
 	}
 
 	runInAction(() => {
-		NotificationStore.lessonChannelId = lessonChannelId
-		if (oldNotification?.id) NotificationStore.id = oldNotification.id
+		LessonNotifStore.lessonChannelId = lessonChannelId
+		if (oldNotification?.id) LessonNotifStore.id = oldNotification.id
 	})
 }
 
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
-	if (!Settings.notificationsEnabled || !NotificationStore.lessonChannelId) {
-		return NotificationStore.remove()
+	if (!Settings.notificationsEnabled || !LessonNotifStore.lessonChannelId) {
+		return LessonNotifStore.remove()
 	}
 
 	const { result } = DiaryStore
@@ -94,7 +94,7 @@ autorun(function notificationFromDiary() {
 				}
 
 				// Nothing to show
-				NotificationStore.remove()
+				LessonNotifStore.remove()
 			}),
 		1000,
 	)
@@ -155,17 +155,18 @@ async function showNotification(
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
+	// notifee.registerForegroundService(() => new Promise(() => {}))
 	const notificationId = await notifee.displayNotification({
-		...(NotificationStore.id ? { id: NotificationStore.id } : {}),
+		...(LessonNotifStore.id ? { id: LessonNotifStore.id } : {}),
 		title,
 		body,
 		android: {
-			channelId: NotificationStore.lessonChannelId,
+			channelId: LessonNotifStore.lessonChannelId,
 			ongoing: true,
 			smallIcon: 'notification_icon',
 
 			// only alert when lesson notification
-			onlyAlertOnce: NotificationStore.currentLesson === lessonId,
+			onlyAlertOnce: LessonNotifStore.currentLesson === lessonId,
 
 			progress:
 				state === LessonState.going
@@ -180,7 +181,7 @@ async function showNotification(
 	})
 
 	runInAction(() => {
-		NotificationStore.id = notificationId
-		NotificationStore.currentLesson = lessonId
+		LessonNotifStore.id = notificationId
+		LessonNotifStore.currentLesson = lessonId
 	})
 }

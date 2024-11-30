@@ -7,10 +7,8 @@ import { Theme } from '~models/theme'
 import { API } from '~services/net-school/api'
 import { Spacings } from '../../utils/Spacings'
 
-function logout() {
-	runInAction(() => {
-		API.logOut()
-	})
+function logOut() {
+	runInAction(() => API.logOut())
 }
 
 export default observer(function LogoutScreen() {
@@ -18,16 +16,7 @@ export default observer(function LogoutScreen() {
 		<View style={{ flex: 1, backgroundColor: Theme.colors.background }}>
 			<Header title="Выход"></Header>
 			<View style={styles.container}>
-				<Button
-					onPress={logout}
-					style={{
-						backgroundColor: Theme.colors.errorContainer,
-					}}
-					labelStyle={{
-						fontSize: 16,
-						color: Theme.colors.onErrorContainer,
-					}}
-				>
+				<Button onPress={logOut} {...Theme.destructiveButton}>
 					Выйти
 				</Button>
 				<Text style={styles.subtitle}>
