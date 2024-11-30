@@ -72,7 +72,6 @@ autorun(function registerTask() {
 		BackgroundFetch.registerTaskAsync(TASK_ID, {
 			startOnBoot: true,
 			stopOnTerminate: false,
-			minimumInterval: 10,
 		}).catch(onError)
 	} else {
 		MarksNotificationStore.log('info', 'Состояние: Выключено')
