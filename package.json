@@ -1,20 +1,26 @@
 {
 	"name": "xdnevnik",
 	"version": "1.0.0",
-	"main": "node_modules/expo/AppEntry.js",
 	"private": true,
+	"main": "node_modules/expo/AppEntry.js",
+	"workspaces": [
+		"docs/"
+	],
 	"scripts": {
-		"start": "yarn expo start --dev-client",
-		"no-dev": "yarn expo start --dev-client --minify --no-dev",
+		"android": "expo run:android",
 		"build": "eas build -p android",
 		"build-dev-client": "eas build -p android --profile development",
-		"update": "eas update --channel production --auto",
-		"android": "expo run:android",
-		"ios": "expo run:ios",
+		"dep-graph": "madge src/screens/ -x src/utils/.+ --dot | dot -T svg > dependency-graph.svg",
 		"docs": "cd docs && yarn vite-react-ssg dev",
 		"docs-build": "cd docs && yarn vite-react-ssg build",
 		"docs-preview": "cd docs && yarn vite preview",
-		"dep-graph": "madge src/screens/ -x src/utils/.+ --dot | dot -T svg > dependency-graph.svg"
+		"ios": "expo run:ios",
+		"no-dev": "yarn expo start --dev-client --minify --no-dev",
+		"start": "yarn expo start --dev-client",
+		"update": "eas update --channel production --auto"
+	},
+	"resolutions": {
+		"@react-native-community/cli-server-api@npm:12.3.2": "patch:@react-native-community/cli-server-api@npm%3A12.3.2#~/.yarn/patches/@react-native-community-cli-server-api-npm-12.3.0-7465574591.patch"
 	},
 	"dependencies": {
 		"@boterop/react-native-background-timer": "^2.4.1",
@@ -77,11 +83,5 @@
 		"expo-build-properties": "~0.11.1",
 		"typescript": "^5.3.3"
 	},
-	"packageManager": "yarn@4.1.1",
-	"resolutions": {
-		"@react-native-community/cli-server-api@npm:12.3.2": "patch:@react-native-community/cli-server-api@npm%3A12.3.2#~/.yarn/patches/@react-native-community-cli-server-api-npm-12.3.0-7465574591.patch"
-	},
-	"workspaces": [
-		"docs/"
-	]
+	"packageManager": "yarn@4.1.1"
 }
