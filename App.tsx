@@ -114,7 +114,7 @@ const AppStore = new (class AppStore {
 	get fallback() {
 		let Fallback: React.ReactNode | undefined
 		if (!API.session) {
-			Fallback = <Loading text="Авторизация{dots}" />
+			Fallback = <Loading text="Авторизация..." />
 		} else if (StudentsStore.fallback) {
 			Fallback = StudentsStore.fallback
 		}

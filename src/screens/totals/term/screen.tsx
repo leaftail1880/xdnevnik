@@ -112,7 +112,7 @@ const TermTotalsList = observer(function TermTotalsList({
 		SubjectsStore.fallback ||
 		TotalsStore.fallback ||
 		(TotalsStore.result === null || TotalsStore.result.length < 1 ? (
-			<Loading text="Загрузка из кэша{dots}" />
+			<Loading text="Загрузка из кэша..." />
 		) : (
 			<FlatList
 				ListHeaderComponent={Header}

@@ -163,7 +163,7 @@ export class AsyncStore<
 					name={this.name}
 				/>
 			) : (
-				<Loading text={`Загрузка ${this.name}{dots}`} />
+				<Loading text={`Загрузка ${this.name}...`} />
 			)
 		}
 	}

@@ -123,6 +123,6 @@ const SelectStudent = observer(function SelectStudent() {
 			/>
 		)
 	) : (
-		<Loading text="Ожидание авторизации{dots}"></Loading>
+		<Loading text="Войдите в аккаунт!" />
 	)
 })

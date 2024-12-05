@@ -3,6 +3,7 @@ import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
 import { Theme } from '~models/theme'
 import { NetSchoolError } from '~services/net-school/api'
+import { Spacings } from '~utils/Spacings'
 import { RequestError, RequestErrorReason } from '../utils/RequestError'
 
 interface ErrorHandlerProps {
@@ -19,35 +20,34 @@ export default function ErrorHandler({
 }: ErrorHandlerProps) {
 	const [more, setMore] = useState<boolean>(false)
 	const errorString = RequestError.stringify(error[1])
-	const beforeAuth = error[1] instanceof NetSchoolError && error[1].useCache
+	const useCache = error[1] instanceof NetSchoolError && error[1].useCache
 	return (
 		<View
 			style={{
 				flex: 1,
-				alignContent: 'center',
-				justifyContent: 'center',
-				alignSelf: 'center',
-				maxWidth: 300,
+				width: '100%',
+				alignItems: 'center',
 			}}
 		>
 			<Text
 				style={{
-					fontSize: 20,
+					fontSize: 18,
 					fontWeight: 'bold',
 					color: Theme.colors.error,
 				}}
 			>
 				Ошибка{error[0] ? ` (${error[0]})` : ''}
 			</Text>
-			<Text>При загрузке {name}</Text>
-			{beforeAuth && <Text>Авторизуйтесь!</Text>}
+			<Text>При загрузке данных {name}</Text>
+			{useCache && <Text>Нет данных в кэше для отображения.</Text>}
 			{errorString === RequestErrorReason.noConnection && <Text>Нет сети</Text>}
-			{more && <Text>{errorString}</Text>}
-			<View>
-				<Button onPress={() => setMore(!more)} mode="contained">
+			{more && <Text selectable>{errorString}</Text>}
+
+			<View style={{ gap: Spacings.s2, margin: Spacings.s2 }}>
+				<Button onPress={() => setMore(!more)} mode="elevated">
 					<Text>{!more ? 'Подробнее' : 'Свернуть'}</Text>
 				</Button>
-				<Button onPress={reload} icon="reload" mode="contained">
+				<Button onPress={reload} icon="reload" mode="elevated">
 					Попробовать снова
 				</Button>
 				{/* {!beforeAuth && (

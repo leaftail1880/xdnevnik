@@ -75,7 +75,7 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 		return () => BackHandler.removeEventListener('hardwareBackPress', goBack)
 	}, [regionName])
 
-	if (loggingIn) return <Loading text="Вход{dots}" />
+	if (loggingIn) return <Loading text="Авторизация..." />
 	if (EndpointsStore.fallback) return EndpointsStore.fallback
 
 	if (!regionName)

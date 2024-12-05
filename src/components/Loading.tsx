@@ -1,32 +1,28 @@
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ActivityIndicator, Text } from 'react-native-paper'
 import { Spacings } from '../utils/Spacings'
 
 interface LoadingProps {
-	/**
-	 * {dots} can be used to set loading dots
-	 */
 	text?: string
 }
 
 // eslint-disable-next-line mobx/missing-observer
-export default function Loading({ text = 'Загрузка' }: LoadingProps) {
-	if (!text.includes('{dots}')) text += '...'
-
+export default function Loading({ text = 'Загрузка...' }: LoadingProps) {
 	return (
-		<View
-			style={{
-				padding: 10,
-				flexDirection: 'row',
-				alignItems: 'center',
-				alignContent: 'stretch',
-				alignSelf: 'center',
-			}}
-		>
+		<View style={styles.view}>
 			<ActivityIndicator />
-			<Text style={{ margin: Spacings.s2 }}>
-				{text.replace(/\{dots\}/g, '...')}
-			</Text>
+			<Text>{text}</Text>
 		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	view: {
+		padding: 10,
+		flexDirection: 'row',
+		alignItems: 'center',
+		alignContent: 'stretch',
+		alignSelf: 'center',
+		gap: Spacings.s2,
+	},
+})
