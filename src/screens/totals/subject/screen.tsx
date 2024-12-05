@@ -2,7 +2,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import { Chip, IconButton, Surface, Text } from 'react-native-paper'
+import { Chip, IconButton, Text } from 'react-native-paper'
 import Mark from '~components/Mark'
 import { RoundedSurface } from '~components/RoundedSurface'
 import SubjectName from '~components/SubjectName'
@@ -27,9 +27,7 @@ export default observer(function SubjectTotals({
 		studentId,
 		subjectId,
 	})
-	performance.withParams({
-		termId,
-	})
+	performance.withParams({ termId })
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
 	const [attendance, setAttendance] = useState(false)
@@ -116,17 +114,15 @@ export default observer(function SubjectTotals({
 						Уроки без оценок
 					</Chip>
 				</View>
-				<Surface elevation={1}>
-					{totalsAndSheduledTotals.map((e, i) => (
-						<MarkRow
-							mark={e}
-							maxWeight={maxWeight}
-							minWeight={minWeight}
-							onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
-							key={e.assignmentId ?? i.toString()}
-						/>
-					))}
-				</Surface>
+				{totalsAndSheduledTotals.map((e, i) => (
+					<MarkRow
+						mark={e}
+						maxWeight={maxWeight}
+						minWeight={minWeight}
+						onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
+						key={e.assignmentId ?? i.toString()}
+					/>
+				))}
 				<RoundedSurface elevation={1}>
 					<AddMarkForm
 						setCustomMarks={setCustomMarks}
@@ -211,7 +207,12 @@ const MarkRow = observer(function MarkRow({
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
 	return (
-		<View style={[styles.stretch, { padding: Spacings.s2 }]}>
+		<View
+			style={[
+				styles.stretch,
+				{ paddingTop: Spacings.s1, paddingHorizontal: Spacings.s2 },
+			]}
+		>
 			<Mark
 				duty={mark.duty ?? false}
 				mark={mark.result ?? null}

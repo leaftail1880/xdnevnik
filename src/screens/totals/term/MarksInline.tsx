@@ -4,18 +4,20 @@ import { ScrollView, StyleProp, View, ViewStyle } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
 import Loading from '~components/Loading'
 import Mark from '~components/Mark'
+import { RoundedSurface } from '~components/RoundedSurface'
 import { styles } from '~constants'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import { Total } from '~services/net-school/entities'
 import { SubjectPerformanceStores } from '~services/net-school/store'
-import { Spacings } from '../../../utils/Spacings'
-import { calculateMarks, CalculateTotals } from '../../../utils/calculateMarks'
+import { Spacings } from '~utils/Spacings'
+import { calculateMarks, CalculateTotals } from '~utils/calculateMarks'
 import { SubjectInfo, TermStore } from './state'
 
 const containerStyle: StyleProp<ViewStyle> = {
 	padding: Spacings.s1,
 	alignItems: 'center',
+	transform: [],
 }
 
 export default observer(function SubjectMarksInline(
@@ -30,27 +32,6 @@ export default observer(function SubjectMarksInline(
 		| { totals?: undefined; fallback: React.JSX.Element }
 		| { totals: CalculateTotals; fallback?: undefined }
 		| undefined
-
-	// TODO Investigate why Homework store does not returns assignments with marks
-	// const homework = HomeworkMarksStore.result
-	// if (homework) {
-	// 	const allAssignments = homework.filter(
-	// 		e => e.subjectId === props.total.subjectId,
-	// 	)
-	// 	const results = allAssignments // allAssignments
-	// 		.filter(e => typeof e.result === 'number')
-	// 		.map(e => ({ date: e.dueDate, ...e }))
-
-	// 	if (results.length) {
-	// 		result = {
-	// 			totals: {
-	// 				results,
-	// 				averageMark: props.term.avgMark ?? 0,
-	// 				classmeetingsStats: { passed: results.length, scheduled: 0 },
-	// 			},
-	// 		}
-	// 	}
-	// }
 
 	const assignments = SubjectPerformanceStores.use({
 		studentId,
@@ -183,12 +164,22 @@ export default observer(function SubjectMarksInline(
 						</Chip>
 					)}
 					{!Settings.targetMarkCompact && (
-						<View style={[styles.stretch, { gap: Spacings.s1 }]}>
+						<RoundedSurface
+							style={[
+								styles.stretch,
+								{
+									gap: Spacings.s1,
+									backgroundColor: Theme.colors.elevation.level5,
+									marginHorizontal: 0,
+									padding: Spacings.s1,
+								},
+							]}
+						>
 							<Text>До</Text>
 							<Mark
 								mark={student?.targetMark}
 								duty={false}
-								style={{ padding: Spacings.s1 }}
+								style={{ padding: 2 }}
 							/>
 							<Text>нужно </Text>
 							<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
@@ -197,13 +188,13 @@ export default observer(function SubjectMarksInline(
 
 							<Mark
 								duty={false}
-								style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
+								style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
 								textStyle={{ fontSize: 10 }}
 								subTextStyle={{ fontSize: 8 }}
 								weight={student?.defaultMarkWeight}
 								mark={student?.defaultMark}
 							/>
-						</View>
+						</RoundedSurface>
 					)}
 				</View>
 			)}
