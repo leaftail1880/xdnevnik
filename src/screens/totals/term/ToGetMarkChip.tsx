@@ -1,0 +1,73 @@
+import { observer } from 'mobx-react-lite'
+import { Chip, Text } from 'react-native-paper'
+import Mark from '~components/Mark'
+import { RoundedSurface } from '~components/RoundedSurface'
+import { styles } from '~constants'
+import { Settings } from '~models/settings'
+import { Theme } from '~models/theme'
+import { Spacings } from '~utils/Spacings'
+
+export const ToGetMarkChip = observer(function ToGetMarkChip({
+	toGetTarget,
+}: {
+	toGetTarget: number | undefined
+}) {
+	const { studentId } = Settings
+	if (!studentId) return
+	if (typeof toGetTarget !== 'number') return
+
+	const student = Settings.forStudent(Settings.studentId!)
+	if (toGetTarget === 0) {
+		return (
+			<Chip
+				mode="flat"
+				compact
+				style={{ backgroundColor: Theme.colors.errorContainer }}
+			>
+				Исправить до {student.targetMark} невозможно
+			</Chip>
+		)
+	}
+
+	return (
+		<>
+			{Settings.targetMarkCompact && (
+				<Chip mode="flat" compact>
+					<Text>Нужно </Text>
+					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+						{toGetTarget}x
+					</Text>
+				</Chip>
+			)}
+			{!Settings.targetMarkCompact && (
+				<RoundedSurface
+					style={[
+						styles.stretch,
+						{
+							gap: Spacings.s1,
+							backgroundColor: Theme.colors.secondaryContainer,
+							marginHorizontal: 0,
+							padding: Spacings.s1,
+						},
+					]}
+				>
+					<Text>До</Text>
+					<Mark mark={student.targetMark} duty={false} style={{ padding: 2 }} />
+					<Text>нужно </Text>
+					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+						{toGetTarget}x
+					</Text>
+
+					<Mark
+						duty={false}
+						style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
+						textStyle={{ fontSize: 10 }}
+						subTextStyle={{ fontSize: 8 }}
+						weight={student.defaultMarkWeight}
+						mark={student.defaultMark}
+					/>
+				</RoundedSurface>
+			)}
+		</>
+	)
+})

@@ -79,6 +79,15 @@ class SettingsStore {
 		}
 	}
 
+	forStudentOrThrow() {
+		const { studentId } = this
+		if (!studentId)
+			throw new TypeError(
+				'Unable to get settings for student: StudentID is undefined!',
+			)
+		return this.forStudent(studentId)
+	}
+
 	get studentSettings() {
 		if (!this.studentId) return
 
@@ -88,6 +97,7 @@ class SettingsStore {
 	constructor() {
 		makeAutoObservable(this, {
 			forStudent: false,
+			forStudentOrThrow: false,
 			studentSettings: false,
 			fullname: false,
 			studentId: false,

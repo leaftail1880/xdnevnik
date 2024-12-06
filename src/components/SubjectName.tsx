@@ -1,9 +1,10 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
 	ColorValue,
 	StyleProp,
+	StyleSheet,
 	TextStyle,
 	TouchableOpacity,
 	ViewStyle,
@@ -18,18 +19,10 @@ import {
 } from 'react-native-paper'
 import { Settings } from '~models/settings'
 import { Subject } from '~services/net-school/entities'
-import Loading from './Loading'
 
 type SubjectNameOptions = {
 	subjectId: number
-} & (
-	| {
-			subjects: Subject[]
-	  }
-	| {
-			subjectName: string
-	  }
-)
+} & ({ subjects: Subject[] } | { subjectName: string })
 
 export function getSubjectName(from: SubjectNameOptions) {
 	const { studentId } = Settings
@@ -58,73 +51,82 @@ type SubjectNameProps = {
 		style?: Omit<TextStyle, 'color'> & { color?: ColorValue }
 	}
 
+const styles = StyleSheet.create({
+	touchable: { margin: 0, padding: 0 },
+})
+
 export default observer(function SubjectName({
 	viewStyle,
 	...props
 }: SubjectNameProps) {
 	const [isEditing, setIsEditing] = useState(false)
-	const [newName, setNewName] = useState('')
-	const { studentId } = Settings
-
-	if (!studentId) return <Loading />
-
 	const name = getSubjectName(props)
+	const onPress = useCallback(() => setIsEditing(true), [setIsEditing])
 
 	return (
-		<TouchableOpacity
-			style={[{ margin: 0, padding: 0 }, viewStyle]}
-			onPress={() => setIsEditing(true)}
-		>
+		<TouchableOpacity style={[styles.touchable, viewStyle]} onPress={onPress}>
 			<Text {...props}>{name}</Text>
 			{isEditing && (
-				<Portal>
-					<Dialog visible onDismiss={() => setIsEditing(false)}>
-						<Dialog.Title>Изменить имя</Dialog.Title>
-						<Dialog.Content style={{ gap: 10 }}>
-							<Text>
-								Имя в журнале:{' '}
-								<Text style={{ fontWeight: 'bold' }} selectable>
-									{getRealName(props)}
-								</Text>
-							</Text>
-							<TextInput
-								mode="flat"
-								defaultValue={name}
-								onChangeText={setNewName}
-								placeholder="Как в журнале"
-							/>
-						</Dialog.Content>
-						<Dialog.Actions>
-							<Button
-								onPress={() => {
-									setNewName('')
-									setIsEditing(false)
-								}}
-								style={props.style}
-							>
-								Отмена
-							</Button>
-							<Button
-								icon={'content-save'}
-								style={props.style}
-								onPress={() => {
-									runInAction(() => {
-										const studentSettings = Settings.forStudent(studentId)
-										if (newName) {
-											studentSettings.subjectNames[props.subjectId] = newName
-										} else {
-											delete studentSettings.subjectNames[props.subjectId]
-										}
-									})
-									setIsEditing(false)
-								}}
-							>
-								Сохранить
-							</Button>
-						</Dialog.Actions>
-					</Dialog>
-				</Portal>
+				<EditSubjectName setIsEditing={setIsEditing} name={name} {...props} />
 			)}
 		</TouchableOpacity>
+	)
+})
+
+const EditSubjectName = observer(function EditSubjectName({
+	setIsEditing,
+	name,
+	...props
+}: { name: string; setIsEditing: (v: boolean) => void } & SubjectNameProps) {
+	const [newName, setNewName] = useState('')
+	const onCancelPress = useCallback(() => {
+		setNewName('')
+		setIsEditing(false)
+	}, [setNewName, setIsEditing])
+
+	const onSavePress = useCallback(() => {
+		runInAction(() => {
+			const studentSettings = Settings.forStudentOrThrow()
+			if (newName) {
+				studentSettings.subjectNames[props.subjectId] = newName
+			} else {
+				delete studentSettings.subjectNames[props.subjectId]
+			}
+		})
+		setIsEditing(false)
+	}, [newName, setIsEditing, props.subjectId])
+
+	return (
+		<Portal>
+			<Dialog visible onDismiss={() => setIsEditing(false)}>
+				<Dialog.Title>Изменить имя</Dialog.Title>
+				<Dialog.Content style={{ gap: 10 }}>
+					<Text>
+						Имя в журнале:{' '}
+						<Text style={{ fontWeight: 'bold' }} selectable>
+							{getRealName(props)}
+						</Text>
+					</Text>
+					<TextInput
+						mode="outlined"
+						defaultValue={name}
+						onChangeText={setNewName}
+						placeholder="Как в журнале"
+					/>
+				</Dialog.Content>
+				<Dialog.Actions>
+					<Button icon="cancel" onPress={onCancelPress} style={props.style}>
+						Отмена
+					</Button>
+					<Button
+						icon={'content-save'}
+						style={props.style}
+						onPress={onSavePress}
+					>
+						Сохранить
+					</Button>
+				</Dialog.Actions>
+			</Dialog>
+		</Portal>
 	)
 })

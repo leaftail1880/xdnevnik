@@ -89,6 +89,7 @@ export function calculateMarks({
 			targetMark &&
 			roundMark(avgMark) < targetMark
 		) {
+			toGetTarget = 0
 			const remainingLessons =
 				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
 			for (let i = 1; i <= remainingLessons; i++) {

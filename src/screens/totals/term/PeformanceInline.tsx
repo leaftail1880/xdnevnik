@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import { TouchableOpacity } from 'react-native'
 import { Surface } from 'react-native-paper'
 
 import Loading from '~components/Loading'
@@ -36,29 +35,22 @@ export default observer(function SubjectPerformanceInline(props: SubjectInfo) {
 			style={{
 				margin: Spacings.s1,
 				borderRadius: Theme.roundness * 2,
-				flex: 1,
 			}}
 		>
-			<TouchableOpacity onPress={openDetails}>
-				<SubjectName
-					subjectId={props.total.subjectId}
-					subjects={props.subjects}
-					style={{
-						fontSize: 16,
-						fontWeight: 'bold',
-						marginHorizontal: Spacings.s2,
-					}}
-				/>
-				{term ? (
-					<SubjectMarksInline
-						{...props}
-						openDetails={openDetails}
-						term={term}
-					/>
-				) : (
-					<Loading />
-				)}
-			</TouchableOpacity>
+			<SubjectName
+				subjectId={props.total.subjectId}
+				subjects={props.subjects}
+				style={{
+					fontSize: 16,
+					fontWeight: 'bold',
+					marginHorizontal: Spacings.s2,
+				}}
+			/>
+			{term ? (
+				<SubjectMarksInline {...props} openDetails={openDetails} term={term} />
+			) : (
+				<Loading />
+			)}
 		</Surface>
 	)
 })
