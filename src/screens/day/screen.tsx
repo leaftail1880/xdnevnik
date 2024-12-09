@@ -50,7 +50,7 @@ const SelectDay = observer(function SelectDay() {
 			onSelect={item =>
 				runInAction(() => {
 					if ('week' in item) DiaryState.week = item.week
-					DiaryState.day = item.value
+					DiaryState.day = item.value.replace('$TODAY', '')
 				})
 			}
 		/>

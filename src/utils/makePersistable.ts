@@ -15,5 +15,5 @@ export const makeReloadPersistable: typeof makePersistable = (
 		}
 	}
 
-	return makePersistable(object, options)
+	return makePersistable(object, options, { delay: 200, fireImmediately: false },)
 }

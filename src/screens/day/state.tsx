@@ -12,6 +12,11 @@ import { Spacings } from '~utils/Spacings'
 import { LANG, styles } from '../../constants'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
+const second = 1000
+const minute = second * 60
+const hour = minute * 60
+const day = hour * 24
+
 export const DiaryState = new (class {
 	constructor() {
 		makeAutoObservable<this, 'weekOffset'>(this, {
@@ -33,10 +38,8 @@ export const DiaryState = new (class {
 	get weekDays() {
 		return Date.week(this.week)
 	}
-	private weekOffset(offset: number) {
-		const date = new Date()
-		date.setDate(this.week.getDate() + offset)
-		return date
+	private weekOffset(daysOffset: number) {
+		return new Date(this.week.getTime() + daysOffset * day)
 	}
 	get weekBefore() {
 		return this.weekOffset(-7)
@@ -45,47 +48,24 @@ export const DiaryState = new (class {
 		return this.weekOffset(7)
 	}
 	get weekDaysDropdown() {
+		const today = new Date()
+		const todayWeek = Date.week(today)
+		const todayString = today.toYYYYMMDD()
 		return [
-			{
-				label: 'Прошлая неделя',
-				value: Date.week(this.weekBefore)[0].toYYYYMMDD(),
-				week: this.weekBefore,
-			},
-			...this.weekDays.map((day, i) => {
-				const today = new Date().toYYYYMMDD() === day.toYYYYMMDD()
-				const dayName = LANG.days[i]
-				return {
-					label: today ? (
-						<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
-							{dayName}, cегодня
-						</Text>
-					) : (
-						<View
-							style={[
-								{
-									margin: Spacings.s1,
-									width: '90%',
-									flex: 1,
-								},
-								styles.stretch,
-							]}
-						>
-							<Text style={{ fontWeight: 'bold' }}>{dayName}</Text>
-							<Text>
-								{'  '}
-								{day.toYYYYMMDD()}
-							</Text>
-						</View>
-					),
-					value: day.toYYYYMMDD(),
-				}
-			}),
-			{
-				label: 'Следующая неделя',
-				value: Date.week(this.weekAfter)[0].toYYYYMMDD(),
-				week: this.weekAfter,
-			},
-		]
+			this.weekDays[0].toYYYYMMDD() === todayWeek[0].toYYYYMMDD()
+				? null
+				: {
+						label: <DayRenderer day={today} i={0} />,
+						value: todayString + '$TODAY', // Just so no same warning keys warning is thrown
+						week: todayWeek[0],
+					},
+			weekValue('Прошлая неделя', this.weekBefore),
+			...this.weekDays.map((day, i) => ({
+				label: <DayRenderer day={day} i={i} />,
+				value: day.toYYYYMMDD(),
+			})),
+			weekValue('Следующая неделя', this.weekAfter),
+		].filter(e => !!e)
 	}
 })()
 
@@ -115,3 +95,40 @@ autorun(() => {
 		assignmentIds: withAttachments?.length ? withAttachments : undefined,
 	})
 })
+
+function weekValue(text: string, week: Date) {
+	const day = Date.week(week)[0].toYYYYMMDD()
+	return {
+		label: `Прошлая неделя (${day})`,
+		value: day,
+		week: week,
+	}
+}
+
+// eslint-disable-next-line mobx/missing-observer
+function DayRenderer({ day, i }: { day: Date; i: number }) {
+	const today = new Date().toYYYYMMDD() === day.toYYYYMMDD()
+	const dayName = LANG.days[i]
+	return today ? (
+		<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+			{dayName}, cегодня
+		</Text>
+	) : (
+		<View
+			style={[
+				{
+					margin: Spacings.s1,
+					width: '90%',
+					flex: 1,
+				},
+				styles.stretch,
+			]}
+		>
+			<Text style={{ fontWeight: 'bold' }}>{dayName}</Text>
+			<Text>
+				{'  '}
+				{day.toYYYYMMDD()}
+			</Text>
+		</View>
+	)
+}
