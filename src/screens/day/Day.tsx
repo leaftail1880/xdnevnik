@@ -17,8 +17,9 @@ export default observer(function DiaryDay(props: DiaryLessonNavigation) {
 
 	return day
 		.sort((a, b) => a.order - b.order)
-		.map(lesson => (
+		.map((lesson, i) => (
 			<DiaryLesson
+				i={i}
 				key={lesson.classmeetingId.toString()}
 				lesson={lesson}
 				{...props}

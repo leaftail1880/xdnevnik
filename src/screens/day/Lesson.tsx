@@ -18,6 +18,7 @@ import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
 export default observer(function DiaryLesson({
 	lesson,
 	navigation,
+	i,
 	...props
 }: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & DiaryLessonNavigation) {
 	const currentTerm = TermStore.currentTerm
@@ -34,7 +35,12 @@ export default observer(function DiaryLesson({
 			})
 	}, [currentTerm, lesson, navigation])
 
-	const newProps: DiaryLessonProps = { lesson, navigateToLessonMarks, ...props }
+	const newProps: DiaryLessonProps = {
+		i,
+		lesson,
+		navigateToLessonMarks,
+		...props,
+	}
 
 	return (
 		<Card
@@ -50,6 +56,8 @@ export default observer(function DiaryLesson({
 
 				borderColor: Theme.colors.primary,
 				padding: Spacings.s2,
+				flex: 1,
+				gap: Spacings.s2,
 			}}
 		>
 			<TopRow {...newProps} />
@@ -60,13 +68,14 @@ export default observer(function DiaryLesson({
 	)
 })
 
-const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
+const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
 	return (
 		<>
-			<SubjectName {...lesson} style={Theme.fonts.titleMedium} />
-			<View
-				style={[styles.row, { marginVertical: Spacings.s1, gap: Spacings.s1 }]}
-			>
+			<View style={[styles.row, { alignItems: 'center' }]}>
+				<Text>{i + 1} </Text>
+				<SubjectName {...lesson} style={Theme.fonts.titleMedium} />
+			</View>
+			<View style={[styles.row, { gap: Spacings.s1 }]}>
 				<Chip compact>
 					{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
 				</Chip>
@@ -76,16 +85,11 @@ const TopRow = observer(function TopRow({ lesson }: DiaryLessonProps) {
 	)
 })
 
-const MiddleRow = observer(function MiddleRow({
-	lesson,
-	navigateToLessonMarks,
-}: DiaryLessonProps) {
+const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	return (
 		<>
 			{DiaryState.showLessonTheme && (
-				<Text selectable onPress={navigateToLessonMarks}>
-					{lesson.lessonTheme ?? 'Темы нет'}
-				</Text>
+				<Text selectable>{lesson.lessonTheme ?? 'Темы нет'}</Text>
 			)}
 
 			{DiaryState.showAttachments && lesson.attachmentsExists && (

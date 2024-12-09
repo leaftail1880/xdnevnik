@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
 })
 
 export type DiaryLessonProps = {
+	i: number
 	lesson: Lesson
 	navigateToLessonMarks: VoidFunction
 } 
