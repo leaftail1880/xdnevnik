@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system'
 import { observer } from 'mobx-react-lite'
 import React, { useEffect, useState } from 'react'
-import { Image, View } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
 import { Chip, Divider, Text } from 'react-native-paper'
 import Mark from '~components/Mark'
 
@@ -110,10 +110,7 @@ const AttachmentFile = observer(function AttachmentFile({
 		<Chip
 			mode="flat"
 			icon={isImage ? 'camera' : 'file'}
-			style={{
-				margin: Spacings.s1,
-				padding: Spacings.s1,
-			}}
+			style={styles.attachmentFile}
 			onPress={async () => {
 				if (!size) {
 					const result = await downloadAttachment(
@@ -133,30 +130,37 @@ const AttachmentFile = observer(function AttachmentFile({
 				if (isImage) {
 					ModalAlert.show(
 						'Вложение',
-						<View
-							style={{
-								alignItems: 'center',
-								justifyContent: 'center',
-								gap: Spacings.s1,
-							}}
-						>
+						<View style={styles.attachmentModal}>
 							<Text>{attachment.fileName}</Text>
 							<Image source={{ uri: fileUri, width: 200, height: 400 }}></Image>
 							<Chip mode="flat" onPress={share}>
-								Отправить
+								Поделиться
 							</Chip>
 						</View>,
 					)
 				} else share()
 			}}
 		>
-			<View style={{ flex: 1, gap: Spacings.s1, flexDirection: 'row' }}>
+			<View style={styles.preview}>
 				<Text>{attachment.fileName}</Text>
-				{size && <Size t={size} />}
+				{size ? <Size t={size} /> : undefined}
 				<Text>{progress}</Text>
 			</View>
 		</Chip>
 	)
+})
+
+const styles = StyleSheet.create({
+	attachmentFile: {
+		margin: Spacings.s1,
+		padding: Spacings.s1,
+	},
+	attachmentModal: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: Spacings.s1,
+	},
+	preview: { flex: 1, gap: Spacings.s1, flexDirection: 'row' },
 })
 
 async function downloadAttachment(

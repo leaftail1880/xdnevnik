@@ -27,9 +27,21 @@ module.exports = {
 		'no-empty': 'warn',
 		'no-console': 'warn',
 		'prefer-const': 'warn',
+		'react-native/no-raw-text': [
+			'error',
+			{
+				skip: [
+					'Chip',
+					'DataTable.Title',
+					'HelperText',
+					'Button',
+					'Dialog.Title',
+				],
+			},
+		],
+
 		'react-native/sort-styles': 'off',
 		'react-native/no-inline-styles': 'off',
-		'react-native/no-raw-text': 'off',
 		'react/prop-types': 'off',
 
 		// Disabling allowSyntheticalDefaultExport in tsconfig will cause
