@@ -16,6 +16,7 @@ import { Spacings } from '~utils/Spacings'
 import { ModalAlert } from '~utils/Toast'
 import { calculateMarks } from '~utils/calculateMarks'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
+import { ToGetMarkChip } from '../term/ToGetMarkChip'
 import { AddMarkForm } from './AddMarkForm'
 
 export default observer(function SubjectTotals({
@@ -23,6 +24,7 @@ export default observer(function SubjectTotals({
 }: StackScreenProps<TermNavigationParamMap, typeof S_SUBJECT_TOTALS>) {
 	const { termId, subjectId, finalMark } = route.params ?? {}
 	const { studentId } = Settings
+	const studentSettings = Settings.forStudentOrThrow()
 	const performance = SubjectPerformanceStores.use({
 		studentId,
 		subjectId,
@@ -42,14 +44,29 @@ export default observer(function SubjectTotals({
 				lessonsWithoutMark,
 				customMarks,
 				attendance: attendance,
+				targetMark: studentSettings.targetMark,
+				defaultMark: studentSettings.defaultMark,
+				defaultMarkWeight: studentSettings.defaultMarkWeight,
 			}),
-		[attendance, customMarks, lessonsWithoutMark, performance.result],
+		[
+			attendance,
+			customMarks,
+			lessonsWithoutMark,
+			performance.result,
+			studentSettings,
+		],
 	)
 
 	if (performance.fallback) return performance.fallback
 
 	if (!marks) return <Text>Ошибка при подсчете оценок</Text>
-	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight } = marks
+	const {
+		avgMark,
+		totalsAndSheduledTotals,
+		maxWeight,
+		minWeight,
+		toGetTarget,
+	} = marks
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -87,16 +104,14 @@ export default observer(function SubjectTotals({
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{ gap: Spacings.s2 }}
 			>
-				<View
-					style={{
-						padding: Spacings.s2,
-						flex: 1,
-						flexDirection: 'row',
-						gap: Spacings.s1,
-					}}
-				>
+				<ScrollView style={{ margin: Spacings.s1 }} horizontal>
+					<ToGetMarkChip
+						style={{ margin: Spacings.s1 }}
+						toGetTarget={toGetTarget}
+					/>
 					<Chip
 						mode="flat"
+						style={{ margin: Spacings.s1 }}
 						selected={attendance}
 						onPress={() => {
 							setAttendance(!attendance)
@@ -106,6 +121,7 @@ export default observer(function SubjectTotals({
 					</Chip>
 					<Chip
 						mode="flat"
+						style={{ margin: Spacings.s1 }}
 						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
@@ -113,7 +129,7 @@ export default observer(function SubjectTotals({
 					>
 						Уроки без оценок
 					</Chip>
-				</View>
+				</ScrollView>
 				{totalsAndSheduledTotals.map((e, i) => (
 					<MarkRow
 						mark={e}

@@ -54,14 +54,7 @@ const StickyHeader = observer(function StickyHeader() {
 
 const Header = observer(function Header() {
 	return (
-		<ScrollView
-			style={{
-				flex: 1,
-				flexDirection: 'row',
-				margin: Spacings.s1,
-			}}
-			horizontal
-		>
+		<ScrollView style={{ margin: Spacings.s1 }} horizontal>
 			<Chip
 				mode="flat"
 				selected={TermStore.sort === 'averageMark'}
