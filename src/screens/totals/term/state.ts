@@ -9,7 +9,7 @@ import {
 import { TotalsScreenParams } from '../navigation'
 
 export const TermStore = new (class {
-	sort = true
+	sort: 'averageMark' | 'toGetMarkAmount' | false = 'averageMark'
 	attendance = false
 
 	get terms() {
@@ -37,13 +37,24 @@ export const TermStore = new (class {
 			return []
 		}
 
-		if (this.sort) {
+		if (this.sort === 'averageMark') {
 			return TotalsStore.result
 				.slice()
 				.sort((a, b) => this.getOrder(a) - this.getOrder(b))
 		}
 
+		if (this.sort === 'toGetMarkAmount') {
+			return TotalsStore.result.slice().sort((a, b) => this.getOrderByMarksAmount(b) -  this.getOrderByMarksAmount(a))
+ 		}
+
 		return TotalsStore.result
+	}
+
+	subjectGetMarks: Record<string, number | undefined> = {}
+
+	private getOrderByMarksAmount(a: Total) {
+			const order = this.subjectGetMarks[a.subjectId] ?? 0
+			return order + (10000 - this.getOrder(a) * 0.0001)
 	}
 
 	private getOrder(

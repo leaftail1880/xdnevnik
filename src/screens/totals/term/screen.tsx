@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { memo, useCallback } from 'react'
-import { FlatList, ListRenderItem, View } from 'react-native'
+import { FlatList, ListRenderItem, ScrollView } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
@@ -19,7 +19,7 @@ import {
 	TotalsStore,
 } from '~services/net-school/store'
 import { Spacings } from '../../../utils/Spacings'
-import SubjectPerformanceInline from './PeformanceInline'
+import SubjectPerformanceInline from './Subject'
 import { TermStore } from './state'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -54,33 +54,53 @@ const StickyHeader = observer(function StickyHeader() {
 
 const Header = observer(function Header() {
 	return (
-		<View
+		<ScrollView
 			style={{
 				flex: 1,
 				flexDirection: 'row',
-				gap: Spacings.s2,
-				padding: Spacings.s2,
+				margin: Spacings.s1,
 			}}
+			horizontal
 		>
 			<Chip
 				mode="flat"
-				selected={TermStore.sort}
+				selected={TermStore.sort === 'averageMark'}
+				style={{ margin: Spacings.s1 }}
 				onPress={() => {
-					runInAction(() => (TermStore.sort = !TermStore.sort))
+					runInAction(() =>
+						TermStore.sort === 'averageMark'
+							? (TermStore.sort = false)
+							: (TermStore.sort = 'averageMark'),
+					)
 				}}
 			>
-				Плохие оценки вверху
+				Сортировать по баллу
+			</Chip>
+			<Chip
+				mode="flat"
+				selected={TermStore.sort === 'toGetMarkAmount'}
+				style={{ margin: Spacings.s1 }}
+				onPress={() => {
+					runInAction(() =>
+						TermStore.sort === 'toGetMarkAmount'
+							? (TermStore.sort = false)
+							: (TermStore.sort = 'toGetMarkAmount'),
+					)
+				}}
+			>
+				Сортировать по кол-ву для исправления
 			</Chip>
 			<Chip
 				mode="flat"
 				selected={TermStore.attendance}
+				style={{ margin: Spacings.s1 }}
 				onPress={() => {
 					runInAction(() => (TermStore.attendance = !TermStore.attendance))
 				}}
 			>
 				Пропуски
 			</Chip>
-		</View>
+		</ScrollView>
 	)
 })
 
