@@ -18,7 +18,7 @@ import { makeAutoObservable, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { View } from 'react-native'
-import { Icon, PaperProvider } from 'react-native-paper'
+import { Icon, PaperProvider, TouchableRipple } from 'react-native-paper'
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -171,6 +171,10 @@ const Navigation = observer(function Navigation() {
 					<Icon source={ScreenIcons[route.name]} color={color} size={23} />
 				),
 			})}
+			// https://github.com/callstack/react-native-paper/issues/4401
+			renderTouchable={({ key, ...props }) => (
+				<TouchableRipple {...props} key={key} />
+			)}
 		>
 			{!API.session && (
 				<Tab.Screen name={LANG['s_log_in']} component={LoginScreen} />

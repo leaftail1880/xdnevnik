@@ -7,7 +7,7 @@ import * as NavigationBar from 'expo-navigation-bar'
 import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Appearance } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
@@ -65,7 +65,7 @@ export class ThemeStore {
 	}
 
 	get fonts() {
-		return this.theme.fonts
+		return toJS(this.theme.fonts)
 	}
 
 	constructor() {
