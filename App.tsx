@@ -63,6 +63,13 @@ const ScreenIcons = {
 
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 
+import * as SplashScreen from 'expo-splash-screen'
+
+SplashScreen.setOptions({
+	duration: 200,
+	fade: true,
+})
+
 export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)

@@ -52,7 +52,7 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 					gap: Spacings.s1,
 				}}
 			>
-				<Text>Чтобы чтобы в итогах было</Text>
+				<Text>Чтобы в итогах было</Text>
 				<Mark mark={student.targetMark} duty={false} style={{ padding: 2 }} />
 				<Text>нужно получить</Text>
 				<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>

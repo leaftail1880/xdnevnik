@@ -2,10 +2,11 @@
 import withBuildProperties from 'expo-build-properties'
 import {
 	AndroidConfig,
-	withAndroidColorsNight,
 	withAndroidStyles,
 	withGradleProperties,
 } from 'expo/config-plugins'
+
+const version = '0.17.0'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
@@ -22,18 +23,6 @@ const sentry = {
 const splashBackgroundDark = '#252525'
 const splashBackgroundLight = '#EBEAEA'
 
-/** @type {import("@expo/config-types/build/ExpoConfig.js").ExpoConfig['splash']} */
-const splash = {
-	image: './assets/splash.png',
-	resizeMode: 'cover',
-	backgroundColor: splashBackgroundLight,
-	dark: {
-		image: './assets/splash.png',
-		resizeMode: 'cover',
-		backgroundColor: splashBackgroundDark,
-	},
-}
-
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
 
 /** @type {{expo: import("@expo/config-types/build/ExpoConfig.js").ExpoConfig}} */
@@ -41,9 +30,9 @@ const Config = {
 	expo: {
 		name: IS_DEV ? 'XDnevnik Dev Client' : 'XDnevnik',
 		slug: 'xdnevnik',
-		version: '0.16.0',
+		version: version,
 		owner: 'leaftail1880',
-		orientation: 'portrait',
+		orientation: 'default',
 		icon: './assets/icon.png',
 		assetBundlePatterns: ['**/*'],
 		userInterfaceStyle: 'automatic',
@@ -54,7 +43,6 @@ const Config = {
 
 		ios: {
 			bundleIdentifier: id,
-			splash: splash,
 			userInterfaceStyle: 'automatic',
 			infoPlist: {
 				UIBackgroundModes: ['lesson-notifications'],
@@ -63,7 +51,6 @@ const Config = {
 
 		android: {
 			package: id,
-			splash: splash,
 			userInterfaceStyle: 'automatic',
 			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
 			adaptiveIcon: {
@@ -83,6 +70,18 @@ const Config = {
 					position: 'relative',
 					visibility: 'visible',
 					behavior: 'inset-swipe',
+				},
+			],
+			[
+				'expo-splash-screen',
+				{
+					backgroundColor: splashBackgroundLight,
+					image: './assets/splash.png',
+					dark: {
+						image: './assets/splash.png',
+						backgroundColor: splashBackgroundDark,
+					},
+					imageWidth: 1284,
 				},
 			],
 		],
@@ -127,19 +126,9 @@ Config.expo = withGradleProperties(Config.expo, config => {
 			type: 'property',
 			key: 'gradle',
 			value: 'build -x lint -x lintVitalRelease',
-		}
+		},
 	)
 
-	return config
-})
-
-// Adjust color of the android status bar during splash screen
-const { assignColorValue } = AndroidConfig.Colors
-Config.expo = withAndroidColorsNight(Config.expo, async config => {
-	config.modResults = assignColorValue(config.modResults, {
-		name: 'colorPrimaryDark',
-		value: splashBackgroundDark,
-	})
 	return config
 })
 
@@ -149,10 +138,10 @@ Config.expo = withAndroidStyles(Config.expo, config => {
 		config.modResults,
 		{
 			add: true,
-			parent: AndroidConfig.Styles.getAppThemeLightNoActionBarGroup(),
+			parent: AndroidConfig.Styles.getAppThemeGroup(),
 			name: `android:forceDarkAllowed`,
 			value: 'false',
-		}
+		},
 	)
 	return config
 })
