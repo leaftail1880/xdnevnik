@@ -84,7 +84,6 @@ export default Sentry.wrap(
 					<StatusBar
 						style={Theme.dark ? 'light' : 'dark'}
 						hidden={false}
-						{/*backgroundColor="transparent"*/}
 					/>
 					<NavigationContainer
 						theme={ProvidedTheme}
