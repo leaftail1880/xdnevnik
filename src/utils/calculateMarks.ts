@@ -54,6 +54,7 @@ export function calculateMarks({
 		) as Partial<PartialAssignment>[]
 
 		if (lessonsWithoutMark) {
+			// TODO Fix
 			const length =
 				totals.classmeetingsStats.passed -
 				totals.results.length -
@@ -75,6 +76,7 @@ export function calculateMarks({
 		}
 
 		if (lessonsWithoutMark) {
+			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
 					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,
@@ -107,7 +109,7 @@ export function calculateMarks({
 			}
 		}
 
-		const weights = totals.results.map(e => e.weight)
+		const weights = totals.results.concat(customMarks).map(e => e.weight)
 		const maxWeight = Math.max(...weights)
 		const minWeight = Math.min(...weights)
 		return {
