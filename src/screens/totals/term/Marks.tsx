@@ -155,9 +155,11 @@ export default observer(function SubjectMarks(
 					style={styles.totalMark}
 				/>
 			</View>
-			<View style={styles.chips}>
-				<ToGetMarkChip toGetTarget={toGetTarget} />
-			</View>
+			{typeof toGetTarget !== 'undefined' && (
+				<View style={styles.chips}>
+					<ToGetMarkChip toGetTarget={toGetTarget} />
+				</View>
+			)}
 		</>
 	)
 })

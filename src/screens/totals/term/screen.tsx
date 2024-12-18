@@ -20,7 +20,7 @@ import {
 } from '~services/net-school/store'
 import { Spacings } from '../../../utils/Spacings'
 import SubjectPerformanceInline from './Subject'
-import { TermStore } from './state'
+import { TermStore, TermStoreSortModes } from './state'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
@@ -52,37 +52,17 @@ const StickyHeader = observer(function StickyHeader() {
 	)
 })
 
-const Header = observer(function Header() {
+const ChipsRow = observer(function Header() {
 	return (
 		<ScrollView style={{ margin: Spacings.s1 }} horizontal>
-			<Chip
-				mode="flat"
-				selected={TermStore.sort === 'averageMark'}
-				style={{ margin: Spacings.s1 }}
-				onPress={() => {
-					runInAction(() =>
-						TermStore.sort === 'averageMark'
-							? (TermStore.sort = false)
-							: (TermStore.sort = 'averageMark'),
-					)
-				}}
-			>
-				Сортировать по баллу
-			</Chip>
-			<Chip
-				mode="flat"
-				selected={TermStore.sort === 'toGetMarkAmount'}
-				style={{ margin: Spacings.s1 }}
-				onPress={() => {
-					runInAction(() =>
-						TermStore.sort === 'toGetMarkAmount'
-							? (TermStore.sort = false)
-							: (TermStore.sort = 'toGetMarkAmount'),
-					)
-				}}
-			>
-				Сортировать по кол-ву для исправления
-			</Chip>
+			<SelectModal
+				mode="chip"
+				label="Сортировать по"
+				value={TermStore.sortMode}
+				inlineChip
+				data={TermStoreSortModes}
+				onSelect={v => runInAction(() => (TermStore.sortMode = v.value))}
+			/>
 			<Chip
 				mode="flat"
 				selected={TermStore.attendance}
@@ -128,7 +108,7 @@ const TermTotalsList = observer(function TermTotalsList({
 			<Loading text="Загрузка из кэша..." />
 		) : (
 			<FlatList
-				ListHeaderComponent={Header}
+				ListHeaderComponent={ChipsRow}
 				initialNumToRender={5}
 				maxToRenderPerBatch={1}
 				scrollEventThrottle={2000}

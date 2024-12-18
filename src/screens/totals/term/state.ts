@@ -1,16 +1,27 @@
 import { makeAutoObservable } from 'mobx'
-import { Logger } from '~constants'
+import { getSubjectName } from '~components/SubjectName'
 import { Settings } from '~models/settings'
 import { NSEntity, Subject, Total } from '~services/net-school/entities'
 import {
 	SubjectPerformanceStores,
+	SubjectsStore,
 	TotalsStore,
 } from '~services/net-school/store'
-import { TotalsScreenParams } from '../navigation'
+import { makeReloadPersistable } from '~utils/makePersistable'
+import { stringSimilarity } from '~utils/search'
+import { TotalsScreenParams, TotalsStateStore } from '../navigation'
+
+export const TermStoreSortModes = [
+	{ value: 'averageMark', label: 'Средней оценке' },
+	{ value: 'toGetMarkAmount', label: 'Кол-ву для исправления' },
+	{ value: 'markAmount', label: 'Кол-ву оценок' },
+	{ value: 'none', label: 'Никак' },
+] as const
 
 export const TermStore = new (class {
-	sort: 'averageMark' | 'toGetMarkAmount' | false = 'averageMark'
+	sortMode: (typeof TermStoreSortModes)[number]['value'] = 'averageMark'
 	attendance = false
+	search = ''
 
 	get terms() {
 		return TotalsStore.result?.[0]?.termTotals.map(total => ({
@@ -33,31 +44,80 @@ export const TermStore = new (class {
 			!TotalsStore.result.length ||
 			!this.currentTerm
 		) {
-			Logger.debug('ABC', this.currentTerm)
 			return []
 		}
 
-		if (this.sort === 'averageMark') {
+		if (TotalsStateStore.search) {
 			return TotalsStore.result
 				.slice()
-				.sort((a, b) => this.getOrder(a) - this.getOrder(b))
+				.map(e => ({ element: e, order: this.getSearchOrder(e) }))
+				.sort((a, b) => b.order - a.order)
+				.map(e => e.element)
 		}
 
-		if (this.sort === 'toGetMarkAmount') {
-			return TotalsStore.result.slice().sort((a, b) => this.getOrderByMarksAmount(b) -  this.getOrderByMarksAmount(a))
- 		}
+		if (this.sortMode === 'averageMark') {
+			return TotalsStore.result
+				.slice()
+				.sort(
+					(a, b) => this.getAverageMarkOrder(a) - this.getAverageMarkOrder(b),
+				)
+		}
+
+		if (this.sortMode === 'toGetMarkAmount') {
+			return TotalsStore.result
+				.slice()
+				.sort((a, b) => this.getToGetMarkOrder(b) - this.getToGetMarkOrder(a))
+		}
+
+		if (this.sortMode === 'markAmount') {
+			return TotalsStore.result
+				.slice()
+				.sort((a, b) => this.getMarkAmountOrder(a) - this.getMarkAmountOrder(b))
+		}
 
 		return TotalsStore.result
 	}
 
 	subjectGetMarks: Record<string, number | undefined> = {}
 
-	private getOrderByMarksAmount(a: Total) {
-			const order = this.subjectGetMarks[a.subjectId] ?? 0
-			return order + (10000 - this.getOrder(a) * 0.0001)
+	private getSearchOrder(total: Total) {
+		const name = getSubjectName(
+			SubjectsStore.result
+				? { subjectId: total.subjectId, subjects: SubjectsStore.result }
+				: { subjectId: total.subjectId, subjectName: '' },
+		)
+		return stringSimilarity(name, TotalsStateStore.search)
 	}
 
-	private getOrder(
+	private getMarkAmountOrder(total: Total) {
+		const { store } = SubjectPerformanceStores.get(
+			{
+				studentId: Settings.studentId,
+				subjectId: total.subjectId,
+			},
+			false,
+		)
+		if (!store.result?.results) return 0
+		let avg = store.result.results.length
+
+		const term = total.termTotals.find(e => e.term.id === this.currentTerm!.id)
+		if (!term) return 0
+
+		if (term.avgMark) {
+			avg += term.avgMark / 10000
+		} else if (term.mark && !isNaN(Number(term.mark))) {
+			avg += Number(term.mark) / 10000
+		}
+
+		return avg
+	}
+
+	private getToGetMarkOrder(a: Total) {
+		const order = this.subjectGetMarks[a.subjectId] ?? 0
+		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
+	}
+
+	private getAverageMarkOrder(
 		total: Total,
 		term = total.termTotals.find(e => e.term.id === this.currentTerm!.id),
 	) {
@@ -79,8 +139,15 @@ export const TermStore = new (class {
 		return avg
 	}
 	constructor() {
-		makeAutoObservable<this, 'getOrder'>(this, {
-			getOrder: false,
+		makeAutoObservable<this, string>(this, {
+			getAverageMarkOrder: false,
+			getToGetMarkOrder: false,
+			getMarkAmountOrder: false,
+			getSearchOrder: false,
+		})
+		makeReloadPersistable(this, {
+			name: 'termStore',
+			properties: ['sortMode', 'attendance'],
 		})
 	}
 })()

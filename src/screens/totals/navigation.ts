@@ -20,6 +20,7 @@ export const Stack = createStackNavigator<TermNavigationParamMap>()
 export const TotalsStateStore = new (class {
 	schoolYear: Education['schoolyear'] | null = null
 	years: { label: string; value: string; year: Education['schoolyear'] }[] = []
+	search = ''
 
 	constructor() {
 		makeAutoObservable(this)

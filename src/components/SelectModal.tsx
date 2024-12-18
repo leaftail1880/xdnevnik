@@ -41,9 +41,10 @@ type Item<T extends string> = {
 type Props<V extends string = string, I extends Item<V> = Item<V>> = {
 	label: string
 	value: V
-	data: I[]
+	data: readonly I[]
 	onSelect: (v: I) => void
 	mode?: 'button' | 'list.item' | 'chip'
+	inlineChip?: boolean
 	style?: StyleProp<ViewStyle>
 	description?: string
 }
@@ -94,10 +95,10 @@ export default observer(function SelectModal<
 				<Chip
 					mode="flat"
 					style={props.style}
-					textStyle={Theme.fonts.bodySmall}
+					textStyle={props.inlineChip ? undefined : Theme.fonts.bodySmall}
 					onPress={store.toggleVisibility}
 				>
-					{(label + value).slice(0, 16)}
+					{(label + value).slice(0, props.inlineChip ? Infinity : 16)}
 				</Chip>
 			) : (
 				<List.Item

@@ -1,7 +1,8 @@
-import { autorun } from 'mobx'
-import { observer } from 'mobx-react-lite'
+import { StackNavigationOptions } from '@react-navigation/stack'
+import { autorun, runInAction } from 'mobx'
+import { Observer, observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
-import { Chip } from 'react-native-paper'
+import { Chip, Searchbar } from 'react-native-paper'
 import { Settings } from '~models/settings'
 import { SubjectsStore, TotalsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
@@ -63,12 +64,28 @@ function headerRight() {
 	return <HeaderSwitch />
 }
 
-const subjectTotalsOptions = {
+function headerTitle() {
+	return (
+		<Observer>
+			{() => (
+				<Searchbar
+					placeholder="Поиск"
+					style={{ minWidth: '70%' }}
+					onChangeText={v => runInAction(() => (TotalsStateStore.search = v))}
+					value={TotalsStateStore.search}
+				/>
+			)}
+		</Observer>
+	)
+}
+
+const subjectTotalsOptions: StackNavigationOptions = {
 	headerStyle: styles.headerStyle,
 }
-const totalsOptions = {
+const totalsOptions: StackNavigationOptions = {
 	headerRight,
 	headerStyle: styles.headerStyle,
+	headerTitle,
 }
 
 const HeaderSwitch = observer(function HeaderSwitch() {
