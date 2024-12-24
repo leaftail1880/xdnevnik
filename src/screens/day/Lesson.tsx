@@ -104,12 +104,12 @@ const Assignments = observer(function Assignments(props: DiaryLessonProps) {
 
 	const results = AssignmentsStore.result.filter(e => {
 		const sameLesson = e.classmeetingId === props.lesson.classmeetingId
-		const sameDay =
-			!e.weight &&
-			new Date(e.assignmentDate).toYYYYMMDD() ===
-				props.lesson.start.toYYYYMMDD()
+		// const sameDay =
+		// !e.weight &&
+		// new Date(e.assignmentDate).toYYYYMMDD() ===
+		// props.lesson.start.toYYYYMMDD()
 
-		return sameLesson || sameDay
+		return sameLesson // || sameDay
 	})
 
 	if (results.length) {

@@ -99,7 +99,7 @@ autorun(() => {
 function weekValue(text: string, week: Date) {
 	const day = Date.week(week)[0].toYYYYMMDD()
 	return {
-		label: `Прошлая неделя (${day})`,
+		label: `${text} (${day})`,
 		value: day,
 		week: week,
 	}
