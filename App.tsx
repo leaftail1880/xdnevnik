@@ -81,10 +81,10 @@ export default Sentry.wrap(
 		return (
 			<SafeAreaProvider>
 				<PaperProvider theme={ProvidedTheme}>
-					<StatusBar
+					{/**<StatusBar
 						style="auto"
 						translucent
-					/>
+					/>*/}
 					<NavigationContainer
 						theme={ProvidedTheme}
 						ref={navigation}
