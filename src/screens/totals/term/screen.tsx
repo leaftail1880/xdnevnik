@@ -26,33 +26,16 @@ import { TermStore, TermStoreSortModes } from './state'
 export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
 	return (
 		<>
-			<StickyHeader />
 			<TermTotalsList {...props} />
 		</>
 	)
 })
 
-const StickyHeader = observer(function StickyHeader() {
+const ChipsRow = observer(function Header() {
 	if (!Settings.studentId) return
 
 	const terms = TermStore.terms
 	const studentSettings = Settings.forStudent(Settings.studentId)
-	return (
-		terms && (
-			<SelectModal
-				data={terms}
-				mode="button"
-				value={String(TermStore.currentTerm?.id)}
-				label={''}
-				onSelect={v =>
-					runInAction(() => (studentSettings.currentTerm = v.term))
-				}
-			/>
-		)
-	)
-})
-
-const ChipsRow = observer(function Header() {
 	return (
 		<ScrollView style={{ margin: Spacings.s1 }} horizontal>
 			<SelectModal
@@ -61,8 +44,22 @@ const ChipsRow = observer(function Header() {
 				value={TermStore.sortMode}
 				inlineChip
 				data={TermStoreSortModes}
+				style={{ margin: Spacings.s1 }}
 				onSelect={v => runInAction(() => (TermStore.sortMode = v.value))}
 			/>
+			{terms && (
+				<SelectModal
+					data={terms}
+					mode="chip"
+					value={String(TermStore.currentTerm?.id)}
+					style={{ margin: Spacings.s1 }}
+					inlineChip
+					label={''}
+					onSelect={v =>
+						runInAction(() => (studentSettings.currentTerm = v.term))
+					}
+				/>
+			)}
 			<Chip
 				mode="flat"
 				selected={TermStore.attendance}

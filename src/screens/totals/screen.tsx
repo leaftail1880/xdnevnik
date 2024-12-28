@@ -1,8 +1,8 @@
 import { StackNavigationOptions } from '@react-navigation/stack'
 import { autorun, runInAction } from 'mobx'
-import { Observer, observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
-import { Chip, Searchbar } from 'react-native-paper'
+import { Appbar, Chip, Searchbar } from 'react-native-paper'
 import { Settings } from '~models/settings'
 import { SubjectsStore, TotalsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
@@ -15,6 +15,7 @@ import {
 import SubjectTotals from './subject/screen'
 import TotalsScreenTerm from './term/screen'
 import TotalsScreenTable from './terms/TotalsScreenTable'
+import { Theme } from '~models/theme'
 
 let autorunStarted = false
 
@@ -65,27 +66,39 @@ function headerRight() {
 }
 
 function headerTitle() {
-	return (
-		<Observer>
-			{() => (
-				<Searchbar
-					placeholder="Поиск"
-					style={{ minWidth: '70%' }}
-					onChangeText={v => runInAction(() => (TotalsStateStore.search = v))}
-					value={TotalsStateStore.search}
-				/>
-			)}
-		</Observer>
-	)
+	return <HeaderSearch />
 }
+
+const HeaderSearch = observer(function HeaderSearch() {
+	return (
+		<Searchbar
+			placeholder="Поиск"
+			style={{ minWidth: '60%' }}
+			onChangeText={v => runInAction(() => (TotalsStateStore.search = v))}
+			value={TotalsStateStore.search}
+		/>
+	)
+})
 
 const subjectTotalsOptions: StackNavigationOptions = {
 	headerStyle: styles.headerStyle,
 }
 const totalsOptions: StackNavigationOptions = {
 	headerRight,
-	headerStyle: styles.headerStyle,
 	headerTitle,
+	header() {
+		return (
+			<Appbar.Header
+				style={{
+					backgroundColor: Theme.colors.navigationBar,
+				}}
+				mode="center-aligned"
+			>
+				<HeaderSearch />
+				<HeaderSwitch />
+			</Appbar.Header>
+		)
+	},
 }
 
 const HeaderSwitch = observer(function HeaderSwitch() {
@@ -94,9 +107,7 @@ const HeaderSwitch = observer(function HeaderSwitch() {
 			<Chip
 				selected={!Settings.currentTotalsOnly}
 				onPress={() =>
-					Settings.save({
-						currentTotalsOnly: !Settings.currentTotalsOnly,
-					})
+					Settings.save({ currentTotalsOnly: !Settings.currentTotalsOnly })
 				}
 			>
 				Все четверти
