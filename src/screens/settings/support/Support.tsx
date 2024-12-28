@@ -1,15 +1,19 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
 import { Linking, ScrollView, View } from 'react-native'
-import { Divider, List, Text } from 'react-native-paper'
+import { Divider, List, Text, Button } from 'react-native-paper'
 import { SettingsJumpNavigation } from '~components/Navigate'
 import { Spacings } from '../../../utils/Spacings'
 import { SettingsRoutes } from '../navigation'
+import { useState } from 'react'
+import WebView from 'react-native-webview'
 
 // eslint-disable-next-line mobx/missing-observer
 export default function About(props: StackScreenProps<SettingsRoutes>) {
+	const [dino, setDino] = useState(false)
+
 	return (
-		<ScrollView contentContainerStyle={{ flex: 1 }}>
+		<ScrollView>
 			<SettingsJumpNavigation
 				navigation={props}
 				target={'privacy'}
@@ -61,7 +65,16 @@ export default function About(props: StackScreenProps<SettingsRoutes>) {
 				<Text>Версия: {Application.nativeApplicationVersion}</Text>
 				<Text>Идентификатор: {Application.applicationId}</Text>
 				<Text>Сделано с ❤️ Leaftail и Milk_Cool</Text>
+				<Button onPress={() => setDino(!dino)}>Show Google Dino</Button>
 			</View>
+			{dino && (
+				<View style={{ marginBottom: Spacings.s5 }}>
+					<WebView
+						source={{ uri: 'https://chromedino.com/' }}
+						style={{ width: '100%', height: 600 }}
+					></WebView>
+				</View>
+			)}
 		</ScrollView>
 	)
 }

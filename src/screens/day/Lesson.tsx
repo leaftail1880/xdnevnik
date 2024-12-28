@@ -72,7 +72,24 @@ const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
 	return (
 		<>
 			<View style={[styles.row, { alignItems: 'center' }]}>
-				<Text>{i + 1} </Text>
+				<View
+					style={{
+						backgroundColor: Theme.colors.secondaryContainer,
+						borderRadius: Theme.roundness,
+						padding: Spacings.s1,
+						marginBottom: Spacings.s2,
+						marginRight: Spacings.s1,
+					}}
+				>
+					<Text
+						style={{
+							color: Theme.colors.onSecondaryContainer,
+							fontWeight: 'bold',
+						}}
+					>
+						{i + 1}
+					</Text>
+				</View>
 				<SubjectName {...lesson} style={Theme.fonts.titleMedium} />
 			</View>
 			<View style={[styles.row, { gap: Spacings.s1 }]}>
