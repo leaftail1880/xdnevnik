@@ -38,10 +38,10 @@ export default observer(function Notifications(
 					data={markStyles}
 					onSelect={({ value }) => Settings.save({ markStyle: value })}
 				/>
-				<SwitchSetting
+				{/* <SwitchSetting
 					title='"Вес: " перед весом оценки'
 					setting="showMarkWeightTip"
-				/>
+				/> */}
 			</List.Section>
 			<List.Section title="Целевая оценка">
 				{student && (

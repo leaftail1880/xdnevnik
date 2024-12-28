@@ -132,7 +132,7 @@ export default observer(function Mark({
 				</Text>
 				{typeof weight === 'number' && (
 					<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>
-						{Settings.showMarkWeightTip ? 'Вес: ' : ''}
+						{/* {Settings.showMarkWeightTip ? 'Вес: ' : ''} */}
 						{weight}
 					</Text>
 				)}

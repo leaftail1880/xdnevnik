@@ -91,7 +91,7 @@ export class NetSchoolApi {
 	constructor() {
 		// eslint-disable-next-line mobx/exhaustive-make-observable
 		makeObservable(this, {
-			cache: observable.struct,
+			cache: true,
 			authorized: true,
 			reload: true,
 			session: observable.struct,

@@ -42,7 +42,7 @@ class SettingsStore {
 	nameFormat: 'fio' | 'ifo' = 'ifo'
 	currentTotalsOnly = false
 	markStyle: 'background' | 'border' = 'background'
-	showMarkWeightTip = true
+	// showMarkWeightTip = true
 	collapseLongAssignmentText = false
 	targetMarkCompact = false
 
