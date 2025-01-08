@@ -1,4 +1,5 @@
 // Initial setup & polyfills & monitoring
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import './src/utils/polyfill'
 
 import './src/services/sentry'
@@ -79,24 +80,23 @@ export default Sentry.wrap(
 
 		const ProvidedTheme = toJS(theme)
 		return (
-			<SafeAreaProvider>
-				<PaperProvider theme={ProvidedTheme}>
-					{/**<StatusBar
-						style="auto"
-						translucent
-					/>*/}
-					<NavigationContainer
-						theme={ProvidedTheme}
-						ref={navigation}
-						onReady={() =>
-							SENTRY_ROUTING.registerNavigationContainer(navigation)
-						}
-					>
-						<Navigation />
-					</NavigationContainer>
-					<Toast />
-				</PaperProvider>
-			</SafeAreaProvider>
+			<GestureHandlerRootView>
+				<SafeAreaProvider>
+					<PaperProvider theme={ProvidedTheme}>
+						<StatusBar style="auto" translucent />
+						<NavigationContainer
+							theme={ProvidedTheme}
+							ref={navigation}
+							onReady={() =>
+								SENTRY_ROUTING.registerNavigationContainer(navigation)
+							}
+						>
+							<Navigation />
+						</NavigationContainer>
+						<Toast />
+					</PaperProvider>
+				</SafeAreaProvider>
+			</GestureHandlerRootView>
 		)
 	}),
 )

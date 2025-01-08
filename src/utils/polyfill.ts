@@ -12,9 +12,20 @@ declare global {
 		toReadable(): string
 		getDayFromMonday(): number
 	}
+
+	// @ts-expect-error Something wrong with types lol
+	let debug: (...messages: unknown[]) => void
 }
 
 export {}
+
+if (__DEV__) {
+	// eslint-disable-next-line no-console
+	debug = console.log.bind(console)
+} else {
+	debug = () => {}
+}
+
 
 Date.prototype.toNetSchool = function (this: Date) {
 	return this.toJSON().split('T')[0]

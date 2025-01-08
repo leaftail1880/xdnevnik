@@ -67,6 +67,10 @@ export default observer(function AppearanceSettings_() {
 					title="Сворачивать длинный текст заданий"
 					setting="collapseLongAssignmentText"
 				/>
+				<SwitchSetting
+					title="Использовать календарь для выбора даты"
+					setting="newDatePicker"
+				/>
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />
 

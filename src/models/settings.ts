@@ -46,6 +46,8 @@ class SettingsStore {
 	collapseLongAssignmentText = false
 	targetMarkCompact = false
 
+	newDatePicker = true
+
 	/**
 	 * Map containing per student overrides
 	 */

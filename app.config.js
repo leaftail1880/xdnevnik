@@ -60,7 +60,8 @@ const Config = {
 		},
 
 		plugins: [
-			IS_DEV ? 'expo-dev-client' : '',
+			'expo-dev-client',
+			// IS_DEV ? 'expo-dev-client' : '',
 			'expo-updates',
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
