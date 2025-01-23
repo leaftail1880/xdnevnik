@@ -28,9 +28,11 @@ export const LessonNotifStore = new (class {
 	currentLesson: undefined | string = undefined
 
 	async remove(id = LessonNotifStore.id) {
-		if (!id) return
-
-		await notifee.cancelDisplayedNotification(id)
+		if (!id) ReturnType
+    
+    if (foregroundServiceRegistered) {
+      await notifee.stopForegroundService()
+    } else await notifee.cancelDisplayedNotification(id)
 		runInAction(() => {
 			if (LessonNotifStore.id) LessonNotifStore.id = undefined
 		})
@@ -181,7 +183,7 @@ async function showNotification(
 
 			// only alert when lesson notification
 			onlyAlertOnce: LessonNotifStore.currentLesson === lessonId,
-			asForegroundService: true,
+			asForegroundService: foregroundServiceRegistered,
 
 			progress:
 				state === LessonState.going
