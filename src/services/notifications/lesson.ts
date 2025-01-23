@@ -126,7 +126,7 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 	}
 	return { date, period }
 }
-
+let registered = false
 async function showNotification(
 	lesson: Lesson,
 	now: number,
@@ -155,7 +155,10 @@ async function showNotification(
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
-	// notifee.registerForegroundService(() => new Promise(() => {}))
+	if (!registered) {
+        notifee.registerForegroundService(() => new Promise(() => {}))
+	registered = true
+	}
 	const notificationId = await notifee.displayNotification({
 		...(LessonNotifStore.id ? { id: LessonNotifStore.id } : {}),
 		title,
@@ -167,7 +170,8 @@ async function showNotification(
 
 			// only alert when lesson notification
 			onlyAlertOnce: LessonNotifStore.currentLesson === lessonId,
-
+                        asForegroundService: true,
+			
 			progress:
 				state === LessonState.going
 					? {
