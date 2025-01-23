@@ -32,6 +32,20 @@ export default observer(function MicroUpdateId() {
 	)
 })
 
+enum UpdateCheckState {
+	default,
+	notAvailable,
+	available,
+	error,
+}
+
+const states: Record<UpdateCheckState, string> = {
+	[UpdateCheckState.default]: 'Проверить наличие микрообновлений',
+	[UpdateCheckState.error]: 'Ошибка',
+	[UpdateCheckState.available]: 'Проверить наличие микрообновлений',
+	[UpdateCheckState.notAvailable]: 'Нет обновлений',
+}
+
 const openModal = () => ModalAlert.show('Микрообновления', <MicroUpdateModal />)
 
 const MicroUpdateModal = observer(function MicroUpdateModal() {
@@ -50,24 +64,24 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		? 'Запущено из сборки'
 		: 'Запущено из микрообновления'
 
-	const [found, setFound] = useState(true)
+	const [state, setState] = useState(UpdateCheckState.default)
 
 	const timeout = useRef<number>()
 	useEffect(() => {
 		clearTimeout(timeout.current)
-		if (!found) {
+		if (!state) {
 			timeout.current = setTimeout(
-				() => setFound(true),
+				() => setState(UpdateCheckState.default),
 				5000,
 			) as unknown as number
 		}
-	}, [found])
+	}, [state])
 
 	async function wrap<T>(promise: Promise<T>, onResolve: (t: T) => void) {
 		try {
 			onResolve(await promise)
 		} catch (e) {
-			setFound(false)
+			setState(UpdateCheckState.error)
 		}
 	}
 
@@ -77,13 +91,17 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 			{!isUpdateAvailable ? (
 				<Button
 					onPress={() =>
-						wrap(Updates.checkForUpdateAsync(), e => setFound(e.isAvailable))
+						wrap(Updates.checkForUpdateAsync(), e =>
+							setState(
+								e.isAvailable
+									? UpdateCheckState.available
+									: UpdateCheckState.notAvailable,
+							),
+						)
 					}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}
 				>
-					<HelperText type="info">
-						{found ? 'Проверить наличие микрообновлений' : 'Не удалось найти'}
-					</HelperText>
+					<HelperText type="info">{states[state]}</HelperText>
 				</Button>
 			) : (
 				<Button
@@ -91,9 +109,11 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 					onPress={() =>
 						wrap(Updates.fetchUpdateAsync(), result => {
 							if (result.isNew || result.isRollBackToEmbedded) {
+								setState(UpdateCheckState.available)
 								Updates.reloadAsync()
-								setFound(true)
-							} else setFound(false)
+							} else {
+								setState(UpdateCheckState.notAvailable)
+							}
 						})
 					}
 				>
