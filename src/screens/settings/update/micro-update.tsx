@@ -69,7 +69,7 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 	const timeout = useRef<number>()
 	useEffect(() => {
 		clearTimeout(timeout.current)
-		if (!state) {
+		if (state !== UpdateCheckState.default) {
 			timeout.current = setTimeout(
 				() => setState(UpdateCheckState.default),
 				5000,
