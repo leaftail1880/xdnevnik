@@ -77,7 +77,7 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 			{!isUpdateAvailable ? (
 				<Button
 					onPress={() =>
-						wrap(Updates.checkForUpdateAsync(), () => setFound(true))
+						wrap(Updates.checkForUpdateAsync(), e => setFound(e.isAvailable))
 					}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}
 				>
