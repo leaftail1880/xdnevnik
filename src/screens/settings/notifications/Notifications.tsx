@@ -30,6 +30,11 @@ function usePromise<T>(promise: () => Promise<T>) {
 	return state
 }
 
+const checkForNewMarks = checkForNewMarksAndNotify.bind(
+	undefined,
+	'Запрос пользователя',
+)
+
 export default observer(function Notifications(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	props: StackScreenProps<SettingsRoutes>,
@@ -86,7 +91,7 @@ export default observer(function Notifications(
 				<Button mode="elevated" onPress={Linking.openSettings}>
 					Системные настройки приложения
 				</Button>
-				<Button mode="elevated" onPress={checkForNewMarksAndNotify}>
+				<Button mode="elevated" onPress={checkForNewMarks}>
 					Проверить наличие новых оценок
 				</Button>
 				<Button mode="elevated" onPress={() => setLogs(!logs)}>

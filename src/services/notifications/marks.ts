@@ -8,10 +8,10 @@ import * as TaskManager from 'expo-task-manager'
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
 import { getSubjectName } from '~components/SubjectName'
 import { Settings } from '~models/settings'
+import { makeReloadPersistable } from '~utils/makePersistable'
 import { Logger } from '../../constants'
 import { API } from '../net-school/api'
 import { Assignment } from '../net-school/entities'
-import { makeReloadPersistable } from '~utils/makePersistable'
 
 export const MarksNotificationStore = new (class {
 	notified: string[] = []
@@ -64,7 +64,11 @@ function enabled() {
 
 const TASK_ID = 'background-fetch'
 
-TaskManager.defineTask(TASK_ID, checkForNewMarksAndNotify)
+TaskManager.defineTask(TASK_ID, () =>
+	checkForNewMarksAndNotify('Фоновый запрос: '),
+)
+
+let interval: number | undefined | NodeJS.Timeout
 
 autorun(function registerTask() {
 	if (enabled()) {
@@ -73,9 +77,14 @@ autorun(function registerTask() {
 			startOnBoot: true,
 			stopOnTerminate: false,
 		}).catch(onError)
+		interval = setInterval(
+			() => checkForNewMarksAndNotify('Активное приложение'),
+			1000 * 60, // minute
+		)
 	} else {
 		MarksNotificationStore.log('info', 'Состояние: Выключено')
 		BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
+		clearInterval(interval)
 	}
 })
 
@@ -83,8 +92,10 @@ function onError(reason: unknown) {
 	Logger.debug(`Unregistering task ${TASK_ID} failed:`, reason)
 }
 
-export async function checkForNewMarksAndNotify(): Promise<BackgroundFetchResult> {
-	MarksNotificationStore.log('info', `Запрос новых оценок...`)
+export async function checkForNewMarksAndNotify(
+	text = 'Фоновый запрос',
+): Promise<BackgroundFetchResult> {
+	MarksNotificationStore.log('info', `${text}: Запрос новых оценок...`)
 
 	const { studentId } = Settings
 	if (!studentId) return MarksNotificationStore.log('error', 'Не выбран учени')
@@ -114,10 +125,16 @@ function checkForNewMarks(marks: Assignment[]) {
 	let newMarks = 0
 
 	for (const assignment of marks.filter(e => typeof e.result === 'number')) {
-		const id = assignment.assignmentId + ''
+		const oldId = assignment.assignmentId + ''
+		const newId = `${assignment.result} -  ${getSubjectName(assignment)}, ${assignment.assignmentTypeAbbr} ${assignment.assignmentId}`
 
-		if (!MarksNotificationStore.notified.includes(id)) {
-			runInAction(() => MarksNotificationStore.notified.push(id))
+		if (
+			!MarksNotificationStore.notified.includes(oldId) &&
+			!MarksNotificationStore.notified.includes(newId)
+		) {
+			runInAction(() => MarksNotificationStore.notified.push(newId))
+
+			MarksNotificationStore.log('info', newId)
 
 			newMarks++
 			notifee.displayNotification({

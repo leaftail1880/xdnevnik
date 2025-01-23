@@ -11,6 +11,7 @@ import {
 	clearBackgroundInterval,
 	setBackgroundInterval,
 } from '~utils/backgroundIntervals'
+import { MarksNotificationStore } from './marks'
 
 export const LessonNotifStore = new (class {
 	constructor() {
@@ -126,7 +127,9 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 	}
 	return { date, period }
 }
-let registered = true
+
+let foregroundServiceRegistered = false
+
 async function showNotification(
 	lesson: Lesson,
 	now: number,
@@ -155,10 +158,18 @@ async function showNotification(
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
-	if (!registered) {
-        notifee.registerForegroundService(() => new Promise(() => {}))
-	registered = true
+	try {
+		if (!foregroundServiceRegistered) {
+			notifee.registerForegroundService(() => new Promise(() => {}))
+			foregroundServiceRegistered = true
+		}
+	} catch (e) {
+		MarksNotificationStore.log(
+			'error',
+			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
+		)
 	}
+
 	const notificationId = await notifee.displayNotification({
 		...(LessonNotifStore.id ? { id: LessonNotifStore.id } : {}),
 		title,
@@ -170,8 +181,8 @@ async function showNotification(
 
 			// only alert when lesson notification
 			onlyAlertOnce: LessonNotifStore.currentLesson === lessonId,
-                        //asForegroundService: true,
-			
+			asForegroundService: true,
+
 			progress:
 				state === LessonState.going
 					? {

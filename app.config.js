@@ -2,6 +2,7 @@
 import withBuildProperties from 'expo-build-properties'
 import {
 	AndroidConfig,
+	withAndroidManifest,
 	withAndroidStyles,
 	withGradleProperties,
 } from 'expo/config-plugins'
@@ -52,7 +53,11 @@ const Config = {
 		android: {
 			package: id,
 			userInterfaceStyle: 'automatic',
-			permissions: ['FOREGROUND_SERVICE', 'REQUEST_INSTALL_PACKAGES'],
+			permissions: [
+				'FOREGROUND_SERVICE',
+				'REQUEST_INSTALL_PACKAGES',
+				'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
+			],
 			adaptiveIcon: {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: splashBackgroundLight,
@@ -144,6 +149,22 @@ Config.expo = withAndroidStyles(Config.expo, config => {
 			value: 'false',
 		},
 	)
+	return config
+})
+
+Config.expo = withAndroidManifest(Config.expo, config => {
+	const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(
+		config.modResults,
+	)
+	if (mainApplication && !mainApplication?.service) {
+		mainApplication.service = []
+	}
+	mainApplication?.service?.push({
+		$: {
+			'android:name': 'app.notifee.core.ForegroundService',
+			'android:foregroundServiceType': 'dataSync',
+		},
+	})
 	return config
 })
 
