@@ -130,7 +130,7 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 	return { date, period }
 }
 
-let foregroundServiceRegistered = false
+let foregroundServiceRegistered = true
 
 async function showNotification(
 	lesson: Lesson,
@@ -161,7 +161,7 @@ async function showNotification(
 	}
 
 	try {
-		if (!foregroundServiceRegistered) {
+		if (false && !foregroundServiceRegistered) {
 			notifee.registerForegroundService(() => new Promise(() => {}))
 			foregroundServiceRegistered = true
 		}
