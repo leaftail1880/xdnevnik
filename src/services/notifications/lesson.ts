@@ -130,7 +130,7 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 	return { date, period }
 }
 
-let foregroundServiceRegistered = true
+let foregroundServiceRegistered = false
 
 async function showNotification(
 	lesson: Lesson,
