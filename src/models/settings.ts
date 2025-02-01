@@ -15,6 +15,8 @@ export interface StudentSettings {
 	 */
 	subjects: Record<string, object>
 
+	lessonOrder: Record<number, Record<string, number> | undefined>
+
 	/**
 	 * Current term of the student
 	 */
@@ -60,15 +62,19 @@ class SettingsStore {
 	}
 
 	forStudent(id: number) {
+		const defaultValue: StudentSettings = {
+			subjectNames: {},
+			subjects: {},
+			lessonOrder: {},
+		}
 		const overrides = this.studentOverrides[id]
 
 		if (overrides) {
+			for (const [k, v] of Object.entries(defaultValue)) {
+				overrides[k as keyof StudentSettings] ??= v
+			}
 			return overrides
 		} else {
-			const defaultValue: StudentSettings = {
-				subjectNames: {},
-				subjects: {},
-			}
 			runInAction(() => (this.studentOverrides[id] = defaultValue))
 
 			const overrides = this.studentOverrides[id]
