@@ -6,17 +6,17 @@ import { StyleSheet, View } from 'react-native'
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Chip } from 'react-native-paper'
+import { Chip, FAB } from 'react-native-paper'
 import Header from '~components/Header'
 import SelectModal from '~components/SelectModal'
 import UpdateDate from '~components/UpdateDate'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
-import { Lesson } from '~services/net-school/entities'
+import { Lesson } from '~services/net-school/lesson'
 import { DiaryStore } from '~services/net-school/store'
 import { ParamListBase } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
-import Day from './Day'
+import Day, { DiaryEditDay } from './Day'
 import { DiaryState } from './state'
 
 // @ts-expect-error fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
@@ -82,26 +82,52 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
-			<ScrollView
-				contentContainerStyle={{
-					justifyContent: 'center',
-					alignContent: 'center',
+			<FAB
+				onPress={() => runInAction(() => (DiaryState.edit = !DiaryState.edit))}
+				label=""
+				icon={DiaryState.edit ? 'content-save' : 'pencil'}
+				style={{
+					position: 'absolute',
+					margin: 16,
+					right: 0,
+					bottom: 10,
+					zIndex: 100,
 				}}
-				refreshControl={DiaryStore.refreshControl}
-			>
-				<View style={{ flex: 1, zIndex: 30 }}>
-					<SelectDay />
+			/>
+			{!DiaryState.edit ? (
+				<ScrollView
+					contentContainerStyle={{
+						justifyContent: 'center',
+						alignContent: 'center',
+					}}
+					refreshControl={DiaryStore.refreshControl}
+				>
+					<View style={{ flex: 1, zIndex: 30 }}>
+						<SelectDay />
+					</View>
+					<View style={{ flex: 1, flexDirection: 'row', padding: Spacings.s2 }}>
+						<Filter type="showHomework" label="Оценки" />
+						<Filter type="showAttachments" label="Файлы" />
+						<Filter type="showLessonTheme" label="Темы" />
+					</View>
+					<View style={{ padding: Spacings.s1 }}>
+						{DiaryStore.fallback || <Day {...props} />}
+					</View>
+					<UpdateDate store={DiaryStore} />
+				</ScrollView>
+			) : (
+				<View
+					style={{
+						paddingHorizontal: Spacings.s1,
+						marginBottom: 100,
+						padding: Spacings.s3,
+					}}
+				>
+					{DiaryStore.fallback || (
+						<DiaryEditDay lessons={DiaryStore.result.lessons} />
+					)}
 				</View>
-				<View style={{ flex: 1, flexDirection: 'row', padding: Spacings.s2 }}>
-					<Filter type="showHomework" label="Оценки" />
-					<Filter type="showAttachments" label="Файлы" />
-					<Filter type="showLessonTheme" label="Темы" />
-				</View>
-				<View style={{ padding: Spacings.s1 }}>
-					{DiaryStore.fallback || <Day {...props} />}
-				</View>
-				<UpdateDate store={DiaryStore} />
-			</ScrollView>
+			)}
 		</View>
 	)
 })

@@ -11466,6 +11466,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-reorderable-list@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "react-native-reorderable-list@npm:0.9.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: ">=2.12.0"
+    react-native-reanimated: ">=3.12.0"
+  checksum: 10c0/d1ce255ebe9fd85c22aaf074b601833d6180820f5cd9822794efd2988006002d02367354fc531492c890916c0fd582513de50ca8ed84d3cb537dd2ba7b25b857
+  languageName: node
+  linkType: hard
+
 "react-native-safe-area-context@npm:4.12.0":
   version: 4.12.0
   resolution: "react-native-safe-area-context@npm:4.12.0"
@@ -14225,6 +14237,7 @@ __metadata:
     react-native-mmkv: "npm:^2.11.0"
     react-native-paper: "patch:react-native-paper@npm%3A5.12.5#~/.yarn/patches/react-native-paper-npm-5.12.5-c595c2e788.patch"
     react-native-reanimated: "npm:~3.16.1"
+    react-native-reorderable-list: "npm:^0.9.0"
     react-native-safe-area-context: "npm:4.12.0"
     react-native-screens: "npm:~4.1.0"
     react-native-vector-icons: "npm:^10.0.3"

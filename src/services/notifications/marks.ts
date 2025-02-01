@@ -11,7 +11,7 @@ import { Settings } from '~models/settings'
 import { makeReloadPersistable } from '~utils/makePersistable'
 import { Logger } from '../../constants'
 import { API } from '../net-school/api'
-import { Assignment } from '../net-school/entities'
+import { Assignment } from '~services/net-school/entities'
 
 export const MarksNotificationStore = new (class {
 	notified: string[] = []

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { View } from 'react-native'
+import { ListRenderItem, View } from 'react-native'
 import { Card, Chip, Text } from 'react-native-paper'
 import { Theme } from '~models/theme'
 import { AssignmentsStore } from '~services/net-school/store'
@@ -7,9 +7,12 @@ import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
 import { useCallback } from 'react'
-import SubjectName from '~components/SubjectName'
+import { useReorderableDrag } from 'react-native-reorderable-list'
+import { getSubjectName } from '~components/SubjectName'
+import { Settings } from '~models/settings'
 import { TermNavigationParamMap } from '~screens/totals/navigation'
 import { TermStore } from '~screens/totals/term/state'
+import { Lesson } from '~services/net-school/lesson'
 import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
@@ -68,36 +71,81 @@ export default observer(function DiaryLesson({
 	)
 })
 
+const DiaryLessonDraggable = observer(function DraggableLesson({
+	item: lesson,
+}: {
+	item: Lesson
+	index: number
+}) {
+	const drag = useReorderableDrag()
+	const studentSettings = Settings.forStudentOrThrow()
+
+	return (
+		<Card onLongPress={drag}>
+			<View style={[styles.row, { gap: Spacings.s1, alignItems: 'center' }]}>
+				<Name lesson={lesson} i={lesson.start(studentSettings).getDay() - 1} />
+				<Time lesson={lesson}></Time>
+			</View>
+		</Card>
+	)
+})
+
+// eslint-disable-next-line mobx/missing-observer
+export const RenderDiaryLessonDraggable: ListRenderItem<Lesson> = args => (
+	<DiaryLessonDraggable {...args} />
+)
+
 const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
 	return (
 		<>
 			<View style={[styles.row, { alignItems: 'center' }]}>
-				<View
-					style={{
-						backgroundColor: Theme.colors.secondaryContainer,
-						borderRadius: Theme.roundness,
-						padding: Spacings.s1,
-						marginBottom: Spacings.s2,
-						marginRight: Spacings.s1,
-					}}
-				>
-					<Text
-						style={{
-							color: Theme.colors.onSecondaryContainer,
-							fontWeight: 'bold',
-						}}
-					>
-						{i + 1}
-					</Text>
-				</View>
-				<SubjectName {...lesson} style={Theme.fonts.titleMedium} />
+				<Name lesson={lesson} i={i}></Name>
 			</View>
 			<View style={[styles.row, { gap: Spacings.s1 }]}>
-				<Chip compact>
-					{lesson.start.toHHMM()} - {lesson.end.toHHMM()}
-				</Chip>
+				<Time lesson={lesson} />
 				<Chip compact>{lesson.roomName ?? '?'}</Chip>
 			</View>
+		</>
+	)
+})
+
+const Name = observer(function Name({
+	lesson,
+	i,
+}: Pick<DiaryLessonProps, 'lesson' | 'i'>) {
+	return (
+		<>
+			<View
+				style={{
+					backgroundColor: Theme.colors.secondaryContainer,
+					borderRadius: Theme.roundness,
+					padding: Spacings.s1,
+					marginBottom: Spacings.s2,
+					marginRight: Spacings.s1,
+				}}
+			>
+				<Text
+					style={{
+						color: Theme.colors.onSecondaryContainer,
+						fontWeight: 'bold',
+					}}
+				>
+					{i + 1}
+				</Text>
+			</View>
+			<Text style={Theme.fonts.titleMedium}>{getSubjectName(lesson)}</Text>
+		</>
+	)
+})
+
+const Time = observer(function Time({ lesson }: { lesson: Lesson }) {
+	const studentSettings = Settings.forStudentOrThrow()
+	return (
+		<>
+			<Chip compact>
+				{lesson.start(studentSettings).toHHMM()} -{' '}
+				{lesson.end(studentSettings).toHHMM()}
+			</Chip>
 		</>
 	)
 })

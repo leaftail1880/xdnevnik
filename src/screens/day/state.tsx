@@ -35,6 +35,8 @@ export const DiaryState = new (class {
 	showAttachments = true
 	showLessonTheme = true
 
+	edit = false
+
 	get weekDays() {
 		return Date.week(this.week)
 	}

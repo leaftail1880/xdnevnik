@@ -33,9 +33,7 @@ export default observer(function SubjectTotals({
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
 	const [attendance, setAttendance] = useState(false)
-	const [customMarks, setCustomMarks] = useState<Partial<PartialAssignment>[]>(
-		[],
-	)
+	const [customMarks, setCustomMarks] = useState<PartialAssignment[]>([])
 	const marks = useMemo(
 		() =>
 			!!performance.result &&

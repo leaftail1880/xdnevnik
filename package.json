@@ -54,6 +54,7 @@
 		"react-native-mmkv": "^2.11.0",
 		"react-native-paper": "patch:react-native-paper@npm%3A5.12.5#~/.yarn/patches/react-native-paper-npm-5.12.5-c595c2e788.patch",
 		"react-native-reanimated": "~3.16.1",
+		"react-native-reorderable-list": "^0.9.0",
 		"react-native-safe-area-context": "4.12.0",
 		"react-native-screens": "~4.1.0",
 		"react-native-vector-icons": "^10.0.3",

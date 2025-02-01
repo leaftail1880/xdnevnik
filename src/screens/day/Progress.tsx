@@ -3,8 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
+import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
-import { Lesson, LessonState } from '~services/net-school/entities'
+import { Lesson, LessonState } from '~services/net-school/lesson'
 import { Spacings } from '../../utils/Spacings'
 
 export const LessonProgressStore = new (class {
@@ -18,9 +19,10 @@ export const LessonProgressStore = new (class {
 const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
+	const studentSettings = Settings.forStudentOrThrow()
 	const { elapsed, startsAfter, beforeStart, progress, state, remaining } =
 		useMemo(
-			() => Lesson.status(props.lesson),
+			() => Lesson.status(props.lesson, studentSettings),
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			[props.lesson, store.now],
 		)
