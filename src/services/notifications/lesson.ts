@@ -13,6 +13,9 @@ import {
 } from '~utils/backgroundIntervals'
 import { MarksNotificationStore } from './marks'
 
+const foregroundServiceEnabled = false
+let foregroundServiceRegistered = false
+
 export const LessonNotifStore = new (class {
 	constructor() {
 		makeAutoObservable(this)
@@ -143,8 +146,6 @@ function getLessonPeriod(previousLesson: Lesson, currentLesson: Lesson) {
 	return { date, period }
 }
 
-let foregroundServiceRegistered = false
-
 async function showNotification(
 	lesson: Lesson,
 	now: number,
@@ -175,16 +176,18 @@ async function showNotification(
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
-	try {
-		if (false && !foregroundServiceRegistered) {
-			notifee.registerForegroundService(() => new Promise(() => {}))
-			foregroundServiceRegistered = true
+	if (foregroundServiceEnabled) {
+		try {
+			if (!foregroundServiceRegistered) {
+				notifee.registerForegroundService(() => new Promise(() => {}))
+				foregroundServiceRegistered = true
+			}
+		} catch (e) {
+			MarksNotificationStore.log(
+				'error',
+				'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
+			)
 		}
-	} catch (e) {
-		MarksNotificationStore.log(
-			'error',
-			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
-		)
 	}
 
 	const notificationId = await notifee.displayNotification({
