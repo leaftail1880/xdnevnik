@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.17.0'
+const version = '0.18.0'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
