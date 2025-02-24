@@ -161,7 +161,7 @@ async function showNotification(
 	}
 
 	try {
-		if (false && !foregroundServiceRegistered) {
+		if (!foregroundServiceRegistered) {
 			notifee.registerForegroundService(() => new Promise(() => {}))
 			foregroundServiceRegistered = true
 		}
