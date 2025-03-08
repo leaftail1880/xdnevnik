@@ -22,17 +22,22 @@ export default observer(function DiaryLesson({
 	...props
 }: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & DiaryLessonNavigation) {
 	const currentTerm = TermStore.currentTerm
-	const navigateToLessonMarks = useCallback(() => {
-		currentTerm &&
-			// @ts-expect-error Huh
-			navigation.navigate(LANG['s_totals'], {
-				screen: LANG['s_subject_totals'],
-				params: {
-					subjectId: lesson.subjectId,
-					termId: currentTerm.id,
-					finalMark: null,
-				} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
-			})
+	const navigateToLessonMarks = useCallback(async () => {
+		if (!currentTerm) return
+
+		navigation.navigate(LANG['s_totals'])
+
+		await new Promise(r => setTimeout(r, 100))
+
+		// @ts-expect-error Huh
+		navigation.navigate(LANG['s_totals'], {
+			screen: LANG['s_subject_totals'],
+			params: {
+				subjectId: lesson.subjectId,
+				termId: currentTerm.id,
+				finalMark: null,
+			} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
+		})
 	}, [currentTerm, lesson, navigation])
 
 	const newProps: DiaryLessonProps = {

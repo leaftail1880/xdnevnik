@@ -55,7 +55,7 @@ export class AsyncStore<
 	Fn = FunctionsFromObject<Source>[MethodName],
 	FnReturn = Fn extends AsyncMethod ? Awaited<ReturnType<Fn>> : never,
 	FnParams = Fn extends AsyncMethod ? Optional<Parameters<Fn>[0]> : never,
-	DefaultParams = Record<string, never>,
+	DefaultParams = Record<'', never>,
 > {
 	constructor(
 		// eslint-disable-next-line @typescript-eslint/naming-convention

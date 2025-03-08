@@ -16,6 +16,7 @@ export const TotalsStore = method('totals', 'итоговых оценок')
 
 export const DiaryStore = method('diary', 'дневника')
 export const AssignmentsStore = method('assignments', 'оценок')
+export const MarkAssignmentsStore = method('assignments', 'оценок')
 export const AttachmentsStore = method('attachments', 'файлов')
 
 interface SubjectPerformanceStoreID {
@@ -33,7 +34,7 @@ function method<
 	MethodName extends keyof FunctionsFromObject<typeof API>,
 	Fn = FunctionsFromObject<typeof API>[MethodName],
 	FnReturn = Fn extends AsyncMethod ? Awaited<ReturnType<Fn>> : never,
-	DefaultParams = Record<string, never>,
+	DefaultParams = Record<'', never>,
 >(
 	method: MethodName,
 	name: string,
