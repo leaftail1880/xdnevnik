@@ -13,7 +13,6 @@ import {
 } from '~utils/backgroundIntervals'
 import { MarksNotificationStore } from './marks'
 
-const foregroundServiceEnabled = false
 let foregroundServiceRegistered = false
 
 export const LessonNotifStore = new (class {
@@ -176,18 +175,16 @@ async function showNotification(
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
-	if (foregroundServiceEnabled) {
-		try {
-			if (!foregroundServiceRegistered) {
-				notifee.registerForegroundService(() => new Promise(() => {}))
-				foregroundServiceRegistered = true
-			}
-		} catch (e) {
-			MarksNotificationStore.log(
-				'error',
-				'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
-			)
+	try {
+		if (!foregroundServiceRegistered) {
+			notifee.registerForegroundService(() => new Promise(() => {}))
+			foregroundServiceRegistered = true
 		}
+	} catch (e) {
+		MarksNotificationStore.log(
+			'error',
+			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
+		)
 	}
 
 	const notificationId = await notifee.displayNotification({
