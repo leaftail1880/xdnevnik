@@ -81,6 +81,8 @@ const TermTotalsList = observer(function TermTotalsList({
 
 	HomeworkMarksStore.withParams({
 		studentId: Settings.studentId,
+		withoutMarks: false,
+		withExpiredClassAssign: true,
 	})
 
 	const renderItem = useCallback<ListRenderItem<Total>>(
