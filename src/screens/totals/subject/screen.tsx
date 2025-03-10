@@ -119,7 +119,7 @@ export default observer(function SubjectTotals({
 					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
-					style={{ padding: Spacings.s1 }}
+					style={{ padding: Spacings.s2 }}
 					textStyle={{ fontSize: 18 }}
 				/>
 			</View>
@@ -268,6 +268,7 @@ const MarkRow = observer(function MarkRow({
 				style={{
 					paddingHorizontal: Spacings.s2 * 1.5,
 					paddingVertical: 2,
+					minWidth: 40,
 				}}
 				onPress={() => {
 					const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
