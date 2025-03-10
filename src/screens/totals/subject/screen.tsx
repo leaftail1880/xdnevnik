@@ -118,22 +118,25 @@ export default observer(function SubjectTotals({
 					duty={false}
 					finalMark={finalMark}
 					mark={avgMark}
-					style={{ padding: Spacings.s2 }}
-					textStyle={{ fontSize: 20 }}
+					style={{ padding: Spacings.s1 }}
+					textStyle={{ fontSize: 18 }}
 				/>
 			</View>
 			<ScrollView
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{ gap: Spacings.s2 }}
 			>
-				<ScrollView style={{ margin: Spacings.s1 }} horizontal>
-					<ToGetMarkChip
-						style={{ margin: Spacings.s1 }}
-						toGetTarget={toGetTarget}
-					/>
+				<ScrollView
+					style={{ padding: Spacings.s2, marginRight: Spacings.s2 }}
+					contentContainerStyle={{ gap: Spacings.s2 }}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					fadingEdgeLength={100}
+				>
+					<ToGetMarkChip toGetTarget={toGetTarget} />
 					<Chip
 						mode="flat"
-						style={{ margin: Spacings.s1 }}
+						compact
 						selected={attendance}
 						onPress={() => {
 							setAttendance(!attendance)
@@ -143,7 +146,7 @@ export default observer(function SubjectTotals({
 					</Chip>
 					<Chip
 						mode="flat"
-						style={{ margin: Spacings.s1 }}
+						compact
 						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
@@ -254,7 +257,11 @@ const MarkRow = observer(function MarkRow({
 		<View
 			style={[
 				styles.stretch,
-				{ paddingTop: Spacings.s1, paddingHorizontal: Spacings.s2 },
+				{
+					paddingTop: Spacings.s1,
+					paddingHorizontal: Spacings.s2,
+					gap: Spacings.s1,
+				},
 			]}
 		>
 			<Mark
@@ -263,8 +270,10 @@ const MarkRow = observer(function MarkRow({
 				weight={mark.weight}
 				minWeight={minWeight}
 				maxWeight={maxWeight}
-				style={{ paddingHorizontal: Spacings.s3, paddingVertical: 2 }}
-				textStyle={{ fontSize: 17 }}
+				style={{
+					paddingHorizontal: Spacings.s2 * 1.5,
+					paddingVertical: 2,
+				}}
 				onPress={() => {
 					const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
 					ModalAlert.show(
