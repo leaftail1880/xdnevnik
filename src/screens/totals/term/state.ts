@@ -12,7 +12,7 @@ import { stringSimilarity } from '~utils/search'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 
 export const TermStoreSortModes = [
-	{ value: 'averageMark', label: 'Средняя оценка' },
+	{ value: 'averageMark', label: 'Средний балл' },
 	{ value: 'toGetMarkAmount', label: 'Кол-во для исправления' },
 	{ value: 'markAmount', label: 'Кол-во оценок' },
 	{ value: 'none', label: 'Никак' },
@@ -21,6 +21,8 @@ export const TermStoreSortModes = [
 export const TermStore = new (class {
 	sortMode: (typeof TermStoreSortModes)[number]['value'] = 'averageMark'
 	attendance = false
+	shortStats = false
+	toGetMark = true
 	search = ''
 
 	get terms() {

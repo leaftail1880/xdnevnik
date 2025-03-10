@@ -2,7 +2,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -23,6 +23,7 @@ import { DiaryState } from './state'
 ExpandableCalendar.defaultProps = undefined
 
 import { LocaleConfig } from 'react-native-calendars'
+import { Chips } from '~components/Chips'
 
 // localization for react-native-calendars
 // https://github.com/arshaw/xdate/blob/3060bceb5f0901f48df9ae657b6349b2733fec37/src/xdate.js#L475
@@ -92,11 +93,11 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 				<View style={{ flex: 1, zIndex: 30 }}>
 					<SelectDay />
 				</View>
-				<View style={{ flex: 1, flexDirection: 'row', padding: Spacings.s2 }}>
+				<Chips>
 					<Filter type="showHomework" label="Оценки" />
 					<Filter type="showAttachments" label="Файлы" />
 					<Filter type="showLessonTheme" label="Темы" />
-				</View>
+				</Chips>
 				<View style={{ padding: Spacings.s1 }}>
 					{DiaryStore.fallback || <Day {...props} />}
 				</View>
@@ -195,20 +196,12 @@ const Filter = observer(function Filter(props: FilterProps) {
 	)
 
 	return (
-		<Chip
-			mode="flat"
-			selected={DiaryState[props.type]}
-			onPress={onPress}
-			style={styles.filter}
-		>
+		<Chip mode="flat" selected={DiaryState[props.type]} onPress={onPress}>
 			{props.label}
 		</Chip>
 	)
 })
 
-const styles = StyleSheet.create({
-	filter: { marginHorizontal: Spacings.s1 },
-})
 
 export type DiaryLessonProps = {
 	i: number

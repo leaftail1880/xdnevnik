@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { memo, useCallback } from 'react'
-import { FlatList, ListRenderItem, ScrollView } from 'react-native'
+import { FlatList, ListRenderItem } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
@@ -9,6 +9,7 @@ import Loading from '~components/Loading'
 import SelectModal from '~components/SelectModal'
 import UpdateDate from '~components/UpdateDate'
 
+import { Chips } from '~components/Chips'
 import { Settings } from '~models/settings'
 import { Theme } from '~models/theme'
 import { Total } from '~services/net-school/entities'
@@ -18,7 +19,6 @@ import {
 	SubjectsStore,
 	TotalsStore,
 } from '~services/net-school/store'
-import { Spacings } from '../../../utils/Spacings'
 import SubjectPerformanceInline from './Subject'
 import { TermStore, TermStoreSortModes } from './state'
 
@@ -37,12 +37,7 @@ const ChipsRow = observer(function Header() {
 	const terms = TermStore.terms
 	const studentSettings = Settings.forStudent(Settings.studentId)
 	return (
-		<ScrollView
-			style={{ padding: Spacings.s2 }}
-			contentContainerStyle={{ gap: Spacings.s2 }}
-			showsHorizontalScrollIndicator={false}
-			horizontal
-		>
+		<Chips>
 			<SelectModal
 				mode="chip"
 				label="Режим сортировки"
@@ -63,17 +58,38 @@ const ChipsRow = observer(function Header() {
 					}
 				/>
 			)}
-			<Chip
-				mode="flat"
-				selected={TermStore.attendance}
-				compact
-				onPress={() => {
-					runInAction(() => (TermStore.attendance = !TermStore.attendance))
-				}}
-			>
-				Пропуски
-			</Chip>
-		</ScrollView>
+
+			<Filter store={TermStore} storeKey="attendance" label="Пропуски" />
+			<Filter store={TermStore} storeKey="toGetMark" label="Целевая оценка" />
+			<Filter
+				store={TermStore}
+				storeKey="shortStats"
+				label="Краткая статистика"
+			/>
+		</Chips>
+	)
+})
+
+const Filter = observer(function Filter<T extends object>(props: {
+	store: T
+	storeKey: keyof FilterObject<T, boolean>
+	label: string
+}) {
+	return (
+		<Chip
+			mode="flat"
+			selected={props.store[props.storeKey] as boolean}
+			compact
+			onPress={() => {
+				runInAction(
+					() =>
+						((props.store[props.storeKey] as boolean) =
+							!props.store[props.storeKey]),
+				)
+			}}
+		>
+			{props.label}
+		</Chip>
 	)
 })
 

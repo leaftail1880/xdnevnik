@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, Chip, IconButton, Text } from 'react-native-paper'
+import { Chips } from '~components/Chips'
 import Mark from '~components/Mark'
 import { RoundedSurface } from '~components/RoundedSurface'
 import SubjectName from '~components/SubjectName'
@@ -126,13 +127,7 @@ export default observer(function SubjectTotals({
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{ gap: Spacings.s2 }}
 			>
-				<ScrollView
-					style={{ padding: Spacings.s2, marginRight: Spacings.s2 }}
-					contentContainerStyle={{ gap: Spacings.s2 }}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					fadingEdgeLength={100}
-				>
+				<Chips style={{ marginRight: Spacings.s2 }}>
 					<ToGetMarkChip toGetTarget={toGetTarget} />
 					<Chip
 						mode="flat"
@@ -154,7 +149,7 @@ export default observer(function SubjectTotals({
 					>
 						Уроки без оценок
 					</Chip>
-				</ScrollView>
+				</Chips>
 				{totalsAndSheduledTotals.map((e, i) => (
 					<MarkRow
 						mark={e}

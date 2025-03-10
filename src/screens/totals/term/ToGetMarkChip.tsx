@@ -100,16 +100,20 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 						style={{ padding: 2 }}
 						onPress={onPress}
 					/>
-					<Text>нужно </Text>
+					<Text>нужно</Text>
 					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
 						{toGetTarget}x
 					</Text>
 
 					<Mark
 						duty={false}
-						style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
-						textStyle={{ fontSize: 10 }}
-						subTextStyle={{ fontSize: 8 }}
+						style={{
+							padding: 0,
+							paddingHorizontal: Spacings.s1,
+							paddingVertical: 1,
+						}}
+						textStyle={{ fontSize: 8 }}
+						subTextStyle={{ fontSize: 6 }}
 						weight={student.defaultMarkWeight}
 						mark={student.defaultMark}
 						onPress={onPress}
