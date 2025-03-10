@@ -97,8 +97,9 @@ export default observer(function SelectModal<
 					style={props.style}
 					textStyle={props.inlineChip ? undefined : Theme.fonts.bodySmall}
 					onPress={store.toggleVisibility}
+					compact
 				>
-					{(label + value).slice(0, props.inlineChip ? Infinity : 16)}
+					{props.inlineChip ? value : (label + value).slice(0, 16)}
 				</Chip>
 			) : (
 				<List.Item

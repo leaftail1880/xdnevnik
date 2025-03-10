@@ -37,14 +37,18 @@ const ChipsRow = observer(function Header() {
 	const terms = TermStore.terms
 	const studentSettings = Settings.forStudent(Settings.studentId)
 	return (
-		<ScrollView style={{ margin: Spacings.s1 }} horizontal>
+		<ScrollView
+			style={{ padding: Spacings.s2 }}
+			contentContainerStyle={{ gap: Spacings.s2 }}
+			showsHorizontalScrollIndicator={false}
+			horizontal
+		>
 			<SelectModal
 				mode="chip"
-				label="Сортировать по"
+				label="Режим сортировки"
 				value={TermStore.sortMode}
 				inlineChip
 				data={TermStoreSortModes}
-				style={{ margin: Spacings.s1 }}
 				onSelect={v => runInAction(() => (TermStore.sortMode = v.value))}
 			/>
 			{terms && (
@@ -52,9 +56,8 @@ const ChipsRow = observer(function Header() {
 					data={terms}
 					mode="chip"
 					value={String(TermStore.currentTerm?.id)}
-					style={{ margin: Spacings.s1 }}
 					inlineChip
-					label={''}
+					label={'Четверть/полугодие'}
 					onSelect={v =>
 						runInAction(() => (studentSettings.currentTerm = v.term))
 					}
@@ -63,7 +66,7 @@ const ChipsRow = observer(function Header() {
 			<Chip
 				mode="flat"
 				selected={TermStore.attendance}
-				style={{ margin: Spacings.s1 }}
+				compact
 				onPress={() => {
 					runInAction(() => (TermStore.attendance = !TermStore.attendance))
 				}}

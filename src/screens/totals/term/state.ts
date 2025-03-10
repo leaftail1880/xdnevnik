@@ -12,9 +12,9 @@ import { stringSimilarity } from '~utils/search'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 
 export const TermStoreSortModes = [
-	{ value: 'averageMark', label: 'Средней оценке' },
-	{ value: 'toGetMarkAmount', label: 'Кол-ву для исправления' },
-	{ value: 'markAmount', label: 'Кол-ву оценок' },
+	{ value: 'averageMark', label: 'Средняя оценка' },
+	{ value: 'toGetMarkAmount', label: 'Кол-во для исправления' },
+	{ value: 'markAmount', label: 'Кол-во оценок' },
 	{ value: 'none', label: 'Никак' },
 ] as const
 
