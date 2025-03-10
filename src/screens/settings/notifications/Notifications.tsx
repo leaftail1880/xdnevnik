@@ -46,8 +46,6 @@ export default observer(function Notifications(
 		notifee.getPowerManagerInfo().then(e => e.activity),
 	)
 
-	const [logs, setLogs] = useState(false)
-
 	return (
 		<ScrollView>
 			<List.Section title="Общие">
@@ -91,6 +89,18 @@ export default observer(function Notifications(
 				<Button mode="elevated" onPress={Linking.openSettings}>
 					Системные настройки приложения
 				</Button>
+			</View>
+			<NotificationLogs />
+		</ScrollView>
+	)
+})
+
+export const NotificationLogs = observer(function NotificationLogs() {
+	const [logs, setLogs] = useState(false)
+
+	return (
+		<View style={{ marginBottom: Spacings.s3 }}>
+			<View style={{ padding: Spacings.s2, gap: Spacings.s2 }}>
 				<Button mode="elevated" onPress={checkForNewMarks}>
 					Проверить наличие новых оценок
 				</Button>
@@ -105,13 +115,13 @@ export default observer(function Notifications(
 						Очистить логи
 					</Button>
 				)}
+				{logs && (
+					<Text style={{ padding: Spacings.s1 }} selectable>
+						{MarksNotificationStore.logs.join('\n')}
+					</Text>
+				)}
 			</View>
-			{logs && (
-				<Text style={{ padding: Spacings.s1 }} selectable>
-					{MarksNotificationStore.logs.join('\n')}
-				</Text>
-			)}
-		</ScrollView>
+		</View>
 	)
 })
 

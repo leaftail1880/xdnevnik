@@ -16,6 +16,7 @@ import {
 } from '~models/settings'
 import { Spacings } from '~utils/Spacings'
 import { SettingsRoutes } from '../navigation'
+import { NotificationLogs } from '../notifications/Notifications'
 
 const markStyles = [
 	{ label: 'Линия', value: 'border' as const },
@@ -69,6 +70,7 @@ export default observer(function Notifications(
 					setting="targetMarkCompact"
 				/>
 			</List.Section>
+			<NotificationLogs />
 		</ScrollView>
 	)
 })

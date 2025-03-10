@@ -11,7 +11,7 @@ notifee.onBackgroundEvent(async () => {
 })
 
 autorun(function lessonNotificationSetup() {
-	setupLessonChannel(Settings.notificationsEnabled)
+	setupLessonChannel()
 	setupMarksChannel()
 
 	if (Settings.notificationsEnabled) {

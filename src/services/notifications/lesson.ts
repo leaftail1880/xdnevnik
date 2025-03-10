@@ -28,18 +28,19 @@ export const LessonNotifStore = new (class {
 	currentLesson: undefined | string = undefined
 
 	async remove(id = LessonNotifStore.id) {
-		if (!id) ReturnType
-    
-    if (foregroundServiceRegistered) {
-      await notifee.stopForegroundService()
-    } else await notifee.cancelDisplayedNotification(id)
+		if (!id) return
+
+		if (foregroundServiceRegistered) {
+			await notifee.stopForegroundService()
+		} else await notifee.cancelDisplayedNotification(id)
+
 		runInAction(() => {
 			if (LessonNotifStore.id) LessonNotifStore.id = undefined
 		})
 	}
 })()
 
-export async function setupLessonChannel(enabled: boolean) {
+export async function setupLessonChannel() {
 	// Show notification channels even when they are disabled
 	const lessonChannelId = await notifee.createChannel({
 		id: 'lessons',
@@ -53,7 +54,7 @@ export async function setupLessonChannel(enabled: boolean) {
 		e => e.notification.android?.channelId === lessonChannelId,
 	)
 
-	if (!enabled) {
+	if (!Settings.lessonNotifications) {
 		return runInAction(() => {
 			LessonNotifStore.remove(LessonNotifStore.id || oldNotification?.id)
 		})
@@ -68,7 +69,7 @@ export async function setupLessonChannel(enabled: boolean) {
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
-	if (!Settings.notificationsEnabled || !LessonNotifStore.lessonChannelId) {
+	if (!Settings.lessonNotifications || !LessonNotifStore.lessonChannelId) {
 		return LessonNotifStore.remove()
 	}
 

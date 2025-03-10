@@ -26,8 +26,10 @@ export default observer(function SwitchSetting(props: SwitchSettingProps) {
 	const value = 'setting' in props ? Settings[props.setting] : props.value
 
 	const right = useCallback(
-		() => <Switch value={value} onChange={onChange} />,
-		[value, onChange],
+		() => (
+			<Switch value={value} onChange={onChange} disabled={props.disabled} />
+		),
+		[value, onChange, props.disabled],
 	)
 
 	return <List.Item {...props} onPress={onChange} right={right} />
