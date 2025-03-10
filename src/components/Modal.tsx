@@ -76,7 +76,9 @@ const DialogModal = observer(function DialogModal() {
 							: Theme.colors.elevation.level3,
 					}}
 				>
-					<Dialog.Title>{ModalAlert.state.title}</Dialog.Title>
+					<Dialog.Title style={Theme.fonts.titleMedium}>
+						{ModalAlert.state.title}
+					</Dialog.Title>
 					{ModalAlert.state.body && (
 						<Dialog.Content>
 							{typeof ModalAlert.state.body === 'object' ? (

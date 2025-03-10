@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
 	},
 	mark: {
 		padding: Spacings.s1,
-		paddingHorizontal: Spacings.s2 + 4,
+		paddingHorizontal: Spacings.s2,
 		marginHorizontal: 2,
 		transform: [{ scaleX: -1 }],
 	},
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		padding: Spacings.s2,
+		padding: Spacings.s1,
 		gap: Spacings.s2,
 	},
 })
@@ -127,7 +127,8 @@ export default observer(function SubjectMarks(
 					horizontal
 					style={viewStyle}
 					contentContainerStyle={styles.container}
-					fadingEdgeLength={5}
+					fadingEdgeLength={100}
+					showsHorizontalScrollIndicator={false}
 				>
 					{totalsAndSheduledTotals
 						.slice()
