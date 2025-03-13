@@ -149,7 +149,7 @@ export const TermStore = new (class {
 		})
 		makeReloadPersistable(this, {
 			name: 'termStore',
-			properties: ['sortMode', 'attendance'],
+			properties: ['sortMode', 'attendance', 'shortStats'],
 		})
 	}
 })()
