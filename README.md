@@ -6,15 +6,17 @@
   <h1 align="center">XDnevnik</h1>
   <h3 align="center">Alternative NetSchool Diary Mobile App</h3>
   <a href="https://github.com/leaftail1880/xdnevnik/releases">
-    <img src="https://img.shields.io/github/downloads/leaftail1880/xdnevnik/total?style=for-the-badge"/>
-    <img src="https://img.shields.io/github/commits-since/leaftail1880/xdnevnik/latest?style=for-the-badge"/>
-    <img src="https://img.shields.io/github/actions/workflow/status/leaftail1880/xdnevnik/build.yml?style=for-the-badge"/>
+    <img src="https://img.shields.io/github/downloads/leaftail1880/xdnevnik/total"/>
+    <img src="https://img.shields.io/github/commits-since/leaftail1880/xdnevnik/latest"/>
+    <img src="https://img.shields.io/github/actions/workflow/status/leaftail1880/xdnevnik/update.yml"/>
   </a>
+  <a href="https://codeclimate.com/github/leaftail1880/xdnevnik/maintainability"><img src="https://api.codeclimate.com/v1/badges/c6caa96200ca2926a6bd/maintainability" /></a>
+  <a href="https://codeclimate.com/github/leaftail1880/xdnevnik/test_coverage"><img src="https://api.codeclimate.com/v1/badges/c6caa96200ca2926a6bd/test_coverage" /></a>
   <a href="https://telegram.me/xdnevnikoffical">
-	  <img src="https://img.shields.io/badge/News%20Channel-grey?style=for-the-badge&logo=telegram" alt="News Channel" />
+	  <img src="https://img.shields.io/badge/News%20Channel-grey?logo=telegram" alt="News Channel" />
   </a>
   <a href="https://telegram.me/xdnevniksupport">
-	  <img src="https://img.shields.io/badge/Support%20Chat-grey?style=for-the-badge&logo=telegram" alt="Support Chat" />
+	  <img src="https://img.shields.io/badge/Support%20Chat-grey?logo=telegram" alt="Support Chat" />
   </a>
 </div>
 
