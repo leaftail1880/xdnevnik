@@ -1,7 +1,7 @@
+import { Settings } from '@/models/settings'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { List, ListItemProps, Switch } from 'react-native-paper'
-import { Settings } from '~models/settings'
 
 type SwitchSettingProps = Omit<ListItemProps, 'right' | 'onPress'> &
 	(

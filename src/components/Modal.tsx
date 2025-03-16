@@ -1,3 +1,4 @@
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import {
@@ -9,7 +10,6 @@ import {
 	Text,
 } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
-import { Theme } from '~models/theme'
 import { styles } from '../constants'
 import { ModalAlert, Toast } from '../utils/Toast'
 

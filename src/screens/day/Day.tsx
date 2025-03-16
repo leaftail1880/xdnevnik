@@ -1,7 +1,7 @@
+import { DiaryStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
-import { DiaryStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson from './Lesson'
 import { DiaryLessonNavigation } from './screen'

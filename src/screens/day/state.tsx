@@ -1,14 +1,14 @@
-import { autorun, makeAutoObservable } from 'mobx'
-import { View } from 'react-native'
-import { Text } from 'react-native-paper'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
 import {
 	AssignmentsStore,
 	AttachmentsStore,
 	DiaryStore,
-} from '~services/net-school/store'
-import { Spacings } from '~utils/Spacings'
+} from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
+import { autorun, makeAutoObservable } from 'mobx'
+import { View } from 'react-native'
+import { Text } from 'react-native-paper'
 import { LANG, styles } from '../../constants'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 

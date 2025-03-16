@@ -1,14 +1,14 @@
-import { makeAutoObservable } from 'mobx'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { NSEntity, Subject, Total } from '~services/net-school/entities'
+import { getSubjectName } from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
+import { NSEntity, Subject, Total } from '@/services/net-school/entities'
 import {
 	SubjectPerformanceStores,
 	SubjectsStore,
 	TotalsStore,
-} from '~services/net-school/store'
-import { makeReloadPersistable } from '~utils/makePersistable'
-import { stringSimilarity } from '~utils/search'
+} from '@/services/net-school/store'
+import { makeReloadPersistable } from '@/utils/makePersistable'
+import { stringSimilarity } from '@/utils/search'
+import { makeAutoObservable } from 'mobx'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 
 export const TermStoreSortModes = [

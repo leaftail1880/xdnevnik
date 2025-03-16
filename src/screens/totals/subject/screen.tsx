@@ -1,3 +1,23 @@
+import { Chips } from '@/components/Chips'
+import Mark from '@/components/Mark'
+import { RoundedSurface } from '@/components/RoundedSurface'
+import SubjectName from '@/components/SubjectName'
+import UpdateDate from '@/components/UpdateDate'
+import { LANG, styles } from '@/constants'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { DiaryState } from '@/screens/day/state'
+import type {
+	Assignment,
+	PartialAssignment,
+} from '@/services/net-school/entities'
+import {
+	MarkAssignmentsStore,
+	SubjectPerformanceStores,
+} from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
+import { calculateMarks } from '@/utils/calculateMarks'
 import { StackScreenProps } from '@react-navigation/stack'
 import { formatDistanceToNow, formatDuration } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -5,26 +25,6 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, Chip, IconButton, Text } from 'react-native-paper'
-import { Chips } from '~components/Chips'
-import Mark from '~components/Mark'
-import { RoundedSurface } from '~components/RoundedSurface'
-import SubjectName from '~components/SubjectName'
-import UpdateDate from '~components/UpdateDate'
-import { LANG, styles } from '~constants'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { DiaryState } from '~screens/day/state'
-import type {
-	Assignment,
-	PartialAssignment,
-} from '~services/net-school/entities'
-import {
-	MarkAssignmentsStore,
-	SubjectPerformanceStores,
-} from '~services/net-school/store'
-import { Spacings } from '~utils/Spacings'
-import { ModalAlert } from '~utils/Toast'
-import { calculateMarks } from '~utils/calculateMarks'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
 import { ToGetMarkChip } from '../term/ToGetMarkChip'
 import { AddMarkForm } from './AddMarkForm'

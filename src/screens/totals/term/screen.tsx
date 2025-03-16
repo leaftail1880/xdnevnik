@@ -5,20 +5,20 @@ import { FlatList, ListRenderItem } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
-import Loading from '~components/Loading'
-import SelectModal from '~components/SelectModal'
-import UpdateDate from '~components/UpdateDate'
+import Loading from '@/components/Loading'
+import SelectModal from '@/components/SelectModal'
+import UpdateDate from '@/components/UpdateDate'
 
-import { Chips } from '~components/Chips'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Total } from '~services/net-school/entities'
+import { Chips } from '@/components/Chips'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Total } from '@/services/net-school/entities'
 import {
 	EducationStore,
 	HomeworkMarksStore,
 	SubjectsStore,
 	TotalsStore,
-} from '~services/net-school/store'
+} from '@/services/net-school/store'
 import SubjectPerformanceInline from './Subject'
 import { TermStore, TermStoreSortModes } from './state'
 

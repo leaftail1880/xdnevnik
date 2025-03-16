@@ -1,8 +1,8 @@
+import { Logger } from '@/constants'
+import { NSEntity } from '@/services/net-school/entities'
+import { StudentsStore } from '@/services/net-school/store'
 import { isObservable, makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
-import { Logger } from '~constants'
-import { NSEntity } from '~services/net-school/entities'
-import { StudentsStore } from '~services/net-school/store'
 import { makeReloadPersistable } from '../utils/makePersistable'
 
 export interface StudentSettings {

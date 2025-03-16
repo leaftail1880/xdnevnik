@@ -1,3 +1,4 @@
+import { Theme } from '@/models/theme'
 import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { useCallback, useState } from 'react'
@@ -18,7 +19,6 @@ import {
 	RadioButton,
 	Text,
 } from 'react-native-paper'
-import { Theme } from '~models/theme'
 import { Spacings } from '../utils/Spacings'
 
 class Store {

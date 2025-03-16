@@ -1,25 +1,25 @@
+import SwitchSetting from '@/components/SwitchSetting'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import {
+	checkForNewMarksAndNotify,
+	MarksNotificationStore,
+} from '@/services/notifications/marks'
+import { Spacings } from '@/utils/Spacings'
 import notifee from '@notifee/react-native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { Linking, ScrollView, View } from 'react-native'
 import { Button, HelperText, List, Text } from 'react-native-paper'
-import SwitchSetting from '~components/SwitchSetting'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import {
-	checkForNewMarksAndNotify,
-	MarksNotificationStore,
-} from '~services/notifications/marks'
-import { Spacings } from '~utils/Spacings'
 import { SettingsRoutes } from '../navigation'
 
 function usePromise<T>(promise: () => Promise<T>) {
 	const [state, setState] = useState<T | undefined>(undefined)
 
-	const interval = useRef<number | undefined | NodeJS.Timeout>()
+	const interval = useRef<ReturnType<typeof setTimeout> | undefined>()
 	useEffect(() => {
-		clearInterval(interval.current)
+		if (interval.current) clearInterval(interval.current)
 		interval.current = setInterval(() => {
 			promise().then(e => {
 				if (state !== e) setState(e)
@@ -32,18 +32,18 @@ function usePromise<T>(promise: () => Promise<T>) {
 
 const checkForNewMarks = checkForNewMarksAndNotify.bind(
 	undefined,
-	'Запрос пользователя',
+	'Запрос пользователя'
 )
 
 export default observer(function Notifications(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	props: StackScreenProps<SettingsRoutes>,
+	props: StackScreenProps<SettingsRoutes>
 ) {
 	const batteryOptimizations = !!usePromise(() =>
-		notifee.isBatteryOptimizationEnabled(),
+		notifee.isBatteryOptimizationEnabled()
 	)
 	const powerManager = !!usePromise(() =>
-		notifee.getPowerManagerInfo().then(e => e.activity),
+		notifee.getPowerManagerInfo().then(e => e.activity)
 	)
 
 	return (

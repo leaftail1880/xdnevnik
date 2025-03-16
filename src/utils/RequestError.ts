@@ -36,3 +36,13 @@ export class RequestError extends Error implements RequestErrorOptions {
 		Object.assign(this, options ?? {})
 	}
 }
+
+export function abortSignalTimeout(ms: number) {
+	const controller = new AbortController()
+
+	setTimeout(() => {
+		if (!controller.signal.aborted) controller.abort()
+	}, ms)
+
+	return controller.signal
+}

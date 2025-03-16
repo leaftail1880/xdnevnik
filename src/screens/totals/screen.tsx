@@ -1,11 +1,11 @@
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { SubjectsStore, TotalsStore } from '@/services/net-school/store'
 import { StackNavigationOptions } from '@react-navigation/stack'
 import { autorun, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
 import { Appbar, Chip, Searchbar } from 'react-native-paper'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { SubjectsStore, TotalsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import {
 	S_SUBJECT_TOTALS,

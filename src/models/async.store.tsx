@@ -1,3 +1,6 @@
+import ErrorHandler from '@/components/ErrorHandler'
+import Loading from '@/components/Loading'
+import { API as NSApi, NetSchoolError } from '@/services/net-school/api'
 import {
 	action,
 	autorun,
@@ -7,9 +10,6 @@ import {
 	toJS,
 } from 'mobx'
 import { RefreshControl } from 'react-native'
-import ErrorHandler from '~components/ErrorHandler'
-import Loading from '~components/Loading'
-import { API as NSApi, NetSchoolError } from '~services/net-school/api'
 import { Logger } from '../constants'
 
 export type AsyncMethod = (

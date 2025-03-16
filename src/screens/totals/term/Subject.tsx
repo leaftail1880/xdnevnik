@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { Surface } from 'react-native-paper'
 
-import Loading from '~components/Loading'
-import SubjectName from '~components/SubjectName'
+import Loading from '@/components/Loading'
+import SubjectName from '@/components/SubjectName'
 import SubjectMarks from './Marks'
 
+import { LANG } from '@/constants'
+import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
 import { useCallback } from 'react'
-import { LANG } from '~constants'
-import { Theme } from '~models/theme'
-import { Spacings } from '~utils/Spacings'
 import { SubjectInfo } from './state'
 
 export default observer(function TermSubject(props: SubjectInfo) {

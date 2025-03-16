@@ -37,3 +37,6 @@ dependency-graph.svg
 # typescript
 *.tsbuildinfo
 .yarn/install-state.gz
+
+# testing
+coverage

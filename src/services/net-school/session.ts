@@ -9,41 +9,45 @@ import { ROUTES } from './routes'
 
 let requestSent = false
 
-autorun(function autologin() {
-	// Not loaded
-	if (!API.session) return
+if (!__TEST__) setTimeout(setupSession, 2000)
 
-	// Already authorized
-	if (API.authorized) return
+function setupSession() {
+	autorun(function autologin() {
+		// Not loaded
+		if (!API.session) return
 
-	// Already sent auth req
-	if (requestSent) return
+		// Already authorized
+		if (API.authorized) return
 
-	// Session is still active
-	if (API.session.expires.getTime() > Date.now()) {
-		if (!__DEV__)
-			Logger.debug(
-				'Session is still active, expires: ',
-				API.session.expires.toReadable(),
-				'now is',
-				new Date().toReadable(),
-			)
+		// Already sent auth req
+		if (requestSent) return
 
-		runInAction(() => {
-			API.authorized = true
-		})
-		return
-	}
+		// Session is still active
+		if (API.session.expires.getTime() > Date.now()) {
+			if (!__DEV__)
+				Logger.debug(
+					'Session is still active, expires: ',
+					API.session.expires.toReadable(),
+					'now is',
+					new Date().toReadable()
+				)
 
-	requestSent = true
-	API.getToken(
-		ROUTES.refreshTokenTemplate(API.session.refresh_token),
-		'Ошибка при авторизации, перезайдите.',
-	)
-		.catch(e => {
-			Toast.show({ title: RequestError.stringify(e), error: true })
-		})
-		.finally(() => {
-			requestSent = false
-		})
-})
+			runInAction(() => {
+				API.authorized = true
+			})
+			return
+		}
+
+		requestSent = true
+		API.getToken(
+			ROUTES.refreshTokenTemplate(API.session.refresh_token),
+			'Ошибка при авторизации, перезайдите.'
+		)
+			.catch(e => {
+				Toast.show({ title: RequestError.stringify(e), error: true })
+			})
+			.finally(() => {
+				requestSent = false
+			})
+	})
+}

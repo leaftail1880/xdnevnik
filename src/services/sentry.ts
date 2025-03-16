@@ -22,15 +22,14 @@ const owner = extra?.expoClient?.owner ?? '[account]'
 		'debug-url': `https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`
 	})
 
+if (!__TEST__) {
+	Sentry.init({
+		dsn: 'https://9f602cf540f26a8de9d5d708df4558b3@o4506601427369984.ingest.sentry.io/4506601430122496',
+		// Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+		tracesSampleRate: 0.9,
+		ignoreErrors: [/Unable activate keep awake/g],
+		integrations: [SENTRY_ROUTING],
 
-Sentry.init({
-	dsn: 'https://9f602cf540f26a8de9d5d708df4558b3@o4506601427369984.ingest.sentry.io/4506601430122496',
-	// Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-	tracesSampleRate: 0.9,
-	ignoreErrors: [/Unable activate keep awake/g],
-	integrations: [
-		SENTRY_ROUTING,
-	],
-
-	enabled: !__DEV__,
-})
+		enabled: !__DEV__,
+	})
+}

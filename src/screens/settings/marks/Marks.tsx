@@ -1,20 +1,20 @@
-import { StackScreenProps } from '@react-navigation/stack'
-import { observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
-import { ScrollView } from 'react-native'
-import { HelperText, List } from 'react-native-paper'
-import Mark from '~components/Mark'
-import NumberInputSetting from '~components/NumberInput'
-import { RoundedSurface } from '~components/RoundedSurface'
-import SelectModal from '~components/SelectModal'
-import SwitchSetting from '~components/SwitchSetting'
+import Mark from '@/components/Mark'
+import NumberInputSetting from '@/components/NumberInput'
+import { RoundedSurface } from '@/components/RoundedSurface'
+import SelectModal from '@/components/SelectModal'
+import SwitchSetting from '@/components/SwitchSetting'
 import {
 	changeSettings,
 	Settings,
 	StudentSettings,
 	StudentSettingsWithSave,
-} from '~models/settings'
-import { Spacings } from '~utils/Spacings'
+} from '@/models/settings'
+import { Spacings } from '@/utils/Spacings'
+import { StackScreenProps } from '@react-navigation/stack'
+import { observer } from 'mobx-react-lite'
+import { useCallback, useState } from 'react'
+import { ScrollView } from 'react-native'
+import { HelperText, List } from 'react-native-paper'
 import { SettingsRoutes } from '../navigation'
 import { NotificationLogs } from '../notifications/Notifications'
 

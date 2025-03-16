@@ -1,13 +1,13 @@
+import NumberInput from '@/components/NumberInput'
+import { Size } from '@/components/Size'
+import { Theme } from '@/models/theme'
+import { API } from '@/services/net-school/api'
 import { observable, runInAction } from 'mobx'
 import { PersistStore, PersistStoreMap } from 'mobx-persist-store'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { List, Text } from 'react-native-paper'
-import NumberInput from '~components/NumberInput'
-import { Size } from '~components/Size'
-import { Theme } from '~models/theme'
-import { API } from '~services/net-school/api'
 
 export default observer(function Appearance() {
 	Theme.key

@@ -1,5 +1,5 @@
+import { AsyncStore } from '@/models/async.store'
 import { observable } from 'mobx'
-import { AsyncStore } from '~models/async.store'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 import { GithubRelease } from './entities'
 

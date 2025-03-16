@@ -1,8 +1,8 @@
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { memo, useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Badge, Chip } from 'react-native-paper'
-import { Theme } from '~models/theme'
 import { ModalAlert } from '../../../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer, react/display-name

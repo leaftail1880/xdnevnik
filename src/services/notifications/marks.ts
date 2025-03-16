@@ -1,3 +1,7 @@
+import { getSubjectName } from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
+import { Assignment } from '@/services/net-school/entities'
+import { makeReloadPersistable } from '@/utils/makePersistable'
 import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
@@ -6,10 +10,6 @@ import * as BackgroundFetch from 'expo-background-fetch'
 import { BackgroundFetchResult } from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { Assignment } from '~services/net-school/entities'
-import { makeReloadPersistable } from '~utils/makePersistable'
 import { Logger } from '../../constants'
 import { API } from '../net-school/api'
 
@@ -22,7 +22,7 @@ export const MarksNotificationStore = new (class {
 		makeAutoObservable(
 			this,
 			{ log: action, clearLogs: action },
-			{ autoBind: true },
+			{ autoBind: true }
 		)
 		makeReloadPersistable(this, {
 			name: 'marksNotifications',
@@ -32,7 +32,13 @@ export const MarksNotificationStore = new (class {
 
 	log(level: 'info' | 'error', ...messages: unknown[]) {
 		this.logs.unshift(
-			`${level.toUpperCase()}   ${new Date().toReadable().split(' ').reverse().join(' ')}  ${messages.map(e => (e instanceof Error ? e.stack : String(e))).join(' ')}`,
+			`${level.toUpperCase()}   ${new Date()
+				.toReadable()
+				.split(' ')
+				.reverse()
+				.join(' ')}  ${messages
+				.map(e => (e instanceof Error ? e.stack : String(e)))
+				.join(' ')}`
 		)
 		Logger[level]('[BACKGROUND MARKS NOTIFICATIONS FETCH]', ...messages)
 		if (this.logs.length >= 100) this.logs.pop()
@@ -65,10 +71,10 @@ function enabled() {
 const TASK_ID = 'background-fetch'
 
 TaskManager.defineTask(TASK_ID, () =>
-	checkForNewMarksAndNotify('Фоновый запрос: '),
+	checkForNewMarksAndNotify('Фоновый запрос: ')
 )
 
-let interval: number | undefined | NodeJS.Timeout
+let interval: ReturnType<typeof setTimeout>
 
 autorun(function registerTask() {
 	if (enabled()) {
@@ -79,7 +85,7 @@ autorun(function registerTask() {
 		}).catch(onError)
 		interval = setInterval(
 			() => checkForNewMarksAndNotify('Активное приложение'),
-			1000 * 60, // minute
+			1000 * 60 // minute
 		)
 	} else {
 		MarksNotificationStore.log('info', 'Состояние: Выключено')
@@ -93,7 +99,7 @@ function onError(reason: unknown) {
 }
 
 export async function checkForNewMarksAndNotify(
-	text = 'Фоновый запрос',
+	text = 'Фоновый запрос'
 ): Promise<BackgroundFetchResult> {
 	MarksNotificationStore.log('info', `${text}: Запрос новых оценок...`)
 
@@ -102,7 +108,7 @@ export async function checkForNewMarksAndNotify(
 	if (!enabled())
 		return MarksNotificationStore.log(
 			'error',
-			'Уведомления об оценках выключены',
+			'Уведомления об оценках выключены'
 		)
 
 	try {
@@ -114,7 +120,7 @@ export async function checkForNewMarksAndNotify(
 		const newMarks = checkForNewMarks(marks)
 		MarksNotificationStore.log(
 			'info',
-			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`,
+			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`
 		)
 
 		return newMarks
@@ -130,7 +136,9 @@ function checkForNewMarks(marks: Assignment[]) {
 
 	for (const assignment of marks.filter(e => typeof e.result === 'number')) {
 		const oldId = assignment.assignmentId + ''
-		const newId = `${assignment.result} -  ${getSubjectName(assignment)}, ${assignment.assignmentTypeAbbr} ${assignment.assignmentId}`
+		const newId = `${assignment.result} -  ${getSubjectName(assignment)}, ${
+			assignment.assignmentTypeAbbr
+		} ${assignment.assignmentId}`
 
 		if (
 			!MarksNotificationStore.notified.includes(oldId) &&
@@ -142,7 +150,9 @@ function checkForNewMarks(marks: Assignment[]) {
 
 			newMarks++
 			notifee.displayNotification({
-				title: `${assignment.result} - ${getSubjectName(assignment)}, ${assignment.assignmentTypeAbbr}, Веc: ${assignment.weight}`,
+				title: `${assignment.result} - ${getSubjectName(assignment)}, ${
+					assignment.assignmentTypeAbbr
+				}, Веc: ${assignment.weight}`,
 				body: `${assignment.assignmentName}`,
 				android: {
 					channelId: MarksNotificationStore.marksChannelId,

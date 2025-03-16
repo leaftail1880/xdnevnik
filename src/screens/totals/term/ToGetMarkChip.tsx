@@ -1,13 +1,13 @@
+import Mark from '@/components/Mark'
+import { RoundedSurface } from '@/components/RoundedSurface'
+import { styles } from '@/constants'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
 import { observer } from 'mobx-react-lite'
 import { StyleProp, View, ViewStyle } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
-import Mark from '~components/Mark'
-import { RoundedSurface } from '~components/RoundedSurface'
-import { styles } from '~constants'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Spacings } from '~utils/Spacings'
-import { ModalAlert } from '~utils/Toast'
 
 export const ToGetMarkChip = observer(function ToGetMarkChip({
 	toGetTarget,

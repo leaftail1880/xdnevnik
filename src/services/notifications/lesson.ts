@@ -1,16 +1,16 @@
+import { getSubjectName } from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
+import { Lesson, LessonState } from '@/services/net-school/entities'
+import { DiaryStore } from '@/services/net-school/store'
+import {
+	clearBackgroundInterval,
+	setBackgroundInterval,
+} from '@/utils/backgroundIntervals'
 import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { Lesson, LessonState } from '~services/net-school/entities'
-import { DiaryStore } from '~services/net-school/store'
-import {
-	clearBackgroundInterval,
-	setBackgroundInterval,
-} from '~utils/backgroundIntervals'
 import { MarksNotificationStore } from './marks'
 
 export const LessonNotifStore = new (class {

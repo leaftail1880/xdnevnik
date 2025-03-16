@@ -1,6 +1,10 @@
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { Logger } from '../../constants'
-import { RequestError, RequestErrorOptions } from '../../utils/RequestError'
+import {
+	abortSignalTimeout,
+	RequestError,
+	RequestErrorOptions,
+} from '../../utils/RequestError'
 import { Toast } from '../../utils/Toast'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 import {
@@ -16,14 +20,11 @@ import {
 	Total,
 } from './entities'
 import { ROUTES } from './routes'
+import './session'
 
 // TODO! WARNING This code can cause anxiety
 // TODO Create separated HttpSessionAgent class with cache support and leave here only
 // TODO Api implemenation
-
-setTimeout(() => {
-	import('./session')
-}, 2000)
 
 // Common request options
 interface StudentId {
@@ -54,7 +55,7 @@ export class NetSchoolError extends RequestError {
 		options?: {
 			cacheGuide?: boolean
 			useCache?: boolean
-		} & RequestErrorOptions,
+		} & RequestErrorOptions
 	) {
 		super(message, options)
 		this.useCache = !!options?.useCache
@@ -74,7 +75,7 @@ export class NetSchoolApi {
 					.filter(e => !e.demo && !/demo/i.test(e.name))
 					.map(e => {
 						return { name: e.name, url: e.url }
-					}),
+					})
 			)
 
 		return result
@@ -171,7 +172,7 @@ export class NetSchoolApi {
 
 	public async getToken(
 		form: Record<string, string>,
-		error400: string = 'Вход не удался, перезайдите.',
+		error400: string = 'Вход не удался, перезайдите.'
 	) {
 		Logger.debug('getToken request', {
 			expires: this.session?.expires.toReadable(),
@@ -196,7 +197,7 @@ export class NetSchoolApi {
 					access_token: json.access_token || '',
 					refresh_token: json.refresh_token || '',
 					expires: new Date(
-						Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000,
+						Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
 					),
 				}
 
@@ -204,7 +205,7 @@ export class NetSchoolApi {
 			})
 		} else
 			throw new NetSchoolError(
-				'Ошибка ' + response.status + ' при получении токена',
+				'Ошибка ' + response.status + ' при получении токена'
 			)
 	}
 
@@ -218,7 +219,7 @@ export class NetSchoolApi {
 		return [this.origin, this.base, ...paths]
 			.map(path => path.replace(/^\//, ''))
 			.map((path, i, a) =>
-				path.endsWith('/') || i + 1 === a.length ? path : `${path}/`,
+				path.endsWith('/') || i + 1 === a.length ? path : `${path}/`
 			)
 			.join('')
 	}
@@ -232,8 +233,8 @@ export class NetSchoolApi {
 		init: ReqInit = {},
 		fetchFn: (
 			url: string,
-			init: RequestInit,
-		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch,
+			init: RequestInit
+		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch
 	): Promise<T> {
 		const request: RequestInit & { headers: Record<string, string> } = {
 			headers: {},
@@ -246,7 +247,7 @@ export class NetSchoolApi {
 		if (init.params) {
 			if (!url.endsWith('?')) url += '?'
 			url += new URLSearchParams(
-				init.params as unknown as [string, string][],
+				init.params as unknown as [string, string][]
 			).toString()
 		}
 
@@ -256,7 +257,7 @@ export class NetSchoolApi {
 					Logger.debug(
 						'Session expired',
 						this.session.expires.toReadable(),
-						new Date().toReadable(),
+						new Date().toReadable()
 					)
 
 					// Request update of the token
@@ -269,8 +270,9 @@ export class NetSchoolApi {
 						useCache: true,
 					})
 				} else {
-					request.headers['Authorization'] =
-						`Bearer ${this.session.access_token}`
+					request.headers[
+						'Authorization'
+					] = `Bearer ${this.session.access_token}`
 				}
 			}
 
@@ -278,7 +280,7 @@ export class NetSchoolApi {
 				return this.cache[url][1] as T
 			this.reqs = Math.max(0, this.reqs + 1)
 
-			const signal = AbortSignal.timeout(this.timeoutLimit * 1000)
+			const signal = abortSignalTimeout(this.timeoutLimit * 1000)
 			const response = await fetchFn(url, { signal, ...init, ...request })
 
 			if (response.status === 503)
@@ -295,7 +297,7 @@ export class NetSchoolApi {
 							? reasons[status as keyof typeof reasons]
 							: 'Неизвестная ошибка'
 					}\nКод ошибки сервера: ${status}`,
-					{ cacheGuide: true },
+					{ cacheGuide: true }
 				)
 				Logger.error(error, 'URL:', url, 'Request:', init)
 				throw error
@@ -325,7 +327,7 @@ export class NetSchoolApi {
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
 					this.errorReasons.HowToCache + ' ' + error.message,
-					{ useCache: error.useCache, loggerIgnore: true },
+					{ useCache: error.useCache, loggerIgnore: true }
 				)
 			} else throw error
 		} finally {
@@ -345,7 +347,7 @@ export class NetSchoolApi {
 
 	private async get<T extends object>(
 		url: string,
-		init?: Omit<ReqInit, 'method'>,
+		init?: Omit<ReqInit, 'method'>
 	) {
 		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
 	}
@@ -376,7 +378,7 @@ export class NetSchoolApi {
 					endDate: endDate,
 					extraActivity: null,
 				},
-			}),
+			})
 		)
 	}
 
@@ -464,7 +466,7 @@ export class NetSchoolApi {
 		return totals.map(total => {
 			runInAction(() => {
 				total.termTotals = total.termTotals.sort(
-					(a, b) => parseInt(a.term.name) - parseInt(b.term.name),
+					(a, b) => parseInt(a.term.name) - parseInt(b.term.name)
 				)
 
 				if (total.termTotals.length < maxLength) {
@@ -480,7 +482,7 @@ export class NetSchoolApi {
 
 				const visitedIds = new Set<number>()
 				total.yearTotals = total.yearTotals.filter(e =>
-					visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id),
+					visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id)
 				)
 			})
 

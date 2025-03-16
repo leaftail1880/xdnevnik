@@ -2,7 +2,7 @@ name: Expo Update
 on: 
   push:
     branches:
-      - update
+      - main
     paths:
       - 'src/**.ts'
       - 'src/**.tsx'
@@ -50,8 +50,16 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🚀 Create update
+      - name: 🏃‍♂️ Run tests
+        run: yarn jest --coverage
+
+      - name: ✈ Create update
         run: eas update --auto --non-interactive --channel production --platform android
 
       - name: 🚀 Upload Sentry sourcemaps
         run: npx sentry-expo-upload-sourcemaps dist
+
+      - name: 🚀 Upload test coverage results
+        uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: 021dac39683c4a9332b1aa0d79272875b0e945ad7529556617c9f7a1e073b0d2

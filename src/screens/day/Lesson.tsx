@@ -1,15 +1,15 @@
+import { Theme } from '@/models/theme'
+import { AssignmentsStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Card, Chip, Text } from 'react-native-paper'
-import { Theme } from '~models/theme'
-import { AssignmentsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
+import SubjectName from '@/components/SubjectName'
+import { TermNavigationParamMap } from '@/screens/totals/navigation'
+import { TermStore } from '@/screens/totals/term/state'
 import { useCallback } from 'react'
-import SubjectName from '~components/SubjectName'
-import { TermNavigationParamMap } from '~screens/totals/navigation'
-import { TermStore } from '~screens/totals/term/state'
 import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
@@ -27,7 +27,7 @@ export default observer(function DiaryLesson({
 
 		navigation.navigate(LANG['s_totals'])
 
-		await new Promise(r => setTimeout(r, 100))
+		await new Promise<void>(r => setTimeout(r, 100))
 
 		// @ts-expect-error Huh
 		navigation.navigate(LANG['s_totals'], {

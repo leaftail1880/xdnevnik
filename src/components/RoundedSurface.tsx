@@ -1,7 +1,7 @@
+import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
 import { observer } from 'mobx-react-lite'
 import { Surface, SurfaceProps } from 'react-native-paper'
-import { Theme } from '~models/theme'
-import { Spacings } from '~utils/Spacings'
 
 export const RoundedSurface = observer(function RoundedSurface(
 	props: SurfaceProps,

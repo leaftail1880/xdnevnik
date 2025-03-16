@@ -1,6 +1,6 @@
-import { roundMark } from '~components/Mark'
-import type { PartialAssignment } from '~services/net-school/entities'
-import { SubjectPerformance } from '~services/net-school/entities'
+import { roundMark } from '@/components/Mark'
+import type { PartialAssignment } from '@/services/net-school/entities'
+import { SubjectPerformance } from '@/services/net-school/entities'
 import { Logger } from '../constants'
 
 // TODO: Refactor and use class MarksCalculator instead of one big shitty function
@@ -43,15 +43,15 @@ export function calculateMarks({
 						assignmentId: e.classMeetingDate + e.attendanceMark,
 						date: e.classMeetingDate,
 					}
-				}),
+				})
 			)
 		}
 
 		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
 			(a, b) =>
 				new Date(a.classMeetingDate ?? a.date).getTime() -
-				new Date(b.classMeetingDate ?? b.date).getTime(),
-		) as Partial<PartialAssignment>[]
+				new Date(b.classMeetingDate ?? b.date).getTime()
+		) as PartialAssignment[]
 
 		if (lessonsWithoutMark) {
 			// TODO Fix
@@ -71,6 +71,7 @@ export function calculateMarks({
 		let avgMark = totals.averageMark
 
 		if (customMarks.length) {
+			// @ts-expect-error AAAAAAAAAAA
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
 			avgMark = calculateAvg(customMarks, totals)
 		}
@@ -79,8 +80,8 @@ export function calculateMarks({
 			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
-					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,
-				).fill({}),
+					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length
+				).fill({})
 			)
 		}
 
@@ -100,7 +101,7 @@ export function calculateMarks({
 						result: defaultMark,
 						weight: defaultMarkWeight,
 					} satisfies Partial<PartialAssignment>),
-					totals,
+					totals
 				)
 				if (roundMark(avg) >= targetMark) {
 					toGetTarget = i
@@ -109,6 +110,7 @@ export function calculateMarks({
 			}
 		}
 
+		// @ts-expect-error AAAAAAAAAAAA
 		const weights = totals.results.concat(customMarks).map(e => e.weight)
 		const maxWeight = Math.max(...weights)
 		const minWeight = Math.min(...weights)
@@ -126,7 +128,7 @@ export function calculateMarks({
 }
 function calculateAvg(
 	customMarks: Partial<PartialAssignment>[],
-	totals: CalculateTotals,
+	totals: CalculateTotals
 ) {
 	let totalWeight = 0
 	let totalMark = 0

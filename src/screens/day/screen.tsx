@@ -1,3 +1,10 @@
+import Header from '@/components/Header'
+import SelectModal from '@/components/SelectModal'
+import UpdateDate from '@/components/UpdateDate'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Lesson } from '@/services/net-school/entities'
+import { DiaryStore } from '@/services/net-school/store'
 import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -7,13 +14,6 @@ import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Chip } from 'react-native-paper'
-import Header from '~components/Header'
-import SelectModal from '~components/SelectModal'
-import UpdateDate from '~components/UpdateDate'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Lesson } from '~services/net-school/entities'
-import { DiaryStore } from '~services/net-school/store'
 import { ParamListBase } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
 import Day from './Day'
@@ -22,8 +22,8 @@ import { DiaryState } from './state'
 // @ts-expect-error fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
 ExpandableCalendar.defaultProps = undefined
 
+import { Chips } from '@/components/Chips'
 import { LocaleConfig } from 'react-native-calendars'
-import { Chips } from '~components/Chips'
 
 // localization for react-native-calendars
 // https://github.com/arshaw/xdate/blob/3060bceb5f0901f48df9ae657b6349b2733fec37/src/xdate.js#L475
@@ -202,11 +202,10 @@ const Filter = observer(function Filter(props: FilterProps) {
 	)
 })
 
-
 export type DiaryLessonProps = {
 	i: number
 	lesson: Lesson
 	navigateToLessonMarks: VoidFunction
-} 
+}
 
 export type DiaryLessonNavigation = StackScreenProps<ParamListBase>

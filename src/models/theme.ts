@@ -8,7 +8,7 @@ import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Appearance } from 'react-native'
+import { Appearance, Platform } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -113,13 +113,15 @@ export class ThemeStore {
 		// Generate theme based on accent color
 		this.theme = this.generateTheme()
 
-		NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark').catch(
-			captureException,
-		)
-		NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar).catch(
-			captureException,
-		)
-		NavigationBar.setVisibilityAsync('visible').catch(captureException)
+		if (Platform.OS === 'android') {
+			NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark').catch(
+				captureException
+			)
+			NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar).catch(
+				captureException
+			)
+			NavigationBar.setVisibilityAsync('visible').catch(captureException)
+		}
 		SystemUI.setBackgroundColorAsync(Theme.colors.background).catch(
 			captureException,
 		)

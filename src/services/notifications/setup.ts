@@ -1,7 +1,7 @@
+import { Settings } from '@/models/settings'
 import notifee, { AuthorizationStatus } from '@notifee/react-native'
 import * as Device from 'expo-device'
 import { autorun } from 'mobx'
-import { Settings } from '~models/settings'
 import { Toast } from '../../utils/Toast'
 import { setupLessonChannel } from './lesson'
 import { setupMarksChannel } from './marks'

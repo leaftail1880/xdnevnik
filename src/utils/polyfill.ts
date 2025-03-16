@@ -1,3 +1,6 @@
+// @ts-expect-error Global variable
+globalThis.__TEST__ = false
+
 declare global {
 	interface DateConstructor {
 		week(date: Date): [Date, Date, Date, Date, Date, Date, Date]
@@ -13,7 +16,6 @@ declare global {
 		getDayFromMonday(): number
 	}
 
-	// @ts-expect-error Something wrong with types lol
 	let debug: (...messages: unknown[]) => void
 }
 
@@ -25,7 +27,6 @@ if (__DEV__) {
 } else {
 	debug = () => {}
 }
-
 
 Date.prototype.toNetSchool = function (this: Date) {
 	return this.toJSON().split('T')[0]
@@ -54,15 +55,5 @@ Date.week = date =>
 		.fill('')
 		.map(
 			(_, i) =>
-				new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs),
+				new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs)
 		) as ReturnType<typeof Date.week>
-
-AbortSignal.timeout = ms => {
-	const controller = new AbortController()
-
-	setTimeout(() => {
-		if (!controller.signal.aborted) controller.abort()
-	}, ms)
-
-	return controller.signal
-}
