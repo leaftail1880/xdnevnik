@@ -1,6 +1,6 @@
+import { Logger } from '@/constants'
+import type { StudentSettings } from '@/models/settings'
 import { makeAutoObservable } from 'mobx'
-import { Logger } from '~constants'
-import type { StudentSettings } from '~models/settings'
 import { NSEntity } from './entities'
 
 interface BaseLesson {
