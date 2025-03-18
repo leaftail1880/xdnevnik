@@ -1,19 +1,16 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { DiaryStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
-import { useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import ReorderableList, {
-	ReorderableListReorderEvent,
-	reorderItems,
-} from 'react-native-reorderable-list'
-import { Settings, StudentSettings } from '~models/settings'
-import type { Lesson } from '~services/net-school/lesson'
-import { DiaryStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson, { RenderDiaryLessonDraggable } from './Lesson'
 import { DiaryLessonNavigation } from './screen'
 import { DiaryState } from './state'
+import { Lesson } from '@/services/net-school/lesson'
+import { Settings, StudentSettings } from '@/models/settings'
+import { makeAutoObservable, runInAction } from 'mobx'
+import { useCallback } from 'react'
+import ReorderableList, { ReorderableListReorderEvent, reorderItems } from 'react-native-reorderable-list'
 
 function sortByDate(
 	lessons: Lesson[],

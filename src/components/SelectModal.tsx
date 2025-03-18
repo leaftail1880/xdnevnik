@@ -1,3 +1,4 @@
+import { Theme } from '@/models/theme'
 import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { useCallback, useState } from 'react'
@@ -18,7 +19,6 @@ import {
 	RadioButton,
 	Text,
 } from 'react-native-paper'
-import { Theme } from '~models/theme'
 import { Spacings } from '../utils/Spacings'
 
 class Store {
@@ -97,8 +97,9 @@ export default observer(function SelectModal<
 					style={props.style}
 					textStyle={props.inlineChip ? undefined : Theme.fonts.bodySmall}
 					onPress={store.toggleVisibility}
+					compact
 				>
-					{(label + value).slice(0, props.inlineChip ? Infinity : 16)}
+					{props.inlineChip ? value : (label + value).slice(0, 16)}
 				</Chip>
 			) : (
 				<List.Item
@@ -120,7 +121,9 @@ const Modal = observer(function Modal(props: Props & { store: Store }) {
 				onDismiss={props.store.toggleVisibility}
 				visible={props.store.visible}
 			>
-				<Dialog.Title>{props.label}</Dialog.Title>
+				<Dialog.Title style={Theme.fonts.titleMedium}>
+					{props.label}
+				</Dialog.Title>
 				<ScrollView>
 					{props.data.map(item => (
 						<Option {...props} item={item} key={item.value} />

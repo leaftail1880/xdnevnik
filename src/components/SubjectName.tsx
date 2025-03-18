@@ -1,3 +1,6 @@
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Subject } from '@/services/net-school/entities'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
@@ -17,8 +20,6 @@ import {
 	TextInput,
 	TextProps,
 } from 'react-native-paper'
-import { Settings } from '~models/settings'
-import { Subject } from '~services/net-school/entities'
 
 type SubjectNameOptions = {
 	subjectId: number
@@ -99,7 +100,9 @@ const EditSubjectName = observer(function EditSubjectName({
 	return (
 		<Portal>
 			<Dialog visible onDismiss={() => setIsEditing(false)}>
-				<Dialog.Title>Изменить имя</Dialog.Title>
+				<Dialog.Title style={Theme.fonts.titleMedium}>
+					Изменить имя
+				</Dialog.Title>
 				<Dialog.Content style={{ gap: 10 }}>
 					<Text>
 						Имя в журнале:{' '}

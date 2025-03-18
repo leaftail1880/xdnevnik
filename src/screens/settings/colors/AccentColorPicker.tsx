@@ -1,3 +1,4 @@
+import { Theme, ThemeStore } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { memo } from 'react'
 import { View } from 'react-native'
@@ -7,7 +8,6 @@ import ColorPicker, {
 	Preview,
 	Swatches,
 } from 'reanimated-color-picker'
-import { Theme, ThemeStore } from '~models/theme'
 
 export default observer(function AccentColorPicker() {
 	const meta = ThemeStore.meta(Theme)

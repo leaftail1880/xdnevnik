@@ -4,8 +4,8 @@ import {
 	AsyncState,
 	AsyncStore,
 	FunctionsFromObject,
-} from '~models/async.store'
-import { KeyStore } from '~models/key.store'
+} from '@/models/async.store'
+import { KeyStore } from '@/models/key.store'
 import { API } from './api'
 
 export const StudentsStore = method('students', 'списка учеников', {})

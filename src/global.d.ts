@@ -31,6 +31,11 @@ declare global {
 			| 'setUTCFullYear'
 		>
 	>
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	const __TEST__: boolean
+
+	type VoidFunction = () => void
 }
 
 export {}

@@ -1,0 +1,12 @@
+diff --git a/lib/url-state-machine.js b/lib/url-state-machine.js
+index 26b7596bf929f833f038fd4e7358cd14937cc6a7..d73981e6509a9c6d10cd7e5721c2666d8ccdd63f 100644
+--- a/lib/url-state-machine.js
++++ b/lib/url-state-machine.js
+@@ -1,6 +1,6 @@
+ "use strict";
+ const { Buffer } = require("buffer/");
+-const punycode = require("punycode");
++const punycode = require("punycode/");
+ 
+ const infra = require("./infra");
+ const { percentEncode, percentDecode } = require("./urlencoded");

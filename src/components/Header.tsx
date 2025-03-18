@@ -1,6 +1,6 @@
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { Appbar } from 'react-native-paper'
-import { Theme } from '~models/theme'
 
 export default observer(function Header(props: {
 	title: string

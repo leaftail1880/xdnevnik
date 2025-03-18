@@ -1,3 +1,13 @@
+import { Chips } from '@/components/Chips'
+import Loading from '@/components/Loading'
+import Mark from '@/components/Mark'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Total } from '@/services/net-school/entities'
+import { SubjectPerformanceStores } from '@/services/net-school/store'
+import { calculateMarks } from '@/utils/calculateMarks'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
@@ -8,14 +18,7 @@ import {
 	View,
 	ViewStyle,
 } from 'react-native'
-import Loading from '~components/Loading'
-import Mark from '~components/Mark'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Total } from '~services/net-school/entities'
-import { SubjectPerformanceStores } from '~services/net-school/store'
-import { calculateMarks } from '~utils/calculateMarks'
-import { Spacings } from '~utils/Spacings'
+import { Chip, Text } from 'react-native-paper'
 import { SubjectInfo, TermStore } from './state'
 import { ToGetMarkChip } from './ToGetMarkChip'
 
@@ -27,14 +30,13 @@ const styles = StyleSheet.create({
 	},
 	mark: {
 		padding: Spacings.s1,
-		paddingHorizontal: Spacings.s2 + 4,
+		paddingHorizontal: Spacings.s2,
 		marginHorizontal: 2,
 		transform: [{ scaleX: -1 }],
+		height: 40,
 	},
 	marks: {
 		flexDirection: 'row',
-		paddingHorizontal: Spacings.s1,
-		paddingBottom: Spacings.s1,
 	},
 	totalMark: { padding: Spacings.s2, alignSelf: 'center' },
 	totalMarkText: { fontSize: 18 },
@@ -43,8 +45,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		padding: Spacings.s2,
 		gap: Spacings.s2,
+	},
+	marksAndChipsContainer: {
+		gap: Spacings.s1,
+		padding: Spacings.s1,
 	},
 })
 
@@ -56,12 +61,11 @@ export default observer(function SubjectMarks(
 ) {
 	const { studentId } = Settings
 
-	const assignments = SubjectPerformanceStores.use({
+	const performance = SubjectPerformanceStores.use({
 		studentId,
 		subjectId: props.total.subjectId,
 	})
-
-	assignments.withParams({ termId: props.selectedTerm.id })
+	performance.withParams({ termId: props.selectedTerm.id })
 
 	const student = studentId ? Settings.forStudent(studentId) : undefined
 	const backgroundColor = Theme.colors.elevation.level1
@@ -76,20 +80,20 @@ export default observer(function SubjectMarks(
 		return [viewStyle, [viewStyle, styles.container]]
 	}, [backgroundColor])
 
+	const attendance = TermStore.attendance
 	const marks = useMemo(
 		() =>
-			assignments?.result &&
+			performance?.result &&
 			calculateMarks({
-				totals: assignments.result,
-				attendance: TermStore.attendance,
+				attendance,
+				totals: performance.result,
 				defaultMark: student?.defaultMark,
 				defaultMarkWeight: student?.defaultMarkWeight,
 				targetMark: student?.targetMark,
 			}),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
-			assignments.result,
-			TermStore.attendance,
+			performance.result,
+			attendance,
 			student?.defaultMark,
 			student?.defaultMarkWeight,
 			student?.targetMark,
@@ -107,8 +111,8 @@ export default observer(function SubjectMarks(
 
 	if (!student || !studentId) return
 
-	if (assignments.fallback)
-		return <View style={viewContainerStyle}>{assignments.fallback}</View>
+	if (performance.fallback)
+		return <View style={viewContainerStyle}>{performance.fallback}</View>
 
 	if (!marks)
 		return (
@@ -121,13 +125,14 @@ export default observer(function SubjectMarks(
 
 	if (totalsAndSheduledTotals.length === 0) return
 	return (
-		<>
+		<View style={styles.marksAndChipsContainer}>
 			<View style={styles.marks}>
 				<ScrollView
 					horizontal
 					style={viewStyle}
 					contentContainerStyle={styles.container}
-					fadingEdgeLength={5}
+					fadingEdgeLength={100}
+					showsHorizontalScrollIndicator={false}
 				>
 					{totalsAndSheduledTotals
 						.slice()
@@ -155,11 +160,31 @@ export default observer(function SubjectMarks(
 					style={styles.totalMark}
 				/>
 			</View>
-			{typeof toGetTarget !== 'undefined' && (
-				<View style={styles.chips}>
+			<Chips style={{ padding: 0 }}>
+				{typeof toGetTarget !== 'undefined' && TermStore.toGetMark && (
 					<ToGetMarkChip toGetTarget={toGetTarget} />
-				</View>
-			)}
-		</>
+				)}
+				{TermStore.shortStats && (
+					<Chip
+						compact
+						onPress={() => {
+							ModalAlert.show(
+								'Краткая статистика',
+								<View>
+									<Text>О - Оценки</Text>
+									<Text>У - Прошедшие уроки/Запланированные уроки</Text>
+									<Text>В - Суммарный вес всех оценок</Text>
+								</View>,
+							)
+						}}
+					>
+						О {performance.result.results.length}, У{' '}
+						{performance.result.classmeetingsStats.passed}/
+						{performance.result.classmeetingsStats.scheduled}, В{' '}
+						{performance.result.results.reduce((p, c) => p + c.weight, 0)}
+					</Chip>
+				)}
+			</Chips>
+		</View>
 	)
 })

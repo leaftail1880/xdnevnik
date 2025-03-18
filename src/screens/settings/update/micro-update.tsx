@@ -1,11 +1,11 @@
+import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
 import * as Updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { Button, HelperText, Text } from 'react-native-paper'
-import { Theme } from '~models/theme'
-import { Spacings } from '~utils/Spacings'
-import { ModalAlert } from '~utils/Toast'
 
 export default observer(function MicroUpdateId() {
 	const updateId = Updates.updateId?.slice(-6) ?? 'из сборки'
@@ -66,13 +66,13 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 
 	const [state, setState] = useState(UpdateCheckState.default)
 
-	const timeout = useRef<number>()
+	const timeout = useRef<number | undefined>()
 	useEffect(() => {
-		clearTimeout(timeout.current)
+		if (timeout.current) clearTimeout(timeout.current)
 		if (state !== UpdateCheckState.default) {
 			timeout.current = setTimeout(
 				() => setState(UpdateCheckState.default),
-				5000,
+				5000
 			) as unknown as number
 		}
 	}, [state])
@@ -95,8 +95,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 							setState(
 								e.isAvailable
 									? UpdateCheckState.available
-									: UpdateCheckState.notAvailable,
-							),
+									: UpdateCheckState.notAvailable
+							)
 						)
 					}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}

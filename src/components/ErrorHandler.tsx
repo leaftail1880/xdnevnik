@@ -1,9 +1,9 @@
+import { Theme } from '@/models/theme'
+import { NetSchoolError } from '@/services/net-school/api'
+import { Spacings } from '@/utils/Spacings'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
-import { Theme } from '~models/theme'
-import { NetSchoolError } from '~services/net-school/api'
-import { Spacings } from '~utils/Spacings'
 import { RequestError, RequestErrorReason } from '../utils/RequestError'
 
 interface ErrorHandlerProps {

@@ -1,13 +1,13 @@
+import Mark from '@/components/Mark'
+import { RoundedSurface } from '@/components/RoundedSurface'
+import { styles } from '@/constants'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
 import { observer } from 'mobx-react-lite'
 import { StyleProp, View, ViewStyle } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
-import Mark from '~components/Mark'
-import { RoundedSurface } from '~components/RoundedSurface'
-import { styles } from '~constants'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Spacings } from '~utils/Spacings'
-import { ModalAlert } from '~utils/Toast'
 
 export const ToGetMarkChip = observer(function ToGetMarkChip({
 	toGetTarget,
@@ -100,16 +100,20 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 						style={{ padding: 2 }}
 						onPress={onPress}
 					/>
-					<Text>нужно </Text>
+					<Text>нужно</Text>
 					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
 						{toGetTarget}x
 					</Text>
 
 					<Mark
 						duty={false}
-						style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
-						textStyle={{ fontSize: 10 }}
-						subTextStyle={{ fontSize: 8 }}
+						style={{
+							padding: 0,
+							paddingHorizontal: Spacings.s1,
+							paddingVertical: 1,
+						}}
+						textStyle={{ fontSize: 8 }}
+						subTextStyle={{ fontSize: 6 }}
 						weight={student.defaultMarkWeight}
 						mark={student.defaultMark}
 						onPress={onPress}

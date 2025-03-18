@@ -1,3 +1,4 @@
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import {
@@ -9,7 +10,6 @@ import {
 	Text,
 } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
-import { Theme } from '~models/theme'
 import { styles } from '../constants'
 import { ModalAlert, Toast } from '../utils/Toast'
 
@@ -76,7 +76,9 @@ const DialogModal = observer(function DialogModal() {
 							: Theme.colors.elevation.level3,
 					}}
 				>
-					<Dialog.Title>{ModalAlert.state.title}</Dialog.Title>
+					<Dialog.Title style={Theme.fonts.titleMedium}>
+						{ModalAlert.state.title}
+					</Dialog.Title>
 					{ModalAlert.state.body && (
 						<Dialog.Content>
 							{typeof ModalAlert.state.body === 'object' ? (

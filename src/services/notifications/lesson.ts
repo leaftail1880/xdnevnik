@@ -1,16 +1,16 @@
+import { getSubjectName } from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
+import { Lesson, LessonState } from '@/services/net-school/lesson'
+import { DiaryStore } from '@/services/net-school/store'
+import {
+	clearBackgroundInterval,
+	setBackgroundInterval,
+} from '@/utils/backgroundIntervals'
 import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { Lesson, LessonState } from '~services/net-school/lesson'
-import { DiaryStore } from '~services/net-school/store'
-import {
-	clearBackgroundInterval,
-	setBackgroundInterval,
-} from '~utils/backgroundIntervals'
 import { MarksNotificationStore } from './marks'
 
 let foregroundServiceRegistered = false
@@ -42,7 +42,7 @@ export const LessonNotifStore = new (class {
 	}
 })()
 
-export async function setupLessonChannel(enabled: boolean) {
+export async function setupLessonChannel() {
 	// Show notification channels even when they are disabled
 	const lessonChannelId = await notifee.createChannel({
 		id: 'lessons',
@@ -56,7 +56,7 @@ export async function setupLessonChannel(enabled: boolean) {
 		e => e.notification.android?.channelId === lessonChannelId,
 	)
 
-	if (!enabled) {
+	if (!Settings.lessonNotifications) {
 		return runInAction(() => {
 			LessonNotifStore.remove(LessonNotifStore.id || oldNotification?.id)
 		})
@@ -71,7 +71,7 @@ export async function setupLessonChannel(enabled: boolean) {
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
-	if (!Settings.notificationsEnabled || !LessonNotifStore.lessonChannelId) {
+	if (!Settings.lessonNotifications || !LessonNotifStore.lessonChannelId) {
 		return LessonNotifStore.remove()
 	}
 

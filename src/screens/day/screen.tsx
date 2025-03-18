@@ -1,19 +1,19 @@
+import Header from '@/components/Header'
+import SelectModal from '@/components/SelectModal'
+import UpdateDate from '@/components/UpdateDate'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Lesson } from '@/services/net-school/lesson'
+import { DiaryStore } from '@/services/net-school/store'
 import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Chip, FAB } from 'react-native-paper'
-import Header from '~components/Header'
-import SelectModal from '~components/SelectModal'
-import UpdateDate from '~components/UpdateDate'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Lesson } from '~services/net-school/lesson'
-import { DiaryStore } from '~services/net-school/store'
 import { ParamListBase } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
 import Day, { DiaryEditDay } from './Day'
@@ -22,6 +22,7 @@ import { DiaryState } from './state'
 // @ts-expect-error fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
 ExpandableCalendar.defaultProps = undefined
 
+import { Chips } from '@/components/Chips'
 import { LocaleConfig } from 'react-native-calendars'
 
 // localization for react-native-calendars
@@ -105,11 +106,11 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 					<View style={{ flex: 1, zIndex: 30 }}>
 						<SelectDay />
 					</View>
-					<View style={{ flex: 1, flexDirection: 'row', padding: Spacings.s2 }}>
+					<Chips>
 						<Filter type="showHomework" label="Оценки" />
 						<Filter type="showAttachments" label="Файлы" />
 						<Filter type="showLessonTheme" label="Темы" />
-					</View>
+					</Chips>
 					<View style={{ padding: Spacings.s1 }}>
 						{DiaryStore.fallback || <Day {...props} />}
 					</View>
@@ -221,25 +222,16 @@ const Filter = observer(function Filter(props: FilterProps) {
 	)
 
 	return (
-		<Chip
-			mode="flat"
-			selected={DiaryState[props.type]}
-			onPress={onPress}
-			style={styles.filter}
-		>
+		<Chip mode="flat" selected={DiaryState[props.type]} onPress={onPress}>
 			{props.label}
 		</Chip>
 	)
-})
-
-const styles = StyleSheet.create({
-	filter: { marginHorizontal: Spacings.s1 },
 })
 
 export type DiaryLessonProps = {
 	i: number
 	lesson: Lesson
 	navigateToLessonMarks: VoidFunction
-} 
+}
 
 export type DiaryLessonNavigation = StackScreenProps<ParamListBase>

@@ -1,22 +1,22 @@
+import { Theme } from '@/models/theme'
+import { AssignmentsStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { ListRenderItem, View } from 'react-native'
 import { Card, Chip, Text } from 'react-native-paper'
-import { Theme } from '~models/theme'
-import { AssignmentsStore } from '~services/net-school/store'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
+import SubjectName, { getSubjectName } from '@/components/SubjectName'
+import { TermNavigationParamMap } from '@/screens/totals/navigation'
+import { TermStore } from '@/screens/totals/term/state'
 import { useCallback } from 'react'
-import { useReorderableDrag } from 'react-native-reorderable-list'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { TermNavigationParamMap } from '~screens/totals/navigation'
-import { TermStore } from '~screens/totals/term/state'
-import { Lesson } from '~services/net-school/lesson'
 import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
 import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
+import { useReorderableDrag } from 'react-native-reorderable-list'
+import { Lesson } from '@/services/net-school/lesson'
+import { Settings } from '@/models/settings'
 
 export default observer(function DiaryLesson({
 	lesson,
@@ -30,7 +30,7 @@ export default observer(function DiaryLesson({
 
 		navigation.navigate(LANG['s_totals'])
 
-		await new Promise(r => setTimeout(r, 100))
+		await new Promise<void>(r => setTimeout(r, 100))
 
 		// @ts-expect-error Huh
 		navigation.navigate(LANG['s_totals'], {

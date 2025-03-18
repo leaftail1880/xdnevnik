@@ -1,12 +1,12 @@
+import { Theme } from '@/models/theme'
+import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Lesson, LessonState } from '~services/net-school/lesson'
 import { Spacings } from '../../utils/Spacings'
+import { Settings } from '@/models/settings'
 
 export const LessonProgressStore = new (class {
 	now = Date.now()

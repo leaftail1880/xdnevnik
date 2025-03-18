@@ -1,26 +1,28 @@
-import { makeAutoObservable } from 'mobx'
-import { getSubjectName } from '~components/SubjectName'
-import { Settings } from '~models/settings'
-import { NSEntity, Subject, Total } from '~services/net-school/entities'
+import { getSubjectName } from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
+import { NSEntity, Subject, Total } from '@/services/net-school/entities'
 import {
 	SubjectPerformanceStores,
 	SubjectsStore,
 	TotalsStore,
-} from '~services/net-school/store'
-import { makeReloadPersistable } from '~utils/makePersistable'
-import { stringSimilarity } from '~utils/search'
+} from '@/services/net-school/store'
+import { makeReloadPersistable } from '@/utils/makePersistable'
+import { stringSimilarity } from '@/utils/search'
+import { makeAutoObservable } from 'mobx'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 
 export const TermStoreSortModes = [
-	{ value: 'averageMark', label: 'Средней оценке' },
-	{ value: 'toGetMarkAmount', label: 'Кол-ву для исправления' },
-	{ value: 'markAmount', label: 'Кол-ву оценок' },
+	{ value: 'averageMark', label: 'Средний балл' },
+	{ value: 'toGetMarkAmount', label: 'Кол-во для исправления' },
+	{ value: 'markAmount', label: 'Кол-во оценок' },
 	{ value: 'none', label: 'Никак' },
 ] as const
 
 export const TermStore = new (class {
 	sortMode: (typeof TermStoreSortModes)[number]['value'] = 'averageMark'
 	attendance = false
+	shortStats = false
+	toGetMark = true
 	search = ''
 
 	get terms() {
@@ -147,7 +149,7 @@ export const TermStore = new (class {
 		})
 		makeReloadPersistable(this, {
 			name: 'termStore',
-			properties: ['sortMode', 'attendance'],
+			properties: ['sortMode', 'attendance', 'shortStats'],
 		})
 	}
 })()

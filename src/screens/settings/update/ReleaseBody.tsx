@@ -1,7 +1,7 @@
+import { Theme } from '@/models/theme'
 import { memo } from 'react'
 import { Linking } from 'react-native'
 import { Text } from 'react-native-paper'
-import { Theme } from '~models/theme'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function ReleaseBody(props: { body: string }) {

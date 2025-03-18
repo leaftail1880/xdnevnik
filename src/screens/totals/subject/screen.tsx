@@ -1,3 +1,23 @@
+import { Chips } from '@/components/Chips'
+import Mark from '@/components/Mark'
+import { RoundedSurface } from '@/components/RoundedSurface'
+import SubjectName from '@/components/SubjectName'
+import UpdateDate from '@/components/UpdateDate'
+import { LANG, styles } from '@/constants'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { DiaryState } from '@/screens/day/state'
+import type {
+	Assignment,
+	PartialAssignment,
+} from '@/services/net-school/entities'
+import {
+	MarkAssignmentsStore,
+	SubjectPerformanceStores,
+} from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
+import { calculateMarks } from '@/utils/calculateMarks'
 import { StackScreenProps } from '@react-navigation/stack'
 import { formatDistanceToNow, formatDuration } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -5,25 +25,6 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, Chip, IconButton, Text } from 'react-native-paper'
-import Mark from '~components/Mark'
-import { RoundedSurface } from '~components/RoundedSurface'
-import SubjectName from '~components/SubjectName'
-import UpdateDate from '~components/UpdateDate'
-import { LANG, styles } from '~constants'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { DiaryState } from '~screens/day/state'
-import type {
-	Assignment,
-	PartialAssignment,
-} from '~services/net-school/entities'
-import {
-	MarkAssignmentsStore,
-	SubjectPerformanceStores,
-} from '~services/net-school/store'
-import { Spacings } from '~utils/Spacings'
-import { ModalAlert } from '~utils/Toast'
-import { calculateMarks } from '~utils/calculateMarks'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
 import { ToGetMarkChip } from '../term/ToGetMarkChip'
 import { AddMarkForm } from './AddMarkForm'
@@ -117,21 +118,18 @@ export default observer(function SubjectTotals({
 					finalMark={finalMark}
 					mark={avgMark}
 					style={{ padding: Spacings.s2 }}
-					textStyle={{ fontSize: 20 }}
+					textStyle={{ fontSize: 18 }}
 				/>
 			</View>
 			<ScrollView
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{ gap: Spacings.s2 }}
 			>
-				<ScrollView style={{ margin: Spacings.s1 }} horizontal>
-					<ToGetMarkChip
-						style={{ margin: Spacings.s1 }}
-						toGetTarget={toGetTarget}
-					/>
+				<Chips style={{ marginRight: Spacings.s2 }}>
+					<ToGetMarkChip toGetTarget={toGetTarget} />
 					<Chip
 						mode="flat"
-						style={{ margin: Spacings.s1 }}
+						compact
 						selected={attendance}
 						onPress={() => {
 							setAttendance(!attendance)
@@ -141,7 +139,7 @@ export default observer(function SubjectTotals({
 					</Chip>
 					<Chip
 						mode="flat"
-						style={{ margin: Spacings.s1 }}
+						compact
 						selected={lessonsWithoutMark}
 						onPress={() => {
 							setLessonsWithoutMark(!lessonsWithoutMark)
@@ -149,7 +147,7 @@ export default observer(function SubjectTotals({
 					>
 						Уроки без оценок
 					</Chip>
-				</ScrollView>
+				</Chips>
 				{totalsAndSheduledTotals.map((e, i) => (
 					<MarkRow
 						mark={e}
@@ -252,7 +250,11 @@ const MarkRow = observer(function MarkRow({
 		<View
 			style={[
 				styles.stretch,
-				{ paddingTop: Spacings.s1, paddingHorizontal: Spacings.s2 },
+				{
+					paddingTop: Spacings.s1,
+					paddingHorizontal: Spacings.s2,
+					gap: Spacings.s1,
+				},
 			]}
 		>
 			<Mark
@@ -261,8 +263,11 @@ const MarkRow = observer(function MarkRow({
 				weight={mark.weight}
 				minWeight={minWeight}
 				maxWeight={maxWeight}
-				style={{ paddingHorizontal: Spacings.s3, paddingVertical: 2 }}
-				textStyle={{ fontSize: 17 }}
+				style={{
+					paddingHorizontal: Spacings.s2 * 1.5,
+					paddingVertical: 2,
+					minWidth: 40,
+				}}
 				onPress={() => {
 					const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
 					ModalAlert.show(

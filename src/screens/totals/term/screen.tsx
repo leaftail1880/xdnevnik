@@ -1,24 +1,24 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { memo, useCallback } from 'react'
-import { FlatList, ListRenderItem, ScrollView } from 'react-native'
+import { FlatList, ListRenderItem } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
-import Loading from '~components/Loading'
-import SelectModal from '~components/SelectModal'
-import UpdateDate from '~components/UpdateDate'
+import Loading from '@/components/Loading'
+import SelectModal from '@/components/SelectModal'
+import UpdateDate from '@/components/UpdateDate'
 
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { Total } from '~services/net-school/entities'
+import { Chips } from '@/components/Chips'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { Total } from '@/services/net-school/entities'
 import {
 	EducationStore,
 	HomeworkMarksStore,
 	SubjectsStore,
 	TotalsStore,
-} from '~services/net-school/store'
-import { Spacings } from '../../../utils/Spacings'
+} from '@/services/net-school/store'
 import SubjectPerformanceInline from './Subject'
 import { TermStore, TermStoreSortModes } from './state'
 
@@ -37,14 +37,13 @@ const ChipsRow = observer(function Header() {
 	const terms = TermStore.terms
 	const studentSettings = Settings.forStudent(Settings.studentId)
 	return (
-		<ScrollView style={{ margin: Spacings.s1 }} horizontal>
+		<Chips>
 			<SelectModal
 				mode="chip"
-				label="Сортировать по"
+				label="Режим сортировки"
 				value={TermStore.sortMode}
 				inlineChip
 				data={TermStoreSortModes}
-				style={{ margin: Spacings.s1 }}
 				onSelect={v => runInAction(() => (TermStore.sortMode = v.value))}
 			/>
 			{terms && (
@@ -52,25 +51,45 @@ const ChipsRow = observer(function Header() {
 					data={terms}
 					mode="chip"
 					value={String(TermStore.currentTerm?.id)}
-					style={{ margin: Spacings.s1 }}
 					inlineChip
-					label={''}
+					label={'Четверть/полугодие'}
 					onSelect={v =>
 						runInAction(() => (studentSettings.currentTerm = v.term))
 					}
 				/>
 			)}
-			<Chip
-				mode="flat"
-				selected={TermStore.attendance}
-				style={{ margin: Spacings.s1 }}
-				onPress={() => {
-					runInAction(() => (TermStore.attendance = !TermStore.attendance))
-				}}
-			>
-				Пропуски
-			</Chip>
-		</ScrollView>
+
+			<Filter store={TermStore} storeKey="attendance" label="Пропуски" />
+			<Filter store={TermStore} storeKey="toGetMark" label="Целевая оценка" />
+			<Filter
+				store={TermStore}
+				storeKey="shortStats"
+				label="Краткая статистика"
+			/>
+		</Chips>
+	)
+})
+
+const Filter = observer(function Filter<T extends object>(props: {
+	store: T
+	storeKey: keyof FilterObject<T, boolean>
+	label: string
+}) {
+	return (
+		<Chip
+			mode="flat"
+			selected={props.store[props.storeKey] as boolean}
+			compact
+			onPress={() => {
+				runInAction(
+					() =>
+						((props.store[props.storeKey] as boolean) =
+							!props.store[props.storeKey]),
+				)
+			}}
+		>
+			{props.label}
+		</Chip>
 	)
 })
 

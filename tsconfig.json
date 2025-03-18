@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"jsx": "preserve",
-		"lib": ["DOM", "ESNext"],
+		"lib": ["ESNext"],
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "node",
@@ -9,27 +9,22 @@
 		"allowJs": true,
 		"forceConsistentCasingInFileNames": true,
 		"noEmit": true,
+		"skipLibCheck": true,
 		"resolveJsonModule": true,
 
 		"strictBindCallApply": true,
 		"strictNullChecks": true,
 		"noImplicitAny": true,
 
-		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
-		"skipLibCheck": true,
 		"allowImportingTsExtensions": true,
+
 		"paths": {
-			"~*": ["./*"]
+			"@/*": ["./*"]
 		},
-		"baseUrl": "./src"
+		"baseUrl": "./src",
+		"types": ["@types/jest", "./src/global.d.ts"]
 	},
-	"include": ["App.tsx", "src/*"],
-	"exclude": [
-		"node_modules",
-		"babel.config.js",
-		"metro.config.js",
-		"jest.config.js"
-	],
-	"extends": "expo/tsconfig.base"
+	"include": ["App.tsx", "src"],
+	"exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
 }

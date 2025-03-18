@@ -1,7 +1,7 @@
+import { Settings } from '@/models/settings'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { List, ListItemProps, Switch } from 'react-native-paper'
-import { Settings } from '~models/settings'
 
 type SwitchSettingProps = Omit<ListItemProps, 'right' | 'onPress'> &
 	(
@@ -26,8 +26,10 @@ export default observer(function SwitchSetting(props: SwitchSettingProps) {
 	const value = 'setting' in props ? Settings[props.setting] : props.value
 
 	const right = useCallback(
-		() => <Switch value={value} onChange={onChange} />,
-		[value, onChange],
+		() => (
+			<Switch value={value} onChange={onChange} disabled={props.disabled} />
+		),
+		[value, onChange, props.disabled],
 	)
 
 	return <List.Item {...props} onPress={onChange} right={right} />

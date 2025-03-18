@@ -1,11 +1,11 @@
+import Loading from '@/components/Loading'
+import { SettingsJumpNavigation } from '@/components/Navigate'
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
+import { API } from '@/services/net-school/api'
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
 import { ScrollView, View } from 'react-native'
-import Loading from '~components/Loading'
-import { SettingsJumpNavigation } from '~components/Navigate'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
-import { API } from '~services/net-school/api'
 
 import Advanced from './advanced/Advanced'
 import Appearance from './colors/Appearance'
@@ -17,12 +17,12 @@ import TermsAndConditions from './support/TermsAndConditions'
 import MicroUpdate from './update/micro-update'
 import UpdatesScreen from './update/screen'
 
+import SelectModal from '@/components/SelectModal'
+import { StudentsStore } from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
 import * as Application from 'expo-application'
 import { memo } from 'react'
 import { HelperText } from 'react-native-paper'
-import SelectModal from '~components/SelectModal'
-import { StudentsStore } from '~services/net-school/store'
-import { Spacings } from '~utils/Spacings'
 import {
 	SETTINGS_ROUTES,
 	SettingsNavigation,

@@ -1,6 +1,6 @@
-import { roundMark } from '~components/Mark'
-import type { PartialAssignment } from '~services/net-school/entities'
-import { SubjectPerformance } from '~services/net-school/entities'
+import { roundMark } from '@/components/Mark'
+import type { PartialAssignment } from '@/services/net-school/entities'
+import { SubjectPerformance } from '@/services/net-school/entities'
 import { Logger } from '../constants'
 
 // TODO: Refactor and use class MarksCalculator instead of one big shitty function
@@ -44,7 +44,7 @@ export function calculateMarks({
 						date: e.classMeetingDate,
 						weight: 0,
 					}
-				}),
+				})
 			)
 		}
 
@@ -80,8 +80,8 @@ export function calculateMarks({
 			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
-					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,
-				).fill({}),
+					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length
+				).fill({})
 			)
 		}
 
@@ -101,7 +101,7 @@ export function calculateMarks({
 						result: defaultMark,
 						weight: defaultMarkWeight,
 					} satisfies Partial<PartialAssignment>),
-					totals,
+					totals
 				)
 				if (roundMark(avg) >= targetMark) {
 					toGetTarget = i
@@ -127,7 +127,7 @@ export function calculateMarks({
 }
 function calculateAvg(
 	customMarks: Partial<PartialAssignment>[],
-	totals: CalculateTotals,
+	totals: CalculateTotals
 ) {
 	let totalWeight = 0
 	let totalMark = 0

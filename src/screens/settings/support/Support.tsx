@@ -1,12 +1,12 @@
+import { SettingsJumpNavigation } from '@/components/Navigate'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as Application from 'expo-application'
+import { useState } from 'react'
 import { Linking, ScrollView, View } from 'react-native'
-import { Divider, List, Text, Button } from 'react-native-paper'
-import { SettingsJumpNavigation } from '~components/Navigate'
+import { Button, Divider, List, Text } from 'react-native-paper'
+import WebView from 'react-native-webview'
 import { Spacings } from '../../../utils/Spacings'
 import { SettingsRoutes } from '../navigation'
-import { useState } from 'react'
-import WebView from 'react-native-webview'
 
 // eslint-disable-next-line mobx/missing-observer
 export default function About(props: StackScreenProps<SettingsRoutes>) {

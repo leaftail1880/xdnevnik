@@ -1,3 +1,5 @@
+import { Settings } from '@/models/settings'
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import {
 	TextStyle,
@@ -6,8 +8,6 @@ import {
 	View,
 } from 'react-native'
 import { Text } from 'react-native-paper'
-import { Settings } from '~models/settings'
-import { Theme } from '~models/theme'
 
 const MarkColorsBG = {
 	5: '#007000',

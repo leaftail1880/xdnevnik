@@ -1,0 +1,8 @@
+{
+  "name": "swc-flow-jest",
+  "main": "./index.js",
+  "license": "MIT",
+  "private": true,
+  "type": "commonjs",
+  "version": "0.0.0"
+}
