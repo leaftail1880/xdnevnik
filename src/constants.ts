@@ -3,12 +3,14 @@ import { StyleSheet } from 'react-native'
 import { logger, mapConsoleTransport, sentryTransport } from 'react-native-logs'
 
 export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
-	printLevel: false,
-	transport: __DEV__ ? mapConsoleTransport : sentryTransport,
+	transport: __DEV__
+		? mapConsoleTransport
+		: /* istanbul ignore next */ sentryTransport,
 	transportOptions: {
 		SENTRY: Sentry,
 		errorLevels: 'error',
 	},
+	printLevel: false,
 })
 
 export const ACCENT_COLOR = '#578059'

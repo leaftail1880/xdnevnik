@@ -26,5 +26,5 @@ module.exports = {
 	globals: {
 		__DEV__: true,
 	},
-	cacheDirectory: process.env.CI ? '.jest' : undefined,
+	cacheDirectory: '.jest',
 }

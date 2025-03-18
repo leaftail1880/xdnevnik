@@ -126,8 +126,9 @@ export function calculateMarks({
 			Logger.error('calcMarks', e)
 	}
 }
+
 function calculateAvg(
-	customMarks: Partial<PartialAssignment>[],
+	customMarks: Partial<Pick<PartialAssignment, 'weight' | 'result'>>[],
 	totals: CalculateTotals
 ) {
 	let totalWeight = 0

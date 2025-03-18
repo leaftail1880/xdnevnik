@@ -21,6 +21,7 @@ declare global {
 
 export {}
 
+/* istanbul ignore else */
 if (__DEV__) {
 	// eslint-disable-next-line no-console
 	debug = console.log.bind(console)

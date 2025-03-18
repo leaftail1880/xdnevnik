@@ -321,6 +321,7 @@ export class NetSchoolApi {
 						body: RequestError.stringify(error),
 					})
 				}
+				/* istanbul ignore if */
 				if (!__DEV__)
 					Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
 				return this.cache[url][1] as T
