@@ -24,8 +24,7 @@ const markStyles = [
 ]
 
 export default observer(function Notifications(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	props: StackScreenProps<SettingsRoutes>,
+	props: StackScreenProps<SettingsRoutes>
 ) {
 	const student = Settings.studentId
 		? Settings.forStudent(Settings.studentId)

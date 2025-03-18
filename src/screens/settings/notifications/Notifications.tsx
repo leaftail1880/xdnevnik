@@ -36,7 +36,6 @@ const checkForNewMarks = checkForNewMarksAndNotify.bind(
 )
 
 export default observer(function Notifications(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	props: StackScreenProps<SettingsRoutes>
 ) {
 	const batteryOptimizations = !!usePromise(() =>

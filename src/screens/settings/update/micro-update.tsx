@@ -16,7 +16,6 @@ export default observer(function MicroUpdateId() {
 	return (
 		<Text
 			onPress={openModal}
-			// eslint-disable-next-line react-native/no-color-literals
 			style={{
 				backgroundColor: update
 					? Theme.colors.errorContainer

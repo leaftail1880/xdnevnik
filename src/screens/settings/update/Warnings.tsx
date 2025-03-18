@@ -3,13 +3,13 @@ import { observer } from 'mobx-react-lite'
 import { memo, useCallback, useMemo } from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
 import { Chip } from 'react-native-paper'
-import semver from 'semver'
+import { parse } from 'semver'
 import { ModalAlert } from '../../../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function Warnings(props: { version: string }) {
 	if (!props.version) return false
-	const versionNum = semver.parse(props.version)
+	const versionNum = parse(props.version)
 
 	return Object.entries(minFeatureVersions)
 		.filter(e => {

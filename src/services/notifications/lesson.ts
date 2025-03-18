@@ -166,10 +166,10 @@ async function showNotification(
 			notifee.registerForegroundService(() => new Promise(() => {}))
 			foregroundServiceRegistered = true
 		}
-	} catch (e) {
+	} catch {
 		MarksNotificationStore.log(
 			'error',
-			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',
+			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.'
 		)
 	}
 

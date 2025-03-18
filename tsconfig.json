@@ -26,5 +26,5 @@
 		"types": ["@types/jest", "./src/global.d.ts"]
 	},
 	"include": ["App.tsx", "src"],
-	"exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+	"exclude": ["node_modules"]
 }

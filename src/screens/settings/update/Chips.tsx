@@ -5,8 +5,8 @@ import { StyleSheet, View } from 'react-native'
 import { Badge, Chip } from 'react-native-paper'
 import { ModalAlert } from '../../../utils/Toast'
 
-// eslint-disable-next-line mobx/missing-observer, react/display-name
-export const BetaChip = memo(() => {
+// eslint-disable-next-line mobx/missing-observer
+export const BetaChip = memo(function BetaChip() {
 	return (
 		<Chip compact onPress={betaChipWarning}>
 			Бета
@@ -20,8 +20,8 @@ const betaChipWarning = () =>
 		'Эта версия приложения может работать нестабильно, но содержит новые функции. Пробуйте на свой страх и риск.',
 	)
 
-// eslint-disable-next-line mobx/missing-observer, react/display-name
-export const FilesizeChip = memo(({ size }: { size: number | undefined }) => {
+// eslint-disable-next-line mobx/missing-observer
+export const FilesizeChip = memo(function FilesizeChip({ size }: { size: number | undefined }) {
 	const onPress = useCallback(
 		() =>
 			ModalAlert.show(
