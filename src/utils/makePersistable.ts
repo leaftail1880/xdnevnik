@@ -6,6 +6,7 @@ export const makeReloadPersistable: typeof makePersistable = (
 	options,
 ) => {
 	// Prevent warnings while dev
+	/* istanbul ignore if */
 	if (__DEV__) {
 		for (const [key, store] of PersistStoreMap.entries()) {
 			if (store.storageName === options.name) {
@@ -15,5 +16,8 @@ export const makeReloadPersistable: typeof makePersistable = (
 		}
 	}
 
-	return makePersistable(object, options, { delay: 200, fireImmediately: false },)
+	return makePersistable(object, options, {
+		delay: 200,
+		fireImmediately: false,
+	})
 }

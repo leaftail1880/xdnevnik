@@ -2,12 +2,9 @@ import {
 	argbFromHex,
 	themeFromSourceColor,
 } from '@material/material-color-utilities'
-import camelCase from 'camelcase'
+// import camelCase from 'camelcase'
 import Color from 'color'
-import type {
-	MD3Colors,
-	MD3ElevationColors,
-} from 'react-native-paper/lib/typescript/types'
+import type { MD3ElevationColors } from 'react-native-paper/lib/typescript/types'
 
 type ARGBTheme = ReturnType<typeof argbThemeFromColor>
 type RGBTheme = Record<keyof ARGBTheme, string>
@@ -86,80 +83,66 @@ const prepareElevations = (argbTheme: ARGBTheme): MD3ElevationColors => {
 	return elevations as MD3ElevationColors
 }
 
-export function getMatchingColor(colorName: keyof MD3Colors, theme: MD3Colors) {
-	if (colorName === 'outline') {
-		return theme.surface
-	}
+// function prepareCustomColors(
+// 	type: 'light' | 'dark',
+// 	custom?: [string, string][],
+// ) {
+// 	if (!custom?.length) {
+// 		return {}
+// 	}
 
-	if (colorName.startsWith('on')) {
-		const key = camelCase(colorName.slice(2))
-		return theme[key as keyof MD3Colors]
-	}
+// 	const customColors: Record<string, string> = {}
 
-	const key = `on${camelCase(colorName, { pascalCase: true })}`
-	return theme[key as keyof MD3Colors]
-}
+// 	for (const [name, value] of custom) {
+// 		if (name) {
+// 			const customColor = argbThemeToRgbTheme(argbThemeFromColor(value, type))
+// 			const camelName = camelCase(name)
+// 			const PascalName = camelCase(name, { pascalCase: true })
 
-function prepareCustomColors(
-	type: 'light' | 'dark',
-	custom?: [string, string][],
-) {
-	if (!custom?.length) {
-		return {}
-	}
+// 			customColors[camelName] = customColor.primary
+// 			customColors[`on${PascalName}`] = customColor.onPrimary
+// 			customColors[`${camelName}Container`] = customColor.primaryContainer
+// 			customColors[`on${PascalName}Container`] = customColor.onPrimaryContainer
+// 		}
+// 	}
 
-	const customColors: Record<string, string> = {}
-
-	for (const [name, value] of custom) {
-		if (name) {
-			const customColor = argbThemeToRgbTheme(argbThemeFromColor(value, type))
-			const camelName = camelCase(name)
-			const PascalName = camelCase(name, { pascalCase: true })
-
-			customColors[camelName] = customColor.primary
-			customColors[`on${PascalName}`] = customColor.onPrimary
-			customColors[`${camelName}Container`] = customColor.primaryContainer
-			customColors[`on${PascalName}Container`] = customColor.onPrimaryContainer
-		}
-	}
-
-	return customColors
-}
+// 	return customColors
+// }
 
 export function prepareVariant({
 	primary,
-	secondary,
-	tertiary,
+	// secondary,
+	// tertiary,
 	type,
-	custom,
-}: CustomTheme) {
+}: // custom,
+CustomTheme) {
 	const baseTheme = argbThemeFromColor(primary, type)
 
-	if (secondary) {
-		const secondaryTheme = argbThemeFromColor(secondary, type)
-		baseTheme.secondary = secondaryTheme.primary
-		baseTheme.onSecondary = secondaryTheme.onPrimary
-		baseTheme.secondaryContainer = secondaryTheme.primaryContainer
-		baseTheme.onSecondaryContainer = secondaryTheme.onPrimaryContainer
-	}
+	// if (secondary) {
+	// 	const secondaryTheme = argbThemeFromColor(secondary, type)
+	// 	baseTheme.secondary = secondaryTheme.primary
+	// 	baseTheme.onSecondary = secondaryTheme.onPrimary
+	// 	baseTheme.secondaryContainer = secondaryTheme.primaryContainer
+	// 	baseTheme.onSecondaryContainer = secondaryTheme.onPrimaryContainer
+	// }
 
-	if (tertiary) {
-		const tertiaryTheme = argbThemeFromColor(tertiary, type)
-		baseTheme.tertiary = tertiaryTheme.primary
-		baseTheme.onTertiary = tertiaryTheme.onPrimary
-		baseTheme.tertiaryContainer = tertiaryTheme.primaryContainer
-		baseTheme.onTertiaryContainer = tertiaryTheme.onPrimaryContainer
-	}
+	// if (tertiary) {
+	// 	const tertiaryTheme = argbThemeFromColor(tertiary, type)
+	// 	baseTheme.tertiary = tertiaryTheme.primary
+	// 	baseTheme.onTertiary = tertiaryTheme.onPrimary
+	// 	baseTheme.tertiaryContainer = tertiaryTheme.primaryContainer
+	// 	baseTheme.onTertiaryContainer = tertiaryTheme.onPrimaryContainer
+	// }
 
 	const theme = argbThemeToRgbTheme(baseTheme)
 	const elevation = prepareElevations(baseTheme)
 	const surfaceColors = prepareSurfaceColors(baseTheme)
-	const customColors = prepareCustomColors(type, custom)
+	// const customColors = prepareCustomColors(type, custom)
 
 	return {
 		...theme,
 		elevation,
 		...surfaceColors,
-		...customColors,
+		// ...customColors,
 	}
 }
