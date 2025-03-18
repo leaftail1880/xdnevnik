@@ -128,7 +128,7 @@ export default observer(function Mark({
 				}}
 			>
 				<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
-					{duty ? '.' : finalMark ?? rawMark ?? ' '}
+					{duty ? '.' : (finalMark ?? rawMark ?? ' ')}
 				</Text>
 				{typeof weight === 'number' && (
 					<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>

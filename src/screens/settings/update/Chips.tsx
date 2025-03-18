@@ -21,7 +21,11 @@ const betaChipWarning = () =>
 	)
 
 // eslint-disable-next-line mobx/missing-observer
-export const FilesizeChip = memo(function FilesizeChip({ size }: { size: number | undefined }) {
+export const FilesizeChip = memo(function FilesizeChip({
+	size,
+}: {
+	size: number | undefined
+}) {
 	const onPress = useCallback(
 		() =>
 			ModalAlert.show(

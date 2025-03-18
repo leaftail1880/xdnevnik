@@ -6,7 +6,7 @@ import { View } from 'react-native'
 import { HelperText, Text, TextProps } from 'react-native-paper'
 
 export const ScrollTextCopyable = observer(function ScrollTextCopyable(
-	props: TextProps<string>
+	props: TextProps<string>,
 ) {
 	const onLongPress = useCallback(() => {
 		ModalAlert.show(
@@ -17,7 +17,7 @@ export const ScrollTextCopyable = observer(function ScrollTextCopyable(
 				<HelperText type="info">
 					Подсказка: текст можно выделить и скопировать
 				</HelperText>
-			</View>
+			</View>,
 		)
 	}, [props.children])
 

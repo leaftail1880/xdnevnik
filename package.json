@@ -19,7 +19,7 @@
 		"start": "yarn expo start --dev-client",
 		"update": "eas update --channel production --auto",
 		"eslint": "./node_modules/.bin/eslint App.tsx src",
-		"format": "prettier -w App.tsx src"
+		"format": "./node_modules/.bin/prettier -w App.tsx src"
 	},
 	"resolutions": {
 		"whatwg-url-without-unicode@npm:8.0.0-3": "patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch"
@@ -87,6 +87,7 @@
 		"eslint-plugin-react-native": "^5.0.0",
 		"expo-build-properties": "~0.13.1",
 		"flow-remove-types": "^2.265.3",
+		"prettier": "^3.5.3",
 		"jest": "~29.7.0",
 		"jest-expo": "~52.0.6",
 		"swc-flow-jest": "portal:swc-flow-jest",

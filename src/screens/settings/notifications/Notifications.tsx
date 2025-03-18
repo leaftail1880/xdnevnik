@@ -32,17 +32,17 @@ function usePromise<T>(promise: () => Promise<T>) {
 
 const checkForNewMarks = checkForNewMarksAndNotify.bind(
 	undefined,
-	'Запрос пользователя'
+	'Запрос пользователя',
 )
 
 export default observer(function Notifications(
-	props: StackScreenProps<SettingsRoutes>
+	props: StackScreenProps<SettingsRoutes>,
 ) {
 	const batteryOptimizations = !!usePromise(() =>
-		notifee.isBatteryOptimizationEnabled()
+		notifee.isBatteryOptimizationEnabled(),
 	)
 	const powerManager = !!usePromise(() =>
-		notifee.getPowerManagerInfo().then(e => e.activity)
+		notifee.getPowerManagerInfo().then(e => e.activity),
 	)
 
 	return (

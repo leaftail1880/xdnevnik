@@ -287,9 +287,8 @@ export class NetSchoolApi {
 						useCache: true,
 					})
 				} else {
-					request.headers[
-						'Authorization'
-					] = `Bearer ${this.session.access_token}`
+					request.headers['Authorization'] =
+						`Bearer ${this.session.access_token}`
 				}
 			}
 

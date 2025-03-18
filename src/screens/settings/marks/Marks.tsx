@@ -24,7 +24,7 @@ const markStyles = [
 ]
 
 export default observer(function Notifications(
-	props: StackScreenProps<SettingsRoutes>
+	props: StackScreenProps<SettingsRoutes>,
 ) {
 	const student = Settings.studentId
 		? Settings.forStudent(Settings.studentId)

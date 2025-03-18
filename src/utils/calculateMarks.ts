@@ -43,14 +43,14 @@ export function calculateMarks({
 						assignmentId: e.classMeetingDate + e.attendanceMark,
 						date: e.classMeetingDate,
 					}
-				})
+				}),
 			)
 		}
 
 		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
 			(a, b) =>
 				new Date(a.classMeetingDate ?? a.date).getTime() -
-				new Date(b.classMeetingDate ?? b.date).getTime()
+				new Date(b.classMeetingDate ?? b.date).getTime(),
 		) as PartialAssignment[]
 
 		if (lessonsWithoutMark) {
@@ -80,8 +80,8 @@ export function calculateMarks({
 			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
-					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length
-				).fill({})
+					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,
+				).fill({}),
 			)
 		}
 
@@ -101,7 +101,7 @@ export function calculateMarks({
 						result: defaultMark,
 						weight: defaultMarkWeight,
 					} satisfies Partial<PartialAssignment>),
-					totals
+					totals,
 				)
 				if (roundMark(avg) >= targetMark) {
 					toGetTarget = i
@@ -129,7 +129,7 @@ export function calculateMarks({
 
 function calculateAvg(
 	customMarks: Partial<Pick<PartialAssignment, 'weight' | 'result'>>[],
-	totals: CalculateTotals
+	totals: CalculateTotals,
 ) {
 	let totalWeight = 0
 	let totalMark = 0

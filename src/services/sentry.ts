@@ -13,14 +13,14 @@ const extra = manifest && 'metadata' in manifest ? manifest.extra : undefined
 const updateGroup =
 	metadata && 'updateGroup' in metadata ? metadata.updateGroup : undefined
 const owner = extra?.expoClient?.owner ?? '[account]'
-		const slug = extra?.expoClient?.slug ?? '[project]'
+const slug = extra?.expoClient?.slug ?? '[project]'
 
-	Sentry.setContext('expo', {
-    'update-id': updates.updateId,
-		'is-embeded-update': updates.isEmbeddedLaunch,
-		'update-group': updateGroup,
-		'debug-url': `https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`
-	})
+Sentry.setContext('expo', {
+	'update-id': updates.updateId,
+	'is-embeded-update': updates.isEmbeddedLaunch,
+	'update-group': updateGroup,
+	'debug-url': `https://expo.dev/accounts/${owner}/projects/${slug}/updates/${updateGroup}`,
+})
 
 if (!__TEST__) {
 	Sentry.init({

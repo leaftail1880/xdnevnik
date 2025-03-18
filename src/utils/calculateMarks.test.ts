@@ -10,7 +10,7 @@ describe('calculateMarks', () => {
 					classmeetingsStats: { passed: 1, scheduled: 2 },
 					results: [],
 				},
-			})
+			}),
 		).toMatchInlineSnapshot(`
 {
   "avgMark": 5,
@@ -30,7 +30,7 @@ describe('calculateMarks', () => {
 					classmeetingsStats: { passed: 1, scheduled: 2 },
 					results: [mark(3, 10), mark(4, 10), mark(5, 10)],
 				},
-			})
+			}),
 		).toMatchInlineSnapshot(`
 {
   "avgMark": 4.5,
@@ -148,4 +148,3 @@ function mark(result: number, weight: number): Assignment & { date: string } {
 		subjectName: '',
 	}
 }
-
