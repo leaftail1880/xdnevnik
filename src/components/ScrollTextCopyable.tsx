@@ -2,11 +2,11 @@ import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
-import { Text, TextProps, View } from 'react-native'
-import { HelperText } from 'react-native-paper'
+import { View } from 'react-native'
+import { HelperText, Text, TextProps } from 'react-native-paper'
 
 export const ScrollTextCopyable = observer(function ScrollTextCopyable(
-	props: TextProps,
+	props: TextProps<string>
 ) {
 	const onLongPress = useCallback(() => {
 		ModalAlert.show(
@@ -17,7 +17,7 @@ export const ScrollTextCopyable = observer(function ScrollTextCopyable(
 				<HelperText type="info">
 					Подсказка: текст можно выделить и скопировать
 				</HelperText>
-			</View>,
+			</View>
 		)
 	}, [props.children])
 
