@@ -3,11 +3,11 @@ import * as FileSystem from 'expo-file-system'
 import { observer } from 'mobx-react-lite'
 import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import { Chip, Divider, Text } from 'react-native-paper'
+import { Chip, Text } from 'react-native-paper'
 
+import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 import { Size } from '@/components/Size'
 import { Settings } from '@/models/settings'
-import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
 import { Assignment, Attachment } from '@/services/net-school/entities'
 import { ROUTES } from '@/services/net-school/routes'
@@ -17,7 +17,6 @@ import { shareAsync } from 'expo-sharing'
 import { Logger } from '../../constants'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryLessonProps } from './screen'
-
 // TODO support adding attachment
 
 export default observer(function DiaryAssignment({
@@ -41,22 +40,20 @@ export default observer(function DiaryAssignment({
 		attachments.result &&
 		attachments.result?.filter(e => e.assignmentId === assignment.assignmentId)
 
+	const showAttachments = showHomework && assignment.attachmentsExists
 	return (
 		<>
-			<Divider style={{ marginTop: Spacings.s1 }} />
 			<View
 				style={{
-					borderRadius: Theme.roundness,
 					flexDirection: 'row',
 					justifyContent: 'space-between',
 					alignContent: 'stretch',
 					alignItems: 'center',
-					marginTop: Spacings.s1,
+					gap: Spacings.s1,
 				}}
 			>
-				<Text
-					style={{ alignSelf: 'center', flex: 1 }}
-					selectable
+				<ScrollTextCopyable
+					style={{ alignSelf: 'center', flex: 3 }}
 					onPress={
 						Settings.collapseLongAssignmentText
 							? () => setShowHomework(!showHomework)
@@ -66,7 +63,7 @@ export default observer(function DiaryAssignment({
 					{showHomework
 						? `${assignment.assignmentTypeName}: ${assignment.assignmentName}`
 						: '...'}
-				</Text>
+				</ScrollTextCopyable>
 
 				<Mark
 					mark={assignment.result ?? 'Нет'}
@@ -78,8 +75,8 @@ export default observer(function DiaryAssignment({
 					onPress={navigateToLessonMarks}
 				/>
 			</View>
-			{showHomework &&
-				((assignment.attachmentsExists && attachments.fallback) ||
+			{showAttachments &&
+				(attachments.fallback ||
 					(attachment && (
 						<View style={{ width: '100%' }}>
 							{attachment.map(e => (

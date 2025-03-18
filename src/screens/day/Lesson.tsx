@@ -14,6 +14,7 @@ import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
 import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
+import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 
 export default observer(function DiaryLesson({
 	lesson,
@@ -111,7 +112,9 @@ const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	return (
 		<>
 			{DiaryState.showLessonTheme && (
-				<Text selectable>{lesson.lessonTheme ?? 'Темы нет'}</Text>
+				<ScrollTextCopyable>
+					{lesson.lessonTheme ?? 'Темы нет'}
+				</ScrollTextCopyable>
 			)}
 
 			{DiaryState.showAttachments && lesson.attachmentsExists && (
