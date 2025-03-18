@@ -1,10 +1,23 @@
 import { makeAutoObservable, observable } from 'mobx'
 import React from 'react'
 
-type ModalInfo = {
+interface BaseProps {
 	title: string
 	body?: React.ReactNode
 	error?: boolean
+}
+
+interface ModalProps extends BaseProps {
+	buttons?: ModalButton[]
+}
+
+interface ModalButton {
+	label: React.ReactNode
+	callback: VoidFunction
+}
+
+interface ToastProps extends BaseProps {
+	timeout?: number
 }
 
 export const Toast = new (class {
@@ -18,16 +31,10 @@ export const Toast = new (class {
 
 	private timeout: ReturnType<typeof setTimeout>
 
-	state: ModalInfo | null = null
+	state: ToastProps | null = null
 
-	show({
-		title,
-		body,
-		error,
-		timeout = 7000,
-	}: ModalInfo & { timeout?: number }) {
+	show({ title, body, error, timeout = 7000 }: ToastProps) {
 		this.state = { title, body, error }
-
 		if (this.timeout) clearTimeout(this.timeout)
 		this.timeout = setTimeout(this.hide, timeout)
 	}
@@ -39,16 +46,21 @@ export const Toast = new (class {
 
 export const ModalAlert = new (class {
 	constructor() {
-		makeAutoObservable(this, { state: observable.shallow }, { autoBind: false })
+		makeAutoObservable(this, { state: observable.shallow }, { autoBind: true })
 	}
 
-	state: ModalInfo | null = null
+	state: ModalProps | null = null
 
-	show(title: string, body?: React.ReactNode, error?: boolean) {
-		this.state = { title, body, error }
+	show(
+		title: string,
+		body?: React.ReactNode,
+		error?: boolean,
+		buttons: ModalButton[] = [],
+	) {
+		this.state = { title, body, error, buttons }
 	}
 
 	close() {
-		ModalAlert.state = null
+		this.state = null
 	}
 })()

@@ -1,6 +1,6 @@
 import { getSubjectName } from '@/components/SubjectName'
 import { Settings } from '@/models/settings'
-import { NSEntity, Subject, Total } from '@/services/net-school/entities'
+import { Total } from '@/services/net-school/entities'
 import {
 	SubjectPerformanceStores,
 	SubjectsStore,
@@ -10,6 +10,7 @@ import { makeReloadPersistable } from '@/utils/makePersistable'
 import { stringSimilarity } from '@/utils/search'
 import { makeAutoObservable } from 'mobx'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
+import { RenderSubject } from './screen'
 
 export const TermStoreSortModes = [
 	{ value: 'averageMark', label: 'Средний балл' },
@@ -154,9 +155,6 @@ export const TermStore = new (class {
 	}
 })()
 
-export type SubjectInfo = {
-	total: Total
-	selectedTerm: NSEntity
+export type SubjectInfo = Parameters<RenderSubject>[0] & {
 	attendance: boolean
-	subjects: Subject[]
 } & Pick<TotalsScreenParams, 'navigation'>

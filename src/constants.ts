@@ -46,5 +46,6 @@ export const LANG = {
 	s_totals: 'Оценки',
 	s_totalsN: 'Оценки ',
 	s_settings: 'Настройки',
+	s_usefull_tools: 'Инструменты',
 	s_subject_totals: 'Итоги по предмету',
 } as const

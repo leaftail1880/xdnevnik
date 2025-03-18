@@ -183,7 +183,7 @@ export class AsyncStore<
 		}
 	}
 
-	withParams(params: Omit<FnParams, keyof DefaultParams>) {
+	withParams(params: Omit<FnParams, keyof DefaultParams | 'cache'>) {
 		this.log('Changing params from', this.params, 'to', params)
 		// @ts-expect-error Type infering
 		this.params = params

@@ -40,9 +40,9 @@ import { StudentsStore } from './src/services/net-school/store'
 // Screens
 import DiaryScreen from './src/screens/day/screen'
 import LoginScreen from './src/screens/login/in'
-import LogoutScreen from './src/screens/login/out'
 import SettingsScreen from './src/screens/settings/screen'
 import TotalsNavigation from './src/screens/totals/screen'
+import UsefullTools from './src/screens/usefull-tools/screen'
 
 export type ParamListBase = Record<
 	(typeof LANG)[
@@ -50,7 +50,8 @@ export type ParamListBase = Record<
 		| 's_log_out'
 		| 's_totals'
 		| 's_settings'
-		| 's_diary'],
+		| 's_diary'
+		| 's_usefull_tools'],
 	undefined
 >
 
@@ -60,6 +61,7 @@ const ScreenIcons = {
 	[LANG['s_diary']]: 'book',
 	[LANG['s_totals']]: 'school',
 	[LANG['s_settings']]: 'cog',
+	[LANG['s_usefull_tools']]: 'tools',
 }
 
 const Tab = createMaterialBottomTabNavigator<ParamListBase>()
@@ -194,9 +196,11 @@ const Navigation = observer(function Navigation() {
 				component={SettingsScreen}
 			></Tab.Screen>
 
-			{API.session && (
+			<Tab.Screen name={LANG['s_usefull_tools']} component={UsefullTools} />
+
+			{/* {API.session && (
 				<Tab.Screen name={LANG['s_log_out']} component={LogoutScreen} />
-			)}
+			)} */}
 		</Tab.Navigator>
 	)
 })

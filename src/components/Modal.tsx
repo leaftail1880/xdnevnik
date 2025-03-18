@@ -88,20 +88,30 @@ const DialogModal = observer(function DialogModal() {
 							)}
 						</Dialog.Content>
 					)}
-					<Dialog.Actions>
-						<Button
-							onPress={ModalAlert.close}
-							labelStyle={
-								ModalAlert.state.error && {
-									color: Theme.colors.onErrorContainer,
-								}
-							}
-						>
-							Закрыть
-						</Button>
-					</Dialog.Actions>
+					<Actions />
 				</Dialog>
 			)}
 		</Portal>
+	)
+})
+
+const Actions = observer(function Actions() {
+	if (!ModalAlert.state) return
+
+	const labelStyle = ModalAlert.state.error && {
+		color: Theme.colors.onErrorContainer,
+	}
+
+	return (
+		<Dialog.Actions>
+			{ModalAlert.state.buttons?.map((e, i) => (
+				<Button onPress={e.callback} key={i.toString()} labelStyle={labelStyle}>
+					{e.label}
+				</Button>
+			))}
+			<Button onPress={ModalAlert.close} labelStyle={labelStyle}>
+				Закрыть
+			</Button>
+		</Dialog.Actions>
 	)
 })
