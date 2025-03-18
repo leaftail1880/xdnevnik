@@ -8157,6 +8157,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flow-remove-types@npm:^2.265.3":
+  version: 2.265.3
+  resolution: "flow-remove-types@npm:2.265.3"
+  dependencies:
+    hermes-parser: "npm:0.25.1"
+    pirates: "npm:^3.0.2"
+    vlq: "npm:^0.2.1"
+  bin:
+    flow-node: flow-node
+    flow-remove-types: flow-remove-types
+  checksum: 10c0/8ec1e6bf6a9eaad548351ec88d23e5e465ee50cd1e260eb17c99a118cec9ff6fad0db633f2299c04726445660d32d72ddc3014c50e1495faf5bd314a1930c972
+  languageName: node
+  linkType: hard
+
 "fontfaceobserver@npm:^2.1.0":
   version: 2.3.0
   resolution: "fontfaceobserver@npm:2.3.0"
@@ -11550,6 +11564,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-modules-regexp@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "node-modules-regexp@npm:1.0.0"
+  checksum: 10c0/d4a9b6425a18e9fadd38f21a7f7820b3bfda4663c7d3b9f80043e3f5f7e27a0a1e04f524077b00a15ae77148cd81319da5772900229d89541062f7e876b36763
+  languageName: node
+  linkType: hard
+
 "node-releases@npm:^2.0.14":
   version: 2.0.14
   resolution: "node-releases@npm:2.0.14"
@@ -12127,6 +12148,15 @@ __metadata:
   version: 4.0.1
   resolution: "pify@npm:4.0.1"
   checksum: 10c0/6f9d404b0d47a965437403c9b90eca8bb2536407f03de165940e62e72c8c8b75adda5516c6b9b23675a5877cc0bcac6bdfb0ef0e39414cd2476d5495da40e7cf
+  languageName: node
+  linkType: hard
+
+"pirates@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "pirates@npm:3.0.2"
+  dependencies:
+    node-modules-regexp: "npm:^1.0.0"
+  checksum: 10c0/f71519f64abff750ad00398e7a0f724e7d3af0ce14c0cf149a47dd9e1fae5e9aea24cb3a63b4ce8dce8b051f7d44531af6743078e33f72cb8602c5a7365185d1
   languageName: node
   linkType: hard
 
@@ -14341,6 +14371,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swc-flow-jest@file:swc-flow-jest::locator=xdnevnik%40workspace%3A.":
+  version: 0.0.0
+  resolution: "swc-flow-jest@file:swc-flow-jest#swc-flow-jest::hash=6ab75f&locator=xdnevnik%40workspace%3A."
+  checksum: 10c0/69c3a681f5142c757e0162c6d3c33ba57b9c85830fb7342a8cf4999902490a43e1e21525eca12b020c1038efa781561d1d375e384f63fcee13a48212ea686e03
+  languageName: node
+  linkType: hard
+
 "symbol-tree@npm:^3.2.4":
   version: 3.2.4
   resolution: "symbol-tree@npm:3.2.4"
@@ -15217,6 +15254,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vlq@npm:^0.2.1":
+  version: 0.2.3
+  resolution: "vlq@npm:0.2.3"
+  checksum: 10c0/d1557b404353ca75c7affaaf403d245a3273a7d1c6b3380ed7f04ae3f080e4658f41ac700d6f48acb3cd4875fe7bc7da4924b3572cd5584a5de83b35b1de5e12
+  languageName: node
+  linkType: hard
+
 "vlq@npm:^1.0.0":
   version: 1.0.1
   resolution: "vlq@npm:1.0.1"
@@ -15371,6 +15415,17 @@ __metadata:
     punycode: "npm:^2.1.1"
     webidl-conversions: "npm:^5.0.0"
   checksum: 10c0/c27a637ab7d01981b2e2f576fde2113b9c42247500e093d2f5ba94b515d5c86dbcf70e5cad4b21b8813185f21fa1b4846f53c79fa87995293457e28c889cc0fd
+  languageName: node
+  linkType: hard
+
+"whatwg-url-without-unicode@patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch":
+  version: 8.0.0-3
+  resolution: "whatwg-url-without-unicode@patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch::version=8.0.0-3&hash=974655"
+  dependencies:
+    buffer: "npm:^5.4.3"
+    punycode: "npm:^2.1.1"
+    webidl-conversions: "npm:^5.0.0"
+  checksum: 10c0/7baab3a13e03648b943708310ac06a74408afb61924f024ffc90001e6928275d48805a1da4aeceb78500e267fdf9489f15b18b7a5c1e60bcfcad0a2a8e610b1d
   languageName: node
   linkType: hard
 
@@ -15723,6 +15778,7 @@ __metadata:
     expo-system-ui: "npm:~4.0.6"
     expo-task-manager: "npm:~12.0.3"
     expo-updates: "npm:~0.26.10"
+    flow-remove-types: "npm:^2.265.3"
     jest: "npm:~29.7.0"
     jest-expo: "npm:~52.0.6"
     mobx: "npm:^6.13.5"
@@ -15743,6 +15799,7 @@ __metadata:
     react-native-webview: "npm:13.12.5"
     react-test-renderer: "npm:18"
     reanimated-color-picker: "npm:^3.0.3"
+    swc-flow-jest: "file:swc-flow-jest"
     typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft

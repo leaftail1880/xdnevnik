@@ -40,3 +40,4 @@ dependency-graph.svg
 
 # testing
 coverage
+.jest

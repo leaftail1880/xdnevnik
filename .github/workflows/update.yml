@@ -2,7 +2,7 @@ name: Expo Update
 on: 
   push:
     branches:
-      - main
+      - master
     paths:
       - 'src/**.ts'
       - 'src/**.tsx'
@@ -30,13 +30,13 @@ jobs:
           fi
 
       - name: 🏗 Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🏗 Set up corepack
         run: corepack enable
 
       - name: 🏗 Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22.x
           cache: yarn
@@ -50,6 +50,12 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
+      - name: 📦 Cache jest
+        uses: actions/cache@v4
+        with: 
+          path: .jest
+          key: ${{ runner.os }}-jest-cache
+
       - name: 🏃‍♂️ Run tests
         run: yarn jest --coverage
 
@@ -60,6 +66,6 @@ jobs:
         run: npx sentry-expo-upload-sourcemaps dist
 
       - name: 🚀 Upload test coverage results
-        uses: paambaati/codeclimate-action@v8.0.0
+        uses: paambaati/codeclimate-action@v8
         env:
           CC_TEST_REPORTER_ID: 021dac39683c4a9332b1aa0d79272875b0e945ad7529556617c9f7a1e073b0d2
