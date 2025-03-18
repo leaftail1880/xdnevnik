@@ -94,7 +94,7 @@
 		"flow-remove-types": "^2.265.3",
 		"jest": "~29.7.0",
 		"jest-expo": "~52.0.6",
-		"swc-flow-jest": "file:swc-flow-jest",
+		"swc-flow-jest": "portal:swc-flow-jest",
 		"typescript": "^5.8.2"
 	},
 	"packageManager": "yarn@4.1.1"

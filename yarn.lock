@@ -14371,12 +14371,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swc-flow-jest@file:swc-flow-jest::locator=xdnevnik%40workspace%3A.":
-  version: 0.0.0
-  resolution: "swc-flow-jest@file:swc-flow-jest#swc-flow-jest::hash=9d7734&locator=xdnevnik%40workspace%3A."
-  checksum: 10c0/a97d1847398b969007f31b2ecf075da68a629fd7fe4cfb8fa6c6809ebe5537d56b3ed1737a5975e08be8f74ef4cb1795b83053ee2612a580b276c03468b641a1
+"swc-flow-jest@portal:swc-flow-jest::locator=xdnevnik%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "swc-flow-jest@portal:swc-flow-jest::locator=xdnevnik%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "symbol-tree@npm:^3.2.4":
   version: 3.2.4
@@ -15799,7 +15798,7 @@ __metadata:
     react-native-webview: "npm:13.12.5"
     react-test-renderer: "npm:18"
     reanimated-color-picker: "npm:^3.0.3"
-    swc-flow-jest: "file:swc-flow-jest"
+    swc-flow-jest: "portal:swc-flow-jest"
     typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
