@@ -113,18 +113,23 @@ export class ThemeStore {
 		// Generate theme based on accent color
 		this.theme = this.generateTheme()
 
+		// Does not really works for the first time bruh
+		this.updateSystemBars().then(() => this.updateSystemBars())
+	}
+
+	private updateSystemBars() {
+		const promises: Promise<void>[] = []
+
 		if (Platform.OS === 'android') {
-			NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark').catch(
-				captureException
+			promises.push(
+				NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark'),
+				NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar),
+				NavigationBar.setVisibilityAsync('visible'),
 			)
-			NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar).catch(
-				captureException
-			)
-			NavigationBar.setVisibilityAsync('visible').catch(captureException)
 		}
-		SystemUI.setBackgroundColorAsync(Theme.colors.background).catch(
-			captureException,
-		)
+		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.background))
+
+		return Promise.all(promises).catch(captureException)
 	}
 
 	private generateTheme() {

@@ -1,12 +1,12 @@
-import { action, makeObservable, observable, runInAction } from 'mobx'
-import { Logger } from '../../constants'
+import { Logger } from '@/constants'
 import {
 	abortSignalTimeout,
 	RequestError,
 	RequestErrorOptions,
-} from '../../utils/RequestError'
-import { Toast } from '../../utils/Toast'
-import { makeReloadPersistable } from '../../utils/makePersistable'
+} from '@/utils/RequestError'
+import { Toast } from '@/utils/Toast'
+import { makeReloadPersistable } from '@/utils/makePersistable'
+import { action, makeObservable, observable, runInAction } from 'mobx'
 import {
 	Assignment,
 	Attachment,
@@ -20,14 +20,31 @@ import {
 	Total,
 } from './entities'
 import { ROUTES } from './routes'
-import './session'
+if (!__TEST__) setTimeout(() => import('./session'), 2000)
 
 // TODO! WARNING This code can cause anxiety
 // TODO Create separated HttpSessionAgent class with cache support and leave here only
 // TODO Api implemenation
 
+// after trying to refactor i decided to leave it as is, because normal refactor would take too much time writing tests,
+// separating logic and then rewriting most of it... so... here we go? Very, VERY bad network/state managmenet code
+
+// the main problem is that the code is already split between here and the async store
+// and that there is still some state and the functions aren't pure
+
+/**
+ * Used as indicator to use cache for the first request at the async store
+ */
+export interface CacheUsed {
+	isUsed: boolean
+}
+
+export interface CacheableReq {
+	cache?: CacheUsed
+}
+
 // Common request options
-interface StudentId {
+interface StudentId extends CacheableReq {
 	studentId: number
 }
 
@@ -38,7 +55,7 @@ interface StudentAndYear extends StudentId {
 // Request interface
 type Primitive = string | number | boolean | null | undefined
 
-interface ReqInit extends RequestInit {
+interface ReqInit extends RequestInit, CacheableReq {
 	auth?: boolean
 	params?: Record<string, Primitive | Primitive[]> | [Primitive, Primitive][]
 }
@@ -55,7 +72,7 @@ export class NetSchoolError extends RequestError {
 		options?: {
 			cacheGuide?: boolean
 			useCache?: boolean
-		} & RequestErrorOptions
+		} & RequestErrorOptions,
 	) {
 		super(message, options)
 		this.useCache = !!options?.useCache
@@ -75,7 +92,7 @@ export class NetSchoolApi {
 					.filter(e => !e.demo && !/demo/i.test(e.name))
 					.map(e => {
 						return { name: e.name, url: e.url }
-					})
+					}),
 			)
 
 		return result
@@ -172,7 +189,7 @@ export class NetSchoolApi {
 
 	public async getToken(
 		form: Record<string, string>,
-		error400: string = 'Вход не удался, перезайдите.'
+		error400: string = 'Вход не удался, перезайдите.',
 	) {
 		Logger.debug('getToken request', {
 			expires: this.session?.expires.toReadable(),
@@ -197,7 +214,7 @@ export class NetSchoolApi {
 					access_token: json.access_token || '',
 					refresh_token: json.refresh_token || '',
 					expires: new Date(
-						Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000
+						Date.now() + 1000 * parseInt(json.expires_in || '0', 10) - 7000,
 					),
 				}
 
@@ -205,7 +222,7 @@ export class NetSchoolApi {
 			})
 		} else
 			throw new NetSchoolError(
-				'Ошибка ' + response.status + ' при получении токена'
+				'Ошибка ' + response.status + ' при получении токена',
 			)
 	}
 
@@ -219,7 +236,7 @@ export class NetSchoolApi {
 		return [this.origin, this.base, ...paths]
 			.map(path => path.replace(/^\//, ''))
 			.map((path, i, a) =>
-				path.endsWith('/') || i + 1 === a.length ? path : `${path}/`
+				path.endsWith('/') || i + 1 === a.length ? path : `${path}/`,
 			)
 			.join('')
 	}
@@ -233,8 +250,8 @@ export class NetSchoolApi {
 		init: ReqInit = {},
 		fetchFn: (
 			url: string,
-			init: RequestInit
-		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch
+			init: RequestInit,
+		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch,
 	): Promise<T> {
 		const request: RequestInit & { headers: Record<string, string> } = {
 			headers: {},
@@ -247,7 +264,7 @@ export class NetSchoolApi {
 		if (init.params) {
 			if (!url.endsWith('?')) url += '?'
 			url += new URLSearchParams(
-				init.params as unknown as [string, string][]
+				init.params as unknown as [string, string][],
 			).toString()
 		}
 
@@ -257,7 +274,7 @@ export class NetSchoolApi {
 					Logger.debug(
 						'Session expired',
 						this.session.expires.toReadable(),
-						new Date().toReadable()
+						new Date().toReadable(),
 					)
 
 					// Request update of the token
@@ -276,8 +293,17 @@ export class NetSchoolApi {
 				}
 			}
 
-			if (this.reqs > this.useCacheOnMoreThenReqs && url in this.cache)
+			debug(
+				init.cache ? 'AAAAAAAAA' : '--------',
+				init.cache,
+				url in this.cache,
+				url,
+			)
+			if (init.cache && url in this.cache) {
+				init.cache.isUsed = true
 				return this.cache[url][1] as T
+			}
+
 			this.reqs = Math.max(0, this.reqs + 1)
 
 			const signal = abortSignalTimeout(this.timeoutLimit * 1000)
@@ -297,7 +323,7 @@ export class NetSchoolApi {
 							? reasons[status as keyof typeof reasons]
 							: 'Неизвестная ошибка'
 					}\nКод ошибки сервера: ${status}`,
-					{ cacheGuide: true }
+					{ cacheGuide: true },
 				)
 				Logger.error(error, 'URL:', url, 'Request:', init)
 				throw error
@@ -321,14 +347,16 @@ export class NetSchoolApi {
 						body: RequestError.stringify(error),
 					})
 				}
+
 				/* istanbul ignore if */
 				if (!__DEV__)
 					Logger.debug('Using cache for', url.replace(this.origin, ''), errText)
+
 				return this.cache[url][1] as T
 			} else if (error instanceof NetSchoolError && error.cacheGuide) {
 				throw new NetSchoolError(
 					this.errorReasons.HowToCache + ' ' + error.message,
-					{ useCache: error.useCache, loggerIgnore: true }
+					{ useCache: error.useCache, loggerIgnore: true },
 				)
 			} else throw error
 		} finally {
@@ -348,17 +376,18 @@ export class NetSchoolApi {
 
 	private async get<T extends object>(
 		url: string,
-		init?: Omit<ReqInit, 'method'>
+		init?: Omit<ReqInit, 'method'>,
 	) {
 		return this.request<T>(url, { auth: true, ...init, method: 'GET' })
 	}
 
-	public async students() {
-		return this.get<Student[]>(ROUTES.students)
+	public async students(req: CacheableReq = {}) {
+		return this.get<Student[]>(ROUTES.students, req)
 	}
 
-	public async education({ studentId }: StudentId) {
+	public async education({ studentId, cache }: StudentId) {
 		return this.get<Education[]>(ROUTES.education, {
+			cache,
 			params: { studentId },
 		})
 	}
@@ -367,27 +396,31 @@ export class NetSchoolApi {
 		studentId,
 		startDate,
 		endDate,
+		cache,
 	}: StudentId & {
 		startDate: string
 		endDate: string
 	}) {
 		return new Diary(
 			await this.get(ROUTES.classmeetings, {
+				cache,
 				params: {
 					studentIds: [studentId],
 					startDate: startDate,
 					endDate: endDate,
 					extraActivity: null,
 				},
-			})
+			}),
 		)
 	}
 
 	public async attachments({
 		studentId,
 		assignmentIds,
+		cache,
 	}: StudentId & { assignmentIds: number[] }) {
 		return this.get<Attachment[]>(ROUTES.attachments, {
+			cache,
 			params: [
 				['studentId', studentId],
 				...assignmentIds.map(e => ['assignmentId', e] as [string, number]),
@@ -398,8 +431,10 @@ export class NetSchoolApi {
 	public async assignment({
 		studentId,
 		assignmentId,
+		cache,
 	}: StudentId & { assignmentId: number }) {
 		return this.get<Assignment>(`${ROUTES.assignments}/${assignmentId}`, {
+			cache,
 			params: {
 				studentId,
 			},
@@ -409,8 +444,10 @@ export class NetSchoolApi {
 	public async assignments({
 		studentId,
 		classmeetingsIds,
+		cache,
 	}: StudentId & { classmeetingsIds: number[] }) {
 		return this.get<Assignment[]>(ROUTES.assignments, {
+			cache,
 			params: [
 				['studentId', studentId],
 				...classmeetingsIds.map(e => ['classmeetingId', e] as [string, number]),
@@ -422,11 +459,13 @@ export class NetSchoolApi {
 		studentId,
 		withoutMarks,
 		withExpiredClassAssign,
+		cache,
 	}: StudentId & {
 		withoutMarks?: boolean
 		withExpiredClassAssign?: boolean
 	}) {
 		return this.get<Assignment[]>(ROUTES.assignmentsForCurrentTerm, {
+			cache,
 			params: {
 				studentId,
 				withoutMarks: withoutMarks ?? false,
@@ -435,8 +474,9 @@ export class NetSchoolApi {
 		})
 	}
 
-	public async subjects({ studentId, schoolYearId }: StudentAndYear) {
+	public async subjects({ studentId, schoolYearId, cache }: StudentAndYear) {
 		return this.get<Subject[]>(ROUTES.subjects, {
+			cache,
 			params: { studentId, schoolYearId },
 		})
 	}
@@ -445,8 +485,10 @@ export class NetSchoolApi {
 		studentId,
 		subjectId,
 		termId,
+		cache,
 	}: StudentId & { subjectId: number; termId?: number }) {
 		return this.get<SubjectPerformance>(ROUTES.subjectPerformance, {
+			cache,
 			params: {
 				studentId,
 				subjectId,
@@ -455,8 +497,9 @@ export class NetSchoolApi {
 		})
 	}
 
-	public async totals({ studentId, schoolYearId }: StudentAndYear) {
+	public async totals({ studentId, schoolYearId, cache }: StudentAndYear) {
 		const totals: Total[] = await this.get<Total[]>(ROUTES.totals, {
+			cache,
 			params: {
 				studentId,
 				schoolYearId,
@@ -467,7 +510,7 @@ export class NetSchoolApi {
 		return totals.map(total => {
 			runInAction(() => {
 				total.termTotals = total.termTotals.sort(
-					(a, b) => parseInt(a.term.name) - parseInt(b.term.name)
+					(a, b) => parseInt(a.term.name) - parseInt(b.term.name),
 				)
 
 				if (total.termTotals.length < maxLength) {
@@ -483,7 +526,7 @@ export class NetSchoolApi {
 
 				const visitedIds = new Set<number>()
 				total.yearTotals = total.yearTotals.filter(e =>
-					visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id)
+					visitedIds.has(e.period.id) ? false : visitedIds.add(e.period.id),
 				)
 			})
 
