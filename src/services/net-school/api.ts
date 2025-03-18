@@ -293,12 +293,6 @@ export class NetSchoolApi {
 				}
 			}
 
-			debug(
-				init.cache ? 'AAAAAAAAA' : '--------',
-				init.cache,
-				url in this.cache,
-				url,
-			)
 			if (init.cache && url in this.cache) {
 				init.cache.isUsed = true
 				return this.cache[url][1] as T
