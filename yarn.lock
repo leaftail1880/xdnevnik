@@ -14373,8 +14373,8 @@ __metadata:
 
 "swc-flow-jest@file:swc-flow-jest::locator=xdnevnik%40workspace%3A.":
   version: 0.0.0
-  resolution: "swc-flow-jest@file:swc-flow-jest#swc-flow-jest::hash=6ab75f&locator=xdnevnik%40workspace%3A."
-  checksum: 10c0/69c3a681f5142c757e0162c6d3c33ba57b9c85830fb7342a8cf4999902490a43e1e21525eca12b020c1038efa781561d1d375e384f63fcee13a48212ea686e03
+  resolution: "swc-flow-jest@file:swc-flow-jest#swc-flow-jest::hash=9d7734&locator=xdnevnik%40workspace%3A."
+  checksum: 10c0/a97d1847398b969007f31b2ecf075da68a629fd7fe4cfb8fa6c6809ebe5537d56b3ed1737a5975e08be8f74ef4cb1795b83053ee2612a580b276c03468b641a1
   languageName: node
   linkType: hard
 
