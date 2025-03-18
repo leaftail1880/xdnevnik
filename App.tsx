@@ -67,7 +67,7 @@ const Tab = createMaterialBottomTabNavigator<ParamListBase>()
 import * as SplashScreen from 'expo-splash-screen'
 
 SplashScreen.setOptions({
-	duration: 200,
+	duration: 400,
 	fade: true,
 })
 

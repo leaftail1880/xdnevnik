@@ -14,8 +14,9 @@ import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import LessonProgress, { LessonProgressStore } from './Progress'
 import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
-import { useReorderableDrag } from 'react-native-reorderable-list'
+import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 import { Lesson } from '@/services/net-school/lesson'
+import { useReorderableDrag } from 'react-native-reorderable-list'
 import { Settings } from '@/models/settings'
 
 export default observer(function DiaryLesson({
@@ -159,7 +160,9 @@ const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
 	return (
 		<>
 			{DiaryState.showLessonTheme && (
-				<Text selectable>{lesson.lessonTheme ?? 'Темы нет'}</Text>
+				<ScrollTextCopyable>
+					{lesson.lessonTheme ?? 'Темы нет'}
+				</ScrollTextCopyable>
 			)}
 
 			{DiaryState.showAttachments && lesson.attachmentsExists && (

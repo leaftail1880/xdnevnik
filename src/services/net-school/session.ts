@@ -24,6 +24,7 @@ function setupSession() {
 
 		// Session is still active
 		if (API.session.expires.getTime() > Date.now()) {
+			/* istanbul ignore if */
 			if (!__DEV__)
 				Logger.debug(
 					'Session is still active, expires: ',

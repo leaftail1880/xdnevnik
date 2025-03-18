@@ -110,5 +110,11 @@ module.exports = {
 		},
 	],
 	root: true,
-	ignorePatterns: ['docs/*', 'jest.*.js', 'jest.*.ts', 'swc-flow-jest'],
+	ignorePatterns: [
+		'docs',
+		'swc-flow-jest',
+		'jest.*.js',
+		'jest.*.ts',
+		'*.test.*',
+	],
 }
