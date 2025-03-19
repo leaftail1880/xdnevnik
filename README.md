@@ -51,7 +51,6 @@ Make changes, test them live
 
 Commit & push changes and then open pull request!
 
-
 ### Tech stack
 
 This project uses:
