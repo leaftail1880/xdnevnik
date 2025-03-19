@@ -39,6 +39,7 @@
 		"expo-dev-client": "~5.0.14",
 		"expo-device": "~7.0.2",
 		"expo-intent-launcher": "~12.0.2",
+		"expo-linear-gradient": "~14.0.2",
 		"expo-navigation-bar": "~4.0.8",
 		"expo-sharing": "~13.0.1",
 		"expo-splash-screen": "~0.29.22",
