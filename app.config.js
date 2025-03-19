@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.18.0'
+const version = '0.19.0'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
@@ -167,6 +167,5 @@ Config.expo = withAndroidManifest(Config.expo, config => {
 	})
 	return config
 })
-
 
 export default Config
