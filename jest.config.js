@@ -13,7 +13,12 @@ const transformers = {
 /** @type {import('jest').Config} */
 module.exports = {
 	preset: 'jest-expo',
-	transform: transformers[process.env.TRANSFORMER ?? 'swc-all'],
+	transform:
+		transformers[
+			process.env.TRANSFORMER ?? process.platform === 'android'
+				? 'default'
+				: 'swc-all'
+		],
 	transformIgnorePatterns: [
 		'/node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@material)',
 		'/node_modules/react-native-reanimated/plugin/',
