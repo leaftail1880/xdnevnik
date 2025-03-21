@@ -117,7 +117,9 @@ function fromCalendar(calendar: string) {
 
 const SelectDay = observer(function SelectDay() {
 	if (Settings.newDatePicker) {
-		const theme: import('react-native-calendars').CalendarProps['theme'] = {
+		const theme: import('react-native-calendars').CalendarProps['theme'] & {
+			expandableKnobColor: string
+		} = {
 			backgroundColor: Theme.colors.navigationBar,
 			calendarBackground: Theme.colors.navigationBar,
 
@@ -125,14 +127,16 @@ const SelectDay = observer(function SelectDay() {
 			monthTextColor: Theme.colors.primary,
 			arrowColor: Theme.colors.primary,
 
-			selectedDayBackgroundColor: Theme.colors.secondaryContainer,
+			selectedDayBackgroundColor: Theme.colors.primaryContainer,
 			selectedDayTextColor: Theme.colors.onPrimaryContainer,
 
-			todayBackgroundColor: Theme.colors.elevation.level4,
+			todayBackgroundColor: Theme.colors.secondaryContainer,
 			todayTextColor: Theme.colors.onSecondaryContainer,
 
 			textDisabledColor: Theme.colors.onSurfaceDisabled,
 			dayTextColor: Theme.colors.onBackground,
+
+			expandableKnobColor: Theme.colors.secondaryContainer,
 		}
 		return (
 			<CalendarProvider

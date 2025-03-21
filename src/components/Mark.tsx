@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 import { Text } from 'react-native-paper'
 
-const MarkColorsBG = {
+export const MarkColorsBG = {
 	5: '#007000',
 	4: '#946C00',
 	3: '#8D3F00',
