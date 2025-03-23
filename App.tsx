@@ -85,7 +85,7 @@ export default Sentry.wrap(
 			<GestureHandlerRootView>
 				<SafeAreaProvider>
 					<PaperProvider theme={ProvidedTheme}>
-						<StatusBar style="auto" translucent />
+						<StatusBar style="auto" />
 						<NavigationContainer
 							theme={ProvidedTheme}
 							ref={navigation}
