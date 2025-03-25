@@ -6,7 +6,7 @@ import {
 } from '@/utils/RequestError'
 import { Toast } from '@/utils/Toast'
 import { makeReloadPersistable } from '@/utils/makePersistable'
-import { action, makeObservable, observable, runInAction } from 'mobx'
+import { action, autorun, makeObservable, observable, runInAction } from 'mobx'
 import {
 	Assignment,
 	Attachment,
@@ -20,7 +20,6 @@ import {
 	Total,
 } from './entities'
 import { ROUTES } from './routes'
-if (!__TEST__) setTimeout(() => import('./session'), 2000)
 
 // TODO! WARNING This code can cause anxiety
 // TODO Create separated HttpSessionAgent class with cache support and leave here only
@@ -31,6 +30,20 @@ if (!__TEST__) setTimeout(() => import('./session'), 2000)
 
 // the main problem is that the code is already split between here and the async store
 // and that there is still some state and the functions aren't pure
+
+if (!__TEST__) setTimeout(() => import('./session'), 2000)
+
+Promise.withResolvers ??= <T>() => {
+	const result: Partial<PromiseWithResolvers<T>> = {}
+	const promise = new Promise<T>((res, rej) => {
+		result.resolve = res
+		result.reject = rej
+	})
+	result.promise = promise
+
+	return result as PromiseWithResolvers<T>
+}
+let authWaiter: PromiseWithResolvers<void> | undefined = Promise.withResolvers()
 
 /**
  * Used as indicator to use cache for the first request at the async store
@@ -148,6 +161,13 @@ export class NetSchoolApi {
 				},
 			],
 		})
+
+		autorun(() => {
+			if (this.authorized && authWaiter) {
+				authWaiter.resolve()
+				authWaiter = undefined
+			}
+		})
 	}
 
 	timeoutLimit = 5
@@ -243,7 +263,7 @@ export class NetSchoolApi {
 
 	useCacheOnMoreThenReqs = 5
 
-	private reqs = 0
+	// private reqs = 0
 
 	async request<T extends object | null | undefined>(
 		url: string,
@@ -269,6 +289,12 @@ export class NetSchoolApi {
 		}
 
 		try {
+			// If cache is requested, use it
+			if (init.cache && url in this.cache) {
+				init.cache.isUsed = true
+				return this.cache[url][1] as T
+			}
+
 			if (init.auth) {
 				if (this.session && this.session.expires.getTime() < Date.now()) {
 					Logger.debug(
@@ -279,6 +305,11 @@ export class NetSchoolApi {
 
 					// Request update of the token
 					this.authorized = null
+				}
+
+				// Try to wait for the first auth
+				if (authWaiter && (!this.session || !this.authorized)) {
+					await authWaiter.promise
 				}
 
 				if (!this.session || !this.authorized) {
@@ -292,12 +323,7 @@ export class NetSchoolApi {
 				}
 			}
 
-			if (init.cache && url in this.cache) {
-				init.cache.isUsed = true
-				return this.cache[url][1] as T
-			}
-
-			this.reqs = Math.max(0, this.reqs + 1)
+			// this.reqs = Math.max(0, this.reqs + 1)
 
 			const signal = abortSignalTimeout(this.timeoutLimit * 1000)
 			const response = await fetchFn(url, { signal, ...init, ...request })
@@ -353,7 +379,7 @@ export class NetSchoolApi {
 				)
 			} else throw error
 		} finally {
-			this.reqs = Math.max(0, this.reqs - 1)
+			// this.reqs = Math.max(0, this.reqs - 1)
 		}
 	}
 
