@@ -1,7 +1,7 @@
 import Mark from '@/components/Mark'
 import { RoundedSurface } from '@/components/RoundedSurface'
 import { styles } from '@/constants'
-import { Settings } from '@/models/settings'
+import { Settings, StudentSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
@@ -43,31 +43,7 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 	const onPress = () =>
 		ModalAlert.show(
 			`Можно исправить оценку!`,
-			<View
-				style={{
-					flex: 1,
-					flexDirection: 'row',
-					flexWrap: 'wrap',
-					margin: Spacings.s2,
-					gap: Spacings.s1,
-				}}
-			>
-				<Text>Чтобы в итогах было</Text>
-				<Mark mark={student.targetMark} duty={false} style={{ padding: 2 }} />
-				<Text>нужно получить</Text>
-				<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
-					{toGetTarget}
-				</Text>
-				<Text>оценок вида</Text>
-				<Mark
-					duty={false}
-					style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
-					textStyle={{ fontSize: 10 }}
-					subTextStyle={{ fontSize: 8 }}
-					weight={student.defaultMarkWeight}
-					mark={student.defaultMark}
-				/>
-			</View>,
+			<ToFixMarkYouNeed student={student} toGetTarget={toGetTarget} />,
 		)
 
 	return (
@@ -121,5 +97,45 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 				</RoundedSurface>
 			)}
 		</>
+	)
+})
+
+const ToFixMarkYouNeed = observer(function ToFixMarkYouNeed({
+	student,
+	toGetTarget,
+}: {
+	student: StudentSettings
+	toGetTarget: number
+}) {
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				flexWrap: 'wrap',
+				alignItems: 'center',
+				padding: Spacings.s1,
+				gap: Spacings.s1,
+			}}
+		>
+			<Text>Чтобы в итогах было</Text>
+			<Mark
+				mark={student.targetMark}
+				duty={false}
+				style={{ paddingHorizontal: 2 }}
+			/>
+			<Text>нужно получить</Text>
+			<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+				{toGetTarget}
+			</Text>
+			<Text>оценок вида</Text>
+			<Mark
+				duty={false}
+				style={{ paddingHorizontal: Spacings.s1 }}
+				textStyle={{ fontSize: 14 }}
+				subTextStyle={{ fontSize: 10 }}
+				weight={student.defaultMarkWeight}
+				mark={student.defaultMark}
+			/>
+		</View>
 	)
 })

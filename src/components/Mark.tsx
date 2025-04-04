@@ -5,7 +5,6 @@ import {
 	TextStyle,
 	TouchableOpacity,
 	TouchableOpacityProps,
-	View,
 } from 'react-native'
 import { Text } from 'react-native-paper'
 
@@ -34,7 +33,7 @@ export function roundMark(mark: number) {
 
 export default observer(function Mark({
 	finalMark,
-	mark: rawMark,
+	mark,
 	style,
 	textStyle,
 	subTextStyle,
@@ -52,6 +51,77 @@ export default observer(function Mark({
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 } & (Weight | Partial<Weight>)) {
+	const {
+		bg,
+		color,
+		textColor,
+		rawMark: calculatedMark,
+	} = calculateColorsAndMark(
+		duty,
+		mark,
+		finalMark,
+		noColor,
+		weight,
+		minWeight,
+		maxWeight,
+	)
+
+	return (
+		<TouchableOpacity
+			{...props}
+			style={[
+				{
+					elevation: 0,
+					borderRadius: Theme.roundness,
+					alignContent: 'center',
+					justifyContent: 'center',
+					alignItems: 'center',
+				},
+				bg
+					? { backgroundColor: color }
+					: { borderColor: color, borderWidth: 1.5 },
+				finalMark
+					? {
+							borderWidth: 1.5,
+							borderColor: bg ? Theme.colors.onSurface : color,
+							borderCurve: 'circular',
+						}
+					: false,
+				style,
+			]}
+		>
+			<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
+				{duty ? '.' : (finalMark ?? calculatedMark ?? ' ')}
+			</Text>
+			{typeof weight === 'number' && (
+				<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>
+					{/* {Settings.showMarkWeightTip ? 'Вес: ' : ''} */}
+					{weight}
+				</Text>
+			)}
+			{!!finalMark && calculatedMark && (
+				<Text
+					style={[
+						{ alignSelf: 'center', fontSize: 7, color: textColor },
+						subTextStyle,
+					]}
+				>
+					Балл: {calculatedMark}
+				</Text>
+			)}
+		</TouchableOpacity>
+	)
+})
+
+function calculateColorsAndMark(
+	duty: boolean,
+	rawMark: string | number | null | undefined,
+	finalMark: string | number | null | undefined,
+	noColor: string,
+	weight: number | undefined,
+	minWeight: number | undefined,
+	maxWeight: number | undefined,
+) {
 	const bg = Settings.markStyle === 'background'
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
@@ -93,60 +163,5 @@ export default observer(function Mark({
 			color += alpha
 		}
 	}
-
-	return (
-		<TouchableOpacity
-			{...props}
-			style={[
-				{
-					elevation: 0,
-					borderRadius: Theme.roundness,
-					alignContent: 'center',
-					justifyContent: 'center',
-					alignItems: 'center',
-				},
-				bg
-					? { backgroundColor: color }
-					: { borderColor: color, borderWidth: 1.5 },
-				finalMark
-					? {
-							borderWidth: 1.5,
-							borderColor: bg ? Theme.colors.onSurface : color,
-							borderCurve: 'circular',
-						}
-					: false,
-				style,
-			]}
-		>
-			<View
-				style={{
-					padding: 0,
-					margin: 0,
-					alignContent: 'center',
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
-				<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
-					{duty ? '.' : (finalMark ?? rawMark ?? ' ')}
-				</Text>
-				{typeof weight === 'number' && (
-					<Text style={[{ fontSize: 12, color: textColor }, subTextStyle]}>
-						{/* {Settings.showMarkWeightTip ? 'Вес: ' : ''} */}
-						{weight}
-					</Text>
-				)}
-				{!!finalMark && rawMark && (
-					<Text
-						style={[
-							{ alignSelf: 'center', fontSize: 7, color: textColor },
-							subTextStyle,
-						]}
-					>
-						Балл: {rawMark}
-					</Text>
-				)}
-			</View>
-		</TouchableOpacity>
-	)
-})
+	return { bg, color, textColor, rawMark }
+}

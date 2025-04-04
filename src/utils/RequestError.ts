@@ -3,8 +3,8 @@ export interface RequestErrorOptions {
 }
 
 export enum RequestErrorReason {
-	noConnection = 'Нет сети.',
-	timeout = 'Сервер не отвечает. Медленный интернет или сервер на техработах.',
+	noConnection = 'Нет сети',
+	timeout = 'Сервер не отвечает. Медленный интернет, конец четверти или техработы',
 }
 
 export class RequestError extends Error implements RequestErrorOptions {
