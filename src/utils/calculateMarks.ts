@@ -130,7 +130,7 @@ function calculateToGetMark(
 	customMarks: Partial<PartialAssignment>[],
 ) {
 	const roundedAvg = roundMark(avgMark, markRoundAdd)
-	if (roundedAvg > targetMark) return
+	if (roundedAvg >= targetMark) return
 
 	const stats = totals.classmeetingsStats
 	const remainingLessons = stats.scheduled - stats.passed

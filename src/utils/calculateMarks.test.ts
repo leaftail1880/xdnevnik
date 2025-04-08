@@ -23,6 +23,56 @@ describe('calculateMarks', () => {
 	`)
 	})
 
+	it('should calculate 1 mark', () => {
+		expect(
+			calculateMarks({
+				totals: {
+					averageMark: 5,
+					classmeetingsStats: { passed: 1, scheduled: 2 },
+					results: [mark(5, 10)],
+				},
+				targetMark: 5,
+				defaultMark: 5,
+				defaultMarkWeight: 10,
+				markRoundAdd: -0.1,
+			}),
+		).toMatchInlineSnapshot(`
+		{
+		  "avgMark": 5,
+		  "maxWeight": 10,
+		  "minWeight": 10,
+		  "toGetMarks": [],
+		  "totalsAndSheduledTotals": [
+		    {
+		      "answerFilesCount": 0,
+		      "assignmentDate": "1970-01-01",
+		      "assignmentId": 1,
+		      "assignmentName": "",
+		      "assignmentTypeAbbr": "",
+		      "assignmentTypeId": 0,
+		      "assignmentTypeName": "",
+		      "attachmentsExists": false,
+		      "canAnswer": false,
+		      "classAssignment": true,
+		      "classmeetingId": 0,
+		      "comment": "",
+		      "date": "1970-01-01",
+		      "dueDate": "1970-01-01",
+		      "duty": false,
+		      "extraActivity": false,
+		      "hasFileAnswers": false,
+		      "hasTextAnswer": false,
+		      "result": 5,
+		      "resultDate": "1970-01-01",
+		      "subjectId": 0,
+		      "subjectName": "",
+		      "weight": 10,
+		    },
+		  ],
+		}
+	`)
+	})
+
 	it('should calculate marks', () => {
 		const totals: CalculateTotals = {
 			averageMark: 0,

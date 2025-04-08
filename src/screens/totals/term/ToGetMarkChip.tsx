@@ -59,7 +59,7 @@ const ToGetMarkChip = observer(function ToGetMarkChip({
 					)
 				}
 			>
-				Исправить до {} невозможно
+				Исправить до {target} невозможно
 			</Chip>
 		)
 	}
