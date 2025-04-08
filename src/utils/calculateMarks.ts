@@ -56,11 +56,11 @@ export function calculateMarks({
 		) as PartialAssignment[]
 
 		if (lessonsWithoutMark) {
-			// TODO Fix
 			const length =
 				totals.classmeetingsStats.passed -
 				totals.results.length -
 				attendance.length
+
 			if (length > 0)
 				attendance = new Array(length)
 					.fill({
@@ -79,7 +79,6 @@ export function calculateMarks({
 		}
 
 		if (lessonsWithoutMark) {
-			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
 					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,

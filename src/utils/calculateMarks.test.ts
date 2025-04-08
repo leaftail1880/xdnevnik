@@ -44,28 +44,9 @@ describe('calculateMarks', () => {
 		  "toGetMarks": [],
 		  "totalsAndSheduledTotals": [
 		    {
-		      "answerFilesCount": 0,
-		      "assignmentDate": "1970-01-01",
-		      "assignmentId": 1,
-		      "assignmentName": "",
-		      "assignmentTypeAbbr": "",
-		      "assignmentTypeId": 0,
-		      "assignmentTypeName": "",
-		      "attachmentsExists": false,
-		      "canAnswer": false,
-		      "classAssignment": true,
-		      "classmeetingId": 0,
-		      "comment": "",
 		      "date": "1970-01-01",
-		      "dueDate": "1970-01-01",
 		      "duty": false,
-		      "extraActivity": false,
-		      "hasFileAnswers": false,
-		      "hasTextAnswer": false,
 		      "result": 5,
-		      "resultDate": "1970-01-01",
-		      "subjectId": 0,
-		      "subjectName": "",
 		      "weight": 10,
 		    },
 		  ],
@@ -109,80 +90,94 @@ describe('calculateMarks', () => {
 		  ],
 		  "totalsAndSheduledTotals": [
 		    {
-		      "answerFilesCount": 0,
-		      "assignmentDate": "1970-01-01",
-		      "assignmentId": 1,
-		      "assignmentName": "",
-		      "assignmentTypeAbbr": "",
-		      "assignmentTypeId": 0,
-		      "assignmentTypeName": "",
-		      "attachmentsExists": false,
-		      "canAnswer": false,
-		      "classAssignment": true,
-		      "classmeetingId": 0,
-		      "comment": "",
 		      "date": "1970-01-01",
-		      "dueDate": "1970-01-01",
 		      "duty": false,
-		      "extraActivity": false,
-		      "hasFileAnswers": false,
-		      "hasTextAnswer": false,
 		      "result": 4,
-		      "resultDate": "1970-01-01",
-		      "subjectId": 0,
-		      "subjectName": "",
 		      "weight": 10,
 		    },
 		    {
-		      "answerFilesCount": 0,
-		      "assignmentDate": "1970-01-01",
-		      "assignmentId": 1,
-		      "assignmentName": "",
-		      "assignmentTypeAbbr": "",
-		      "assignmentTypeId": 0,
-		      "assignmentTypeName": "",
-		      "attachmentsExists": false,
-		      "canAnswer": false,
-		      "classAssignment": true,
-		      "classmeetingId": 0,
-		      "comment": "",
 		      "date": "1970-01-01",
-		      "dueDate": "1970-01-01",
 		      "duty": false,
-		      "extraActivity": false,
-		      "hasFileAnswers": false,
-		      "hasTextAnswer": false,
 		      "result": 5,
-		      "resultDate": "1970-01-01",
-		      "subjectId": 0,
-		      "subjectName": "",
 		      "weight": 10,
 		    },
 		    {
-		      "answerFilesCount": 0,
-		      "assignmentDate": "1970-01-01",
-		      "assignmentId": 1,
-		      "assignmentName": "",
-		      "assignmentTypeAbbr": "",
-		      "assignmentTypeId": 0,
-		      "assignmentTypeName": "",
-		      "attachmentsExists": false,
-		      "canAnswer": false,
-		      "classAssignment": true,
-		      "classmeetingId": 0,
-		      "comment": "",
 		      "date": "1970-01-01",
-		      "dueDate": "1970-01-01",
 		      "duty": false,
-		      "extraActivity": false,
-		      "hasFileAnswers": false,
-		      "hasTextAnswer": false,
 		      "result": 2,
-		      "resultDate": "1970-01-01",
-		      "subjectId": 0,
-		      "subjectName": "",
 		      "weight": 15,
 		    },
+		  ],
+		}
+	`)
+	})
+
+	it('should calculate custom marks', () => {
+		expect(
+			calculateMarks({
+				totals: {
+					averageMark: 5,
+					classmeetingsStats: { passed: 1, scheduled: 2 },
+					results: [mark(5, 10)],
+				},
+				markRoundAdd: -0.1,
+				customMarks: [{ result: 4, weight: 10 }],
+			}),
+		).toMatchInlineSnapshot(`
+		{
+		  "avgMark": 4.5,
+		  "maxWeight": 10,
+		  "minWeight": 10,
+		  "toGetMarks": [],
+		  "totalsAndSheduledTotals": [
+		    {
+		      "date": "1970-01-01",
+		      "duty": false,
+		      "result": 5,
+		      "weight": 10,
+		    },
+		    {
+		      "result": 4,
+		      "weight": 10,
+		    },
+		  ],
+		}
+	`)
+	})
+
+	it('should calculate attendance', () => {
+		expect(
+			calculateMarks({
+				totals: {
+					averageMark: 5,
+					classmeetingsStats: { passed: 1, scheduled: 5 },
+					results: [mark(5, 10)],
+				},
+				markRoundAdd: -0.1,
+				customMarks: [{ result: 4, weight: 10 }],
+				lessonsWithoutMark: true,
+				attendance: true,
+			}),
+		).toMatchInlineSnapshot(`
+		{
+		  "avgMark": 4.5,
+		  "maxWeight": 10,
+		  "minWeight": 10,
+		  "toGetMarks": [],
+		  "totalsAndSheduledTotals": [
+		    {
+		      "date": "1970-01-01",
+		      "duty": false,
+		      "result": 5,
+		      "weight": 10,
+		    },
+		    {
+		      "result": 4,
+		      "weight": 10,
+		    },
+		    {},
+		    {},
+		    {},
 		  ],
 		}
 	`)
@@ -191,30 +186,32 @@ describe('calculateMarks', () => {
 
 const date = new Date(0).toNetSchool()
 
-function mark(result: number, weight: number): Assignment & { date: string } {
-	return {
+function mark(result: number, weight: number) {
+	const mark = {
 		result,
 		weight,
 		date,
-		answerFilesCount: 0,
-		assignmentDate: date,
-		assignmentId: 1,
-		assignmentName: '',
-		assignmentTypeAbbr: '',
-		assignmentTypeId: 0,
-		assignmentTypeName: '',
-		attachmentsExists: false,
-		canAnswer: false,
-		classAssignment: true,
-		classmeetingId: 0,
-		comment: '',
-		dueDate: date,
+		// answerFilesCount: 0,
+		// assignmentDate: date,
+		// assignmentId: 1,
+		// assignmentName: '',
+		// assignmentTypeAbbr: '',
+		// assignmentTypeId: 0,
+		// assignmentTypeName: '',
+		// attachmentsExists: false,
+		// canAnswer: false,
+		// classAssignment: true,
+		// classmeetingId: 0,
+		// comment: '',
+		// dueDate: date,
 		duty: false,
-		extraActivity: false,
-		hasFileAnswers: false,
-		hasTextAnswer: false,
-		resultDate: date,
-		subjectId: 0,
-		subjectName: '',
-	}
+		// extraActivity: false,
+		// hasFileAnswers: false,
+		// hasTextAnswer: false,
+		// resultDate: date,
+		// subjectId: 0,
+		// subjectName: '',
+	} satisfies Partial<Assignment & { date: string }>
+
+	return mark as unknown as Assignment & { date: string }
 }
