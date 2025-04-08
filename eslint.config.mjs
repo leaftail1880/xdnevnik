@@ -15,14 +15,6 @@ const __dirname = path.dirname(__filename)
 const compat = new FlatCompat({ baseDirectory: __dirname })
 
 export default tseslint.config(
-	eslint.configs.recommended,
-	react.configs.flat.recommended,
-	react.configs.flat['jsx-runtime'],
-	...compat.extends('plugin:react-native/all'),
-	reactHooks.configs['recommended-latest'],
-	tseslint.configs.recommended,
-	mobx.flatConfigs.recommended,
-	prettier,
 	{
 		ignores: [
 			'docs',
@@ -32,6 +24,16 @@ export default tseslint.config(
 			'*.test.*',
 			'eslint.config.mjs',
 		],
+	},
+	eslint.configs.recommended,
+	react.configs.flat.recommended,
+	react.configs.flat['jsx-runtime'],
+	...compat.extends('plugin:react-native/all'),
+	reactHooks.configs['recommended-latest'],
+	tseslint.configs.recommended,
+	mobx.flatConfigs.recommended,
+	prettier,
+	{
 		settings: {
 			react: { version: 'detect' },
 		},
@@ -59,7 +61,7 @@ export default tseslint.config(
 			'mobx/missing-make-observable': 'off',
 			'@typescript-eslint/no-unused-vars': 'off',
 			'@typescript-eslint/explicit-member-accessibility': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off',
+			'@typescript-eslint/no-unused-expressions': 'off',
 			'@typescript-eslint/naming-convention': [
 				'warn',
 				{
@@ -108,5 +110,5 @@ export default tseslint.config(
 				},
 			],
 		},
-	}
+	},
 )

@@ -20,7 +20,7 @@ import {
 } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
 import { SubjectInfo, TermStore } from './state'
-import { ToGetMarkChip } from './ToGetMarkChip'
+import { ToGetMarkChips } from './ToGetMarkChip'
 
 const styles = StyleSheet.create({
 	container: {
@@ -90,6 +90,7 @@ export default observer(function SubjectMarks(
 				defaultMark: student?.defaultMark,
 				defaultMarkWeight: student?.defaultMarkWeight,
 				targetMark: student?.targetMark,
+				markRoundAdd: Settings.markRoundAdd,
 			}),
 		[
 			performance.result,
@@ -104,10 +105,9 @@ export default observer(function SubjectMarks(
 		if (marks)
 			runInAction(
 				() =>
-					(TermStore.subjectGetMarks[props.total.subjectId] =
-						marks.toGetTarget),
+					(TermStore.subjectGetMarks[props.total.subjectId] = marks.toGetMarks),
 			)
-	}, [marks, marks?.toGetTarget, props.total.subjectId])
+	}, [marks, marks?.toGetMarks, props.total.subjectId])
 
 	if (!student || !studentId) return
 
@@ -121,7 +121,7 @@ export default observer(function SubjectMarks(
 			</View>
 		)
 
-	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetTarget } = marks
+	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetMarks } = marks
 
 	if (totalsAndSheduledTotals.length === 0) return
 	return (
@@ -161,9 +161,7 @@ export default observer(function SubjectMarks(
 				/>
 			</View>
 			<Chips style={{ padding: 0 }}>
-				{typeof toGetTarget !== 'undefined' && TermStore.toGetMark && (
-					<ToGetMarkChip toGetTarget={toGetTarget} />
-				)}
+				{TermStore.toGetMark && <ToGetMarkChips toGetMarks={toGetMarks} />}
 				{TermStore.shortStats && (
 					<Chip
 						compact

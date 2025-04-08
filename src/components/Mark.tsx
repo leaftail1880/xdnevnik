@@ -27,8 +27,8 @@ interface Weight {
 	weight: number | undefined
 }
 
-export function roundMark(mark: number) {
-	return Math.round(mark - 0.1)
+export function roundMark(mark: number, markRoundAdd: number) {
+	return Math.round(mark + markRoundAdd)
 }
 
 export default observer(function Mark({
@@ -131,7 +131,7 @@ function calculateColorsAndMark(
 
 	let color = noColor + (typeof weight === 'number' ? '' : '7A')
 	if (typeof mark === 'number' && !isNaN(mark)) {
-		const rounded = roundMark(mark)
+		const rounded = roundMark(mark, Settings.markRoundAdd)
 		if (rounded in colors) color = colors[rounded as keyof typeof colors]
 		else {
 			const keys = Object.keys(colors).map(Number)

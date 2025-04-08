@@ -26,7 +26,7 @@ import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Button, Chip, IconButton, Text } from 'react-native-paper'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
-import { ToGetMarkChip } from '../term/ToGetMarkChip'
+import { ToGetMarkChips } from '../term/ToGetMarkChip'
 import { AddMarkForm } from './AddMarkForm'
 
 type ScreenProps = StackScreenProps<
@@ -63,6 +63,7 @@ export default observer(function SubjectTotals({
 				targetMark: studentSettings.targetMark,
 				defaultMark: studentSettings.defaultMark,
 				defaultMarkWeight: studentSettings.defaultMarkWeight,
+				markRoundAdd: Settings.markRoundAdd,
 			}),
 		[
 			attendance,
@@ -76,13 +77,8 @@ export default observer(function SubjectTotals({
 	if (performance.fallback) return performance.fallback
 
 	if (!marks) return <Text>Ошибка при подсчете оценок</Text>
-	const {
-		avgMark,
-		totalsAndSheduledTotals,
-		maxWeight,
-		minWeight,
-		toGetTarget,
-	} = marks
+	const { avgMark, totalsAndSheduledTotals, maxWeight, minWeight, toGetMarks } =
+		marks
 
 	MarkAssignmentsStore.withParams({
 		classmeetingsIds: totalsAndSheduledTotals
@@ -128,7 +124,7 @@ export default observer(function SubjectTotals({
 				contentContainerStyle={{ gap: Spacings.s2 }}
 			>
 				<Chips style={{ marginRight: Spacings.s2 }}>
-					<ToGetMarkChip toGetTarget={toGetTarget} />
+					<ToGetMarkChips toGetMarks={toGetMarks} />
 					<Chip
 						mode="flat"
 						compact

@@ -9,6 +9,7 @@ import {
 import { makeReloadPersistable } from '@/utils/makePersistable'
 import { stringSimilarity } from '@/utils/search'
 import { makeAutoObservable } from 'mobx'
+import { ToGetMarkTargetCalculated } from '../../../utils/calculateMarks'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 import { RenderSubject } from './screen'
 
@@ -81,7 +82,7 @@ export const TermStore = new (class {
 		return TotalsStore.result
 	}
 
-	subjectGetMarks: Record<string, number | undefined> = {}
+	subjectGetMarks: Record<string, ToGetMarkTargetCalculated[] | undefined> = {}
 
 	private getSearchOrder(total: Total) {
 		const name = getSubjectName(
@@ -116,7 +117,7 @@ export const TermStore = new (class {
 	}
 
 	private getToGetMarkOrder(a: Total) {
-		const order = this.subjectGetMarks[a.subjectId] ?? 0
+		const order = this.subjectGetMarks[a.subjectId]?.[0]?.amount ?? 0
 		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
 	}
 

@@ -48,6 +48,8 @@ class SettingsStore {
 
 	newDatePicker = true
 
+	markRoundAdd = -0.1
+
 	/**
 	 * Map containing per student overrides
 	 */
