@@ -1,6 +1,6 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
-import Mark, { MarkColorsText } from '@/components/Mark'
+import Mark, { MarkColorsBG, MarkColorsText } from '@/components/Mark'
 import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import {
@@ -206,11 +206,12 @@ const AttendanceStatsChip = observer(function AttendanceStatsChip({
 		return ~~((attendance === 0 ? 1 : attendance / from) * 100)
 	}
 	const result = percent(meetings.passed)
+	const colorSource = Theme.dark ? MarkColorsText : MarkColorsBG
 	const colorId = ~~(result / 30) + 2
 	const color =
-		colorId in MarkColorsText
-			? MarkColorsText[colorId as keyof typeof MarkColorsText]
-			: MarkColorsText[2]
+		colorId in colorSource
+			? colorSource[colorId as keyof typeof MarkColorsText]
+			: colorSource[2]
 	return (
 		<>
 			<Chip
