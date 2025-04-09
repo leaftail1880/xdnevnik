@@ -14,7 +14,7 @@ export const MarkColorsBG = {
 	3: '#8D3F00',
 	2: '#940000',
 }
-const MarkColorsText = {
+export const MarkColorsText = {
 	5: '#00C500',
 	4: '#C7A200',
 	3: '#C06600',

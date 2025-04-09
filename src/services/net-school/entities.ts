@@ -211,6 +211,11 @@ export class Diary {
 	}
 }
 
+export interface ClassMeetingStats {
+	passed: number
+	scheduled: number
+}
+
 /**
  * ALl marks for one subject
  */
@@ -220,10 +225,7 @@ export interface SubjectPerformance {
 	averageMark: number
 	classAverageMark: number
 	maxMark: number
-	classmeetingsStats: {
-		passed: number
-		scheduled: number
-	}
+	classmeetingsStats: ClassMeetingStats
 	teachers: NSEntity[]
 	results: {
 		date: string

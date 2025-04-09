@@ -79,6 +79,11 @@ const ChipsRow = observer(function Header() {
 				storeKey="shortStats"
 				label="Краткая статистика"
 			/>
+			<Filter
+				store={TermStore}
+				storeKey="attendanceStats"
+				label="Статистика посещаемости"
+			/>
 		</Chips>
 	)
 })

@@ -25,6 +25,7 @@ export const TermStore = new (class {
 	attendance = false
 	shortStats = false
 	toGetMark = true
+	attendanceStats = true
 	search = ''
 
 	get terms() {
@@ -151,7 +152,7 @@ export const TermStore = new (class {
 		})
 		makeReloadPersistable(this, {
 			name: 'termStore',
-			properties: ['sortMode', 'attendance', 'shortStats'],
+			properties: ['sortMode', 'attendance', 'shortStats', 'attendanceStats'],
 		})
 	}
 })()

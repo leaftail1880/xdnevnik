@@ -1,9 +1,13 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
-import Mark from '@/components/Mark'
+import Mark, { MarkColorsText } from '@/components/Mark'
 import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Total } from '@/services/net-school/entities'
+import {
+	ClassMeetingStats,
+	SubjectPerformance,
+	Total,
+} from '@/services/net-school/entities'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
 import { calculateMarks } from '@/utils/calculateMarks'
 import { Spacings } from '@/utils/Spacings'
@@ -124,6 +128,8 @@ export default observer(function SubjectMarks(
 	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetMarks } = marks
 
 	if (totalsAndSheduledTotals.length === 0) return
+	const perf = performance.result
+	const meetings = perf.classmeetingsStats
 	return (
 		<View style={styles.marksAndChipsContainer}>
 			<View style={styles.marks}>
@@ -176,13 +182,60 @@ export default observer(function SubjectMarks(
 							)
 						}}
 					>
-						О {performance.result.results.length}, У{' '}
-						{performance.result.classmeetingsStats.passed}/
-						{performance.result.classmeetingsStats.scheduled}, В{' '}
-						{performance.result.results.reduce((p, c) => p + c.weight, 0)}
+						О {perf.results.length}, У {meetings.passed}/{meetings.scheduled}, В{' '}
+						{perf.results.reduce((p, c) => p + c.weight, 0)}
 					</Chip>
+				)}
+				{TermStore.attendanceStats && (
+					<AttendanceStatsChip perf={perf} meetings={meetings} />
 				)}
 			</Chips>
 		</View>
+	)
+})
+
+const AttendanceStatsChip = observer(function AttendanceStatsChip({
+	perf,
+	meetings,
+}: {
+	perf: SubjectPerformance
+	meetings: ClassMeetingStats
+}) {
+	const attendance = meetings.passed - perf.attendance.length
+	function percent(from: number) {
+		return ~~((attendance === 0 ? 1 : attendance / from) * 100)
+	}
+	const result = percent(meetings.passed)
+	const colorId = ~~(result / 30) + 2
+	const color =
+		colorId in MarkColorsText
+			? MarkColorsText[colorId as keyof typeof MarkColorsText]
+			: MarkColorsText[2]
+	return (
+		<>
+			<Chip
+				compact
+				onPress={() =>
+					ModalAlert.show(
+						'Посещаемость',
+						<View>
+							<Text>Посещений: {attendance}</Text>
+							<Text>
+								Пропущено: {perf.attendance.length} (
+								<Text style={{ color }}>{result}%</Text>)
+							</Text>
+							<Text>
+								Уроков осталось: {meetings.scheduled - meetings.passed}
+							</Text>
+							<Text>Уроков прошло: {meetings.passed}</Text>
+							<Text>Уроков всего: {meetings.scheduled}</Text>
+							<Text>Итоговая посещамость: {percent(meetings.scheduled)}%</Text>
+						</View>,
+					)
+				}
+			>
+				<Text style={{ color }}>Посещаемость {result}%</Text>
+			</Chip>
+		</>
 	)
 })
