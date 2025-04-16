@@ -82,7 +82,12 @@ const ChipsRow = observer(function Header() {
 			<Filter
 				store={TermStore}
 				storeKey="attendanceStats"
-				label="Статистика посещаемости"
+				label="Посещаемость"
+			/>
+			<Filter
+				store={TermStore}
+				storeKey="attestationStats"
+				label="Аттестация"
 			/>
 		</Chips>
 	)

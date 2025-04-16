@@ -1,7 +1,8 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
 import Mark, { MarkColorsBG, MarkColorsText } from '@/components/Mark'
-import { Settings } from '@/models/settings'
+import NumberInputSetting from '@/components/NumberInput'
+import { changeSettings, Settings, StudentSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import {
 	ClassMeetingStats,
@@ -25,6 +26,8 @@ import {
 import { Chip, Text } from 'react-native-paper'
 import { SubjectInfo, TermStore } from './state'
 import { ToGetMarkChips } from './ToGetMarkChip'
+import { AttestationStatsChip } from './AttestationStatsChip'
+import { AttendanceStatsChip } from './AttendanceStatsChip'
 
 const styles = StyleSheet.create({
 	container: {
@@ -189,54 +192,8 @@ export default observer(function SubjectMarks(
 				{TermStore.attendanceStats && (
 					<AttendanceStatsChip perf={perf} meetings={meetings} />
 				)}
+				{TermStore.attestationStats && <AttestationStatsChip perf={perf} />}
 			</Chips>
 		</View>
-	)
-})
-
-const AttendanceStatsChip = observer(function AttendanceStatsChip({
-	perf,
-	meetings,
-}: {
-	perf: SubjectPerformance
-	meetings: ClassMeetingStats
-}) {
-	const attendance = meetings.passed - perf.attendance.length
-	function percent(from: number) {
-		return ~~((attendance === 0 ? 1 : attendance / from) * 100)
-	}
-	const result = percent(meetings.passed)
-	const colorSource = Theme.dark ? MarkColorsText : MarkColorsBG
-	const colorId = ~~(result / 30) + 2
-	const color =
-		colorId in colorSource
-			? colorSource[colorId as keyof typeof MarkColorsText]
-			: colorSource[2]
-	return (
-		<>
-			<Chip
-				compact
-				onPress={() =>
-					ModalAlert.show(
-						'Посещаемость',
-						<View>
-							<Text>Посещений: {attendance}</Text>
-							<Text>
-								Пропущено: {perf.attendance.length} (
-								<Text style={{ color }}>{result}%</Text>)
-							</Text>
-							<Text>
-								Уроков осталось: {meetings.scheduled - meetings.passed}
-							</Text>
-							<Text>Уроков прошло: {meetings.passed}</Text>
-							<Text>Уроков всего: {meetings.scheduled}</Text>
-							<Text>Итоговая посещамость: {percent(meetings.scheduled)}%</Text>
-						</View>,
-					)
-				}
-			>
-				<Text style={{ color }}>Посещаемость {result}%</Text>
-			</Chip>
-		</>
 	)
 })

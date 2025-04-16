@@ -15,6 +15,9 @@ export interface StudentSettings {
 	 */
 	subjects: Record<string, object>
 
+	subjectAttestation?: Record<string, number>
+	defaultAttestation?: number
+
 	/**
 	 * Current term of the student
 	 */

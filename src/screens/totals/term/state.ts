@@ -11,12 +11,16 @@ import { stringSimilarity } from '@/utils/search'
 import { makeAutoObservable } from 'mobx'
 import { ToGetMarkTargetCalculated } from '../../../utils/calculateMarks'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
+import { getAttendance } from './AttendanceStatsChip'
+import { getAttestation } from './AttestationStatsChip'
 import { RenderSubject } from './screen'
 
 export const TermStoreSortModes = [
 	{ value: 'averageMark', label: 'Средний балл' },
 	{ value: 'toGetMarkAmount', label: 'Кол-во для исправления' },
 	{ value: 'markAmount', label: 'Кол-во оценок' },
+	{ value: 'attendance', label: 'Посещаемость' },
+	{ value: 'attestation', label: 'Аттестация' },
 	{ value: 'none', label: 'Никак' },
 ] as const
 
@@ -26,7 +30,7 @@ export const TermStore = new (class {
 	shortStats = false
 	toGetMark = true
 	attendanceStats = true
-	search = ''
+	attestationStats = true
 
 	get terms() {
 		return TotalsStore.result?.[0]?.termTotals.map(total => ({
@@ -78,6 +82,20 @@ export const TermStore = new (class {
 			return TotalsStore.result
 				.slice()
 				.sort((a, b) => this.getMarkAmountOrder(a) - this.getMarkAmountOrder(b))
+		}
+
+		if (this.sortMode === 'attendance') {
+			return TotalsStore.result
+				.slice()
+				.sort((a, b) => this.getAttendanceOrder(a) - this.getAttendanceOrder(b))
+		}
+
+		if (this.sortMode === 'attestation') {
+			return TotalsStore.result
+				.slice()
+				.sort(
+					(a, b) => this.getAttestationOrder(b) - this.getAttestationOrder(a),
+				)
 		}
 
 		return TotalsStore.result
@@ -134,15 +152,41 @@ export const TermStore = new (class {
 		}
 
 		const { store } = SubjectPerformanceStores.get(
-			{
-				studentId: Settings.studentId,
-				subjectId: total.subjectId,
-			},
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
 			false,
 		)
 		if (store.result?.results) avg += store.result?.results.length / 10000
 		return avg
 	}
+
+	private getAttendanceOrder(total: Total) {
+		const { store } = SubjectPerformanceStores.get(
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			false,
+		)
+		if (!store.result?.results) return 0
+
+		const { attendance } = getAttendance(
+			store.result,
+			store.result.classmeetingsStats,
+		)
+
+		return attendance
+	}
+
+	private getAttestationOrder(total: Total) {
+		const { store } = SubjectPerformanceStores.get(
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			false,
+		)
+		if (!store.result?.results) return 0
+
+		const settings = Settings.forStudentOrThrow()
+		const { attestation } = getAttestation(settings, store.result)
+
+		return attestation
+	}
+
 	constructor() {
 		makeAutoObservable<this, string>(this, {
 			getAverageMarkOrder: false,
