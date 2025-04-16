@@ -14,6 +14,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import { SurfaceProps, Text } from 'react-native-paper'
 import { LogoutButton } from '../login/out'
 import { createSubjectAndTotalsStoreParamsAutorun } from '../totals/screen'
+import { SubjectTotalsImpl } from '../totals/subject/screen'
 import { RenderSubject, TermTotalsList } from '../totals/term/screen'
 
 const Container = observer(function Container(
@@ -40,15 +41,36 @@ export default observer(function UsefullToolsScreen() {
 			</Container>
 			<View style={{ flex: 3, gap: Spacings.s2 }}>
 				<Container flex={1} minHeight={100}>
-					<Text>Подсчитываем оценки...</Text>
+					<Text>Собираем портфель...</Text>
 				</Container>
 				<Container flex={1} minHeight={200}>
-					<Text>Собираем портфель...</Text>
+					<Text>Готовим другие инструменты...</Text>
 				</Container>
 			</View>
 		</View>,
-		<Container flex={5} minHeight={200}>
-			<Text>Готовим другие инструменты...</Text>
+		<Container flex={5}>
+			<SubjectTotalsImpl
+				finalMark={null}
+				performance={{
+					result: {
+						attendance: [],
+						averageMark: 0,
+						classAverageMark: 0,
+						classmeetingsStats: { passed: 0, scheduled: 99999 },
+						markStats: [],
+						maxMark: 0,
+						results: [],
+						subject: { id: 0, name: 'Калькулятор оценок' },
+						teachers: [],
+						term: { id: 0, name: '' },
+					},
+					fallback: undefined,
+					refreshControl: <></>,
+					updateDate: '',
+					reload: () => void 0,
+				}}
+				navigateToDiary={() => void 0}
+			/>
 		</Container>,
 		<LogoutButton />,
 		<View style={{ minHeight: 30 }}></View>,

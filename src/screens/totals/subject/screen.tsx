@@ -4,12 +4,14 @@ import { RoundedSurface } from '@/components/RoundedSurface'
 import SubjectName from '@/components/SubjectName'
 import UpdateDate from '@/components/UpdateDate'
 import { LANG, styles } from '@/constants'
+import { AsyncState } from '@/models/async.store'
 import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { DiaryState } from '@/screens/day/state'
 import type {
 	Assignment,
 	PartialAssignment,
+	SubjectPerformance,
 } from '@/services/net-school/entities'
 import {
 	MarkAssignmentsStore,
@@ -38,14 +40,33 @@ export default observer(function SubjectTotals({
 	route,
 	navigation,
 }: ScreenProps) {
-	const { termId, subjectId, finalMark } = route.params ?? {}
 	const { studentId } = Settings
-	const studentSettings = Settings.forStudentOrThrow()
+	const { subjectId, termId } = route.params
 	const performance = SubjectPerformanceStores.use({
 		studentId,
 		subjectId,
 	})
 	performance.withParams({ termId })
+	return (
+		<SubjectTotalsImpl
+			{...route.params}
+			performance={performance}
+			navigateToDiary={() => navigation.getParent()?.navigate(LANG.s_diary)}
+		/>
+	)
+})
+
+export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
+	performance,
+	navigateToDiary,
+	finalMark,
+}: {
+	performance: AsyncState<SubjectPerformance>
+	navigateToDiary: () => void
+	finalMark: string | number | null
+}) {
+	const { studentId } = Settings
+	const studentSettings = Settings.forStudentOrThrow()
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
 	const [attendance, setAttendance] = useState(false)
@@ -121,37 +142,47 @@ export default observer(function SubjectTotals({
 			</View>
 			<ScrollView
 				refreshControl={performance.refreshControl}
-				contentContainerStyle={{ gap: Spacings.s2 }}
+				contentContainerStyle={{
+					gap: Spacings.s2,
+					paddingTop: Spacings.s2,
+				}}
 			>
-				<Chips style={{ marginRight: Spacings.s2 }}>
-					<ToGetMarkChips toGetMarks={toGetMarks} />
-					<Chip
-						mode="flat"
-						compact
-						selected={attendance}
-						onPress={() => {
-							setAttendance(!attendance)
-						}}
-					>
-						Посещаемость
-					</Chip>
-					<Chip
-						mode="flat"
-						compact
-						selected={lessonsWithoutMark}
-						onPress={() => {
-							setLessonsWithoutMark(!lessonsWithoutMark)
-						}}
-					>
-						Уроки без оценок
-					</Chip>
-				</Chips>
+				{(performance.result.classmeetingsStats.passed > 0 ||
+					!!toGetMarks.length) && (
+					<Chips style={{ marginRight: Spacings.s2, paddingVertical: 0 }}>
+						<ToGetMarkChips toGetMarks={toGetMarks} />
+						{performance.result.classmeetingsStats.passed !== 0 && (
+							<>
+								<Chip
+									mode="flat"
+									compact
+									selected={attendance}
+									onPress={() => {
+										setAttendance(!attendance)
+									}}
+								>
+									Посещаемость
+								</Chip>
+								<Chip
+									mode="flat"
+									compact
+									selected={lessonsWithoutMark}
+									onPress={() => {
+										setLessonsWithoutMark(!lessonsWithoutMark)
+									}}
+								>
+									Уроки без оценок
+								</Chip>
+							</>
+						)}
+					</Chips>
+				)}
 				{totalsAndSheduledTotals.map((e, i) => (
 					<MarkRow
 						mark={e}
 						maxWeight={maxWeight}
 						minWeight={minWeight}
-						navigation={navigation}
+						navigateToDiary={navigateToDiary}
 						onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
 						key={e.assignmentId ?? i.toString()}
 					/>
@@ -163,34 +194,37 @@ export default observer(function SubjectTotals({
 					/>
 				</RoundedSurface>
 				<RoundedSurface elevation={1}>
-					{customMarks.length ? (
+					{!!customMarks.length && (
 						<Text>
 							Возможных оценок:{' '}
 							<Text variant="labelLarge">{customMarks.length}</Text>
 						</Text>
-					) : (
-						false
 					)}
-					<Text>
-						Учитель:{' '}
-						<Text variant="labelLarge">
-							{performance.result.teachers
-								.map(e => Settings.fullname(e.name))
-								.join(', ')}
+					{!!performance.result.teachers.length && (
+						<Text>
+							Учитель:{' '}
+							<Text variant="labelLarge">
+								{performance.result.teachers
+									.map(e => Settings.fullname(e.name))
+									.join(', ')}
+							</Text>
 						</Text>
-					</Text>
-					<Text>
-						Прошло уроков:{' '}
-						<Text variant="labelLarge">
-							{performance.result.classmeetingsStats.passed}/
-							{performance.result.classmeetingsStats.scheduled}
+					)}
+					{performance.result.classmeetingsStats.passed !== 0 && (
+						<Text>
+							Прошло уроков:{' '}
+							<Text variant="labelLarge">
+								{performance.result.classmeetingsStats.passed}/
+								{performance.result.classmeetingsStats.scheduled}
+							</Text>
+							, осталось:{' '}
+							<Text variant="labelLarge">
+								{performance.result.classmeetingsStats.scheduled -
+									performance.result.classmeetingsStats.passed}
+							</Text>
 						</Text>
-						, осталось:{' '}
-						<Text variant="labelLarge">
-							{performance.result.classmeetingsStats.scheduled -
-								performance.result.classmeetingsStats.passed}
-						</Text>
-					</Text>
+					)}
+
 					<Text>
 						Всего оценок:{' '}
 						<Text variant="labelLarge">
@@ -204,23 +238,25 @@ export default observer(function SubjectTotals({
 							{performance.result.results.reduce((p, c) => p + c.weight, 0)}
 						</Text>
 					</Text>
-					<View
-						style={{
-							flexDirection: 'row',
-							marginVertical: Spacings.s1,
-							flex: 1,
-							alignItems: 'center',
-						}}
-					>
-						<Text>Средний балл класса: </Text>
-						<Mark
-							mark={performance.result.classAverageMark}
-							duty={false}
-							style={{ padding: Spacings.s1 }}
-						/>
-					</View>
+					{performance.result.classmeetingsStats.passed !== 0 && (
+						<View
+							style={{
+								flexDirection: 'row',
+								marginVertical: Spacings.s1,
+								flex: 1,
+								alignItems: 'center',
+							}}
+						>
+							<Text>Средний балл класса: </Text>
+							<Mark
+								mark={performance.result.classAverageMark}
+								duty={false}
+								style={{ padding: Spacings.s1 }}
+							/>
+						</View>
+					)}
 				</RoundedSurface>
-				<UpdateDate store={performance} />
+				{!!performance.updateDate && <UpdateDate store={performance} />}
 			</ScrollView>
 		</View>
 	)
@@ -231,13 +267,13 @@ const MarkRow = observer(function MarkRow({
 	maxWeight,
 	minWeight,
 	onDelete,
-	navigation,
+	navigateToDiary,
 }: {
 	mark: Partial<PartialAssignment>
 	maxWeight: number
 	minWeight: number
 	onDelete: VoidFunction
-	navigation: ScreenProps['navigation']
+	navigateToDiary: VoidFunction
 }) {
 	Theme.key
 	const date = mark.classMeetingDate ?? mark.date
@@ -249,7 +285,6 @@ const MarkRow = observer(function MarkRow({
 			style={[
 				styles.stretch,
 				{
-					paddingTop: Spacings.s1,
 					paddingHorizontal: Spacings.s2,
 					gap: Spacings.s1,
 				},
@@ -273,7 +308,7 @@ const MarkRow = observer(function MarkRow({
 						<MarkInfo
 							mark={mark}
 							assignment={assignment}
-							navigation={navigation}
+							navigateToDiary={navigateToDiary}
 						/>,
 					)
 				}}
@@ -301,11 +336,11 @@ const MarkRow = observer(function MarkRow({
 const MarkInfo = observer(function MarkInfo({
 	mark,
 	assignment,
-	navigation,
+	navigateToDiary,
 }: {
 	mark: Partial<PartialAssignment>
 	assignment?: Assignment
-	navigation: ScreenProps['navigation']
+	navigateToDiary: VoidFunction
 }) {
 	const appearDate = mark.date ? new Date(mark.date) : undefined
 	const date = mark.classMeetingDate
@@ -391,7 +426,7 @@ const MarkInfo = observer(function MarkInfo({
 					<Button
 						onPress={() => {
 							DiaryState.day = date.toYYYYMMDD()
-							navigation.getParent()?.navigate(LANG.s_diary)
+							navigateToDiary()
 							ModalAlert.close()
 						}}
 						mode="contained-tonal"

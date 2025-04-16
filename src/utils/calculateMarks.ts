@@ -128,10 +128,12 @@ function calculateToGetMark(
 	toGetMarks: ToGetMarkTargetCalculated[],
 	customMarks: Partial<PartialAssignment>[],
 ) {
+	const stats = totals.classmeetingsStats
+	if (stats.passed === 0 && customMarks.length === 0) return
+
 	const roundedAvg = roundMark(avgMark, markRoundAdd)
 	if (roundedAvg >= targetMark) return
 
-	const stats = totals.classmeetingsStats
 	const remainingLessons = stats.scheduled - stats.passed
 
 	for (let amount = 1; amount <= remainingLessons; amount++) {
