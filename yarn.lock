@@ -10101,6 +10101,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"metro-file-map@patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch":
+  version: 0.81.0
+  resolution: "metro-file-map@patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch::version=0.81.0&hash=9346e5"
+  dependencies:
+    anymatch: "npm:^3.0.3"
+    debug: "npm:^2.2.0"
+    fb-watchman: "npm:^2.0.0"
+    flow-enums-runtime: "npm:^0.0.6"
+    fsevents: "npm:^2.3.2"
+    graceful-fs: "npm:^4.2.4"
+    invariant: "npm:^2.2.4"
+    jest-worker: "npm:^29.6.3"
+    micromatch: "npm:^4.0.4"
+    node-abort-controller: "npm:^3.1.1"
+    nullthrows: "npm:^1.1.1"
+    walker: "npm:^1.0.7"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: 10c0/077b7735d7799d77157789a14d7485ca268ecf1c865c742da4a851a6350c50f76d696c245a6848e022d09055479467f7a0d2aaf2e42da2169355b0087dc704b6
+  languageName: node
+  linkType: hard
+
 "metro-minify-terser@npm:0.81.0":
   version: 0.81.0
   resolution: "metro-minify-terser@npm:0.81.0"
