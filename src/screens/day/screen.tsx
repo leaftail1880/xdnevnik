@@ -127,11 +127,11 @@ const SelectDay = observer(function SelectDay() {
 			monthTextColor: Theme.colors.primary,
 			arrowColor: Theme.colors.primary,
 
-			selectedDayBackgroundColor: Theme.colors.primaryContainer,
-			selectedDayTextColor: Theme.colors.onPrimaryContainer,
+			selectedDayBackgroundColor: Theme.colors.secondaryContainer,
+			selectedDayTextColor: Theme.colors.onSecondaryContainer,
 
-			todayBackgroundColor: Theme.colors.secondaryContainer,
-			todayTextColor: Theme.colors.onSecondaryContainer,
+			todayBackgroundColor: Theme.colors.surfaceDisabled,
+			todayTextColor: Theme.colors.onSurfaceDisabled,
 
 			textDisabledColor: Theme.colors.onSurfaceDisabled,
 			dayTextColor: Theme.colors.onBackground,
