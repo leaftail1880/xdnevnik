@@ -94,7 +94,7 @@ export const TermStore = new (class {
 			return TotalsStore.result
 				.slice()
 				.sort(
-					(a, b) => this.getAttestationOrder(b) - this.getAttestationOrder(a),
+					(a, b) => this.getAttestationOrder(a) - this.getAttestationOrder(b),
 				)
 		}
 
@@ -182,9 +182,9 @@ export const TermStore = new (class {
 		if (!store.result?.results) return 0
 
 		const settings = Settings.forStudentOrThrow()
-		const { attestation } = getAttestation(settings, store.result)
+		const { attestation, marks } = getAttestation(settings, store.result)
 
-		return attestation
+		return attestation <= 100 ? marks : attestation
 	}
 
 	constructor() {

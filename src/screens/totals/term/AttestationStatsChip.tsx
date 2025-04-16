@@ -101,7 +101,7 @@ export function getAttestation(
 		settings.defaultAttestation ??
 		0
 
-	const attestation = marks >= need ? 100 : (need / marks) * 100
+	const attestation = marks >= need ? 100 : (marks / need) * 100
 
 	return { attestation, need, marks }
 }
