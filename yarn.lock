@@ -3412,7 +3412,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react-native@npm:^13.0.1":
+"@testing-library/react-native@npm:^13.2.0":
   version: 13.2.0
   resolution: "@testing-library/react-native@npm:13.2.0"
   dependencies:
@@ -14925,7 +14925,7 @@ __metadata:
     "@sentry/react-native": "npm:~6.3.0"
     "@swc/core": "npm:^1.11.11"
     "@swc/jest": "npm:^0.2.37"
-    "@testing-library/react-native": "npm:^13.0.1"
+    "@testing-library/react-native": "npm:^13.2.0"
     "@types/color": "npm:^3.0.6"
     "@types/eslint": "npm:^9.6.1"
     "@types/jest": "npm:^29.5.14"

@@ -72,7 +72,7 @@
 		"@eslint/eslintrc": "^3.3.0",
 		"@swc/core": "^1.11.11",
 		"@swc/jest": "^0.2.37",
-		"@testing-library/react-native": "^13.0.1",
+		"@testing-library/react-native": "^13.2.0",
 		"@types/color": "^3.0.6",
 		"@types/eslint": "^9.6.1",
 		"@types/jest": "^29.5.14",
