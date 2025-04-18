@@ -14,10 +14,6 @@ export const AttestationStatsChip = observer(function AttestationStatsChip({
 	perf: SubjectPerformance
 }) {
 	const settings = Settings.forStudentOrThrow()
-	runInAction(() => {
-		settings.defaultAttestation ??= 0
-	})
-
 	const { need, attestation, marks } = getAttestation(settings, perf)
 
 	// if (marks >= need) return
@@ -52,9 +48,6 @@ const AttestationStatsChipSettings = observer(
 		perf: SubjectPerformance
 	}) {
 		const settings = Settings.forStudentOrThrow()
-		runInAction(() => {
-			settings.subjectAttestation ??= {}
-		})
 		const { need, attestation, marks } = getAttestation(settings, perf)
 
 		return (
@@ -65,12 +58,10 @@ const AttestationStatsChipSettings = observer(
 					Аттестация {marks}/{need} ({~~attestation}%)
 				</Text>
 				<NumberInputSetting
-					value={settings.subjectAttestation?.[subjectId] ?? 0}
+					value={settings.subjectAttestation[subjectId] ?? 0}
 					onChange={v =>
 						v === 0
-							? runInAction(
-									() => delete settings.subjectAttestation?.[subjectId],
-								)
+							? runInAction(() => delete settings.subjectAttestation[subjectId])
 							: changeSettings(settings, {
 									subjectAttestation: { [subjectId]: v },
 								})
@@ -97,9 +88,7 @@ export function getAttestation(
 ) {
 	const marks = perf.results.length
 	const need =
-		settings.subjectAttestation?.[perf.subject.id] ??
-		settings.defaultAttestation ??
-		0
+		settings.subjectAttestation[perf.subject.id] ?? settings.defaultAttestation
 
 	const attestation = marks >= need ? 100 : (marks / need) * 100
 

@@ -42,8 +42,9 @@ export const TermStore = new (class {
 
 	get currentTerm() {
 		return (
-			Settings.studentSettings?.currentTerm ??
-			TotalsStore.result?.[0]?.termTotals[0].term
+			(Settings.studentId
+				? Settings.forStudent(Settings.studentId)?.currentTerm
+				: undefined) ?? TotalsStore.result?.[0]?.termTotals[0].term
 		)
 	}
 
