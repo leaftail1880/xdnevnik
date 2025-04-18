@@ -27,8 +27,9 @@ if (!__TEST__) {
 		dsn: 'https://9f602cf540f26a8de9d5d708df4558b3@o4506601427369984.ingest.sentry.io/4506601430122496',
 		// Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
 		tracesSampleRate: 0.9,
+    profilesSampleRate: 0.9
 		ignoreErrors: [/Unable activate keep awake/g],
-		integrations: [SENTRY_ROUTING],
+		integrations: [SENTRY_ROUTING, Sentry.hermesProfilingIntegration({})],
 
 		enabled: !__DEV__,
 	})
