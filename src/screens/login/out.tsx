@@ -1,6 +1,7 @@
 import Header from '@/components/Header'
 import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
+import { ModalAlert } from '@/utils/Toast'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
@@ -11,18 +12,32 @@ function logOut() {
 	runInAction(() => API.logOut())
 }
 
+function ensureLogin() {
+	ModalAlert.show(
+		'Вы уверены?',
+		<Text>
+			Если вы выйдете, то ваши логин и пароль будут удалены, и вы не сможете
+			входить автоматически. Также, вы не сможете получать уведомления.
+		</Text>,
+		true,
+		[{ label: 'Выйти', callback: logOut }],
+	)
+}
+
+export const LogoutButton = observer(function LogoutButton() {
+	return (
+		<Button onPress={ensureLogin} {...Theme.destructiveButton}>
+			Выйти
+		</Button>
+	)
+})
+
 export default observer(function LogoutScreen() {
 	return (
 		<View style={{ flex: 1, backgroundColor: Theme.colors.background }}>
 			<Header title="Выход"></Header>
 			<View style={styles.container}>
-				<Button onPress={logOut} {...Theme.destructiveButton}>
-					Выйти
-				</Button>
-				<Text style={styles.subtitle}>
-					Если вы выйдете, то ваши логин и пароль будут удалены, и вы не сможете
-					входить автоматически. Также, вы не сможете получать уведомления.
-				</Text>
+				<LogoutButton />
 			</View>
 		</View>
 	)

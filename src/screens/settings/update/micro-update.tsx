@@ -16,7 +16,6 @@ export default observer(function MicroUpdateId() {
 	return (
 		<Text
 			onPress={openModal}
-			// eslint-disable-next-line react-native/no-color-literals
 			style={{
 				backgroundColor: update
 					? Theme.colors.errorContainer
@@ -72,7 +71,7 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		if (state !== UpdateCheckState.default) {
 			timeout.current = setTimeout(
 				() => setState(UpdateCheckState.default),
-				5000
+				5000,
 			) as unknown as number
 		}
 	}, [state])
@@ -95,8 +94,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 							setState(
 								e.isAvailable
 									? UpdateCheckState.available
-									: UpdateCheckState.notAvailable
-							)
+									: UpdateCheckState.notAvailable,
+							),
 						)
 					}
 					style={{ backgroundColor: Theme.colors.secondaryContainer }}

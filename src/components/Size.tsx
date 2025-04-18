@@ -17,8 +17,8 @@ export function Size({ t }: { t: unknown }) {
 		typeof t === 'number'
 			? t
 			: typeof t === 'string'
-			? t.length
-			: JSON.stringify(t).length
+				? t.length
+				: JSON.stringify(t).length
 
 	for (const [size, chars] of sizes) {
 		if (length / chars < 0.01) continue

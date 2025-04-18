@@ -168,5 +168,4 @@ Config.expo = withAndroidManifest(Config.expo, config => {
 	return config
 })
 
-
 export default Config

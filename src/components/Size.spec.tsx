@@ -1,6 +1,6 @@
-import { render } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native'
 
-import { Size } from './Size';
+import { Size } from './Size'
 
 describe('<Size />', () => {
 	test('string bytes', () => {
@@ -64,7 +64,7 @@ describe('<Size />', () => {
 
 	test('undefined bytes', () => {
 		expect(render(<Size t={undefined} />).toJSON()).toMatchInlineSnapshot(
-			`"empty"`
+			`"empty"`,
 		)
 	})
 
@@ -218,11 +218,3 @@ describe('<Size />', () => {
 `)
 	})
 })
-
-
-
-
-
-
-
-

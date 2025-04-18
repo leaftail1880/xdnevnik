@@ -38,8 +38,8 @@ export function getSubjectName(from: SubjectNameOptions) {
 function getRealName(props: SubjectNameOptions) {
 	return 'subjectName' in props
 		? props.subjectName
-		: props.subjects.find(subject => props.subjectId === subject.id)?.name ??
-				'Предмет 404'
+		: (props.subjects.find(subject => props.subjectId === subject.id)?.name ??
+				'Предмет 404')
 }
 
 type SubjectNameProps = {

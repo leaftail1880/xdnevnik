@@ -104,7 +104,7 @@ function FastChange(
 			onPress={() => {
 				const num = props.value
 					? parseInt(props.value)
-					: props.defaultValue ?? 0
+					: (props.defaultValue ?? 0)
 				const changed = num + props.modifier
 				runInAction(
 					() => (props.onChange(changed), props.setValue(changed.toString())),

@@ -83,7 +83,6 @@ export default observer(function AppearanceSettings_() {
 	)
 })
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DevSettings = observer(function DevSettings() {
 	return (
 		<Surface elevation={1} style={{ borderRadius: Theme.roundness }}>

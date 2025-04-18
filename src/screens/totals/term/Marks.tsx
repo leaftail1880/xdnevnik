@@ -1,9 +1,14 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
-import Mark from '@/components/Mark'
-import { Settings } from '@/models/settings'
+import Mark, { MarkColorsBG, MarkColorsText } from '@/components/Mark'
+import NumberInputSetting from '@/components/NumberInput'
+import { changeSettings, Settings, StudentSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Total } from '@/services/net-school/entities'
+import {
+	ClassMeetingStats,
+	SubjectPerformance,
+	Total,
+} from '@/services/net-school/entities'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
 import { calculateMarks } from '@/utils/calculateMarks'
 import { Spacings } from '@/utils/Spacings'
@@ -20,7 +25,9 @@ import {
 } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
 import { SubjectInfo, TermStore } from './state'
-import { ToGetMarkChip } from './ToGetMarkChip'
+import { ToGetMarkChips } from './ToGetMarkChip'
+import { AttestationStatsChip } from './AttestationStatsChip'
+import { AttendanceStatsChip } from './AttendanceStatsChip'
 
 const styles = StyleSheet.create({
 	container: {
@@ -90,6 +97,7 @@ export default observer(function SubjectMarks(
 				defaultMark: student?.defaultMark,
 				defaultMarkWeight: student?.defaultMarkWeight,
 				targetMark: student?.targetMark,
+				markRoundAdd: Settings.markRoundAdd,
 			}),
 		[
 			performance.result,
@@ -104,10 +112,9 @@ export default observer(function SubjectMarks(
 		if (marks)
 			runInAction(
 				() =>
-					(TermStore.subjectGetMarks[props.total.subjectId] =
-						marks.toGetTarget),
+					(TermStore.subjectGetMarks[props.total.subjectId] = marks.toGetMarks),
 			)
-	}, [marks, marks?.toGetTarget, props.total.subjectId])
+	}, [marks, marks?.toGetMarks, props.total.subjectId])
 
 	if (!student || !studentId) return
 
@@ -121,9 +128,11 @@ export default observer(function SubjectMarks(
 			</View>
 		)
 
-	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetTarget } = marks
+	const { totalsAndSheduledTotals, maxWeight, minWeight, toGetMarks } = marks
 
 	if (totalsAndSheduledTotals.length === 0) return
+	const perf = performance.result
+	const meetings = perf.classmeetingsStats
 	return (
 		<View style={styles.marksAndChipsContainer}>
 			<View style={styles.marks}>
@@ -161,9 +170,7 @@ export default observer(function SubjectMarks(
 				/>
 			</View>
 			<Chips style={{ padding: 0 }}>
-				{typeof toGetTarget !== 'undefined' && TermStore.toGetMark && (
-					<ToGetMarkChip toGetTarget={toGetTarget} />
-				)}
+				{TermStore.toGetMark && <ToGetMarkChips toGetMarks={toGetMarks} />}
 				{TermStore.shortStats && (
 					<Chip
 						compact
@@ -178,12 +185,14 @@ export default observer(function SubjectMarks(
 							)
 						}}
 					>
-						О {performance.result.results.length}, У{' '}
-						{performance.result.classmeetingsStats.passed}/
-						{performance.result.classmeetingsStats.scheduled}, В{' '}
-						{performance.result.results.reduce((p, c) => p + c.weight, 0)}
+						О {perf.results.length}, У {meetings.passed}/{meetings.scheduled}, В{' '}
+						{perf.results.reduce((p, c) => p + c.weight, 0)}
 					</Chip>
 				)}
+				{TermStore.attendanceStats && (
+					<AttendanceStatsChip perf={perf} meetings={meetings} />
+				)}
+				{TermStore.attestationStats && <AttestationStatsChip perf={perf} />}
 			</Chips>
 		</View>
 	)

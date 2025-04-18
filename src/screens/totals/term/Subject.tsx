@@ -12,10 +12,7 @@ import { useCallback } from 'react'
 import { SubjectInfo } from './state'
 
 export default observer(function TermSubject(props: SubjectInfo) {
-	const term = props.total.termTotals.find(
-		e => e.term.id === props.selectedTerm.id,
-	)
-
+	const term = props.term
 	const openDetails = useCallback(
 		() =>
 			term &&

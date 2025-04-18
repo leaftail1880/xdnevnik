@@ -22,7 +22,7 @@ export const MarksNotificationStore = new (class {
 		makeAutoObservable(
 			this,
 			{ log: action, clearLogs: action },
-			{ autoBind: true }
+			{ autoBind: true },
 		)
 		makeReloadPersistable(this, {
 			name: 'marksNotifications',
@@ -38,7 +38,7 @@ export const MarksNotificationStore = new (class {
 				.reverse()
 				.join(' ')}  ${messages
 				.map(e => (e instanceof Error ? e.stack : String(e)))
-				.join(' ')}`
+				.join(' ')}`,
 		)
 		Logger[level]('[BACKGROUND MARKS NOTIFICATIONS FETCH]', ...messages)
 		if (this.logs.length >= 100) this.logs.pop()
@@ -71,7 +71,7 @@ function enabled() {
 const TASK_ID = 'background-fetch'
 
 TaskManager.defineTask(TASK_ID, () =>
-	checkForNewMarksAndNotify('Фоновый запрос: ')
+	checkForNewMarksAndNotify('Фоновый запрос: '),
 )
 
 let interval: ReturnType<typeof setTimeout>
@@ -85,7 +85,7 @@ autorun(function registerTask() {
 		}).catch(onError)
 		interval = setInterval(
 			() => checkForNewMarksAndNotify('Активное приложение'),
-			1000 * 60 // minute
+			1000 * 60, // minute
 		)
 	} else {
 		MarksNotificationStore.log('info', 'Состояние: Выключено')
@@ -99,7 +99,7 @@ function onError(reason: unknown) {
 }
 
 export async function checkForNewMarksAndNotify(
-	text = 'Фоновый запрос'
+	text = 'Фоновый запрос',
 ): Promise<BackgroundFetchResult> {
 	MarksNotificationStore.log('info', `${text}: Запрос новых оценок...`)
 
@@ -108,7 +108,7 @@ export async function checkForNewMarksAndNotify(
 	if (!enabled())
 		return MarksNotificationStore.log(
 			'error',
-			'Уведомления об оценках выключены'
+			'Уведомления об оценках выключены',
 		)
 
 	try {
@@ -120,7 +120,7 @@ export async function checkForNewMarksAndNotify(
 		const newMarks = checkForNewMarks(marks)
 		MarksNotificationStore.log(
 			'info',
-			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`
+			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`,
 		)
 
 		return newMarks

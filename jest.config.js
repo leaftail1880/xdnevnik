@@ -1,5 +1,4 @@
-// @ts-check
-/** @type {Record<string, import('jest').Config['transform']>} */
+/** @type { Record<string, import('jest').Config['transform']>} */
 const transformers = {
 	default: {},
 	['swc-tsx']: {
@@ -10,10 +9,19 @@ const transformers = {
 	},
 }
 
+import module from 'module'
+
+const require = module.createRequire(import.meta.url)
+
 /** @type {import('jest').Config} */
-module.exports = {
+export default {
 	preset: 'jest-expo',
-	transform: transformers[process.env.TRANSFORMER ?? 'swc-all'],
+	transform:
+		transformers[
+			(process.env.TRANSFORMER ?? process.platform === 'android')
+				? 'default'
+				: 'swc-all'
+		],
 	transformIgnorePatterns: [
 		'/node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@material)',
 		'/node_modules/react-native-reanimated/plugin/',
@@ -27,4 +35,5 @@ module.exports = {
 		__DEV__: true,
 	},
 	cacheDirectory: '.jest',
+	prettierPath: require.resolve('prettier-2'),
 }

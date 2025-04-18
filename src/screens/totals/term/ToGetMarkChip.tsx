@@ -1,27 +1,51 @@
 import Mark from '@/components/Mark'
 import { RoundedSurface } from '@/components/RoundedSurface'
 import { styles } from '@/constants'
-import { Settings } from '@/models/settings'
+import { Settings, StudentSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
+import { ToGetMarkTargetCalculated } from '@/utils/calculateMarks'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
 import { observer } from 'mobx-react-lite'
 import { StyleProp, View, ViewStyle } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
 
-export const ToGetMarkChip = observer(function ToGetMarkChip({
-	toGetTarget,
+// eslint-disable-next-line mobx/missing-observer
+export function ToGetMarkChips({
+	toGetMarks,
+}: {
+	toGetMarks: ToGetMarkTargetCalculated[]
+}) {
+	return toGetMarks.map((e, _, a) => (
+		<ToGetMarkChip
+			key={e.target.toString()}
+			amount={e.amount}
+			target={e.target}
+			// Show in full mode because there are different types of marks
+			compact={a.length > 1 ? false : undefined}
+		/>
+	))
+}
+
+const ToGetMarkChip = observer(function ToGetMarkChip({
+	amount,
+	target,
+	compact = Settings.targetMarkCompact,
 	style,
 }: {
-	toGetTarget: number | undefined
+	amount: number | undefined
+	target?: number
+	compact?: boolean
 	style?: StyleProp<ViewStyle>
 }) {
 	const { studentId } = Settings
 	if (!studentId) return
-	if (typeof toGetTarget !== 'number') return
+	if (typeof amount !== 'number') return
 
 	const student = Settings.forStudent(Settings.studentId!)
-	if (toGetTarget === 0) {
+	target ??= student.targetMark
+
+	if (amount === 0) {
 		return (
 			<Chip
 				mode="flat"
@@ -35,7 +59,7 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 					)
 				}
 			>
-				Исправить до {student.targetMark} невозможно
+				Исправить до {target} невозможно
 			</Chip>
 		)
 	}
@@ -43,44 +67,20 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 	const onPress = () =>
 		ModalAlert.show(
 			`Можно исправить оценку!`,
-			<View
-				style={{
-					flex: 1,
-					flexDirection: 'row',
-					flexWrap: 'wrap',
-					margin: Spacings.s2,
-					gap: Spacings.s1,
-				}}
-			>
-				<Text>Чтобы в итогах было</Text>
-				<Mark mark={student.targetMark} duty={false} style={{ padding: 2 }} />
-				<Text>нужно получить</Text>
-				<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
-					{toGetTarget}
-				</Text>
-				<Text>оценок вида</Text>
-				<Mark
-					duty={false}
-					style={{ padding: 0, paddingHorizontal: Spacings.s2 }}
-					textStyle={{ fontSize: 10 }}
-					subTextStyle={{ fontSize: 8 }}
-					weight={student.defaultMarkWeight}
-					mark={student.defaultMark}
-				/>
-			</View>,
+			<ToFixMarkYouNeed student={student} amount={amount} target={target} />,
 		)
 
 	return (
 		<>
-			{Settings.targetMarkCompact && (
+			{compact && (
 				<Chip mode="flat" compact style={style} onPress={onPress}>
 					<Text>Нужно </Text>
 					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
-						{toGetTarget}x
+						{amount}x
 					</Text>
 				</Chip>
 			)}
-			{!Settings.targetMarkCompact && (
+			{!compact && (
 				<RoundedSurface
 					style={[
 						styles.stretch,
@@ -95,14 +95,14 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 				>
 					<Text>До</Text>
 					<Mark
-						mark={student.targetMark}
+						mark={target}
 						duty={false}
 						style={{ padding: 2 }}
 						onPress={onPress}
 					/>
 					<Text>нужно</Text>
 					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
-						{toGetTarget}x
+						{amount}x
 					</Text>
 
 					<Mark
@@ -121,5 +121,43 @@ export const ToGetMarkChip = observer(function ToGetMarkChip({
 				</RoundedSurface>
 			)}
 		</>
+	)
+})
+
+const ToFixMarkYouNeed = observer(function ToFixMarkYouNeed({
+	student,
+	amount,
+	target,
+}: {
+	student: StudentSettings
+	amount: number
+	target: number | undefined
+}) {
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				flexWrap: 'wrap',
+				alignItems: 'center',
+				padding: Spacings.s1,
+				gap: Spacings.s1,
+			}}
+		>
+			<Text>Чтобы в итогах было</Text>
+			<Mark mark={target} duty={false} style={{ paddingHorizontal: 2 }} />
+			<Text>нужно получить</Text>
+			<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+				{amount}
+			</Text>
+			<Text>оценок вида</Text>
+			<Mark
+				duty={false}
+				style={{ paddingHorizontal: Spacings.s1 }}
+				textStyle={{ fontSize: 14 }}
+				subTextStyle={{ fontSize: 10 }}
+				weight={student.defaultMarkWeight}
+				mark={student.defaultMark}
+			/>
+		</View>
 	)
 })

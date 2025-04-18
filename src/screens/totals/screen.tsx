@@ -17,22 +17,8 @@ import SubjectTotals from './subject/screen'
 import TotalsScreenTerm from './term/screen'
 import TotalsScreenTable from './terms/TotalsScreenTable'
 
-let autorunStarted = false
-
 export default observer(function TotalsNavigation() {
-	if (!autorunStarted) {
-		autorun(function totalsNavigation() {
-			const { studentId } = Settings
-
-			if (TotalsStateStore.schoolYear && studentId) {
-				const schoolYearId = TotalsStateStore.schoolYear.id
-
-				SubjectsStore.withParams({ studentId, schoolYearId })
-				TotalsStore.withParams({ schoolYearId, studentId })
-			}
-		})
-		autorunStarted = true
-	}
+	createSubjectAndTotalsStoreParamsAutorun()
 
 	return (
 		<Stack.Navigator
@@ -60,6 +46,24 @@ export default observer(function TotalsNavigation() {
 const styles = StyleSheet.create({
 	headerStyle: { elevation: 0 },
 })
+
+let autorunStarted = false
+
+export function createSubjectAndTotalsStoreParamsAutorun() {
+	if (!autorunStarted) {
+		autorun(function totalsNavigation() {
+			const { studentId } = Settings
+
+			if (TotalsStateStore.schoolYear && studentId) {
+				const schoolYearId = TotalsStateStore.schoolYear.id
+
+				SubjectsStore.withParams({ studentId, schoolYearId })
+				TotalsStore.withParams({ schoolYearId, studentId })
+			}
+		})
+		autorunStarted = true
+	}
+}
 
 function headerRight() {
 	return <HeaderSwitch />

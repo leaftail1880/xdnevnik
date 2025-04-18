@@ -1,7 +1,7 @@
+import { Logger } from '@/constants'
+import { RequestError } from '@/utils/RequestError'
+import { Toast } from '@/utils/Toast'
 import { autorun, runInAction } from 'mobx'
-import { Logger } from '../../constants'
-import { RequestError } from '../../utils/RequestError'
-import { Toast } from '../../utils/Toast'
 import { API } from './api'
 import { ROUTES } from './routes'
 
@@ -9,7 +9,7 @@ import { ROUTES } from './routes'
 
 let requestSent = false
 
-if (!__TEST__) setTimeout(setupSession, 2000)
+setupSession()
 
 function setupSession() {
 	autorun(function autologin() {
@@ -30,7 +30,7 @@ function setupSession() {
 					'Session is still active, expires: ',
 					API.session.expires.toReadable(),
 					'now is',
-					new Date().toReadable()
+					new Date().toReadable(),
 				)
 
 			runInAction(() => {
@@ -42,7 +42,7 @@ function setupSession() {
 		requestSent = true
 		API.getToken(
 			ROUTES.refreshTokenTemplate(API.session.refresh_token),
-			'Ошибка при авторизации, перезайдите.'
+			'Ошибка при авторизации, перезайдите.',
 		)
 			.catch(e => {
 				Toast.show({ title: RequestError.stringify(e), error: true })

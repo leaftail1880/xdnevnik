@@ -24,6 +24,7 @@ export function calculateMarks({
 	defaultMark,
 	defaultMarkWeight,
 	targetMark,
+	markRoundAdd,
 }: {
 	totals: CalculateTotals
 	attendance?: boolean
@@ -32,6 +33,7 @@ export function calculateMarks({
 	defaultMark?: number
 	defaultMarkWeight?: number
 	targetMark?: number
+	markRoundAdd: number
 }) {
 	try {
 		let attendance: PartialAssignment[] = []
@@ -44,7 +46,7 @@ export function calculateMarks({
 						date: e.classMeetingDate,
 						weight: 0,
 					}
-				})
+				}),
 			)
 		}
 
@@ -52,14 +54,14 @@ export function calculateMarks({
 			(a, b) =>
 				new Date(a.classMeetingDate ?? a.date ?? '').getTime() -
 				new Date(b.classMeetingDate ?? b.date ?? '').getTime(),
-		) as Partial<PartialAssignment>[]
+		) as PartialAssignment[]
 
 		if (lessonsWithoutMark) {
-			// TODO Fix
 			const length =
 				totals.classmeetingsStats.passed -
 				totals.results.length -
 				attendance.length
+
 			if (length > 0)
 				attendance = new Array(length)
 					.fill({
@@ -77,37 +79,26 @@ export function calculateMarks({
 		}
 
 		if (lessonsWithoutMark) {
-			// TODO Fix
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(
 				new Array(
-					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length
-				).fill({})
+					totals.classmeetingsStats.scheduled - totalsAndSheduledTotals.length,
+				).fill({}),
 			)
 		}
 
-		let toGetTarget: number | undefined
-		if (
-			defaultMark &&
-			defaultMarkWeight &&
-			targetMark &&
-			roundMark(avgMark) < targetMark
-		) {
-			toGetTarget = 0
-			const remainingLessons =
-				totals.classmeetingsStats.scheduled - totals.classmeetingsStats.passed
-			for (let i = 1; i <= remainingLessons; i++) {
-				const avg = calculateAvg(
-					new Array(i).fill({
-						result: defaultMark,
-						weight: defaultMarkWeight,
-					} satisfies Partial<PartialAssignment>),
-					totals
-				)
-				if (roundMark(avg) >= targetMark) {
-					toGetTarget = i
-					break
-				}
-			}
+		const toGetMarks: ToGetMarkTargetCalculated[] = []
+		if (defaultMark && defaultMarkWeight && targetMark) {
+			calculateToGetMark(
+				avgMark,
+				markRoundAdd,
+				targetMark,
+				totals,
+				defaultMark,
+				defaultMarkWeight,
+				toGetMarks,
+				customMarks,
+			)
+			toGetMarks.sort((a, b) => b.target - a.target)
 		}
 
 		const weights = [...totals.results, ...customMarks].map(e => e.weight)
@@ -118,7 +109,7 @@ export function calculateMarks({
 			totalsAndSheduledTotals,
 			maxWeight,
 			minWeight,
-			toGetTarget,
+			toGetMarks,
 		}
 	} catch (e) {
 		if (!(e + '').includes('TypeError: Cannot convert null value to object'))
@@ -126,9 +117,54 @@ export function calculateMarks({
 	}
 }
 
-function calculateAvg(
+function calculateToGetMark(
+	avgMark: number,
+	markRoundAdd: number,
+	targetMark: number,
+	totals: CalculateTotals,
+	defaultMark: number,
+	defaultMarkWeight: number,
+	toGetMarks: ToGetMarkTargetCalculated[],
+	customMarks: Partial<PartialAssignment>[],
+) {
+	const stats = totals.classmeetingsStats
+	if (stats.passed === 0 && customMarks.length === 0) return
+
+	const roundedAvg = roundMark(avgMark, markRoundAdd)
+	if (roundedAvg >= targetMark) return
+
+	const remainingLessons = stats.scheduled - stats.passed
+
+	for (let amount = 1; amount <= remainingLessons; amount++) {
+		const avg = calculateAvg(
+			new Array(amount)
+				.fill({
+					result: defaultMark,
+					weight: defaultMarkWeight,
+				} satisfies Partial<PartialAssignment>)
+				.concat(customMarks),
+			totals,
+		)
+
+		// Calculate for other possible mark targets too
+		for (let target = roundedAvg + 1; target <= targetMark; target++) {
+			if (roundMark(avg, markRoundAdd) >= target) {
+				const highest = target === targetMark
+
+				if (!toGetMarks.some(e => e.target === target)) {
+					toGetMarks.push({ target, amount, highest })
+				}
+				if (highest) return
+			}
+		}
+	}
+
+	toGetMarks.push({ target: targetMark, amount: 0, highest: true })
+}
+
+export function calculateAvg(
 	customMarks: Partial<Pick<PartialAssignment, 'weight' | 'result'>>[],
-	totals: CalculateTotals
+	totals: CalculateTotals,
 ) {
 	let totalWeight = 0
 	let totalMark = 0
@@ -141,4 +177,10 @@ function calculateAvg(
 	}
 
 	return Number((totalMark / totalWeight).toFixed(2))
+}
+
+export interface ToGetMarkTargetCalculated {
+	highest: boolean
+	target: number
+	amount: number
 }

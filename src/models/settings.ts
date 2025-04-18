@@ -16,6 +16,8 @@ export interface StudentSettings {
 	subjects: Record<string, object>
 
 	lessonOrder: Record<number, Record<string, number> | undefined>
+	subjectAttestation?: Record<string, number>
+	defaultAttestation?: number
 
 	/**
 	 * Current term of the student
@@ -49,6 +51,8 @@ class SettingsStore {
 	targetMarkCompact = false
 
 	newDatePicker = true
+
+	markRoundAdd = -0.1
 
 	/**
 	 * Map containing per student overrides

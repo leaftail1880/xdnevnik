@@ -1,6 +1,11 @@
 import ErrorHandler from '@/components/ErrorHandler'
 import Loading from '@/components/Loading'
-import { API as NSApi, NetSchoolError } from '@/services/net-school/api'
+import {
+	CacheUsed,
+	CacheableReq,
+	API as NSApi,
+	NetSchoolError,
+} from '@/services/net-school/api'
 import {
 	action,
 	autorun,
@@ -14,7 +19,7 @@ import { Logger } from '../constants'
 
 export type AsyncMethod = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	arg: Record<string, any>,
+	arg: Record<string, any> & CacheableReq,
 ) => Promise<unknown>
 
 /**
@@ -48,6 +53,8 @@ export type AdditionalDeps = (
 	| boolean
 	| number
 )[]
+
+const firstTimeCacheUsedFor = new Set<string>()
 
 export class AsyncStore<
 	Source extends object,
@@ -83,6 +90,7 @@ export class AsyncStore<
 			| 'method'
 			| 'API'
 			| 'log'
+			| 'refreshControlLoadingOverride'
 		>(
 			this,
 			{
@@ -98,6 +106,7 @@ export class AsyncStore<
 				params: observable.struct,
 				withParams: action,
 				loading: true,
+				refreshControlLoadingOverride: true,
 				log: false,
 				debug: false,
 				name: false,
@@ -149,8 +158,14 @@ export class AsyncStore<
 
 	updateDate = 'Загрузка...'
 
+	private refreshControlLoadingOverride = true
 	get refreshControl() {
-		return <RefreshControl refreshing={this.loading} onRefresh={this.reload} />
+		return (
+			<RefreshControl
+				refreshing={this.refreshControlLoadingOverride || this.loading}
+				onRefresh={this.reload}
+			/>
+		)
 	}
 
 	get fallback() {
@@ -168,7 +183,7 @@ export class AsyncStore<
 		}
 	}
 
-	withParams(params: Omit<FnParams, keyof DefaultParams>) {
+	withParams(params: Omit<FnParams, keyof DefaultParams | 'cache'>) {
 		this.log('Changing params from', this.params, 'to', params)
 		// @ts-expect-error Type infering
 		this.params = params
@@ -215,11 +230,31 @@ export class AsyncStore<
 			return
 		}
 
+		const key = String(this.method) + '-' + JSON.stringify(params)
+
+		// Only force load from cache on the first request
+		const cache: CacheUsed | undefined = firstTimeCacheUsedFor.has(key)
+			? undefined
+			: { isUsed: false }
+
 		try {
-			this.result = yield request.call(this.API, params)
+			this.result = yield request.call(this.API, { ...params, cache })
 			this.updateDate = `Дата обновления: ${new Date().toLocaleTimeString()}`
-			this.loading = false
-			this.log('Loaded')
+
+			if (cache?.isUsed) {
+				this.refreshControlLoadingOverride = true
+				this.reload()
+			} else if (this.refreshControlLoadingOverride) {
+				this.refreshControlLoadingOverride = false
+			}
+
+			this.log(
+				'Loaded, first time cache expected',
+				!firstTimeCacheUsedFor.has(key),
+				cache,
+				'used',
+				cache?.isUsed,
+			)
 		} catch (error) {
 			const canIgnore =
 				(error instanceof Error && error.message === 'Aborted') ||
@@ -234,6 +269,9 @@ export class AsyncStore<
 			}
 
 			this.error = error
+		} finally {
+			this.loading = false
+			firstTimeCacheUsedFor.add(key)
 		}
 	}
 }

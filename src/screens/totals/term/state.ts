@@ -1,6 +1,6 @@
 import { getSubjectName } from '@/components/SubjectName'
 import { Settings } from '@/models/settings'
-import { NSEntity, Subject, Total } from '@/services/net-school/entities'
+import { Total } from '@/services/net-school/entities'
 import {
 	SubjectPerformanceStores,
 	SubjectsStore,
@@ -9,12 +9,18 @@ import {
 import { makeReloadPersistable } from '@/utils/makePersistable'
 import { stringSimilarity } from '@/utils/search'
 import { makeAutoObservable } from 'mobx'
+import { ToGetMarkTargetCalculated } from '../../../utils/calculateMarks'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
+import { getAttendance } from './AttendanceStatsChip'
+import { getAttestation } from './AttestationStatsChip'
+import { RenderSubject } from './screen'
 
 export const TermStoreSortModes = [
 	{ value: 'averageMark', label: 'Средний балл' },
 	{ value: 'toGetMarkAmount', label: 'Кол-во для исправления' },
 	{ value: 'markAmount', label: 'Кол-во оценок' },
+	{ value: 'attendance', label: 'Посещаемость' },
+	{ value: 'attestation', label: 'Аттестация' },
 	{ value: 'none', label: 'Никак' },
 ] as const
 
@@ -23,7 +29,8 @@ export const TermStore = new (class {
 	attendance = false
 	shortStats = false
 	toGetMark = true
-	search = ''
+	attendanceStats = true
+	attestationStats = true
 
 	get terms() {
 		return TotalsStore.result?.[0]?.termTotals.map(total => ({
@@ -77,10 +84,24 @@ export const TermStore = new (class {
 				.sort((a, b) => this.getMarkAmountOrder(a) - this.getMarkAmountOrder(b))
 		}
 
+		if (this.sortMode === 'attendance') {
+			return TotalsStore.result
+				.slice()
+				.sort((a, b) => this.getAttendanceOrder(a) - this.getAttendanceOrder(b))
+		}
+
+		if (this.sortMode === 'attestation') {
+			return TotalsStore.result
+				.slice()
+				.sort(
+					(a, b) => this.getAttestationOrder(a) - this.getAttestationOrder(b),
+				)
+		}
+
 		return TotalsStore.result
 	}
 
-	subjectGetMarks: Record<string, number | undefined> = {}
+	subjectGetMarks: Record<string, ToGetMarkTargetCalculated[] | undefined> = {}
 
 	private getSearchOrder(total: Total) {
 		const name = getSubjectName(
@@ -115,7 +136,7 @@ export const TermStore = new (class {
 	}
 
 	private getToGetMarkOrder(a: Total) {
-		const order = this.subjectGetMarks[a.subjectId] ?? 0
+		const order = this.subjectGetMarks[a.subjectId]?.[0]?.amount ?? 0
 		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
 	}
 
@@ -131,15 +152,41 @@ export const TermStore = new (class {
 		}
 
 		const { store } = SubjectPerformanceStores.get(
-			{
-				studentId: Settings.studentId,
-				subjectId: total.subjectId,
-			},
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
 			false,
 		)
 		if (store.result?.results) avg += store.result?.results.length / 10000
 		return avg
 	}
+
+	private getAttendanceOrder(total: Total) {
+		const { store } = SubjectPerformanceStores.get(
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			false,
+		)
+		if (!store.result?.results) return 0
+
+		const { attendance } = getAttendance(
+			store.result,
+			store.result.classmeetingsStats,
+		)
+
+		return attendance
+	}
+
+	private getAttestationOrder(total: Total) {
+		const { store } = SubjectPerformanceStores.get(
+			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			false,
+		)
+		if (!store.result?.results) return 0
+
+		const settings = Settings.forStudentOrThrow()
+		const { attestation, marks } = getAttestation(settings, store.result)
+
+		return attestation <= 100 ? marks : attestation
+	}
+
 	constructor() {
 		makeAutoObservable<this, string>(this, {
 			getAverageMarkOrder: false,
@@ -149,14 +196,11 @@ export const TermStore = new (class {
 		})
 		makeReloadPersistable(this, {
 			name: 'termStore',
-			properties: ['sortMode', 'attendance', 'shortStats'],
+			properties: ['sortMode', 'attendance', 'shortStats', 'attendanceStats'],
 		})
 	}
 })()
 
-export type SubjectInfo = {
-	total: Total
-	selectedTerm: NSEntity
+export type SubjectInfo = Parameters<RenderSubject>[0] & {
 	attendance: boolean
-	subjects: Subject[]
 } & Pick<TotalsScreenParams, 'navigation'>

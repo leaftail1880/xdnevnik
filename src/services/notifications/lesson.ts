@@ -42,6 +42,10 @@ export const LessonNotifStore = new (class {
 	}
 })()
 
+function enabled() {
+	return Settings.notificationsEnabled && Settings.lessonNotifications
+}
+
 export async function setupLessonChannel() {
 	// Show notification channels even when they are disabled
 	const lessonChannelId = await notifee.createChannel({
@@ -56,7 +60,7 @@ export async function setupLessonChannel() {
 		e => e.notification.android?.channelId === lessonChannelId,
 	)
 
-	if (!Settings.lessonNotifications) {
+	if (!enabled()) {
 		return runInAction(() => {
 			LessonNotifStore.remove(LessonNotifStore.id || oldNotification?.id)
 		})
@@ -71,7 +75,7 @@ export async function setupLessonChannel() {
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
-	if (!Settings.lessonNotifications || !LessonNotifStore.lessonChannelId) {
+	if (!enabled() || !LessonNotifStore.lessonChannelId) {
 		return LessonNotifStore.remove()
 	}
 
@@ -180,7 +184,7 @@ async function showNotification(
 			notifee.registerForegroundService(() => new Promise(() => {}))
 			foregroundServiceRegistered = true
 		}
-	} catch (e) {
+	} catch {
 		MarksNotificationStore.log(
 			'error',
 			'Не удалось зарегистрировать сервис ПОСТОЯННЫХ уведомлений. Могут быть перебои в работе.',

@@ -50,6 +50,7 @@ export default observer(function DiaryAssignment({
 					alignContent: 'stretch',
 					alignItems: 'center',
 					gap: Spacings.s1,
+					marginTop: Spacings.s1,
 				}}
 			>
 				<ScrollTextCopyable

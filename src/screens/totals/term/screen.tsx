@@ -1,7 +1,7 @@
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { memo, useCallback } from 'react'
-import { FlatList, ListRenderItem } from 'react-native'
+import React, { memo, useCallback } from 'react'
+import { FlatList, FlatListProps, ListRenderItem } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
@@ -12,7 +12,7 @@ import UpdateDate from '@/components/UpdateDate'
 import { Chips } from '@/components/Chips'
 import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Total } from '@/services/net-school/entities'
+import { NSEntity, Subject, Total } from '@/services/net-school/entities'
 import {
 	EducationStore,
 	HomeworkMarksStore,
@@ -24,10 +24,23 @@ import { TermStore, TermStoreSortModes } from './state'
 
 // eslint-disable-next-line mobx/missing-observer
 export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
+	const renderSubject = useCallback<RenderSubject>(
+		totalProps => (
+			<SubjectPerformanceInline
+				attendance
+				{...totalProps}
+				navigation={props.navigation}
+			/>
+		),
+		[props.navigation],
+	)
+
 	return (
-		<>
-			<TermTotalsList {...props} />
-		</>
+		<TermTotalsList
+			renderSubject={renderSubject}
+			ListHeaderComponent={ChipsRow}
+			ListFooterComponent={<UpdateDate store={TotalsStore} />}
+		/>
 	)
 })
 
@@ -66,6 +79,16 @@ const ChipsRow = observer(function Header() {
 				storeKey="shortStats"
 				label="Краткая статистика"
 			/>
+			<Filter
+				store={TermStore}
+				storeKey="attendanceStats"
+				label="Посещаемость"
+			/>
+			<Filter
+				store={TermStore}
+				storeKey="attestationStats"
+				label="Аттестация"
+			/>
 		</Chips>
 	)
 })
@@ -93,9 +116,38 @@ const Filter = observer(function Filter<T extends object>(props: {
 	)
 })
 
-const TermTotalsList = observer(function TermTotalsList({
-	navigation,
-}: TotalsScreenParams) {
+export type RenderSubject = (props: {
+	total: Total
+	subjects: Subject[]
+	selectedTerm: NSEntity
+	term: Total['termTotals'][number] | undefined
+}) => React.ReactElement
+
+export const TermTotalsList = observer(function TermTotalsList(
+	props: Omit<
+		FlatListProps<Total>,
+		'keyExtractor' | 'refreshControl' | 'data' | 'renderItem'
+	> & {
+		renderSubject: RenderSubject
+		ft?: typeof import('react-native').FlatList
+	},
+) {
+	const renderSubject = props.renderSubject
+	const renderItem = useCallback<ListRenderItem<Total>>(
+		total =>
+			TermStore?.currentTerm
+				? renderSubject({
+						total: total.item,
+						selectedTerm: TermStore.currentTerm,
+						subjects: SubjectsStore.result!,
+						term: total.item.termTotals.find(
+							e => e.term.id === TermStore.currentTerm!.id,
+						),
+					})
+				: null,
+		[renderSubject],
+	)
+
 	Theme.key
 
 	HomeworkMarksStore.withParams({
@@ -104,19 +156,7 @@ const TermTotalsList = observer(function TermTotalsList({
 		withExpiredClassAssign: true,
 	})
 
-	const renderItem = useCallback<ListRenderItem<Total>>(
-		total =>
-			TermStore?.currentTerm ? (
-				<SubjectPerformanceInline
-					attendance
-					navigation={navigation}
-					total={total.item}
-					selectedTerm={TermStore.currentTerm}
-					subjects={SubjectsStore.result!}
-				/>
-			) : null,
-		[navigation],
-	)
+	const F = props.ft ?? FlatList
 
 	return (
 		EducationStore.fallback ||
@@ -125,16 +165,15 @@ const TermTotalsList = observer(function TermTotalsList({
 		(TotalsStore.result === null || TotalsStore.result.length < 1 ? (
 			<Loading text="Загрузка из кэша..." />
 		) : (
-			<FlatList
-				ListHeaderComponent={ChipsRow}
+			<F<Total>
 				initialNumToRender={5}
 				maxToRenderPerBatch={1}
 				scrollEventThrottle={2000}
-				data={TermStore.totalsResult}
-				refreshControl={TotalsStore.refreshControl}
+				{...props}
 				renderItem={renderItem}
+				refreshControl={TotalsStore.refreshControl}
 				keyExtractor={keyExtractor}
-				ListFooterComponent={<UpdateDate store={TotalsStore} />}
+				data={TermStore.totalsResult}
 			/>
 		))
 	)

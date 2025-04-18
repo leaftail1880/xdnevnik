@@ -56,5 +56,5 @@ Date.week = date =>
 		.fill('')
 		.map(
 			(_, i) =>
-				new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs)
+				new Date(date.getTime() - (date.getDayFromMonday() - i) * dayInMs),
 		) as ReturnType<typeof Date.week>
