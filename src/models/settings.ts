@@ -15,8 +15,8 @@ export interface StudentSettings {
 	 */
 	subjects: Record<string, object>
 
-	subjectAttestation?: Record<string, number>
-	defaultAttestation?: number
+	subjectAttestation: Record<string, number>
+	defaultAttestation: number
 
 	/**
 	 * Current term of the student
@@ -65,15 +65,22 @@ class SettingsStore {
 	}
 
 	forStudent(id: number) {
+		const defaultValue: StudentSettings = {
+			subjectNames: {},
+			subjectAttestation: {},
+			defaultAttestation: 0,
+			subjects: {},
+		}
 		const overrides = this.studentOverrides[id]
 
 		if (overrides) {
+			runInAction(() => {
+				for (const [k, v] of Object.entries(defaultValue)) {
+					overrides[k as keyof StudentSettings] ??= v
+				}
+			})
 			return overrides
 		} else {
-			const defaultValue: StudentSettings = {
-				subjectNames: {},
-				subjects: {},
-			}
 			runInAction(() => (this.studentOverrides[id] = defaultValue))
 
 			const overrides = this.studentOverrides[id]
@@ -95,17 +102,10 @@ class SettingsStore {
 		return this.forStudent(studentId)
 	}
 
-	get studentSettings() {
-		if (!this.studentId) return
-
-		return this.forStudent(this.studentId)
-	}
-
 	constructor() {
 		makeAutoObservable(this, {
 			forStudent: false,
 			forStudentOrThrow: false,
-			studentSettings: false,
 			fullname: false,
 			studentId: false,
 		})
