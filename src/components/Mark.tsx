@@ -2,11 +2,12 @@ import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import {
+	StyleSheet,
 	TextStyle,
 	TouchableOpacity,
 	TouchableOpacityProps,
 } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Badge, Text } from 'react-native-paper'
 
 export const MarkColorsBG = {
 	5: '#007000',
@@ -42,6 +43,7 @@ export default observer(function Mark({
 	minWeight,
 	duty,
 	noColor = '#7A7A7A',
+	unseen = false,
 	...props
 }: TouchableOpacityProps & {
 	finalMark?: number | null | string
@@ -50,6 +52,7 @@ export default observer(function Mark({
 	noColor?: string
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
+	unseen?: boolean
 } & (Weight | Partial<Weight>)) {
 	const {
 		bg,
@@ -90,6 +93,7 @@ export default observer(function Mark({
 				style,
 			]}
 		>
+			{unseen && <Badge style={styles.badge} size={8} />}
 			<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
 				{duty ? '.' : (finalMark ?? calculatedMark ?? ' ')}
 			</Text>
@@ -165,3 +169,11 @@ function calculateColorsAndMark(
 	}
 	return { bg, color, textColor, rawMark }
 }
+
+const styles = StyleSheet.create({
+	badge: {
+		position: 'absolute',
+		top: -2,
+		right: -2,
+	},
+})

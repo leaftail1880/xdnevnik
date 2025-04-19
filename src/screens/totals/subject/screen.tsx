@@ -17,16 +17,21 @@ import {
 	MarkAssignmentsStore,
 	SubjectPerformanceStores,
 } from '@/services/net-school/store'
+import {
+	MarksNotificationStore,
+	StudentMarksStorage,
+} from '@/services/notifications/marks'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
 import { calculateMarks } from '@/utils/calculateMarks'
 import { StackScreenProps } from '@react-navigation/stack'
 import { formatDistanceToNow, formatDuration } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import { Button, Chip, IconButton, Text } from 'react-native-paper'
+import { Chip, IconButton, Text } from 'react-native-paper'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
 import { ToGetMarkChips } from '../term/ToGetMarkChip'
 import { AddMarkForm } from './AddMarkForm'
@@ -262,6 +267,18 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 	)
 })
 
+const MarkSeenToggleLabel = observer(function MarkSeenToggleLabel({
+	studentStore,
+	id,
+}: {
+	studentStore: StudentMarksStorage
+	id: string | number
+}) {
+	return studentStore.forceNotSeen.includes(id)
+		? 'Отметить прочитанной'
+		: 'Отметить непрочитанной'
+})
+
 const MarkRow = observer(function MarkRow({
 	mark,
 	maxWeight,
@@ -280,6 +297,68 @@ const MarkRow = observer(function MarkRow({
 	const assignment = MarkAssignmentsStore.result?.find(
 		e => e.assignmentId === mark.assignmentId,
 	)
+	const onPress = () => {
+		if (!Settings.studentId) return
+
+		const date = mark.classMeetingDate
+			? new Date(mark.classMeetingDate)
+			: undefined
+		const now = new Date()
+		date?.setHours(
+			now.getHours(),
+			now.getMinutes(),
+			now.getSeconds(),
+			now.getMilliseconds(),
+		)
+
+		const studentStore = MarksNotificationStore.getStudent(Settings.studentId)
+
+		const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
+		const id = mark.assignmentId
+		ModalAlert.show(
+			title,
+			<MarkInfo mark={mark} assignment={assignment} date={date} />,
+			false,
+			id
+				? [
+						{
+							label: 'Перейти ко дню',
+							callback() {
+								if (date) {
+									DiaryState.day = date.toYYYYMMDD()
+									navigateToDiary()
+									ModalAlert.close()
+								}
+							},
+						},
+						{
+							label: (
+								<MarkSeenToggleLabel id={id} studentStore={studentStore} />
+							),
+							callback() {
+								if (studentStore.forceNotSeen.includes(id)) {
+									studentStore.forceNotSeen = studentStore.forceNotSeen.filter(
+										e => e !== id,
+									)
+								} else {
+									studentStore.forceNotSeen.push(id)
+								}
+							},
+						},
+					]
+				: undefined,
+		)
+	}
+	useEffect(() => {
+		runInAction(() => {
+			if (mark.assignmentId && Settings.studentId) {
+				const studentStorage = MarksNotificationStore.getStudent(
+					Settings.studentId,
+				)
+				studentStorage.seen.push(mark.assignmentId)
+			}
+		})
+	}, [mark.assignmentId])
 	return (
 		<View
 			style={[
@@ -301,17 +380,12 @@ const MarkRow = observer(function MarkRow({
 					paddingVertical: 2,
 					minWidth: 40,
 				}}
-				onPress={() => {
-					const title = `${mark.assignmentTypeName ?? ''} ${mark.result ?? 'Оценки нет'}`
-					ModalAlert.show(
-						title,
-						<MarkInfo
-							mark={mark}
-							assignment={assignment}
-							navigateToDiary={navigateToDiary}
-						/>,
-					)
-				}}
+				onPress={onPress}
+				unseen={
+					!!mark.assignmentId &&
+					!!Settings.studentId &&
+					MarksNotificationStore.isUnseen(Settings.studentId, mark.assignmentId)
+				}
 			/>
 			<View
 				style={{
@@ -336,23 +410,13 @@ const MarkRow = observer(function MarkRow({
 const MarkInfo = observer(function MarkInfo({
 	mark,
 	assignment,
-	navigateToDiary,
+	date,
 }: {
 	mark: Partial<PartialAssignment>
 	assignment?: Assignment
-	navigateToDiary: VoidFunction
+	date: Date | undefined
 }) {
 	const appearDate = mark.date ? new Date(mark.date) : undefined
-	const date = mark.classMeetingDate
-		? new Date(mark.classMeetingDate)
-		: undefined
-	const now = new Date()
-	date?.setHours(
-		now.getHours(),
-		now.getMinutes(),
-		now.getSeconds(),
-		now.getMilliseconds(),
-	)
 
 	let appearDateDifferenceInDays = -1
 	if (appearDate && date) {
@@ -423,16 +487,6 @@ const MarkInfo = observer(function MarkInfo({
 							)
 						</Text>
 					)}
-					<Button
-						onPress={() => {
-							DiaryState.day = date.toYYYYMMDD()
-							navigateToDiary()
-							ModalAlert.close()
-						}}
-						mode="contained-tonal"
-					>
-						Перейти ко дню
-					</Button>
 				</>
 			)}
 		</View>

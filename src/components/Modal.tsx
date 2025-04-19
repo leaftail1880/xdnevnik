@@ -103,7 +103,7 @@ const Actions = observer(function Actions() {
 	}
 
 	return (
-		<Dialog.Actions>
+		<Dialog.Actions style={{ flexWrap: 'wrap' }}>
 			{ModalAlert.state.buttons?.map((e, i) => (
 				<Button onPress={e.callback} key={i.toString()} labelStyle={labelStyle}>
 					{e.label}
