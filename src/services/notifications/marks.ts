@@ -10,6 +10,7 @@ import * as BackgroundFetch from 'expo-background-fetch'
 import { BackgroundFetchResult } from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
+import { Platform } from 'react-native'
 import { Logger } from '../../constants'
 import { API } from '../net-school/api'
 
@@ -105,29 +106,31 @@ function enabled() {
 
 const TASK_ID = 'background-fetch'
 
-TaskManager.defineTask(TASK_ID, () =>
-	checkForNewMarksAndNotify('Фоновый запрос: '),
-)
+if (Platform.OS !== 'ios') {
+	TaskManager.defineTask(TASK_ID, () =>
+		checkForNewMarksAndNotify('Фоновый запрос: '),
+	)
 
-let interval: ReturnType<typeof setTimeout>
+	let interval: ReturnType<typeof setTimeout>
 
-autorun(function registerTask() {
-	if (enabled()) {
-		MarksNotificationStore.log('info', 'Состояние: Включено')
-		BackgroundFetch.registerTaskAsync(TASK_ID, {
-			startOnBoot: true,
-			stopOnTerminate: false,
-		}).catch(onError)
-		interval = setInterval(
-			() => checkForNewMarksAndNotify('Активное приложение'),
-			1000 * 60, // minute
-		)
-	} else {
-		MarksNotificationStore.log('info', 'Состояние: Выключено')
-		BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
-		clearInterval(interval)
-	}
-})
+	autorun(function registerTask() {
+		if (enabled()) {
+			MarksNotificationStore.log('info', 'Состояние: Включено')
+			BackgroundFetch.registerTaskAsync(TASK_ID, {
+				startOnBoot: true,
+				stopOnTerminate: false,
+			}).catch(onError)
+			interval = setInterval(
+				() => checkForNewMarksAndNotify('Активное приложение'),
+				1000 * 60, // minute
+			)
+		} else {
+			MarksNotificationStore.log('info', 'Состояние: Выключено')
+			BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
+			clearInterval(interval)
+		}
+	})
+}
 
 function onError(reason: unknown) {
 	Logger.debug(`Unregistering task ${TASK_ID} failed:`, reason)
