@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { Settings, StudentSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Subject } from '@/services/net-school/entities'
 import { runInAction } from 'mobx'
@@ -15,6 +15,7 @@ import {
 import {
 	Button,
 	Dialog,
+	HelperText,
 	Portal,
 	Text,
 	TextInput,
@@ -23,19 +24,34 @@ import {
 
 type SubjectNameOptions = {
 	subjectId: number
+	dayNameId?: string
 } & ({ subjects: Subject[] } | { subjectName: string })
 
 export function getSubjectName(from: SubjectNameOptions) {
 	const { studentId } = Settings
 	if (!studentId) return 'Загрузка'
 
-	const overriden = Settings.forStudent(studentId).subjectNames[from.subjectId]
-	if (overriden) return overriden
+	const studentSettings = Settings.forStudent(studentId)
+	if (from.dayNameId) {
+		const dayOverriden = studentSettings.subjectNamesDay[from.dayNameId]
 
-	return getRealName(from)
+		if (dayOverriden) return dayOverriden
+	}
+
+	return getOverridenOrOfficalName(from, studentSettings)
 }
 
-function getRealName(props: SubjectNameOptions) {
+export function getOverridenOrOfficalName(
+	from: SubjectNameOptions,
+	studentSettings: StudentSettings,
+) {
+	const overriden = studentSettings.subjectNames[from.subjectId]
+	if (overriden) return overriden
+
+	return getOfficalName(from)
+}
+
+function getOfficalName(props: SubjectNameOptions) {
 	return 'subjectName' in props
 		? props.subjectName
 		: (props.subjects.find(subject => props.subjectId === subject.id)?.name ??
@@ -44,6 +60,7 @@ function getRealName(props: SubjectNameOptions) {
 
 type SubjectNameProps = {
 	viewStyle?: StyleProp<ViewStyle>
+	editDisabled?: boolean
 } & SubjectNameOptions &
 	Omit<
 		TextProps<string>,
@@ -58,6 +75,7 @@ const styles = StyleSheet.create({
 
 export default observer(function SubjectName({
 	viewStyle,
+	editDisabled,
 	...props
 }: SubjectNameProps) {
 	const [isEditing, setIsEditing] = useState(false)
@@ -65,37 +83,36 @@ export default observer(function SubjectName({
 	const onPress = useCallback(() => setIsEditing(true), [setIsEditing])
 
 	return (
-		<TouchableOpacity style={[styles.touchable, viewStyle]} onPress={onPress}>
+		<TouchableOpacity
+			style={[styles.touchable, viewStyle]}
+			onPress={editDisabled ? undefined : onPress}
+		>
 			<Text {...props}>{name}</Text>
-			{isEditing && (
-				<EditSubjectName setIsEditing={setIsEditing} name={name} {...props} />
-			)}
+			{isEditing && <EditSubjectName setIsEditing={setIsEditing} {...props} />}
 		</TouchableOpacity>
 	)
 })
 
 const EditSubjectName = observer(function EditSubjectName({
 	setIsEditing,
-	name,
 	...props
-}: { name: string; setIsEditing: (v: boolean) => void } & SubjectNameProps) {
-	const [newName, setNewName] = useState('')
+}: { setIsEditing: (v: boolean) => void } & SubjectNameProps) {
+	const studentSettings = Settings.forStudentOrThrow()
+	const dayOverriden = getSubjectName(props)
+	const globalOverriden = getOverridenOrOfficalName(props, studentSettings)
+	const [name, setName] = useState('')
 	const onCancelPress = useCallback(() => {
-		setNewName('')
+		setName('')
 		setIsEditing(false)
-	}, [setNewName, setIsEditing])
+	}, [setName, setIsEditing])
 
 	const onSavePress = useCallback(() => {
 		runInAction(() => {
-			const studentSettings = Settings.forStudentOrThrow()
-			if (newName) {
-				studentSettings.subjectNames[props.subjectId] = newName
-			} else {
-				delete studentSettings.subjectNames[props.subjectId]
-			}
+			if (name) studentSettings.subjectNames[props.subjectId] = name
+			else delete studentSettings.subjectNames[props.subjectId]
 		})
 		setIsEditing(false)
-	}, [newName, setIsEditing, props.subjectId])
+	}, [setIsEditing, name, studentSettings.subjectNames, props.subjectId])
 
 	return (
 		<Portal>
@@ -107,13 +124,25 @@ const EditSubjectName = observer(function EditSubjectName({
 					<Text>
 						Имя в журнале:{' '}
 						<Text style={{ fontWeight: 'bold' }} selectable>
-							{getRealName(props)}
+							{getOfficalName(props)}
 						</Text>
 					</Text>
+					{dayOverriden !== globalOverriden && (
+						<>
+							<HelperText type="error">
+								Имя уже перезаписано для конкретного дня и урока, а сейчас вы
+								меняете имя глобально. Если вы хотите переименовать конкретный
+								урок в конкретный день, долго зажмите на пустое место на
+								карточке предмета
+							</HelperText>
+							<Text>Глобально: {globalOverriden}</Text>
+							<Text>Для дня: {dayOverriden}</Text>
+						</>
+					)}
 					<TextInput
 						mode="outlined"
-						defaultValue={name}
-						onChangeText={setNewName}
+						defaultValue={getOverridenOrOfficalName(props, studentSettings)}
+						onChangeText={setName}
 						placeholder="Как в журнале"
 					/>
 				</Dialog.Content>

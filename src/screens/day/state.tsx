@@ -134,3 +134,5 @@ function DayRenderer({ day, i }: { day: Date; i: number }) {
 		</View>
 	)
 }
+
+export const DAY_NAMES_SHORT = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']

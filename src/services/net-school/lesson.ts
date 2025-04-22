@@ -21,6 +21,7 @@ interface BaseLesson {
 	attachmentsExists: boolean
 	resultsExists: boolean
 	attendance: string | number | null
+	distanceMeetingId: number
 	addEducation: boolean
 	extraActivity: boolean
 }
@@ -46,9 +47,9 @@ export function toSecondsAndMinutes(ms: number) {
 }
 
 export enum LessonState {
-	notStarted,
-	going,
-	ended,
+	NotStarted,
+	Going,
+	Ended,
 }
 
 function getLessonOverridenDate(
@@ -63,15 +64,15 @@ function getLessonOverridenDate(
 		const offset = lessonOrder?.[subjectId]
 		if (offset) {
 			const newDate = new Date(date.getTime() + offset)
-			debug(
-				'Applied offset',
-				access,
-				offset,
-				'to a',
-				subjectId,
-				'date',
-				newDate.toReadable(),
-			)
+			// debug(
+			// 	'Applied offset',
+			// 	access,
+			// 	offset,
+			// 	'to a',
+			// 	subjectId,
+			// 	'date',
+			// 	newDate.toReadable(),
+			// )
 			return newDate
 		}
 	} catch (e) {
@@ -103,20 +104,26 @@ export class Lesson {
 	teachers: NSEntity[]
 	lessonTheme: string
 	roomName: string
+	distanceMeetingId: number = 0
 	attachmentsExists: boolean
 	resultsExists: boolean
 	attendance: string | number | null
 	addEducation: boolean
 	extraActivity: boolean
-	private endDate: ReadonlyDate
+	endDate: ReadonlyDate
 	startDate: ReadonlyDate
-	private dayDate: ReadonlyDate
+	dayDate: ReadonlyDate
 
 	get offsetId() {
 		return this.dayDate.getDay()
 	}
 
+	get dayNameId() {
+		return `${this.offsetId}${this.order}${this.subjectId}`
+	}
+
 	start(studentSettings: StudentSettings): ReadonlyDate {
+		if (this.isCustom) return this.startDate
 		return getLessonOverridenDate(
 			studentSettings,
 			this.offsetId,
@@ -127,10 +134,12 @@ export class Lesson {
 	}
 
 	day(studentSettings: StudentSettings) {
+		if (this.isCustom) return this.dayDate
 		return this.start(studentSettings)
 	}
 
 	end(studentSettings: StudentSettings): ReadonlyDate {
+		if (this.isCustom) return this.endDate
 		return getLessonOverridenDate(
 			studentSettings,
 			this.offsetId,
@@ -144,7 +153,11 @@ export class Lesson {
 	 * Creates new lesson
 	 * @param lesson - Raw lesson got from fetch response
 	 */
-	constructor(lesson: RawLesson) {
+	constructor(
+		lesson: RawLesson,
+		public readonly isCustom = false,
+		public readonly notifyBeforeTime = 15,
+	) {
 		const { endTime, startTime, day, ...ours } = lesson
 		Object.assign(this, ours)
 
@@ -191,10 +204,10 @@ export class Lesson {
 			progress,
 			state:
 				now < start
-					? LessonState.notStarted
+					? LessonState.NotStarted
 					: now <= end
-						? LessonState.going
-						: LessonState.ended,
+						? LessonState.Going
+						: LessonState.Ended,
 		}
 	}
 }

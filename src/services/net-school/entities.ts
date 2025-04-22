@@ -1,6 +1,8 @@
+import type { CustomSubject, StudentSettings } from '@/models/settings'
+import { add, set } from 'date-fns'
 import { makeAutoObservable } from 'mobx'
-import type { StudentSettings } from '~models/settings'
 import { Lesson, RawLesson } from './lesson'
+import { da } from 'date-fns/locale'
 
 export interface Endpoint {
 	name: string
@@ -56,6 +58,67 @@ export interface Assignment {
 	canAnswer: boolean
 }
 
+function yyyymmddToDate(yyyymmdd: string) {
+	const match = yyyymmdd.match(/(\d\d)\.(\d\d)\.(\d\d\d\d)/)
+	if (!match) return
+	const [, day, month, year] = match.map(e => parseInt(e))
+	const date = set(new Date(), {
+		year: year,
+		date: day,
+		month: month - 1,
+		hours: 0,
+		minutes: 0,
+		seconds: 0,
+		milliseconds: 0,
+	})
+
+	return date
+}
+
+export function customSubjectToLessons(
+	custom: CustomSubject,
+	date: ReadonlyDate,
+	i: number,
+): Lesson[] {
+	const dayFromMonday = date.getDayFromMonday()
+
+	return custom.meetings
+		.filter(e => e.dayIndex === dayFromMonday)
+		.map((e, ii) => {
+			const startTime = set(new Date(date.getTime()), { ...e.startTime })
+			const endTime = add(new Date(startTime), { minutes: e.time })
+
+			const id = -1 * (i + 1) * (ii + 1)
+			return new Lesson(
+				{
+					addEducation: true,
+					assignmentId: [],
+					attachmentsExists: false,
+					attendance: null,
+					classmeetingId: id,
+					day: startTime.toString(),
+					endTime: endTime.toString(),
+					startTime: startTime.toString(),
+					extraActivity: false,
+					lessonTheme: '',
+					order: id,
+					resultsExists: false,
+					roomName: '',
+					scheduleTimeNumber: 0,
+					scheduleTimeRelay: 0,
+					studentId: -1,
+					subjectGroupId: id,
+					subjectId: id,
+					subjectName: custom.name,
+					teachers: [],
+					distanceMeetingId: id,
+				},
+				true,
+				e.sendNotificationBeforeMins,
+			)
+		})
+}
+
 /**
  * Class representing diary
  */
@@ -69,18 +132,25 @@ export class Diary {
 	constructor(lessons: RawLesson[]) {
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
 		makeAutoObservable(this, { forDay: false, isNow: false, lessons: true })
-		// TODO add custom lessons
 	}
 
 	/**
 	 * Gets lesson for specified day
-	 * @param day - Day to search for
+	 * @param day - Day to search for in format yyyymmdd, use Date.toyyyymmdd()
 	 */
-	forDay(day: Date | string, studentSettings: StudentSettings) {
-		if (day instanceof Date) day = day.toYYYYMMDD()
-		return this.lessons.filter(
-			lesson => lesson.start(studentSettings).toYYYYMMDD() === day,
-		)
+	forDay(day: string, studentSettings: StudentSettings) {
+		const date = yyyymmddToDate(day)
+		return this.lessons
+			.concat(
+				...[
+					date
+						? studentSettings.customSubjects
+								.map((e, i) => customSubjectToLessons(e, date, i))
+								.flat()
+						: [],
+				],
+			)
+			.filter(lesson => lesson.start(studentSettings).toYYYYMMDD() === day)
 	}
 
 	isNow(lesson: Lesson, studentSettings: StudentSettings) {

@@ -13,10 +13,10 @@ import { View } from 'react-native'
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Chip, FAB } from 'react-native-paper'
+import { Chip } from 'react-native-paper'
 import { ParamListBase } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
-import Day, { DiaryEditDay } from './Day'
+import Day from './Day'
 import { DiaryState } from './state'
 
 // @ts-expect-error fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
@@ -24,6 +24,8 @@ ExpandableCalendar.defaultProps = undefined
 
 import { Chips } from '@/components/Chips'
 import { LocaleConfig } from 'react-native-calendars'
+import { EditDiaryDayScreen } from './edit/Screen'
+import { EditDiaryFAB } from './edit/Select'
 
 // localization for react-native-calendars
 // https://github.com/arshaw/xdate/blob/3060bceb5f0901f48df9ae657b6349b2733fec37/src/xdate.js#L475
@@ -65,16 +67,7 @@ LocaleConfig.locales['ru-RU'] = {
 		'пятница',
 		'суббота',
 	],
-	dayNamesShort: [
-		//
-		'вс',
-		'пн',
-		'вт',
-		'ср',
-		'чт',
-		'пт',
-		'сб',
-	],
+	dayNamesShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
 	today: 'Сегодня',
 }
 LocaleConfig.defaultLocale = 'ru-RU'
@@ -83,18 +76,7 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
-			<FAB
-				onPress={() => runInAction(() => (DiaryState.edit = !DiaryState.edit))}
-				label=""
-				icon={DiaryState.edit ? 'content-save' : 'pencil'}
-				style={{
-					position: 'absolute',
-					margin: 16,
-					right: 0,
-					bottom: 10,
-					zIndex: 100,
-				}}
-			/>
+			<EditDiaryFAB />
 			{!DiaryState.edit ? (
 				<ScrollView
 					contentContainerStyle={{
@@ -117,17 +99,7 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 					<UpdateDate store={DiaryStore} />
 				</ScrollView>
 			) : (
-				<View
-					style={{
-						paddingHorizontal: Spacings.s1,
-						marginBottom: 100,
-						padding: Spacings.s3,
-					}}
-				>
-					{DiaryStore.fallback || (
-						<DiaryEditDay lessons={DiaryStore.result.lessons} />
-					)}
-				</View>
+				DiaryStore.fallback || <EditDiaryDayScreen />
 			)}
 		</View>
 	)

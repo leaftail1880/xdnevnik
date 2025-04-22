@@ -1,23 +1,25 @@
 import { Theme } from '@/models/theme'
 import { AssignmentsStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
-import { ListRenderItem, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { Card, Chip, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
-import SubjectName, { getSubjectName } from '@/components/SubjectName'
+import { ChipLike } from '@/components/ChipLike'
+import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
+import SubjectName from '@/components/SubjectName'
+import { Settings } from '@/models/settings'
 import { TermNavigationParamMap } from '@/screens/totals/navigation'
 import { TermStore } from '@/screens/totals/term/state'
+import { Lesson } from '@/services/net-school/lesson'
+import { ModalAlert } from '@/utils/Toast'
 import { useCallback } from 'react'
 import { LANG, styles } from '../../constants'
 import DiaryAssignment from './Assignment'
+import { EditSingleLesson } from './edit/EditSingleLesson'
 import LessonProgress, { LessonProgressStore } from './Progress'
 import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
-import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
-import { Lesson } from '@/services/net-school/lesson'
-import { useReorderableDrag } from 'react-native-reorderable-list'
-import { Settings } from '@/models/settings'
 
 export default observer(function DiaryLesson({
 	lesson,
@@ -51,6 +53,12 @@ export default observer(function DiaryLesson({
 		...props,
 	}
 
+	const onLongPress = useCallback(
+		() =>
+			ModalAlert.show('Редактировать', <EditSingleLesson lesson={lesson} />),
+		[lesson],
+	)
+
 	return (
 		<Card
 			style={{
@@ -68,6 +76,7 @@ export default observer(function DiaryLesson({
 				flex: 1,
 				gap: Spacings.s2,
 			}}
+			onLongPress={!lesson.isCustom ? onLongPress : undefined}
 		>
 			<TopRow {...newProps} />
 			<MiddleRow {...newProps} />
@@ -77,41 +86,15 @@ export default observer(function DiaryLesson({
 	)
 })
 
-const DiaryLessonDraggable = observer(function DraggableLesson({
-	item: lesson,
-}: {
-	item: Lesson
-	index: number
-}) {
-	const drag = useReorderableDrag()
-	const studentSettings = Settings.forStudentOrThrow()
-
-	return (
-		<Card onLongPress={drag}>
-			<View style={[styles.row, { gap: Spacings.s1, alignItems: 'center' }]}>
-				<Name lesson={lesson} i={lesson.start(studentSettings).getDay() - 1} />
-				<Time lesson={lesson}></Time>
-			</View>
-		</Card>
-	)
-})
-
-// eslint-disable-next-line mobx/missing-observer
-export const RenderDiaryLessonDraggable: ListRenderItem<Lesson> = args => (
-	<DiaryLessonDraggable {...args} />
-)
-
 const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
 	return (
-		<>
-			<View style={[styles.row, { alignItems: 'center' }]}>
-				<Name lesson={lesson} i={i}></Name>
-			</View>
+		<View style={{ gap: Spacings.s1 }}>
+			<Name lesson={lesson} i={i}></Name>
 			<View style={[styles.row, { gap: Spacings.s1 }]}>
-				<Time lesson={lesson} />
+				<LessonTimeChip lesson={lesson} />
 				<Chip compact>{lesson.roomName ?? '?'}</Chip>
 			</View>
-		</>
+		</View>
 	)
 })
 
@@ -120,39 +103,40 @@ const Name = observer(function Name({
 	i,
 }: Pick<DiaryLessonProps, 'lesson' | 'i'>) {
 	return (
-		<>
-			<View
-				style={{
-					backgroundColor: Theme.colors.secondaryContainer,
-					borderRadius: Theme.roundness,
-					padding: Spacings.s1,
-					marginBottom: Spacings.s2,
-					marginRight: Spacings.s1,
-				}}
-			>
-				<Text
-					style={{
-						color: Theme.colors.onSecondaryContainer,
-						fontWeight: 'bold',
-					}}
-				>
-					{i + 1}
-				</Text>
-			</View>
-			<Text style={Theme.fonts.titleMedium}>{getSubjectName(lesson)}</Text>
-		</>
+		<View style={localStyles.name}>
+			<ChipLike>{i + 1}</ChipLike>
+			<SubjectName
+				editDisabled={lesson.isCustom}
+				style={Theme.fonts.titleMedium}
+				subjectId={lesson.subjectId}
+				subjectName={lesson.subjectName}
+				dayNameId={lesson.dayNameId}
+			/>
+		</View>
 	)
 })
 
-const Time = observer(function Time({ lesson }: { lesson: Lesson }) {
+const localStyles = StyleSheet.create({
+	name: {
+		gap: Spacings.s1,
+		flex: 1,
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		alignItems: 'center',
+	},
+})
+
+export const LessonTimeChip = observer(function Time({
+	lesson,
+}: {
+	lesson: Lesson
+}) {
 	const studentSettings = Settings.forStudentOrThrow()
 	return (
-		<>
-			<Chip compact>
-				{lesson.start(studentSettings).toHHMM()} -{' '}
-				{lesson.end(studentSettings).toHHMM()}
-			</Chip>
-		</>
+		<Chip compact>
+			{lesson.start(studentSettings).toHHMM()} -{' '}
+			{lesson.end(studentSettings).toHHMM()}
+		</Chip>
 	)
 })
 
@@ -177,11 +161,7 @@ const Assignments = observer(function Assignments(props: DiaryLessonProps) {
 
 	const results = AssignmentsStore.result.filter(e => {
 		const sameLesson = e.classmeetingId === props.lesson.classmeetingId
-		// const sameDay =
-		// !e.weight &&
-		// new Date(e.assignmentDate).toYYYYMMDD() ===
-		// props.lesson.start.toYYYYMMDD()
-
+		// const sameDay = !e.weight && new Date(e.assignmentDate).toYYYYMMDD() === props.lesson.start.toYYYYMMDD()
 		return sameLesson // || sameDay
 	})
 

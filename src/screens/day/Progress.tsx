@@ -1,3 +1,4 @@
+import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { makeAutoObservable, runInAction } from 'mobx'
@@ -6,7 +7,6 @@ import { useEffect, useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
-import { Settings } from '@/models/settings'
 
 export const LessonProgressStore = new (class {
 	now = Date.now()
@@ -28,7 +28,7 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		)
 
 	useEffect(() => {
-		if (state === LessonState.going)
+		if (state === LessonState.Going)
 			runInAction(() => (store.currentLesson = props.lesson.classmeetingId))
 		else if (store.currentLesson === props.lesson.classmeetingId) {
 			runInAction(() => (store.currentLesson = 0))
@@ -39,12 +39,12 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		color: Theme.colors.onSurfaceDisabled,
 	}
 
-	if (state === LessonState.notStarted) {
+	if (state === LessonState.NotStarted) {
 		// Do not show time above 15 mins
 		if (beforeStart < 15) {
 			return <Text style={textStyle}>{startsAfter}</Text>
 		}
-	} else if (state === LessonState.going) {
+	} else if (state === LessonState.Going) {
 		return (
 			<View style={styles.row}>
 				<View style={styles.progressView}>
