@@ -1,15 +1,11 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
-import Mark, { MarkColorsBG, MarkColorsText } from '@/components/Mark'
-import NumberInputSetting from '@/components/NumberInput'
-import { changeSettings, Settings, StudentSettings } from '@/models/settings'
+import Mark from '@/components/Mark'
+import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import {
-	ClassMeetingStats,
-	SubjectPerformance,
-	Total,
-} from '@/services/net-school/entities'
+import { Total } from '@/services/net-school/entities'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
+import { MarksNotificationStore } from '@/services/notifications/marks'
 import { calculateMarks } from '@/utils/calculateMarks'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
@@ -24,10 +20,10 @@ import {
 	ViewStyle,
 } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
+import { AttendanceStatsChip } from './AttendanceStatsChip'
+import { AttestationStatsChip } from './AttestationStatsChip'
 import { SubjectInfo, TermStore } from './state'
 import { ToGetMarkChips } from './ToGetMarkChip'
-import { AttestationStatsChip } from './AttestationStatsChip'
-import { AttendanceStatsChip } from './AttendanceStatsChip'
 
 const styles = StyleSheet.create({
 	container: {
@@ -156,6 +152,10 @@ export default observer(function SubjectMarks(
 								style={styles.mark}
 								key={i.toString()}
 								onPress={props.openDetails}
+								unseen={MarksNotificationStore.isUnseen(
+									studentId,
+									e.assignmentId,
+								)}
 							/>
 						))}
 				</ScrollView>

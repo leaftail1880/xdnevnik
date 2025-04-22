@@ -10,24 +10,60 @@ import * as BackgroundFetch from 'expo-background-fetch'
 import { BackgroundFetchResult } from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
+import { Platform } from 'react-native'
 import { Logger } from '../../constants'
 import { API } from '../net-school/api'
 
+export interface StudentMarksStorage {
+	seen: (number | string)[]
+	forceNotSeen: (number | string)[]
+}
+
 export const MarksNotificationStore = new (class {
 	notified: string[] = []
+	students: Record<number, StudentMarksStorage | undefined> = {}
 	logs: string[] = []
 	marksChannelId = ''
 
 	constructor() {
 		makeAutoObservable(
 			this,
-			{ log: action, clearLogs: action },
+			{ log: action, clearLogs: action, getStudent: false, isUnseen: false },
 			{ autoBind: true },
 		)
 		makeReloadPersistable(this, {
 			name: 'marksNotifications',
-			properties: ['notified', 'logs'],
+			properties: ['notified', 'logs', 'students'],
 		})
+	}
+
+	getStudent(studentId: number) {
+		const defaultValue: StudentMarksStorage = {
+			seen: [],
+			forceNotSeen: [],
+		}
+
+		const value = this.students[studentId]
+		if (!value) {
+			runInAction(() => {
+				this.students[studentId] = defaultValue
+			})
+			return this.students[studentId] as StudentMarksStorage
+		} else {
+			runInAction(() => {
+				for (const [key, v] of Object.entries(defaultValue)) {
+					value[key as keyof StudentMarksStorage] ??= v
+				}
+			})
+			return value
+		}
+	}
+
+	isUnseen(studentId: number, assignmentId: number | string) {
+		const student = this.getStudent(studentId)
+		if (student.forceNotSeen.includes(assignmentId)) return true
+
+		return !student.seen.includes(assignmentId)
 	}
 
 	log(level: 'info' | 'error', ...messages: unknown[]) {
@@ -70,29 +106,31 @@ function enabled() {
 
 const TASK_ID = 'background-fetch'
 
-TaskManager.defineTask(TASK_ID, () =>
-	checkForNewMarksAndNotify('Фоновый запрос: '),
-)
+if (Platform.OS !== 'ios') {
+	TaskManager.defineTask(TASK_ID, () =>
+		checkForNewMarksAndNotify('Фоновый запрос: '),
+	)
 
-let interval: ReturnType<typeof setTimeout>
+	let interval: ReturnType<typeof setTimeout>
 
-autorun(function registerTask() {
-	if (enabled()) {
-		MarksNotificationStore.log('info', 'Состояние: Включено')
-		BackgroundFetch.registerTaskAsync(TASK_ID, {
-			startOnBoot: true,
-			stopOnTerminate: false,
-		}).catch(onError)
-		interval = setInterval(
-			() => checkForNewMarksAndNotify('Активное приложение'),
-			1000 * 60, // minute
-		)
-	} else {
-		MarksNotificationStore.log('info', 'Состояние: Выключено')
-		BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
-		clearInterval(interval)
-	}
-})
+	autorun(function registerTask() {
+		if (enabled()) {
+			MarksNotificationStore.log('info', 'Состояние: Включено')
+			BackgroundFetch.registerTaskAsync(TASK_ID, {
+				startOnBoot: true,
+				stopOnTerminate: false,
+			}).catch(onError)
+			interval = setInterval(
+				() => checkForNewMarksAndNotify('Активное приложение'),
+				1000 * 60, // minute
+			)
+		} else {
+			MarksNotificationStore.log('info', 'Состояние: Выключено')
+			BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
+			clearInterval(interval)
+		}
+	})
+}
 
 function onError(reason: unknown) {
 	Logger.debug(`Unregistering task ${TASK_ID} failed:`, reason)
@@ -139,10 +177,12 @@ function checkForNewMarks(marks: Assignment[]) {
 		const newId = `${assignment.result} -  ${getSubjectName(assignment)}, ${
 			assignment.assignmentTypeAbbr
 		} ${assignment.assignmentId}`
+		const superNewId = `${newId} ${Settings.studentId}`
 
 		if (
 			!MarksNotificationStore.notified.includes(oldId) &&
-			!MarksNotificationStore.notified.includes(newId)
+			!MarksNotificationStore.notified.includes(newId) &&
+			!MarksNotificationStore.notified.includes(superNewId)
 		) {
 			runInAction(() => MarksNotificationStore.notified.push(newId))
 
