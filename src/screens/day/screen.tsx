@@ -3,7 +3,7 @@ import SelectModal from '@/components/SelectModal'
 import UpdateDate from '@/components/UpdateDate'
 import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Lesson } from '@/services/net-school/entities'
+import { Lesson } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
 import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
@@ -24,6 +24,8 @@ ExpandableCalendar.defaultProps = undefined
 
 import { Chips } from '@/components/Chips'
 import { LocaleConfig } from 'react-native-calendars'
+import { EditDiaryDayScreen } from './edit/Screen'
+import { EditDiaryFAB } from './edit/Select'
 
 // localization for react-native-calendars
 // https://github.com/arshaw/xdate/blob/3060bceb5f0901f48df9ae657b6349b2733fec37/src/xdate.js#L475
@@ -65,16 +67,7 @@ LocaleConfig.locales['ru-RU'] = {
 		'пятница',
 		'суббота',
 	],
-	dayNamesShort: [
-		//
-		'вс',
-		'пн',
-		'вт',
-		'ср',
-		'чт',
-		'пт',
-		'сб',
-	],
+	dayNamesShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
 	today: 'Сегодня',
 }
 LocaleConfig.defaultLocale = 'ru-RU'
@@ -83,26 +76,31 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	return (
 		<View style={{ flex: 1 }}>
 			<Header title="Дневник"></Header>
-			<ScrollView
-				contentContainerStyle={{
-					justifyContent: 'center',
-					alignContent: 'center',
-				}}
-				refreshControl={DiaryStore.refreshControl}
-			>
-				<View style={{ flex: 1, zIndex: 30 }}>
-					<SelectDay />
-				</View>
-				<Chips>
-					<Filter type="showHomework" label="Оценки" />
-					<Filter type="showAttachments" label="Файлы" />
-					<Filter type="showLessonTheme" label="Темы" />
-				</Chips>
-				<View style={{ padding: Spacings.s1 }}>
-					{DiaryStore.fallback || <Day {...props} />}
-				</View>
-				<UpdateDate store={DiaryStore} />
-			</ScrollView>
+			<EditDiaryFAB />
+			{!DiaryState.edit ? (
+				<ScrollView
+					contentContainerStyle={{
+						justifyContent: 'center',
+						alignContent: 'center',
+					}}
+					refreshControl={DiaryStore.refreshControl}
+				>
+					<View style={{ flex: 1, zIndex: 30 }}>
+						<SelectDay />
+					</View>
+					<Chips>
+						<Filter type="showHomework" label="Оценки" />
+						<Filter type="showAttachments" label="Файлы" />
+						<Filter type="showLessonTheme" label="Темы" />
+					</Chips>
+					<View style={{ padding: Spacings.s1 }}>
+						{DiaryStore.fallback || <Day {...props} />}
+					</View>
+					<UpdateDate store={DiaryStore} />
+				</ScrollView>
+			) : (
+				DiaryStore.fallback || <EditDiaryDayScreen />
+			)}
 		</View>
 	)
 })

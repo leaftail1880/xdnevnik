@@ -93,7 +93,15 @@ export default observer(function Mark({
 				style,
 			]}
 		>
-			{unseen && <Badge style={styles.badge} size={8} />}
+			{unseen && (
+				<Badge
+					style={[
+						styles.badge,
+						{ backgroundColor: Theme.colors.errorContainer },
+					]}
+					size={8}
+				/>
+			)}
 			<Text style={[{ color: textColor, fontWeight: 'bold' }, textStyle]}>
 				{duty ? '.' : (finalMark ?? calculatedMark ?? ' ')}
 			</Text>

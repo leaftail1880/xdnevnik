@@ -29,7 +29,7 @@ export function calculateMarks({
 	totals: CalculateTotals
 	attendance?: boolean
 	lessonsWithoutMark?: boolean
-	customMarks?: Partial<PartialAssignment>[]
+	customMarks?: PartialAssignment[]
 	defaultMark?: number
 	defaultMarkWeight?: number
 	targetMark?: number
@@ -44,6 +44,7 @@ export function calculateMarks({
 						result: e.attendanceMark,
 						assignmentId: e.classMeetingDate + e.attendanceMark,
 						date: e.classMeetingDate,
+						weight: 0,
 					}
 				}),
 			)
@@ -51,8 +52,8 @@ export function calculateMarks({
 
 		let totalsAndSheduledTotals = [...attendance, ...totals.results].sort(
 			(a, b) =>
-				new Date(a.classMeetingDate ?? a.date).getTime() -
-				new Date(b.classMeetingDate ?? b.date).getTime(),
+				new Date(a.classMeetingDate ?? a.date ?? '').getTime() -
+				new Date(b.classMeetingDate ?? b.date ?? '').getTime(),
 		) as PartialAssignment[]
 
 		if (lessonsWithoutMark) {
@@ -73,7 +74,6 @@ export function calculateMarks({
 		let avgMark = totals.averageMark
 
 		if (customMarks.length) {
-			// @ts-expect-error AAAAAAAAAAA
 			totalsAndSheduledTotals = totalsAndSheduledTotals.concat(customMarks)
 			avgMark = calculateAvg(customMarks, totals)
 		}
@@ -101,8 +101,7 @@ export function calculateMarks({
 			toGetMarks.sort((a, b) => b.target - a.target)
 		}
 
-		// @ts-expect-error AAAAAAAAAAAA
-		const weights = totals.results.concat(customMarks).map(e => e.weight)
+		const weights = [...totals.results, ...customMarks].map(e => e.weight)
 		const maxWeight = Math.max(...weights)
 		const minWeight = Math.min(...weights)
 		return {

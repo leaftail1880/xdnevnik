@@ -54,6 +54,8 @@ export interface CacheUsed {
 
 export interface CacheableReq {
 	cache?: CacheUsed
+	skipErrorMessages?: boolean
+	store?: string
 }
 
 // Common request options
@@ -351,6 +353,11 @@ export class NetSchoolApi {
 			const json = await response.json()
 			runInAction(() => {
 				this.cache[url] = [Date.now(), json]
+				for (const [key, [date]] of Object.entries(this.cache)) {
+					// Delete cache keys older then 1week
+					if (Date.now() - date > 1000 * 60 * 60 * 24 * 7)
+						delete this.cache[key]
+				}
 			})
 
 			return json
@@ -359,10 +366,10 @@ export class NetSchoolApi {
 				const beforeAuth = error instanceof NetSchoolError && error.useCache
 				const errText = beforeAuth ? '' : 'error: ' + error
 
-				if (!beforeAuth) {
+				if (!beforeAuth && !init.skipErrorMessages) {
 					Toast.show({
 						error: true,
-						title: 'Ошибка',
+						title: `Ошибка ${init.store ?? 'запроса'}`,
 						body: RequestError.stringify(error),
 					})
 				}
@@ -404,9 +411,9 @@ export class NetSchoolApi {
 		return this.get<Student[]>(ROUTES.students, req)
 	}
 
-	public async education({ studentId, cache }: StudentId) {
+	public async education({ studentId, ...other }: StudentId) {
 		return this.get<Education[]>(ROUTES.education, {
-			cache,
+			...other,
 			params: { studentId },
 		})
 	}
@@ -415,14 +422,14 @@ export class NetSchoolApi {
 		studentId,
 		startDate,
 		endDate,
-		cache,
+		...other
 	}: StudentId & {
 		startDate: string
 		endDate: string
 	}) {
 		return new Diary(
 			await this.get(ROUTES.classmeetings, {
-				cache,
+				...other,
 				params: {
 					studentIds: [studentId],
 					startDate: startDate,
@@ -436,10 +443,10 @@ export class NetSchoolApi {
 	public async attachments({
 		studentId,
 		assignmentIds,
-		cache,
+		...other
 	}: StudentId & { assignmentIds: number[] }) {
 		return this.get<Attachment[]>(ROUTES.attachments, {
-			cache,
+			...other,
 			params: [
 				['studentId', studentId],
 				...assignmentIds.map(e => ['assignmentId', e] as [string, number]),
@@ -450,10 +457,10 @@ export class NetSchoolApi {
 	public async assignment({
 		studentId,
 		assignmentId,
-		cache,
+		...other
 	}: StudentId & { assignmentId: number }) {
 		return this.get<Assignment>(`${ROUTES.assignments}/${assignmentId}`, {
-			cache,
+			...other,
 			params: {
 				studentId,
 			},
@@ -463,10 +470,10 @@ export class NetSchoolApi {
 	public async assignments({
 		studentId,
 		classmeetingsIds,
-		cache,
+		...other
 	}: StudentId & { classmeetingsIds: number[] }) {
 		return this.get<Assignment[]>(ROUTES.assignments, {
-			cache,
+			...other,
 			params: [
 				['studentId', studentId],
 				...classmeetingsIds.map(e => ['classmeetingId', e] as [string, number]),
@@ -478,13 +485,13 @@ export class NetSchoolApi {
 		studentId,
 		withoutMarks,
 		withExpiredClassAssign,
-		cache,
+		...other
 	}: StudentId & {
 		withoutMarks?: boolean
 		withExpiredClassAssign?: boolean
 	}) {
 		return this.get<Assignment[]>(ROUTES.assignmentsForCurrentTerm, {
-			cache,
+			...other,
 			params: {
 				studentId,
 				withoutMarks: withoutMarks ?? false,
@@ -493,9 +500,9 @@ export class NetSchoolApi {
 		})
 	}
 
-	public async subjects({ studentId, schoolYearId, cache }: StudentAndYear) {
+	public async subjects({ studentId, schoolYearId, ...other }: StudentAndYear) {
 		return this.get<Subject[]>(ROUTES.subjects, {
-			cache,
+			...other,
 			params: { studentId, schoolYearId },
 		})
 	}
@@ -504,10 +511,10 @@ export class NetSchoolApi {
 		studentId,
 		subjectId,
 		termId,
-		cache,
+		...other
 	}: StudentId & { subjectId: number; termId?: number }) {
 		return this.get<SubjectPerformance>(ROUTES.subjectPerformance, {
-			cache,
+			...other,
 			params: {
 				studentId,
 				subjectId,
@@ -516,9 +523,9 @@ export class NetSchoolApi {
 		})
 	}
 
-	public async totals({ studentId, schoolYearId, cache }: StudentAndYear) {
+	public async totals({ studentId, schoolYearId, ...other }: StudentAndYear) {
 		const totals: Total[] = await this.get<Total[]>(ROUTES.totals, {
-			cache,
+			...other,
 			params: {
 				studentId,
 				schoolYearId,

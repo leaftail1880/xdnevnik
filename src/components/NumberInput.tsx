@@ -6,7 +6,7 @@ import { Spacings } from '../utils/Spacings'
 
 interface NumberInputSettingProps<T extends number | undefined = number> {
 	value: T
-	defaultValue: T
+	defaultValue?: T
 	onChange: (value: T) => void
 	label: string
 	description?: string
@@ -68,18 +68,19 @@ export default function NumberInputSetting<
 					icon="plus"
 				/>
 
-				<Button
-					onPress={() =>
-						runInAction(
-							() => (
-								props.onChange(props.defaultValue),
+				{typeof props.defaultValue !== 'undefined' && (
+					<Button
+						onPress={() =>
+							runInAction(() => {
+								if (typeof props.defaultValue === 'undefined') return
+								props.onChange(props.defaultValue)
 								setValue(props.defaultValue?.toString() ?? '')
-							),
-						)
-					}
-				>
-					Сбросить...
-				</Button>
+							})
+						}
+					>
+						Сбросить...
+					</Button>
+				)}
 			</View>
 
 			{props.description && (
@@ -119,6 +120,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		alignContent: 'center',
+		gap: Spacings.s2,
+		marginVertical: Spacings.s2,
 	},
-	textInput: { margin: Spacings.s2, flex: 2, maxWidth: '50%' },
+	textInput: { flex: 2, maxWidth: '50%' },
 })

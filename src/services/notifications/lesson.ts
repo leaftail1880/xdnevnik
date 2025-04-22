@@ -1,6 +1,6 @@
 import { getSubjectName } from '@/components/SubjectName'
 import { Settings } from '@/models/settings'
-import { Lesson, LessonState } from '@/services/net-school/entities'
+import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
 import {
 	clearBackgroundInterval,
@@ -11,7 +11,11 @@ import notifee, {
 	AndroidVisibility,
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
+import { customSubjectToLessons } from '../net-school/entities'
 import { MarksNotificationStore } from './marks'
+import { Logger } from '@/constants'
+
+let foregroundServiceRegistered = false
 
 export const LessonNotifStore = new (class {
 	constructor() {
@@ -26,6 +30,8 @@ export const LessonNotifStore = new (class {
 	id: undefined | string = undefined
 
 	currentLesson: undefined | string = undefined
+
+	day = new Date().getDate()
 
 	async remove(id = LessonNotifStore.id) {
 		if (!id) return
@@ -81,6 +87,15 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
+	const studentSettings = Settings.forStudentOrThrow()
+	const date = new Date()
+	const customSubjects = studentSettings.customSubjects
+		.map((e, i) => customSubjectToLessons(e, date, i))
+		.flat()
+
+	const lessons = diary.lessons.concat(...customSubjects)
+	LessonNotifStore.day
+
 	currentLessonInterval = setBackgroundInterval(
 		() =>
 			runInAction(async () => {
@@ -89,16 +104,26 @@ autorun(function notificationFromDiary() {
 				// const now = date.getTime()
 				const now = Date.now()
 
-				for (const [i, lesson] of diary.lessons.entries()) {
-					if (!lesson.end || !lesson.start) continue // Broken data i guess
-					if (lesson.end.getTime() < now) continue // Already was
+				// just to trigget rerun of the code above and use custom subjects for new day
+				LessonNotifStore.day = new Date().getDate()
 
-					// period - перемена
-					const previous = diary.lessons[i - 1]
-					const { date, period } = getLessonPeriod(previous, lesson)
-					if (date.getTime() > now) continue
+				for (const [i, lesson] of lessons.entries()) {
+					try {
+						const end = Lesson.prototype.end
+							.call(lesson, studentSettings)
+							.getTime()
+						if (!end) continue // Broken data i guess
+						if (end < now) continue // Already was
 
-					return await showNotification(lesson, now, period)
+						// period - перемена
+						const previous = diary.lessons[i - 1]
+						const { date, period } = getLessonPeriod(previous, lesson)
+						if (date.getTime() > now) continue
+
+						return await showNotification(lesson, now, period)
+					} catch (e) {
+						Logger.error(e)
+					}
 				}
 
 				// Nothing to show
@@ -110,16 +135,25 @@ autorun(function notificationFromDiary() {
 
 const minute = 60 * 1000
 
-function getLessonPeriod(previous: Lesson, current: Lesson) {
+function getLessonPeriod(previousLesson: Lesson, currentLesson: Lesson) {
 	let period: Date | undefined
 	let date: Date
-	// TODO Support custom
-	const beforeLessonNotifTime = 15
+	const studentSettings = Settings.forStudentOrThrow()
+	const beforeLessonNotifTime = currentLesson.notifyBeforeTime
+
+	const current = currentLesson && {
+		start: Lesson.prototype.start.call(currentLesson, studentSettings),
+	}
+
+	const previous = previousLesson && {
+		start: Lesson.prototype.start.call(previousLesson, studentSettings),
+		end: Lesson.prototype.end.call(previousLesson, studentSettings),
+	}
 
 	// If previous lesson is in the same day, send notification in the end of the lesson
 	if (
 		previous &&
-		current.day.toYYYYMMDD() === previous.day.toYYYYMMDD() &&
+		current.start.toYYYYMMDD() === previous.start.toYYYYMMDD() &&
 		// Only when delay between lessons is less then 15
 		(current.start.getTime() - previous.end.getTime()) / minute <=
 			beforeLessonNotifTime
@@ -135,8 +169,6 @@ function getLessonPeriod(previous: Lesson, current: Lesson) {
 	return { date, period }
 }
 
-let foregroundServiceRegistered = false
-
 async function showNotification(
 	lesson: Lesson,
 	now: number,
@@ -144,9 +176,11 @@ async function showNotification(
 ) {
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
 	const lessonName = getSubjectName(lesson)
+	const studentSettings = Settings.forStudentOrThrow()
 
 	const { state, startsAfter, progress, elapsed, remaining } = Lesson.status(
 		lesson,
+		studentSettings,
 		now,
 	)
 
@@ -157,11 +191,11 @@ async function showNotification(
 
 	let body = ''
 
-	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
-	if (state === LessonState.notStarted) {
+	body += `${lesson.start(studentSettings).toHHMM()} - ${lesson.end(studentSettings).toHHMM()}. `
+	if (state === LessonState.NotStarted) {
 		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter
-	} else if (state === LessonState.going) {
+	} else if (state === LessonState.Going) {
 		body += `Прошло ${elapsed} мин, осталось ${remaining}`
 	}
 
@@ -191,7 +225,7 @@ async function showNotification(
 			asForegroundService: foregroundServiceRegistered,
 
 			progress:
-				state === LessonState.going
+				state === LessonState.Going
 					? {
 							current: progress,
 							max: 100,

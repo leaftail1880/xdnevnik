@@ -27,10 +27,10 @@ import { calculateMarks } from '@/utils/calculateMarks'
 import { StackScreenProps } from '@react-navigation/stack'
 import { formatDistanceToNow, formatDuration } from 'date-fns'
 import { ru } from 'date-fns/locale'
-import { runInAction } from 'mobx'
+import { ObservableSet, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo, useState } from 'react'
-import { ScrollView, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { Chip, IconButton, Text } from 'react-native-paper'
 import type { S_SUBJECT_TOTALS, TermNavigationParamMap } from '../navigation'
 import { ToGetMarkChips } from '../term/ToGetMarkChip'
@@ -61,6 +61,8 @@ export default observer(function SubjectTotals({
 	)
 })
 
+const disabledTotalTypes = new ObservableSet<string | undefined>()
+
 export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 	performance,
 	navigateToDiary,
@@ -72,12 +74,11 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 }) {
 	const { studentId } = Settings
 	const studentSettings = Settings.forStudentOrThrow()
+	const [collapsed, setCollapsed] = useState(true)
 
 	const [lessonsWithoutMark, setLessonsWithoutMark] = useState(false)
 	const [attendance, setAttendance] = useState(false)
-	const [customMarks, setCustomMarks] = useState<Partial<PartialAssignment>[]>(
-		[],
-	)
+	const [customMarks, setCustomMarks] = useState<PartialAssignment[]>([])
 	const marks = useMemo(
 		() =>
 			!!performance.result &&
@@ -113,6 +114,10 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 		studentId,
 	})
 
+	const totalsTypes = new Set<string>()
+	for (const t of totalsAndSheduledTotals)
+		if (t.assignmentTypeName) totalsTypes.add(t.assignmentTypeName)
+
 	return (
 		<View style={{ flex: 1 }}>
 			<View
@@ -145,124 +150,170 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 					textStyle={{ fontSize: 18 }}
 				/>
 			</View>
-			<ScrollView
+			<FlatList
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{
 					gap: Spacings.s2,
 					paddingTop: Spacings.s2,
 				}}
-			>
-				{(performance.result.classmeetingsStats.passed > 0 ||
-					!!toGetMarks.length) && (
-					<Chips style={{ marginRight: Spacings.s2, paddingVertical: 0 }}>
-						<ToGetMarkChips toGetMarks={toGetMarks} />
-						{performance.result.classmeetingsStats.passed !== 0 && (
-							<>
-								<Chip
-									mode="flat"
-									compact
-									selected={attendance}
-									onPress={() => {
-										setAttendance(!attendance)
-									}}
-								>
-									Посещаемость
-								</Chip>
-								<Chip
-									mode="flat"
-									compact
-									selected={lessonsWithoutMark}
-									onPress={() => {
-										setLessonsWithoutMark(!lessonsWithoutMark)
-									}}
-								>
-									Уроки без оценок
-								</Chip>
-							</>
-						)}
-					</Chips>
-				)}
-				{totalsAndSheduledTotals.map((e, i) => (
-					<MarkRow
-						mark={e}
-						maxWeight={maxWeight}
-						minWeight={minWeight}
-						navigateToDiary={navigateToDiary}
-						onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
-						key={e.assignmentId ?? i.toString()}
-					/>
-				))}
-				<RoundedSurface elevation={1}>
-					<AddMarkForm
-						setCustomMarks={setCustomMarks}
-						customMarks={customMarks}
-					/>
-				</RoundedSurface>
-				<RoundedSurface elevation={1}>
-					{!!customMarks.length && (
-						<Text>
-							Возможных оценок:{' '}
-							<Text variant="labelLarge">{customMarks.length}</Text>
-						</Text>
-					)}
-					{!!performance.result.teachers.length && (
-						<Text>
-							Учитель:{' '}
-							<Text variant="labelLarge">
-								{performance.result.teachers
-									.map(e => Settings.fullname(e.name))
-									.join(', ')}
-							</Text>
-						</Text>
-					)}
-					{performance.result.classmeetingsStats.passed !== 0 && (
-						<Text>
-							Прошло уроков:{' '}
-							<Text variant="labelLarge">
-								{performance.result.classmeetingsStats.passed}/
-								{performance.result.classmeetingsStats.scheduled}
-							</Text>
-							, осталось:{' '}
-							<Text variant="labelLarge">
-								{performance.result.classmeetingsStats.scheduled -
-									performance.result.classmeetingsStats.passed}
-							</Text>
-						</Text>
-					)}
-
-					<Text>
-						Всего оценок:{' '}
-						<Text variant="labelLarge">
-							{performance.result.results.length}
-						</Text>
-					</Text>
-
-					<Text>
-						Суммарный вес всех оценок:{' '}
-						<Text variant="labelLarge">
-							{performance.result.results.reduce((p, c) => p + c.weight, 0)}
-						</Text>
-					</Text>
-					{performance.result.classmeetingsStats.passed !== 0 && (
-						<View
-							style={{
-								flexDirection: 'row',
-								marginVertical: Spacings.s1,
-								flex: 1,
-								alignItems: 'center',
-							}}
-						>
-							<Text>Средний балл класса: </Text>
-							<Mark
-								mark={performance.result.classAverageMark}
-								duty={false}
-								style={{ padding: Spacings.s1 }}
+				renderItem={e => e.item}
+				data={[
+					(performance.result.classmeetingsStats.passed > 0 ||
+						!!toGetMarks.length) && (
+						<Chips style={{ marginRight: Spacings.s2, paddingVertical: 0 }}>
+							<ToGetMarkChips toGetMarks={toGetMarks} />
+							{performance.result.classmeetingsStats.passed !== 0 && (
+								<>
+									<Chip
+										mode="flat"
+										compact
+										selected={attendance}
+										onPress={() => {
+											setAttendance(!attendance)
+										}}
+									>
+										Посещаемость
+									</Chip>
+									<Chip
+										mode="flat"
+										compact
+										selected={lessonsWithoutMark}
+										onPress={() => {
+											setLessonsWithoutMark(!lessonsWithoutMark)
+										}}
+									>
+										Уроки без оценок
+									</Chip>
+								</>
+							)}
+						</Chips>
+					),
+					...totalsAndSheduledTotals
+						.slice(
+							collapsed && totalsAndSheduledTotals.length > 7
+								? totalsAndSheduledTotals.length - 7
+								: 0,
+						)
+						.reverse()
+						.filter(e => !disabledTotalTypes.has(e.assignmentTypeName))
+						.map((e, i) => (
+							<MarkRow
+								mark={e}
+								maxWeight={maxWeight}
+								minWeight={minWeight}
+								navigateToDiary={navigateToDiary}
+								onDelete={() => setCustomMarks(v => v.filter(ee => ee !== e))}
+								key={
+									e.assignmentId ??
+									(totalsAndSheduledTotals.length + 5 + i).toString()
+								}
 							/>
-						</View>
-					)}
-				</RoundedSurface>
-				{!!performance.updateDate && <UpdateDate store={performance} />}
-			</ScrollView>
+						)),
+					totalsAndSheduledTotals.length > 7 && (
+						<Chips>
+							{totalsAndSheduledTotals.length > 7 && (
+								<Chip
+									mode="flat"
+									compact
+									selected={collapsed}
+									onPress={() => setCollapsed(v => !v)}
+								>
+									Свернуть старые оценки
+								</Chip>
+							)}
+							{[...totalsTypes].map(e => (
+								<Chip
+									onPress={() =>
+										runInAction(() => {
+											if (disabledTotalTypes.has(e))
+												disabledTotalTypes.delete(e)
+											else disabledTotalTypes.add(e)
+										})
+									}
+									selected={!disabledTotalTypes.has(e)}
+									mode="flat"
+									compact
+									key={e}
+								>
+									{e}
+								</Chip>
+							))}
+						</Chips>
+					),
+					// eslint-disable-next-line react/jsx-key
+					<RoundedSurface elevation={1}>
+						<AddMarkForm
+							setCustomMarks={setCustomMarks}
+							customMarks={customMarks}
+						/>
+					</RoundedSurface>,
+					// eslint-disable-next-line react/jsx-key
+					<RoundedSurface elevation={1}>
+						{!!customMarks.length && (
+							<Text>
+								Возможных оценок:{' '}
+								<Text variant="labelLarge">{customMarks.length}</Text>
+							</Text>
+						)}
+						{!!performance.result.teachers.length && (
+							<Text>
+								Учитель:{' '}
+								<Text variant="labelLarge">
+									{performance.result.teachers
+										.map(e => Settings.fullname(e.name))
+										.join(', ')}
+								</Text>
+							</Text>
+						)}
+						{performance.result.classmeetingsStats.passed !== 0 && (
+							<Text>
+								Прошло уроков:{' '}
+								<Text variant="labelLarge">
+									{performance.result.classmeetingsStats.passed}/
+									{performance.result.classmeetingsStats.scheduled}
+								</Text>
+								, осталось:{' '}
+								<Text variant="labelLarge">
+									{performance.result.classmeetingsStats.scheduled -
+										performance.result.classmeetingsStats.passed}
+								</Text>
+							</Text>
+						)}
+
+						<Text>
+							Всего оценок:{' '}
+							<Text variant="labelLarge">
+								{performance.result.results.length}
+							</Text>
+						</Text>
+
+						<Text>
+							Суммарный вес всех оценок:{' '}
+							<Text variant="labelLarge">
+								{performance.result.results.reduce((p, c) => p + c.weight, 0)}
+							</Text>
+						</Text>
+						{performance.result.classmeetingsStats.passed !== 0 && (
+							<View
+								style={{
+									flexDirection: 'row',
+									marginVertical: Spacings.s1,
+									flex: 1,
+									alignItems: 'center',
+								}}
+							>
+								<Text>Средний балл класса: </Text>
+								<Mark
+									mark={performance.result.classAverageMark}
+									duty={false}
+									style={{ padding: Spacings.s1 }}
+								/>
+							</View>
+						)}
+					</RoundedSurface>,
+					!!performance.updateDate && <UpdateDate store={performance} />,
+				].filter(e => !!e)}
+			/>
 		</View>
 	)
 })

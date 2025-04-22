@@ -1,4 +1,8 @@
+import type { CustomSubject, StudentSettings } from '@/models/settings'
+import { add, set } from 'date-fns'
 import { makeAutoObservable } from 'mobx'
+import { Lesson, RawLesson } from './lesson'
+import { da } from 'date-fns/locale'
 
 export interface Endpoint {
 	name: string
@@ -54,128 +58,65 @@ export interface Assignment {
 	canAnswer: boolean
 }
 
-interface BaseLesson {
-	classmeetingId: number
-	studentId: number
-	assignmentId: number[]
-	order: number
-	scheduleTimeNumber: number
-	scheduleTimeRelay: number
-	subjectName: string
-	subjectId: number
-	subjectGroupId: number
-	startTime: string
-	endTime: string
-	teachers: NSEntity[]
-	lessonTheme: string
-	roomName: string
-	attachmentsExists: boolean
-	resultsExists: boolean
-	attendance: string | number | null
-	addEducation: boolean
-	extraActivity: boolean
+function yyyymmddToDate(yyyymmdd: string) {
+	const match = yyyymmdd.match(/(\d\d)\.(\d\d)\.(\d\d\d\d)/)
+	if (!match) return
+	const [, day, month, year] = match.map(e => parseInt(e))
+	const date = set(new Date(), {
+		year: year,
+		date: day,
+		month: month - 1,
+		hours: 0,
+		minutes: 0,
+		seconds: 0,
+		milliseconds: 0,
+	})
+
+	return date
 }
 
-interface RawLesson extends BaseLesson {
-	day: string
-}
+export function customSubjectToLessons(
+	custom: CustomSubject,
+	date: ReadonlyDate,
+	i: number,
+): Lesson[] {
+	const dayFromMonday = date.getDayFromMonday()
 
-/**
- * Class representing one lesson
- */
-export class Lesson {
-	classmeetingId: number
-	studentId: number
-	assignmentId: number[]
-	order: number
-	scheduleTimeNumber: number
-	scheduleTimeRelay: number
-	subjectName: string
-	subjectId: number
-	subjectGroupId: number
-	teachers: NSEntity[]
-	lessonTheme: string
-	roomName: string
-	attachmentsExists: boolean
-	resultsExists: boolean
-	attendance: string | number | null
-	addEducation: boolean
-	extraActivity: boolean
-	end: ReadonlyDate
-	start: ReadonlyDate
-	day: ReadonlyDate
+	return custom.meetings
+		.filter(e => e.dayIndex === dayFromMonday)
+		.map((e, ii) => {
+			const startTime = set(new Date(date.getTime()), { ...e.startTime })
+			const endTime = add(new Date(startTime), { minutes: e.time })
 
-	/**
-	 * Creates new lesson
-	 * @param lesson - Raw lesson got from fetch response
-	 */
-	constructor(lesson: RawLesson) {
-		const { endTime, startTime, day, ...ours } = lesson
-		Object.assign(this, ours)
-
-		/**
-		 * Start date of the lesson
-		 */
-		this.start = new Date(startTime)
-		/**
-		 * End date of the lesson
-		 */
-		this.end = new Date(endTime)
-		/**
-		 * Day date of the lesson
-		 */
-		this.day = new Date(day)
-
-		makeAutoObservable(this)
-	}
-
-	static status(lesson: Lesson, now = Date.now()) {
-		const start = lesson.start.getTime()
-		const end = lesson.end.getTime()
-		const beforeStart = toSecondsAndMinutes(start - now)
-		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
-			toSecondsAndMinutes(now - start)
-		const { minutes: total, seconds: totalSeconds } = toSecondsAndMinutes(
-			end - start,
-		)
-		const progress = 100 - Math.ceil(((end - now) * 100) / (end - start))
-
-		return {
-			beforeStart: beforeStart.minutes,
-			startsAfter: `Начнется через ${toTime(beforeStart.minutes, beforeStart.seconds)}`,
-			elapsed: `${beforeEnd}/${total + 1}`,
-			remaining: toTime(total - beforeEnd, totalSeconds - beforeEndSeconds),
-			progress,
-			state:
-				now < start
-					? LessonState.notStarted
-					: now <= end
-						? LessonState.going
-						: LessonState.ended,
-		}
-	}
-}
-
-function toTime(...args: number[]) {
-	return args.map(e => e.toString().padStart(2, '0')).join(':')
-}
-
-function toMinutes(ms: number) {
-	return Math.ceil(ms / (1000 * 60))
-}
-
-function toSecondsAndMinutes(ms: number) {
-	const minutes = toMinutes(ms)
-	return {
-		minutes: minutes - 1,
-		seconds: 60 - (minutes * 60 - Math.ceil(ms / 1000)) - 1,
-	}
-}
-
-export enum LessonState {
-	notStarted,
-	going,
-	ended,
+			const id = -1 * (i + 1) * (ii + 1)
+			return new Lesson(
+				{
+					addEducation: true,
+					assignmentId: [],
+					attachmentsExists: false,
+					attendance: null,
+					classmeetingId: id,
+					day: startTime.toString(),
+					endTime: endTime.toString(),
+					startTime: startTime.toString(),
+					extraActivity: false,
+					lessonTheme: '',
+					order: id,
+					resultsExists: false,
+					roomName: '',
+					scheduleTimeNumber: 0,
+					scheduleTimeRelay: 0,
+					studentId: -1,
+					subjectGroupId: id,
+					subjectId: id,
+					subjectName: custom.name,
+					teachers: [],
+					distanceMeetingId: id,
+				},
+				true,
+				e.sendNotificationBeforeMins,
+			)
+		})
 }
 
 /**
@@ -191,20 +132,30 @@ export class Diary {
 	constructor(lessons: RawLesson[]) {
 		this.lessons = lessons.map(lesson => new Lesson(lesson))
 		makeAutoObservable(this, { forDay: false, isNow: false, lessons: true })
-		// TODO add custom lessons
 	}
 
 	/**
 	 * Gets lesson for specified day
-	 * @param day - Day to search for
+	 * @param day - Day to search for in format yyyymmdd, use Date.toyyyymmdd()
 	 */
-	forDay(day: Date | string) {
-		if (day instanceof Date) day = day.toYYYYMMDD()
-		return this.lessons.filter(lesson => lesson.day.toYYYYMMDD() === day)
+	forDay(day: string, studentSettings: StudentSettings) {
+		const date = yyyymmddToDate(day)
+		return this.lessons
+			.concat(
+				...[
+					date
+						? studentSettings.customSubjects
+								.map((e, i) => customSubjectToLessons(e, date, i))
+								.flat()
+						: [],
+				],
+			)
+			.filter(lesson => lesson.start(studentSettings).toYYYYMMDD() === day)
 	}
 
-	isNow(lesson: Lesson) {
-		const { start, end } = lesson
+	isNow(lesson: Lesson, studentSettings: StudentSettings) {
+		const start = lesson.end(studentSettings)
+		const end = lesson.start(studentSettings)
 		const date = new Date()
 
 		return date >= start && date <= end
@@ -295,11 +246,12 @@ export interface Attachment {
 export type PartialAssignment = Partial<
 	Omit<
 		SubjectPerformance['results'][number],
-		'result' | 'assignmentId' | 'date'
+		'result' | 'assignmentId' | 'date' | 'weight' | 'date'
 	>
 > & {
-	date: string
+	date?: string
 	result: 'Нет' | number | string
-	assignmentId: string | number
+	assignmentId?: string | number
 	custom?: boolean
+	weight: number
 }

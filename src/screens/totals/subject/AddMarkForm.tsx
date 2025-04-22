@@ -11,8 +11,8 @@ import { Button, IconButton } from 'react-native-paper'
 import { styles } from '../../../constants'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {
-	setCustomMarks: (p: Partial<PartialAssignment>[]) => void
-	customMarks: Partial<PartialAssignment>[]
+	setCustomMarks: (p: PartialAssignment[]) => void
+	customMarks: PartialAssignment[]
 }) {
 	Theme.key
 

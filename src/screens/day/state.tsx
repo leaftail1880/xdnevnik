@@ -35,6 +35,8 @@ export const DiaryState = new (class {
 	showAttachments = true
 	showLessonTheme = true
 
+	edit = false
+
 	get weekDays() {
 		return Date.week(this.week)
 	}
@@ -132,3 +134,5 @@ function DayRenderer({ day, i }: { day: Date; i: number }) {
 		</View>
 	)
 }
+
+export const DAY_NAMES_SHORT = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']

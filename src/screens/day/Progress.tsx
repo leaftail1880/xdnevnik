@@ -1,5 +1,6 @@
+import { Settings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Lesson, LessonState } from '@/services/net-school/entities'
+import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
@@ -18,15 +19,16 @@ export const LessonProgressStore = new (class {
 const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
+	const studentSettings = Settings.forStudentOrThrow()
 	const { elapsed, startsAfter, beforeStart, progress, state, remaining } =
 		useMemo(
-			() => Lesson.status(props.lesson),
+			() => Lesson.status(props.lesson, studentSettings),
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			[props.lesson, store.now],
 		)
 
 	useEffect(() => {
-		if (state === LessonState.going)
+		if (state === LessonState.Going)
 			runInAction(() => (store.currentLesson = props.lesson.classmeetingId))
 		else if (store.currentLesson === props.lesson.classmeetingId) {
 			runInAction(() => (store.currentLesson = 0))
@@ -37,12 +39,12 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		color: Theme.colors.onSurfaceDisabled,
 	}
 
-	if (state === LessonState.notStarted) {
+	if (state === LessonState.NotStarted) {
 		// Do not show time above 15 mins
 		if (beforeStart < 15) {
 			return <Text style={textStyle}>{startsAfter}</Text>
 		}
-	} else if (state === LessonState.going) {
+	} else if (state === LessonState.Going) {
 		return (
 			<View style={styles.row}>
 				<View style={styles.progressView}>

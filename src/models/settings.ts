@@ -1,3 +1,4 @@
+import { HoursMinutes } from '@/components/SelectTime'
 import { Logger } from '@/constants'
 import { NSEntity } from '@/services/net-school/entities'
 import { StudentsStore } from '@/services/net-school/store'
@@ -5,16 +6,32 @@ import { isObservable, makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
 import { makeReloadPersistable } from '../utils/makePersistable'
 
+export interface CustomSubjectMeeting {
+	dayIndex: number
+	startTime: HoursMinutes
+	time: number
+	sendNotificationBeforeMins: number
+}
+
+export interface CustomSubject {
+	name: string
+	meetings: CustomSubjectMeeting[]
+}
+
 export interface StudentSettings {
 	/**
 	 * Map containing subjectIds as keys and overrided subjectName as value
 	 */
 	subjectNames: Record<string, string | undefined>
-	/**
-	 * Map containing new information about subject
-	 */
-	subjects: Record<string, object>
 
+	/**
+	 * Map containing days as keys and map of lesson.localOverrideId as keys and overriden subjectNames as value
+	 */
+	subjectNamesDay: Record<string, string | undefined>
+
+	customSubjects: CustomSubject[]
+
+	lessonOrder: Record<number, Record<string, number> | undefined>
 	subjectAttestation: Record<string, number>
 	defaultAttestation: number
 
@@ -67,9 +84,11 @@ class SettingsStore {
 	forStudent(id: number) {
 		const defaultValue: StudentSettings = {
 			subjectNames: {},
+			lessonOrder: {},
+			subjectNamesDay: {},
+			customSubjects: [],
 			subjectAttestation: {},
 			defaultAttestation: 0,
-			subjects: {},
 		}
 		const overrides = this.studentOverrides[id]
 

@@ -1,5 +1,4 @@
 import {
-	AdditionalDeps,
 	AsyncMethod,
 	AsyncState,
 	AsyncStore,
@@ -16,7 +15,12 @@ export const TotalsStore = method('totals', 'итоговых оценок')
 
 export const DiaryStore = method('diary', 'дневника')
 export const AssignmentsStore = method('assignments', 'оценок')
-export const MarkAssignmentsStore = method('assignments', 'оценок')
+export const MarkAssignmentsStore = method(
+	'assignments',
+	'оценок',
+	undefined,
+	true,
+)
 export const AttachmentsStore = method('attachments', 'файлов')
 
 interface SubjectPerformanceStoreID {
@@ -39,7 +43,7 @@ function method<
 	method: MethodName,
 	name: string,
 	defaultParams?: DefaultParams,
-	additionalDeps?: () => AdditionalDeps,
+	skipErrorMessages?: boolean,
 	debug?: boolean,
 ) {
 	const store = new AsyncStore(
@@ -47,8 +51,9 @@ function method<
 		method,
 		name,
 		defaultParams,
-		additionalDeps,
+		undefined,
 		debug,
+		skipErrorMessages,
 	)
 	return store as unknown as AsyncState<FnReturn> &
 		Pick<typeof store, 'withParams'>
