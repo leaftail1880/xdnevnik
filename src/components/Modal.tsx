@@ -30,6 +30,7 @@ const ToastModal = observer(function ToastModal() {
 				<Snackbar
 					visible={!!Toast.state}
 					onDismiss={Toast.hide}
+					onTouchStart={Toast.hide}
 					style={{
 						bottom: 62,
 						width: '100%',

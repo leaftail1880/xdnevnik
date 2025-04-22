@@ -75,6 +75,7 @@ export class AsyncStore<
 			NSApi.reload,
 		],
 		public debug = false,
+		private readonly skipErrorMessages = false,
 	) {
 		this.log('Store created')
 
@@ -183,7 +184,12 @@ export class AsyncStore<
 		}
 	}
 
-	withParams(params: Omit<FnParams, keyof DefaultParams | 'cache'>) {
+	withParams(
+		params: Omit<
+			FnParams,
+			keyof DefaultParams | 'cache' | 'skipErrorMessages' | 'store'
+		>,
+	) {
 		this.log('Changing params from', this.params, 'to', params)
 		// @ts-expect-error Type infering
 		this.params = params
@@ -238,7 +244,12 @@ export class AsyncStore<
 			: { isUsed: false }
 
 		try {
-			this.result = yield request.call(this.API, { ...params, cache })
+			this.result = yield request.call(this.API, {
+				...params,
+				cache,
+				skipErrorMessages: this.skipErrorMessages,
+				store: this.name,
+			})
 			this.updateDate = `Дата обновления: ${new Date().toLocaleTimeString()}`
 
 			if (cache?.isUsed) {
