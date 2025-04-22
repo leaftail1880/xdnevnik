@@ -353,11 +353,11 @@ export class NetSchoolApi {
 			const json = await response.json()
 			runInAction(() => {
 				this.cache[url] = [Date.now(), json]
-				for (const [key, [date]] of Object.entries(this.cache)) {
-					// Delete cache keys older then 1week
-					if (Date.now() - date > 1000 * 60 * 60 * 24 * 7)
-						delete this.cache[key]
-				}
+				// for (const [key, [date]] of Object.entries(this.cache)) {
+				// 	// Delete cache keys older then 1week
+				// 	if (Date.now() - date > 1000 * 60 * 60 * 24 * 7)
+				// 		delete this.cache[key]
+				// }
 			})
 
 			return json
