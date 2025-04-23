@@ -1,6 +1,6 @@
 import Loading from '@/components/Loading'
 import { SettingsJumpNavigation } from '@/components/Navigate'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -112,12 +112,12 @@ const SelectStudent = observer(function SelectStudent() {
 			<SelectModal
 				data={StudentsStore.result.map((student, index) => ({
 					value: index + '',
-					label: Settings.fullname(student.name),
+					label: XSettings.fullname(student.name),
 				}))}
 				mode="list.item"
-				value={Settings.studentIndex + ''}
+				value={XSettings.studentIndex + ''}
 				onSelect={student =>
-					Settings.save({ studentIndex: Number(student.value) })
+					XSettings.save({ studentIndex: Number(student.value) })
 				}
 				label={'Ученик'}
 			/>

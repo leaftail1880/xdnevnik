@@ -1,5 +1,5 @@
 import { getSubjectName } from '@/components/SubjectName'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Total } from '@/services/net-school/entities'
 import {
 	SubjectPerformanceStores,
@@ -42,8 +42,8 @@ export const TermStore = new (class {
 
 	get currentTerm() {
 		return (
-			(Settings.studentId
-				? Settings.forStudent(Settings.studentId)?.currentTerm
+			(XSettings.studentId
+				? XSettings.forStudent(XSettings.studentId)?.currentTerm
 				: undefined) ?? TotalsStore.result?.[0]?.termTotals[0].term
 		)
 	}
@@ -116,7 +116,7 @@ export const TermStore = new (class {
 	private getMarkAmountOrder(total: Total) {
 		const { store } = SubjectPerformanceStores.get(
 			{
-				studentId: Settings.studentId,
+				studentId: XSettings.studentId,
 				subjectId: total.subjectId,
 			},
 			false,
@@ -153,7 +153,7 @@ export const TermStore = new (class {
 		}
 
 		const { store } = SubjectPerformanceStores.get(
-			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			{ studentId: XSettings.studentId, subjectId: total.subjectId },
 			false,
 		)
 		if (store.result?.results) avg += store.result?.results.length / 10000
@@ -162,7 +162,7 @@ export const TermStore = new (class {
 
 	private getAttendanceOrder(total: Total) {
 		const { store } = SubjectPerformanceStores.get(
-			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			{ studentId: XSettings.studentId, subjectId: total.subjectId },
 			false,
 		)
 		if (!store.result?.results) return 0
@@ -177,12 +177,12 @@ export const TermStore = new (class {
 
 	private getAttestationOrder(total: Total) {
 		const { store } = SubjectPerformanceStores.get(
-			{ studentId: Settings.studentId, subjectId: total.subjectId },
+			{ studentId: XSettings.studentId, subjectId: total.subjectId },
 			false,
 		)
 		if (!store.result?.results) return 0
 
-		const settings = Settings.forStudentOrThrow()
+		const settings = XSettings.forStudentOrThrow()
 		const { attestation, marks } = getAttestation(settings, store.result)
 
 		return attestation <= 100 ? marks : attestation

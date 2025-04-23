@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { List, ListItemProps, Switch } from 'react-native-paper'
@@ -6,7 +6,7 @@ import { List, ListItemProps, Switch } from 'react-native-paper'
 type SwitchSettingProps = Omit<ListItemProps, 'right' | 'onPress'> &
 	(
 		| {
-				setting: keyof FilterObject<typeof Settings, true | false>
+				setting: keyof FilterObject<typeof XSettings, true | false>
 		  }
 		| {
 				onChange(): void
@@ -19,11 +19,11 @@ export default observer(function SwitchSetting(props: SwitchSettingProps) {
 		if ('onChange' in props) {
 			props.onChange()
 		} else {
-			Settings.save({ [props.setting]: !Settings[props.setting] })
+			XSettings.save({ [props.setting]: !XSettings[props.setting] })
 		}
 	}, [props])
 
-	const value = 'setting' in props ? Settings[props.setting] : props.value
+	const value = 'setting' in props ? XSettings[props.setting] : props.value
 
 	const right = useCallback(
 		() => (

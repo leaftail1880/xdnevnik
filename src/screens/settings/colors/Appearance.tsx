@@ -2,14 +2,14 @@ import Loading from '@/components/Loading'
 import NumberInputSetting from '@/components/NumberInput'
 import SelectModal from '@/components/SelectModal'
 import SwitchSetting from '@/components/SwitchSetting'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme, ThemeStore } from '@/models/theme'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { Suspense, lazy } from 'react'
 import { Appearance, ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
-import { styles } from '../../../constants'
+import { globalStyles } from '../../../constants'
 import { Spacings } from '../../../utils/Spacings'
 import { ModalAlert, Toast } from '../../../utils/Toast'
 
@@ -43,9 +43,9 @@ export default observer(function AppearanceSettings_() {
 
 				<SelectModal
 					label="Порядок Фамилии Имени Отчества"
-					value={Settings.nameFormat}
+					value={XSettings.nameFormat}
 					data={nameFormat}
-					onSelect={({ value }) => Settings.save({ nameFormat: value })}
+					onSelect={({ value }) => XSettings.save({ nameFormat: value })}
 				/>
 
 				<NumberInputSetting
@@ -129,7 +129,7 @@ const ThemePreview = observer(function ThemePreview() {
 						return (
 							<View
 								style={[
-									styles.stretch,
+									globalStyles.stretch,
 									{
 										padding: 0,
 										paddingHorizontal: Spacings.s1,

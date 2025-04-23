@@ -7,7 +7,7 @@ import { Chip, Text } from 'react-native-paper'
 
 import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 import { Size } from '@/components/Size'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { API } from '@/services/net-school/api'
 import { Assignment, Attachment } from '@/services/net-school/entities'
 import { ROUTES } from '@/services/net-school/routes'
@@ -28,7 +28,7 @@ export default observer(function DiaryAssignment({
 	const [showHomework, setShowHomework] = useState(
 		// Do not show long homework by default
 		!(
-			Settings.collapseLongAssignmentText &&
+			XSettings.collapseLongAssignmentText &&
 			assignment.assignmentName.length > 40
 		),
 	)
@@ -56,7 +56,7 @@ export default observer(function DiaryAssignment({
 				<ScrollTextCopyable
 					style={{ alignSelf: 'center', flex: 3 }}
 					onPress={
-						Settings.collapseLongAssignmentText
+						XSettings.collapseLongAssignmentText
 							? () => setShowHomework(!showHomework)
 							: undefined
 					}

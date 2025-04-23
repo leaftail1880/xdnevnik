@@ -96,7 +96,7 @@
 		"prettier-2": "npm:prettier@^2",
 		"react-dom": "18",
 		"swc-flow-jest": "portal:swc-flow-jest",
-		"typescript": "^5.8.2",
+		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.26.1"
 	},
 	"packageManager": "yarn@4.9.1"

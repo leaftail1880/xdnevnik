@@ -1,7 +1,8 @@
 import { Theme } from '@/models/theme'
 import { Spacings } from '@/utils/Spacings'
 import { observer } from 'mobx-react-lite'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
+import { Text } from 'react-native-paper'
 
 export const ChipLike = observer(function ChipLike({
 	children,

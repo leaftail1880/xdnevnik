@@ -1,38 +1,38 @@
 import NumberInputSetting from '@/components/NumberInput'
-import { changeSettings, Settings, StudentSettings } from '@/models/settings'
+import { changeSettings, StudentSettings, XSettings } from '@/models/settings'
 import { SubjectPerformance } from '@/services/net-school/entities'
 import { ModalAlert } from '@/utils/Toast'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Text, View } from 'react-native'
-import { Chip } from 'react-native-paper'
-import { getColor } from './AttendanceStatsChip'
+import { useCallback } from 'react'
+import { View } from 'react-native'
+import { Chip, Text } from 'react-native-paper'
+import { getColorFromPercent } from './AttendanceStatsChip'
 
 export const AttestationStatsChip = observer(function AttestationStatsChip({
 	perf,
 }: {
 	perf: SubjectPerformance
 }) {
-	const settings = Settings.forStudentOrThrow()
+	const settings = XSettings.forStudentOrThrow()
 	const { need, attestation, marks } = getAttestation(settings, perf)
 
-	// if (marks >= need) return
+	const { colorStyle } = getColorFromPercent(~~(attestation / 30) + 2)
+	const onPress = useCallback(
+		() =>
+			ModalAlert.show(
+				'Аттестация',
+				<AttestationStatsChipSettings
+					subjectId={perf.subject.id}
+					perf={perf}
+				/>,
+			),
+		[perf],
+	)
 
-	const color = getColor(~~(attestation / 30) + 2)
 	return (
-		<Chip
-			compact
-			onPress={() =>
-				ModalAlert.show(
-					'Аттестация',
-					<AttestationStatsChipSettings
-						subjectId={perf.subject.id}
-						perf={perf}
-					/>,
-				)
-			}
-		>
-			<Text style={{ color }}>
+		<Chip compact onPress={onPress}>
+			<Text style={colorStyle}>
 				Аттестация {marks}/{need}
 			</Text>
 		</Chip>
@@ -47,7 +47,7 @@ const AttestationStatsChipSettings = observer(
 		subjectId: number
 		perf: SubjectPerformance
 	}) {
-		const settings = Settings.forStudentOrThrow()
+		const settings = XSettings.forStudentOrThrow()
 		const { need, attestation, marks } = getAttestation(settings, perf)
 
 		return (

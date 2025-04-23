@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import {
 	AssignmentsStore,
@@ -9,7 +9,7 @@ import { Spacings } from '@/utils/Spacings'
 import { autorun, makeAutoObservable } from 'mobx'
 import { View } from 'react-native'
 import { Text } from 'react-native-paper'
-import { LANG, styles } from '../../constants'
+import { LANG, globalStyles } from '../../constants'
 import { makeReloadPersistable } from '../../utils/makePersistable'
 
 const second = 1000
@@ -72,7 +72,7 @@ export const DiaryState = new (class {
 })()
 
 autorun(() => {
-	const { studentId } = Settings
+	const { studentId } = XSettings
 	const { showHomework, weekDays } = DiaryState
 
 	DiaryStore.withParams({
@@ -123,7 +123,7 @@ function DayRenderer({ day, i }: { day: Date; i: number }) {
 					width: '90%',
 					flex: 1,
 				},
-				styles.stretch,
+				globalStyles.stretch,
 			]}
 		>
 			<Text style={{ fontWeight: 'bold' }}>{dayName}</Text>

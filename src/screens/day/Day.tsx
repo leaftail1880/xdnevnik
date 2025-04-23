@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { DiaryStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet } from 'react-native'
@@ -12,7 +12,7 @@ import { DiaryState } from './state'
 export default observer(function DiaryDay(props: DiaryLessonNavigation) {
 	if (DiaryStore.fallback) return DiaryStore.fallback
 
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const dayLessons = sortByDate(
 		DiaryStore.result.forDay(DiaryState.day, studentSettings),
 		studentSettings,

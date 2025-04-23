@@ -77,7 +77,7 @@ class SettingsStore {
 
 	get studentId() {
 		const student =
-			StudentsStore.result && StudentsStore.result[Settings.studentIndex]
+			StudentsStore.result && StudentsStore.result[XSettings.studentIndex]
 		if (student) return student.studentId
 	}
 
@@ -168,7 +168,7 @@ class SettingsStore {
 	}
 }
 
-export const Settings = new SettingsStore() as Readonly<SettingsStore>
+export const XSettings = new SettingsStore() as Readonly<SettingsStore>
 
 export function changeSettings<T extends object>(
 	settings: T,

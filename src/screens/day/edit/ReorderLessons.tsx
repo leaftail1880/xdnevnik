@@ -1,7 +1,7 @@
 import { ChipLike } from '@/components/ChipLike'
 import { getSubjectName } from '@/components/SubjectName'
-import { styles } from '@/constants'
-import { Settings, StudentSettings } from '@/models/settings'
+import { globalStyles } from '@/constants'
+import { StudentSettings, XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Lesson } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
@@ -12,12 +12,11 @@ import { useCallback } from 'react'
 import {
 	ListRenderItem,
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	TouchableOpacityProps,
 	View,
 } from 'react-native'
-import { Button } from 'react-native-paper'
+import { Button, Text } from 'react-native-paper'
 import ReorderableList, {
 	ReorderableListReorderEvent,
 	useReorderableDrag,
@@ -35,7 +34,7 @@ const reorderState = new (class {
 	lessons: Lesson[] = []
 
 	reset() {
-		const studentSettings = Settings.forStudentOrThrow()
+		const studentSettings = XSettings.forStudentOrThrow()
 		studentSettings.lessonOrder = {}
 
 		this.key++
@@ -51,7 +50,7 @@ function replaceItems<T>(array: T[], from: number, to: number): T[] {
 
 export const EditDiaryReorderLessons = observer(function DiaryEditDay() {
 	const lessons = DiaryStore.result!.lessons
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const lessonsSorted =
 		reorderState.lessons.length === 0
 			? sortByDate(lessons.slice(), studentSettings)
@@ -136,7 +135,7 @@ export const DiaryLessonShort = observer(function DraggableLesson({
 	lesson: Lesson
 	isEdited?: boolean
 } & TouchableOpacityProps) {
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const isMoved =
 		!!studentSettings.lessonOrder[lesson.offsetId]?.[lesson.subjectId]
 
@@ -149,7 +148,7 @@ export const DiaryLessonShort = observer(function DraggableLesson({
 							? Theme.colors.primaryContainer
 							: Theme.colors.elevation.level1,
 				},
-				styles.row,
+				globalStyles.row,
 				{
 					gap: Spacings.s1,
 					alignItems: 'center',

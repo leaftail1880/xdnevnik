@@ -1,12 +1,14 @@
 import Mark from '@/components/Mark'
 import { RoundedSurface } from '@/components/RoundedSurface'
-import { styles } from '@/constants'
-import { Settings, StudentSettings } from '@/models/settings'
+import { globalStyles } from '@/constants'
+import { StudentSettings, XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { ToGetMarkTargetCalculated } from '@/utils/calculateMarks'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
+import { useStyles } from '@/utils/useStyles'
 import { observer } from 'mobx-react-lite'
+import { useCallback } from 'react'
 import { StyleProp, View, ViewStyle } from 'react-native'
 import { Chip, Text } from 'react-native-paper'
 
@@ -27,48 +29,71 @@ export function ToGetMarkChips({
 	))
 }
 
-const ToGetMarkChip = observer(function ToGetMarkChip({
-	amount,
-	target,
-	compact = Settings.targetMarkCompact,
-	style,
-}: {
+const onImpossiblePress = () =>
+	ModalAlert.show('Исправить оценку невозможно', 'Недостаточно уроков', true)
+
+interface ToGetMarkProps {
 	amount: number | undefined
 	target?: number
 	compact?: boolean
 	style?: StyleProp<ViewStyle>
-}) {
-	const { studentId } = Settings
+}
+
+const ToGetMarkChip = observer(function ToGetMarkChip(props: ToGetMarkProps) {
+	const { studentId } = XSettings
 	if (!studentId) return
+	const amount = props.amount
 	if (typeof amount !== 'number') return
 
-	const student = Settings.forStudent(Settings.studentId!)
-	target ??= student.targetMark
+	const student = XSettings.forStudent(XSettings.studentId!)
 
 	if (amount === 0) {
+		return <ToGetMarkChipImpossible {...props} />
+	} else {
 		return (
-			<Chip
-				mode="flat"
-				compact
-				style={[{ backgroundColor: Theme.colors.errorContainer }, style]}
-				onPress={() =>
-					ModalAlert.show(
-						'Исправить оценку невозможно',
-						'Недостаточно уроков',
-						true,
-					)
-				}
-			>
-				Исправить до {target} невозможно
-			</Chip>
+			<ToGetMarkChipPossible {...props} amount={amount} student={student} />
 		)
 	}
+})
 
-	const onPress = () =>
-		ModalAlert.show(
-			`Можно исправить оценку!`,
-			<ToFixMarkYouNeed student={student} amount={amount} target={target} />,
-		)
+const ToGetMarkChipImpossible = observer(function ToGetMarkChipImpossible(
+	props: ToGetMarkProps,
+) {
+	const impossibleChipStyle = useStyles(() => [
+		{ backgroundColor: Theme.colors.errorContainer },
+		props.style,
+	])
+
+	return (
+		<Chip
+			mode="flat"
+			compact
+			style={impossibleChipStyle}
+			onPress={onImpossiblePress}
+		>
+			Исправить до {props.target} невозможно
+		</Chip>
+	)
+})
+
+const ToGetMarkChipPossible = observer(function ToGetMarkChipPossible({
+	compact = XSettings.targetMarkCompact,
+	student,
+	amount,
+	target = student.targetMark,
+	style,
+}: {
+	student: StudentSettings
+	amount: number
+} & ToGetMarkProps) {
+	const onPress = useCallback(
+		() =>
+			ModalAlert.show(
+				`Можно исправить оценку!`,
+				<ToFixMarkYouNeed student={student} amount={amount} target={target} />,
+			),
+		[student, amount, target],
+	)
 
 	return (
 		<>
@@ -83,7 +108,7 @@ const ToGetMarkChip = observer(function ToGetMarkChip({
 			{!compact && (
 				<RoundedSurface
 					style={[
-						styles.stretch,
+						globalStyles.stretch,
 						{
 							gap: Spacings.s1,
 							backgroundColor: Theme.colors.secondaryContainer,

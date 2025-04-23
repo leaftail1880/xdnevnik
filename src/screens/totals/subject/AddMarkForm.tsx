@@ -1,14 +1,15 @@
 import Mark from '@/components/Mark'
 import NumberInputSetting from '@/components/NumberInput'
-import { Settings } from '@/models/settings'
+import { globalStyles } from '@/constants'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import type { PartialAssignment } from '@/services/net-school/entities'
 import { Spacings } from '@/utils/Spacings'
+import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { Button, IconButton } from 'react-native-paper'
-import { styles } from '../../../constants'
+import { Button } from 'react-native-paper'
 
 export const AddMarkForm = observer(function AddMarkForm(props: {
 	setCustomMarks: (p: PartialAssignment[]) => void
@@ -16,8 +17,8 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 }) {
 	Theme.key
 
-	const student = Settings.studentId
-		? Settings.forStudent(Settings.studentId)
+	const student = XSettings.studentId
+		? XSettings.forStudent(XSettings.studentId)
 		: undefined
 
 	const defaultWeight = student?.defaultMarkWeight ?? 0
@@ -25,55 +26,59 @@ export const AddMarkForm = observer(function AddMarkForm(props: {
 
 	const defaultMark = student?.defaultMark ?? 0
 	const [mark, setMark] = useState(defaultMark)
-	const [addingCustomMark, setAddingCustomMark] = useState(false)
-	const addCustomMark = useCallback(() => {
-		if (addingCustomMark) {
-			// Saving
-			props.setCustomMarks([
-				...props.customMarks,
-				{
-					custom: true,
-					result: Number(mark),
-					weight: Number(weight),
-					comment: 'Кастомная',
-					assignmentTypeName: 'ВОЗМОЖНАЯ',
-				},
-			])
-		}
-	}, [addingCustomMark, mark, props, weight])
+	const [open, setOpen] = useState(false)
+	const addMark = useCallback(() => {
+		if (!open) return
+		// Saving
+		runInAction(() => {
+			props.customMarks.push({
+				custom: true,
+				result: Number(mark),
+				weight: Number(weight),
+				comment: 'Кастомная',
+				assignmentTypeName: 'ВОЗМОЖНАЯ',
+			})
+		})
+	}, [open, mark, props, weight])
 
-	const addCustomMarkAndCloseForm = useCallback(() => {
-		addCustomMark()
-		setAddingCustomMark(v => !v)
-	}, [addCustomMark, setAddingCustomMark])
+	const addCustomMarkAndToggleForm = useCallback(() => {
+		addMark()
+		setOpen(true)
+	}, [addMark, setOpen])
 
 	return (
 		<View>
-			<View style={styles.stretch}>
-				<Button
-					onPress={addCustomMarkAndCloseForm}
-					icon={addingCustomMark ? 'content-save' : 'plus'}
-				>
-					{addingCustomMark ? 'Добавить' : 'Добавить оценку'}
-				</Button>
-				{addingCustomMark && (
+			<View style={globalStyles.stretch}>
+				<View style={globalStyles.row}>
+					<Button
+						onPress={open ? addMark : addCustomMarkAndToggleForm}
+						icon={open ? 'content-save' : 'plus'}
+					>
+						{open ? 'Добавить' : 'Добавить оценку'}
+					</Button>
+
+					{open && (
+						<Button icon="minus" onPress={() => setOpen(false)}>
+							Свернуть
+						</Button>
+					)}
+				</View>
+				{open && (
 					<Mark
 						weight={weight}
 						mark={mark}
 						duty={false}
-						style={{ padding: Spacings.s1, paddingHorizontal: Spacings.s2 }}
-						onPress={addCustomMark}
+						style={{ paddingHorizontal: Spacings.s2 }}
+						onPress={addMark}
 					/>
 				)}
-
-				{addingCustomMark && (
-					<IconButton icon="minus" onPress={() => setAddingCustomMark(false)} />
-				)}
-				{!addingCustomMark && !!props.customMarks.length && (
-					<IconButton icon="delete" onPress={() => props.setCustomMarks([])} />
+				{!open && !!props.customMarks.length && (
+					<Button icon="delete" onPress={() => props.setCustomMarks([])}>
+						Убрать все
+					</Button>
 				)}
 			</View>
-			{addingCustomMark && (
+			{open && (
 				<View>
 					<NumberInputSetting<number>
 						value={mark}

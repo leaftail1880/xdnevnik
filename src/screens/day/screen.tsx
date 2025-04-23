@@ -1,7 +1,7 @@
 import Header from '@/components/Header'
 import SelectModal from '@/components/SelectModal'
 import UpdateDate from '@/components/UpdateDate'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Lesson } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
@@ -9,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -74,26 +74,23 @@ LocaleConfig.defaultLocale = 'ru-RU'
 
 export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={styles.flex}>
 			<Header title="Дневник"></Header>
 			<EditDiaryFAB />
 			{!DiaryState.edit ? (
 				<ScrollView
-					contentContainerStyle={{
-						justifyContent: 'center',
-						alignContent: 'center',
-					}}
+					contentContainerStyle={styles.scrollContentContainer}
 					refreshControl={DiaryStore.refreshControl}
 				>
-					<View style={{ flex: 1, zIndex: 30 }}>
+					<View style={styles.selectDayView}>
 						<SelectDay />
 					</View>
-					<Chips>
+					<Chips style={styles.chips}>
 						<Filter type="showHomework" label="Оценки" />
 						<Filter type="showAttachments" label="Файлы" />
 						<Filter type="showLessonTheme" label="Темы" />
 					</Chips>
-					<View style={{ padding: Spacings.s1 }}>
+					<View style={styles.day}>
 						{DiaryStore.fallback || <Day {...props} />}
 					</View>
 					<UpdateDate store={DiaryStore} />
@@ -105,6 +102,17 @@ export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
 	)
 })
 
+const styles = StyleSheet.create({
+	flex: { flex: 1 },
+	scrollContentContainer: {
+		justifyContent: 'center',
+		alignContent: 'center',
+	},
+	selectDayView: { flex: 1, zIndex: 30 },
+	chips: { paddingBottom: 0 },
+	day: { padding: Spacings.s1 },
+})
+
 function toCalendar(yyyymmdd: string) {
 	return yyyymmdd.split('.').reverse().join('-')
 }
@@ -114,7 +122,7 @@ function fromCalendar(calendar: string) {
 }
 
 const SelectDay = observer(function SelectDay() {
-	if (Settings.newDatePicker) {
+	if (XSettings.newDatePicker) {
 		const theme: import('react-native-calendars').CalendarProps['theme'] & {
 			expandableKnobColor: string
 		} = {

@@ -1,5 +1,5 @@
 import { getSubjectName } from '@/components/SubjectName'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Assignment } from '@/services/net-school/entities'
 import { makeReloadPersistable } from '@/utils/makePersistable'
 import notifee, {
@@ -59,7 +59,9 @@ export const MarksNotificationStore = new (class {
 		}
 	}
 
-	isUnseen(studentId: number, assignmentId: number | string) {
+	isUnseen(studentId: number, assignmentId: number | string | undefined) {
+		if (typeof assignmentId === 'undefined') return false
+
 		const student = this.getStudent(studentId)
 		if (student.forceNotSeen.includes(assignmentId)) return true
 
@@ -101,7 +103,7 @@ export async function setupMarksChannel() {
 }
 
 function enabled() {
-	return Settings.marksNotifications && MarksNotificationStore.marksChannelId
+	return XSettings.marksNotifications && MarksNotificationStore.marksChannelId
 }
 
 const TASK_ID = 'background-fetch'
@@ -141,7 +143,7 @@ export async function checkForNewMarksAndNotify(
 ): Promise<BackgroundFetchResult> {
 	MarksNotificationStore.log('info', `${text}: Запрос новых оценок...`)
 
-	const { studentId } = Settings
+	const { studentId } = XSettings
 	if (!studentId) return MarksNotificationStore.log('error', 'Не выбран учени')
 	if (!enabled())
 		return MarksNotificationStore.log(
@@ -177,7 +179,7 @@ function checkForNewMarks(marks: Assignment[]) {
 		const newId = `${assignment.result} -  ${getSubjectName(assignment)}, ${
 			assignment.assignmentTypeAbbr
 		} ${assignment.assignmentId}`
-		const superNewId = `${newId} ${Settings.studentId}`
+		const superNewId = `${newId} ${XSettings.studentId}`
 
 		if (
 			!MarksNotificationStore.notified.includes(oldId) &&

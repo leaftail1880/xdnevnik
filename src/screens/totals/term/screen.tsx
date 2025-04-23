@@ -10,7 +10,7 @@ import SelectModal from '@/components/SelectModal'
 import UpdateDate from '@/components/UpdateDate'
 
 import { Chips } from '@/components/Chips'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { NSEntity, Subject, Total } from '@/services/net-school/entities'
 import {
@@ -19,6 +19,7 @@ import {
 	SubjectsStore,
 	TotalsStore,
 } from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
 import SubjectPerformanceInline from './Subject'
 import { TermStore, TermStoreSortModes } from './state'
 
@@ -45,12 +46,12 @@ export default memo(function TermTotalsScreen(props: TotalsScreenParams) {
 })
 
 const ChipsRow = observer(function Header() {
-	if (!Settings.studentId) return
+	if (!XSettings.studentId) return
 
 	const terms = TermStore.terms
-	const studentSettings = Settings.forStudent(Settings.studentId)
+	const studentSettings = XSettings.forStudent(XSettings.studentId)
 	return (
-		<Chips>
+		<Chips style={{ paddingBottom: Spacings.s1 }}>
 			<SelectModal
 				mode="chip"
 				label="Режим сортировки"
@@ -98,18 +99,19 @@ const Filter = observer(function Filter<T extends object>(props: {
 	storeKey: keyof FilterObject<T, boolean>
 	label: string
 }) {
+	const onPress = useCallback(() => {
+		runInAction(
+			() =>
+				((props.store[props.storeKey] as boolean) =
+					!props.store[props.storeKey]),
+		)
+	}, [props.store, props.storeKey])
 	return (
 		<Chip
 			mode="flat"
 			selected={props.store[props.storeKey] as boolean}
 			compact
-			onPress={() => {
-				runInAction(
-					() =>
-						((props.store[props.storeKey] as boolean) =
-							!props.store[props.storeKey]),
-				)
-			}}
+			onPress={onPress}
 		>
 			{props.label}
 		</Chip>
@@ -151,7 +153,7 @@ export const TermTotalsList = observer(function TermTotalsList(
 	Theme.key
 
 	HomeworkMarksStore.withParams({
-		studentId: Settings.studentId,
+		studentId: XSettings.studentId,
 		withoutMarks: false,
 		withExpiredClassAssign: true,
 	})

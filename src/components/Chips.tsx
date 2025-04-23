@@ -12,6 +12,12 @@ export function Chips(props: {
 	children: React.ReactNode
 	style?: StyleProp<ViewStyle>
 }) {
+	if (
+		Array.isArray(props.children) &&
+		props.children.filter(Boolean).length === 0
+	)
+		return
+
 	return (
 		<ScrollView
 			style={[styles.style, props.style]}

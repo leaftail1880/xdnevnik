@@ -1,5 +1,5 @@
 import SwitchSetting from '@/components/SwitchSetting'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import {
 	checkForNewMarksAndNotify,
@@ -57,14 +57,14 @@ export default observer(function Notifications(
 					title={'Расписание уроков'}
 					description="Уведомления о текущих уроках"
 					setting="lessonNotifications"
-					disabled={!Settings.notificationsEnabled}
+					disabled={!XSettings.notificationsEnabled}
 				/>
 
 				<SwitchSetting
 					title={'Новые оценки'}
 					description="Уведомления о новых оценках"
 					setting="marksNotifications"
-					disabled={!Settings.notificationsEnabled}
+					disabled={!XSettings.notificationsEnabled}
 				/>
 			</List.Section>
 			<View style={{ padding: Spacings.s2, gap: Spacings.s2 }}>

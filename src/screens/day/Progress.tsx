@@ -1,10 +1,11 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Lesson, LessonState } from '@/services/net-school/lesson'
+import { useStyles } from '@/utils/useStyles'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TextStyle, View } from 'react-native'
 import { ProgressBar, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
 
@@ -19,7 +20,7 @@ export const LessonProgressStore = new (class {
 const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const { elapsed, startsAfter, beforeStart, progress, state, remaining } =
 		useMemo(
 			() => Lesson.status(props.lesson, studentSettings),
@@ -35,9 +36,14 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		}
 	}, [state, props.lesson.classmeetingId])
 
-	const textStyle = {
+	const textStyle = useStyles<TextStyle>(() => ({
 		color: Theme.colors.onSurfaceDisabled,
-	}
+	}))
+
+	const progressBarStyle = useStyles(() => ({
+		height: 10,
+		borderRadius: Theme.roundness,
+	}))
 
 	if (state === LessonState.NotStarted) {
 		// Do not show time above 15 mins
@@ -48,13 +54,7 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		return (
 			<View style={styles.row}>
 				<View style={styles.progressView}>
-					<ProgressBar
-						style={{
-							height: 10,
-							borderRadius: Theme.roundness,
-						}}
-						progress={progress / 100}
-					/>
+					<ProgressBar style={progressBarStyle} progress={progress / 100} />
 				</View>
 				<Text>{elapsed}</Text>
 				<Text>{remaining}</Text>

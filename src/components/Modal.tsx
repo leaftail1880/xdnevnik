@@ -10,7 +10,7 @@ import {
 	Text,
 } from 'react-native-paper'
 import Animated from 'react-native-reanimated'
-import { styles } from '../constants'
+import { globalStyles } from '../constants'
 import { ModalAlert, Toast } from '../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -40,7 +40,7 @@ const ToastModal = observer(function ToastModal() {
 							: Theme.colors.elevation.level5,
 					}}
 				>
-					<View style={[styles.stretch, { flex: 1, width: '100%' }]}>
+					<View style={[globalStyles.stretch, { flex: 1, width: '100%' }]}>
 						<View style={{ flex: 8 }}>
 							<Text style={[Theme.fonts.titleSmall, {}]}>
 								{Toast.state.title}

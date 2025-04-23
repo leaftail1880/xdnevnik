@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Education } from '@/services/net-school/entities'
 import { EducationStore } from '@/services/net-school/store'
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
@@ -25,7 +25,7 @@ export const TotalsStateStore = new (class {
 	constructor() {
 		makeAutoObservable(this)
 		autorun(() => {
-			const { studentId } = Settings
+			const { studentId } = XSettings
 			EducationStore.withParams({ studentId })
 
 			const education = EducationStore.result

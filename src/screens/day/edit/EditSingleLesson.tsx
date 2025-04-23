@@ -1,7 +1,7 @@
 import { HoursMinutes, SelectTime } from '@/components/SelectTime'
 import { getSubjectName } from '@/components/SubjectName'
 import { LANG } from '@/constants'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Lesson } from '@/services/net-school/lesson'
 import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
@@ -17,7 +17,7 @@ export const EditSingleLesson = observer(function EditSingleLesson({
 }: {
 	lesson: Lesson
 }) {
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const [startTime, setStartTime] = useState(
 		dateToHoursMinutes(lesson.start(studentSettings)),
 	)

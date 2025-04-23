@@ -5,9 +5,9 @@ import SelectModal from '@/components/SelectModal'
 import SwitchSetting from '@/components/SwitchSetting'
 import {
 	changeSettings,
-	Settings,
 	StudentSettings,
 	StudentSettingsWithSave,
+	XSettings,
 } from '@/models/settings'
 import { Spacings } from '@/utils/Spacings'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -26,17 +26,17 @@ const markStyles = [
 export default observer(function Notifications(
 	props: StackScreenProps<SettingsRoutes>,
 ) {
-	const student = Settings.studentId
-		? Settings.forStudent(Settings.studentId)
+	const student = XSettings.studentId
+		? XSettings.forStudent(XSettings.studentId)
 		: undefined
 	return (
 		<ScrollView>
 			<List.Section title="Общие">
 				<SelectModal
 					label="Стиль оценок"
-					value={Settings.markStyle}
+					value={XSettings.markStyle}
 					data={markStyles}
-					onSelect={({ value }) => Settings.save({ markStyle: value })}
+					onSelect={({ value }) => XSettings.save({ markStyle: value })}
 				/>
 				{/* <SwitchSetting
 					title='"Вес: " перед весом оценки'
@@ -86,8 +86,8 @@ const MarkInput = observer(function MarkInput(props: MarkInputProps) {
 	const [show, setShow] = useState(true)
 	const toggleShow = useCallback(() => setShow(v => !v), [setShow])
 
-	if (!Settings.studentId) return false
-	const student = Settings.forStudent(Settings.studentId)
+	if (!XSettings.studentId) return false
+	const student = XSettings.forStudent(XSettings.studentId)
 
 	const mark = student[props.markSetting] ?? 'Нет'
 	const weight = props.weightSetting && student[props.weightSetting]

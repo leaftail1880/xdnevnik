@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import {
@@ -134,7 +134,7 @@ function calculateColorsAndMark(
 	minWeight: number | undefined,
 	maxWeight: number | undefined,
 ) {
-	const bg = Settings.markStyle === 'background'
+	const bg = XSettings.markStyle === 'background'
 	const colors = bg ? MarkColorsBG : MarkColorsText
 
 	if (duty) rawMark = 2
@@ -143,7 +143,7 @@ function calculateColorsAndMark(
 
 	let color = noColor + (typeof weight === 'number' ? '' : '7A')
 	if (typeof mark === 'number' && !isNaN(mark)) {
-		const rounded = roundMark(mark, Settings.markRoundAdd)
+		const rounded = roundMark(mark, XSettings.markRoundAdd)
 		if (rounded in colors) color = colors[rounded as keyof typeof colors]
 		else {
 			const keys = Object.keys(colors).map(Number)

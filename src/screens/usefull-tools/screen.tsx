@@ -3,8 +3,8 @@ import Header from '@/components/Header'
 import Mark, { MarkColorsBG } from '@/components/Mark'
 import { RoundedSurface } from '@/components/RoundedSurface'
 import { getSubjectName } from '@/components/SubjectName'
-import { LANG, styles } from '@/constants'
-import { Settings } from '@/models/settings'
+import { LANG, globalStyles } from '@/constants'
+import { XSettings } from '@/models/settings'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
 import { Spacings } from '@/utils/Spacings'
 import { observer } from 'mobx-react-lite'
@@ -114,7 +114,7 @@ const AverageMarkItem = observer(function AverageMarkItem(
 	props: Parameters<RenderSubject>[0],
 ) {
 	const performance = SubjectPerformanceStores.use({
-		studentId: Settings.studentId,
+		studentId: XSettings.studentId,
 		subjectId: props.total.subjectId,
 	})
 
@@ -124,7 +124,10 @@ const AverageMarkItem = observer(function AverageMarkItem(
 	const up = level >= 1000
 	return (
 		<View
-			style={[styles.stretch, { gap: Spacings.s1, marginTop: Spacings.s1 }]}
+			style={[
+				globalStyles.stretch,
+				{ gap: Spacings.s1, marginTop: Spacings.s1 },
+			]}
 		>
 			<Text style={{ flex: 5, flexWrap: 'wrap' }}>
 				{getSubjectName({

@@ -1,11 +1,11 @@
 import NumberInputSetting from '@/components/NumberInput'
 import { RenderHoursMinutes, SelectTime } from '@/components/SelectTime'
 import UpdateDate from '@/components/UpdateDate'
-import { styles } from '@/constants'
+import { globalStyles } from '@/constants'
 import {
 	CustomSubject,
 	CustomSubjectMeeting,
-	Settings,
+	XSettings,
 } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Spacings } from '@/utils/Spacings'
@@ -52,11 +52,13 @@ const Meeting = observer(function Meeting(props: {
 	if (collapsed)
 		return (
 			<Card
-				contentStyle={styles.stretch}
+				contentStyle={globalStyles.stretch}
 				style={{ paddingHorizontal: Spacings.s2 }}
 				onPress={() => setCollapsed(v => !v)}
 			>
-				<View style={[styles.row, { gap: Spacings.s1, alignItems: 'center' }]}>
+				<View
+					style={[globalStyles.row, { gap: Spacings.s1, alignItems: 'center' }]}
+				>
 					<Text>{DAY_NAMES_SHORT[meeting.dayIndex]}</Text>
 					<Text>
 						<RenderHoursMinutes time={meeting.startTime} />
@@ -80,7 +82,7 @@ const Meeting = observer(function Meeting(props: {
 			style={{ padding: Spacings.s2 }}
 			onPress={() => setCollapsed(v => !v)}
 		>
-			<View style={styles.stretch}>
+			<View style={globalStyles.stretch}>
 				<Button
 					onPress={() => setCollapsed(v => !v)}
 					mode="contained-tonal"
@@ -137,7 +139,7 @@ const state = new (class {
 })()
 
 export const EditDiaryAddLesson = observer(function EditDiaryAddLesson() {
-	const settings = Settings.forStudentOrThrow()
+	const settings = XSettings.forStudentOrThrow()
 	return (
 		<ScrollView
 			style={{ padding: Spacings.s2 }}
@@ -208,7 +210,7 @@ const CustomSubjectDescription = observer(function CustomSubjectDescription({
 	return (
 		<Card
 			style={{ paddingHorizontal: Spacings.s2 }}
-			contentStyle={styles.stretch}
+			contentStyle={globalStyles.stretch}
 			onPress={() => runInAction(() => (state.editing = i))}
 		>
 			<Text>
@@ -218,7 +220,7 @@ const CustomSubjectDescription = observer(function CustomSubjectDescription({
 				icon="delete"
 				onPress={() => {
 					runInAction(() => {
-						const settings = Settings.forStudentOrThrow()
+						const settings = XSettings.forStudentOrThrow()
 						settings.customSubjects = settings.customSubjects.filter(
 							e => e !== customSubject,
 						)

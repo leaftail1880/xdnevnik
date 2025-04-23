@@ -1,5 +1,6 @@
 import { getSubjectName } from '@/components/SubjectName'
-import { Settings } from '@/models/settings'
+import { Logger } from '@/constants'
+import { XSettings } from '@/models/settings'
 import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
 import {
@@ -13,7 +14,6 @@ import notifee, {
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { customSubjectToLessons } from '../net-school/entities'
 import { MarksNotificationStore } from './marks'
-import { Logger } from '@/constants'
 
 let foregroundServiceRegistered = false
 
@@ -47,7 +47,7 @@ export const LessonNotifStore = new (class {
 })()
 
 function enabled() {
-	return Settings.notificationsEnabled && Settings.lessonNotifications
+	return XSettings.notificationsEnabled && XSettings.lessonNotifications
 }
 
 export async function setupLessonChannel() {
@@ -87,7 +87,7 @@ autorun(function notificationFromDiary() {
 	if (!result) return
 	const diary = toJS(result)
 
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const date = new Date()
 	const customSubjects = studentSettings.customSubjects
 		.map((e, i) => customSubjectToLessons(e, date, i))
@@ -138,7 +138,7 @@ const minute = 60 * 1000
 function getLessonPeriod(previousLesson: Lesson, currentLesson: Lesson) {
 	let period: Date | undefined
 	let date: Date
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const beforeLessonNotifTime = currentLesson.notifyBeforeTime
 
 	const current = currentLesson && {
@@ -176,7 +176,7 @@ async function showNotification(
 ) {
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
 	const lessonName = getSubjectName(lesson)
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 
 	const { state, startsAfter, progress, elapsed, remaining } = Lesson.status(
 		lesson,

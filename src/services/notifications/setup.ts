@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import notifee, { AuthorizationStatus } from '@notifee/react-native'
 import * as Device from 'expo-device'
 import { autorun } from 'mobx'
@@ -14,14 +14,14 @@ autorun(function lessonNotificationSetup() {
 	setupLessonChannel()
 	setupMarksChannel()
 
-	if (Settings.notificationsEnabled) {
+	if (XSettings.notificationsEnabled) {
 		if (Device.isDevice) {
 			// Required for iOS
 			// See https://notifee.app/react-native/docs/ios/permissions
 			notifee.requestPermission().then(({ authorizationStatus }) => {
 				if (authorizationStatus === AuthorizationStatus.DENIED) {
 					// Permission denied, disable
-					Settings.save({ notificationsEnabled: false })
+					XSettings.save({ notificationsEnabled: false })
 				}
 			})
 		} else {
@@ -30,7 +30,7 @@ autorun(function lessonNotificationSetup() {
 				title: 'Уведомления недоступны вне устройства',
 				error: true,
 			})
-			Settings.save({ notificationsEnabled: false })
+			XSettings.save({ notificationsEnabled: false })
 		}
 	}
 })

@@ -3,7 +3,7 @@ import {
 	getSubjectName,
 } from '@/components/SubjectName'
 import UpdateDate from '@/components/UpdateDate'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Lesson } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
 import { Spacings } from '@/utils/Spacings'
@@ -40,7 +40,7 @@ const Screen = observer(function Screen() {
 					<Button
 						onPress={() => {
 							runInAction(() => {
-								const settings = Settings.forStudentOrThrow()
+								const settings = XSettings.forStudentOrThrow()
 								settings.subjectNamesDay = {}
 								settings.lessonOrder = {}
 							})
@@ -65,7 +65,7 @@ const DiaryLessonItem = observer(function DiaryLessonItem(
 	const onPress = useCallback(() => {
 		ModalAlert.show('Редактировать', <EditSingleLesson lesson={props.item} />)
 	}, [props.item])
-	const settings = Settings.forStudentOrThrow()
+	const settings = XSettings.forStudentOrThrow()
 	return (
 		<DiaryLessonShort
 			isEdited={

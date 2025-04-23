@@ -1,9 +1,9 @@
 import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
 import Mark from '@/components/Mark'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
-import { Total } from '@/services/net-school/entities'
+import { PartialAssignment, Total } from '@/services/net-school/entities'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
 import { MarksNotificationStore } from '@/services/notifications/marks'
 import { calculateMarks } from '@/utils/calculateMarks'
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
 		gap: Spacings.s1,
 		padding: Spacings.s1,
 	},
+	noPadding: { padding: 0 },
 })
 
 export default observer(function SubjectMarks(
@@ -62,7 +63,7 @@ export default observer(function SubjectMarks(
 		openDetails: () => void
 	},
 ) {
-	const { studentId } = Settings
+	const { studentId } = XSettings
 
 	const performance = SubjectPerformanceStores.use({
 		studentId,
@@ -70,7 +71,7 @@ export default observer(function SubjectMarks(
 	})
 	performance.withParams({ termId: props.selectedTerm.id })
 
-	const student = studentId ? Settings.forStudent(studentId) : undefined
+	const student = studentId ? XSettings.forStudent(studentId) : undefined
 	const backgroundColor = Theme.colors.elevation.level1
 	const [viewStyle, viewContainerStyle] = useMemo(() => {
 		const viewStyle: StyleProp<ViewStyle> = {
@@ -93,7 +94,7 @@ export default observer(function SubjectMarks(
 				defaultMark: student?.defaultMark,
 				defaultMarkWeight: student?.defaultMarkWeight,
 				targetMark: student?.targetMark,
-				markRoundAdd: Settings.markRoundAdd,
+				markRoundAdd: XSettings.markRoundAdd,
 			}),
 		[
 			performance.result,
@@ -132,33 +133,14 @@ export default observer(function SubjectMarks(
 	return (
 		<View style={styles.marksAndChipsContainer}>
 			<View style={styles.marks}>
-				<ScrollView
-					horizontal
-					style={viewStyle}
-					contentContainerStyle={styles.container}
-					fadingEdgeLength={100}
-					showsHorizontalScrollIndicator={false}
-				>
-					{totalsAndSheduledTotals
-						.slice()
-						.reverse()
-						.map((e, i) => (
-							<Mark
-								duty={e.duty ?? false}
-								mark={e.result ?? null}
-								weight={e.weight}
-								maxWeight={maxWeight}
-								minWeight={minWeight}
-								style={styles.mark}
-								key={i.toString()}
-								onPress={props.openDetails}
-								unseen={MarksNotificationStore.isUnseen(
-									studentId,
-									e.assignmentId,
-								)}
-							/>
-						))}
-				</ScrollView>
+				<ScrollableMarks
+					viewStyle={viewStyle}
+					totalsAndSheduledTotals={totalsAndSheduledTotals}
+					minWeight={minWeight}
+					maxWeight={maxWeight}
+					studentId={studentId}
+					openDetails={props.openDetails}
+				/>
 				<Mark
 					duty={false}
 					finalMark={props.term?.mark}
@@ -169,7 +151,7 @@ export default observer(function SubjectMarks(
 					style={styles.totalMark}
 				/>
 			</View>
-			<Chips style={{ padding: 0 }}>
+			<Chips style={styles.noPadding}>
 				{TermStore.toGetMark && <ToGetMarkChips toGetMarks={toGetMarks} />}
 				{TermStore.shortStats && (
 					<Chip
@@ -195,5 +177,48 @@ export default observer(function SubjectMarks(
 				{TermStore.attestationStats && <AttestationStatsChip perf={perf} />}
 			</Chips>
 		</View>
+	)
+})
+
+const ScrollableMarks = observer(function ScrollableMarks({
+	viewStyle,
+	totalsAndSheduledTotals,
+	maxWeight,
+	minWeight,
+	openDetails,
+	studentId,
+}: {
+	viewStyle: StyleProp<ViewStyle>
+	totalsAndSheduledTotals: PartialAssignment[]
+	minWeight: number
+	maxWeight: number
+	studentId: number
+	openDetails: VoidFunction
+}) {
+	return (
+		<ScrollView
+			horizontal
+			style={viewStyle}
+			contentContainerStyle={styles.container}
+			fadingEdgeLength={100}
+			showsHorizontalScrollIndicator={false}
+		>
+			{totalsAndSheduledTotals
+				.slice()
+				.reverse()
+				.map((e, i) => (
+					<Mark
+						duty={e.duty ?? false}
+						mark={e.result ?? null}
+						weight={e.weight}
+						maxWeight={maxWeight}
+						minWeight={minWeight}
+						style={styles.mark}
+						key={i.toString()}
+						onPress={openDetails}
+						unseen={MarksNotificationStore.isUnseen(studentId, e.assignmentId)}
+					/>
+				))}
+		</ScrollView>
 	)
 })

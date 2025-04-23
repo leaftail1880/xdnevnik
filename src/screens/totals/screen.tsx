@@ -1,4 +1,4 @@
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { SubjectsStore, TotalsStore } from '@/services/net-school/store'
 import { StackNavigationOptions } from '@react-navigation/stack'
@@ -30,7 +30,7 @@ export default observer(function TotalsNavigation() {
 			<Stack.Screen
 				name={S_TOTALS}
 				component={
-					Settings.currentTotalsOnly ? TotalsScreenTerm : TotalsScreenTable
+					XSettings.currentTotalsOnly ? TotalsScreenTerm : TotalsScreenTable
 				}
 				options={totalsOptions}
 			/>
@@ -52,7 +52,7 @@ let autorunStarted = false
 export function createSubjectAndTotalsStoreParamsAutorun() {
 	if (!autorunStarted) {
 		autorun(function totalsNavigation() {
-			const { studentId } = Settings
+			const { studentId } = XSettings
 
 			if (TotalsStateStore.schoolYear && studentId) {
 				const schoolYearId = TotalsStateStore.schoolYear.id
@@ -109,9 +109,9 @@ const HeaderSwitch = observer(function HeaderSwitch() {
 	return (
 		<View style={{ margin: Spacings.s2 }}>
 			<Chip
-				selected={!Settings.currentTotalsOnly}
+				selected={!XSettings.currentTotalsOnly}
 				onPress={() =>
-					Settings.save({ currentTotalsOnly: !Settings.currentTotalsOnly })
+					XSettings.save({ currentTotalsOnly: !XSettings.currentTotalsOnly })
 				}
 			>
 				Все четверти

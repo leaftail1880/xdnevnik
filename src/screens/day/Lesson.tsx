@@ -9,13 +9,14 @@ import { DiaryState } from './state'
 import { ChipLike } from '@/components/ChipLike'
 import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 import SubjectName from '@/components/SubjectName'
-import { Settings } from '@/models/settings'
+import { XSettings } from '@/models/settings'
 import { TermNavigationParamMap } from '@/screens/totals/navigation'
 import { TermStore } from '@/screens/totals/term/state'
 import { Lesson } from '@/services/net-school/lesson'
 import { ModalAlert } from '@/utils/Toast'
-import { useCallback } from 'react'
-import { LANG, styles } from '../../constants'
+import { useStyles } from '@/utils/useStyles'
+import { useCallback, useMemo } from 'react'
+import { LANG, globalStyles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import { EditSingleLesson } from './edit/EditSingleLesson'
 import LessonProgress, { LessonProgressStore } from './Progress'
@@ -46,12 +47,15 @@ export default observer(function DiaryLesson({
 		})
 	}, [currentTerm, lesson, navigation])
 
-	const newProps: DiaryLessonProps = {
-		i,
-		lesson,
-		navigateToLessonMarks,
-		...props,
-	}
+	const newProps: DiaryLessonProps = useMemo(
+		() => ({
+			i,
+			lesson,
+			navigateToLessonMarks,
+			...props,
+		}),
+		[props, i, lesson, navigateToLessonMarks],
+	)
 
 	const onLongPress = useCallback(
 		() =>
@@ -59,23 +63,28 @@ export default observer(function DiaryLesson({
 		[lesson],
 	)
 
+	const cardStyle = useStyles(
+		() => ({
+			margin: Spacings.s1,
+			borderCurve: 'continuous',
+
+			// Display border frame only when lesson is going
+			borderWidth:
+				LessonProgressStore.currentLesson === lesson.classmeetingId
+					? Spacings.s1
+					: 0,
+
+			borderColor: Theme.colors.primary,
+			padding: Spacings.s2,
+			flex: 1,
+			gap: Spacings.s2,
+		}),
+		[LessonProgressStore.currentLesson],
+	)
+
 	return (
 		<Card
-			style={{
-				margin: Spacings.s1,
-				borderCurve: 'continuous',
-
-				// Display border frame only when lesson is going
-				borderWidth:
-					LessonProgressStore.currentLesson === lesson.classmeetingId
-						? Spacings.s1
-						: 0,
-
-				borderColor: Theme.colors.primary,
-				padding: Spacings.s2,
-				flex: 1,
-				gap: Spacings.s2,
-			}}
+			style={cardStyle}
 			onLongPress={!lesson.isCustom ? onLongPress : undefined}
 		>
 			<TopRow {...newProps} />
@@ -90,7 +99,7 @@ const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
 	return (
 		<View style={{ gap: Spacings.s1 }}>
 			<Name lesson={lesson} i={i}></Name>
-			<View style={[styles.row, { gap: Spacings.s1 }]}>
+			<View style={[globalStyles.row, { gap: Spacings.s1 }]}>
 				<LessonTimeChip lesson={lesson} />
 				<Chip compact>{lesson.roomName ?? '?'}</Chip>
 			</View>
@@ -103,7 +112,7 @@ const Name = observer(function Name({
 	i,
 }: Pick<DiaryLessonProps, 'lesson' | 'i'>) {
 	return (
-		<View style={localStyles.name}>
+		<View style={styles.name}>
 			<ChipLike>{i + 1}</ChipLike>
 			<SubjectName
 				editDisabled={lesson.isCustom}
@@ -116,7 +125,7 @@ const Name = observer(function Name({
 	)
 })
 
-const localStyles = StyleSheet.create({
+const styles = StyleSheet.create({
 	name: {
 		gap: Spacings.s1,
 		flex: 1,
@@ -131,7 +140,7 @@ export const LessonTimeChip = observer(function Time({
 }: {
 	lesson: Lesson
 }) {
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	return (
 		<Chip compact>
 			{lesson.start(studentSettings).toHHMM()} -{' '}

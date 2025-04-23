@@ -2,6 +2,7 @@ import Header from '@/components/Header'
 import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
 import { ModalAlert } from '@/utils/Toast'
+import { useStyles } from '@/utils/useStyles'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
@@ -9,6 +10,7 @@ import { Button, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
 
 function logOut() {
+	ModalAlert.close()
 	runInAction(() => API.logOut())
 }
 
@@ -33,8 +35,13 @@ export const LogoutButton = observer(function LogoutButton() {
 })
 
 export default observer(function LogoutScreen() {
+	const viewStyle = useStyles(() => ({
+		flex: 1,
+		backgroundColor: Theme.colors.background,
+	}))
+
 	return (
-		<View style={{ flex: 1, backgroundColor: Theme.colors.background }}>
+		<View style={viewStyle}>
 			<Header title="Выход"></Header>
 			<View style={styles.container}>
 				<LogoutButton />

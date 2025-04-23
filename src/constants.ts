@@ -16,7 +16,7 @@ export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
 export const ACCENT_COLOR = '#578059'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const styles = StyleSheet.create({
+export const globalStyles = StyleSheet.create({
 	stretch: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',

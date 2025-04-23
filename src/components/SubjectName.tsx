@@ -1,4 +1,4 @@
-import { Settings, StudentSettings } from '@/models/settings'
+import { StudentSettings, XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Subject } from '@/services/net-school/entities'
 import { runInAction } from 'mobx'
@@ -28,10 +28,10 @@ type SubjectNameOptions = {
 } & ({ subjects: Subject[] } | { subjectName: string })
 
 export function getSubjectName(from: SubjectNameOptions) {
-	const { studentId } = Settings
+	const { studentId } = XSettings
 	if (!studentId) return 'Загрузка'
 
-	const studentSettings = Settings.forStudent(studentId)
+	const studentSettings = XSettings.forStudent(studentId)
 	if (from.dayNameId) {
 		const dayOverriden = studentSettings.subjectNamesDay[from.dayNameId]
 
@@ -97,7 +97,7 @@ const EditSubjectName = observer(function EditSubjectName({
 	setIsEditing,
 	...props
 }: { setIsEditing: (v: boolean) => void } & SubjectNameProps) {
-	const studentSettings = Settings.forStudentOrThrow()
+	const studentSettings = XSettings.forStudentOrThrow()
 	const dayOverriden = getSubjectName(props)
 	const globalOverriden = getOverridenOrOfficalName(props, studentSettings)
 	const [name, setName] = useState('')
