@@ -7536,25 +7536,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "form-data@npm:3.0.1"
+"form-data@npm:4.0.1":
+  version: 4.0.1
+  resolution: "form-data@npm:4.0.1"
   dependencies:
     asynckit: "npm:^0.4.0"
     combined-stream: "npm:^1.0.8"
     mime-types: "npm:^2.1.12"
-  checksum: 10c0/1ccc3ae064a080a799923f754d49fcebdd90515a8924f0f54de557540b50e7f1fe48ba5f2bd0435a5664aa2d49729107e6aaf2155a9abf52339474c5638b4485
-  languageName: node
-  linkType: hard
-
-"form-data@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "form-data@npm:4.0.0"
-  dependencies:
-    asynckit: "npm:^0.4.0"
-    combined-stream: "npm:^1.0.8"
-    mime-types: "npm:^2.1.12"
-  checksum: 10c0/cb6f3ac49180be03ff07ba3ff125f9eba2ff0b277fb33c7fc47569fc5e616882c5b1c69b9904c4c4187e97dd0419dd03b134174756f296dec62041e6527e2c6e
+  checksum: 10c0/bb102d570be8592c23f4ea72d7df9daa50c7792eb0cf1c5d7e506c1706e7426a4e4ae48a35b109e91c85f1c0ec63774a21ae252b66f4eb981cb8efef7d0463c8
   languageName: node
   linkType: hard
 
@@ -10221,7 +10210,7 @@ __metadata:
 
 "metro-file-map@patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch":
   version: 0.81.0
-  resolution: "metro-file-map@patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch::version=0.81.0&hash=9346e5"
+  resolution: "metro-file-map@patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch::version=0.81.0&hash=7f095a"
   dependencies:
     anymatch: "npm:^3.0.3"
     debug: "npm:^2.2.0"
@@ -10238,7 +10227,7 @@ __metadata:
   dependenciesMeta:
     fsevents:
       optional: true
-  checksum: 10c0/077b7735d7799d77157789a14d7485ca268ecf1c865c742da4a851a6350c50f76d696c245a6848e022d09055479467f7a0d2aaf2e42da2169355b0087dc704b6
+  checksum: 10c0/36333a75f83f09ff7616dc3ae086f3a6f7070c57327efa37a2c6e423f217267943a69aaf5acec7f14bfe6ccf96cfbe96c14cf2e6873ed708e8e41e0a6fe88e9f
   languageName: node
   linkType: hard
 

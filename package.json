@@ -24,7 +24,8 @@
 	},
 	"resolutions": {
 		"whatwg-url-without-unicode@npm:8.0.0-3": "patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch",
-		"metro-file-map@npm:0.81.0": "patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch"
+		"metro-file-map@npm:0.81.0": "patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch",
+		"form-data": "4.0.1"
 	},
 	"dependencies": {
 		"@boterop/react-native-background-timer": "^2.4.1",

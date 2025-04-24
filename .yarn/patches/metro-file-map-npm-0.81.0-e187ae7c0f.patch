@@ -1,31 +1,20 @@
 diff --git a/src/watchers/NodeWatcher.js b/src/watchers/NodeWatcher.js
-index a9403c6f91f9b3279923a12d2d7f0c1c8c47cf10..60f740817b584707a66c51c03c9143478dce964f 100644
+index a9403c6f91f9b3279923a12d2d7f0c1c8c47cf10..e797ef9a45c7a730ce9eccbb81be70458369fe8c 100644
 --- a/src/watchers/NodeWatcher.js
 +++ b/src/watchers/NodeWatcher.js
-@@ -86,15 +86,17 @@ module.exports = class NodeWatcher extends EventEmitter {
+@@ -86,6 +86,7 @@ module.exports = class NodeWatcher extends EventEmitter {
      if (this.watched[dir]) {
        return false;
      }
--    const watcher = fs.watch(
--      dir,
--      {
--        persistent: true,
--      },
--      (event, filename) => this._normalizeChange(dir, event, filename)
--    );
--    this.watched[dir] = watcher;
--    watcher.on("error", this._checkedEmitError);
-+    if (!/.git|node_modules/.test(dir)) {
-+      const watcher = fs.watch(
-+        dir,
-+        {
-+          persistent: true,
-+        },
-+        (event, filename) => this._normalizeChange(dir, event, filename)
-+      );
-+      this.watched[dir] = watcher;
-+      watcher.on("error", this._checkedEmitError);
-+    }
++    if (!dir.includes("node_modules") && !dir.includes(".git") && !dir.includes(".expo")) {
+     const watcher = fs.watch(
+       dir,
+       {
+@@ -98,6 +99,7 @@ module.exports = class NodeWatcher extends EventEmitter {
      if (this.root !== dir) {
        this._register(dir, "d");
      }
++    }
+     return true;
+   };
+   async _stopWatching(dir) {
