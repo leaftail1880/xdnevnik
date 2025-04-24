@@ -191,7 +191,7 @@ async function showNotification(
 
 	let body = ''
 
-	body += `${lesson.start(studentSettings).toHHMM()} - ${lesson.end(studentSettings).toHHMM()}. `
+	body += `${Lesson.prototype.start.call(lesson, studentSettings).toHHMM()} - ${Lesson.prototype.end.call(lesson, studentSettings).toHHMM()}. `
 	if (state === LessonState.NotStarted) {
 		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter

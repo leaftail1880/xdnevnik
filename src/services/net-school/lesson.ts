@@ -186,8 +186,8 @@ export class Lesson {
 		studentSettings: StudentSettings,
 		now = Date.now(),
 	) {
-		const start = lesson.start(studentSettings).getTime()
-		const end = lesson.end(studentSettings).getTime()
+		const start = Lesson.prototype.start.call(lesson, studentSettings).getTime()
+		const end = Lesson.prototype.end.call(lesson, studentSettings).getTime()
 		const beforeStart = toSecondsAndMinutes(start - now)
 		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
 			toSecondsAndMinutes(now - start)
