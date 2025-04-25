@@ -14,7 +14,7 @@ import notifee, {
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
 import { customSubjectToLessons } from '../net-school/entities'
 import { MarksNotificationStore } from './marks'
-
+console.log("Updt")
 let foregroundServiceRegistered = false
 
 export const LessonNotifStore = new (class {
