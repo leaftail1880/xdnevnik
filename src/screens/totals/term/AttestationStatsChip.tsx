@@ -1,6 +1,7 @@
 import NumberInputSetting from '@/components/NumberInput'
-import { changeSettings, StudentSettings, XSettings } from '@/models/settings'
+import { StudentSettings, XSettings } from '@/models/settings'
 import { SubjectPerformance } from '@/services/net-school/entities'
+import { setInAction } from '@/utils/setInAction'
 import { ModalAlert } from '@/utils/Toast'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -32,7 +33,7 @@ export const AttestationStatsChip = observer(function AttestationStatsChip({
 
 	return (
 		<Chip compact onPress={onPress}>
-			<Text style={colorStyle}>
+			<Text variant="labelLarge" style={colorStyle}>
 				Аттестация {marks}/{need}
 			</Text>
 		</Chip>
@@ -62,7 +63,7 @@ const AttestationStatsChipSettings = observer(
 					onChange={v =>
 						v === 0
 							? runInAction(() => delete settings.subjectAttestation[subjectId])
-							: changeSettings(settings, {
+							: setInAction(settings, {
 									subjectAttestation: { [subjectId]: v },
 								})
 					}
@@ -72,7 +73,7 @@ const AttestationStatsChipSettings = observer(
 				/>
 				<NumberInputSetting
 					value={settings.defaultAttestation}
-					onChange={v => changeSettings(settings, { defaultAttestation: v })}
+					onChange={v => setInAction(settings, { defaultAttestation: v })}
 					defaultValue={0}
 					label="Для всех предметов"
 					description="Кол-во оценок для всех предметов по умолчанию. 0 чтобы отключить проверку аттестации."

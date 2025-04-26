@@ -1,6 +1,6 @@
 import { getSubjectName } from '@/components/SubjectName'
 import { Logger } from '@/constants'
-import { XSettings } from '@/models/settings'
+import { StudentSettings, XSettings } from '@/models/settings'
 import { Lesson, LessonState } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
 import {
@@ -11,10 +11,10 @@ import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
 } from '@notifee/react-native'
-import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
+import { autorun, makeAutoObservable, runInAction } from 'mobx'
 import { customSubjectToLessons } from '../net-school/entities'
 import { MarksNotificationStore } from './marks'
-console.log("Updt")
+
 let foregroundServiceRegistered = false
 
 export const LessonNotifStore = new (class {
@@ -76,6 +76,35 @@ export async function setupLessonChannel() {
 	})
 }
 
+type NotifLesson = {
+	start: ReadonlyDate
+	end: ReadonlyDate
+} & Readonly<
+	Pick<
+		Lesson,
+		| 'notifyBeforeTime'
+		| 'roomName'
+		| 'subjectId'
+		| 'classmeetingId'
+		| 'subjectName'
+	>
+>
+
+function lessonToNotifLesson(
+	lesson: Lesson,
+	settings: StudentSettings,
+): NotifLesson {
+	return {
+		start: lesson.start(settings),
+		end: lesson.end(settings),
+		notifyBeforeTime: lesson.notifyBeforeTime,
+		roomName: lesson.roomName,
+		subjectId: lesson.subjectId,
+		classmeetingId: lesson.classmeetingId,
+		subjectName: lesson.subjectName,
+	}
+}
+
 let currentLessonInterval: ReturnType<typeof setBackgroundInterval>
 autorun(function notificationFromDiary() {
 	if (currentLessonInterval) clearBackgroundInterval(currentLessonInterval)
@@ -85,15 +114,19 @@ autorun(function notificationFromDiary() {
 
 	const { result } = DiaryStore
 	if (!result) return
-	const diary = toJS(result)
 
 	const studentSettings = XSettings.forStudentOrThrow()
+	const diaryLessons = result.lessons.map(lesson =>
+		lessonToNotifLesson(lesson, studentSettings),
+	)
+
 	const date = new Date()
-	const customSubjects = studentSettings.customSubjects
+	const customLessons = studentSettings.customSubjects
 		.map((e, i) => customSubjectToLessons(e, date, i))
 		.flat()
+		.map(lesson => lessonToNotifLesson(lesson, studentSettings))
 
-	const lessons = diary.lessons.concat(...customSubjects)
+	const lessons = diaryLessons.concat(...customLessons)
 	LessonNotifStore.day
 
 	currentLessonInterval = setBackgroundInterval(
@@ -104,19 +137,17 @@ autorun(function notificationFromDiary() {
 				// const now = date.getTime()
 				const now = Date.now()
 
-				// just to trigget rerun of the code above and use custom subjects for new day
+				// just to trigger rerun of the code above and use custom subjects for new day
 				LessonNotifStore.day = new Date().getDate()
 
 				for (const [i, lesson] of lessons.entries()) {
 					try {
-						const end = Lesson.prototype.end
-							.call(lesson, studentSettings)
-							.getTime()
+						const end = lesson.end.getTime()
 						if (!end) continue // Broken data i guess
 						if (end < now) continue // Already was
 
 						// period - перемена
-						const previous = diary.lessons[i - 1]
+						const previous = diaryLessons[i - 1]
 						const { date, period } = getLessonPeriod(previous, lesson)
 						if (date.getTime() > now) continue
 
@@ -135,20 +166,13 @@ autorun(function notificationFromDiary() {
 
 const minute = 60 * 1000
 
-function getLessonPeriod(previousLesson: Lesson, currentLesson: Lesson) {
+function getLessonPeriod(
+	previous: NotifLesson | undefined,
+	current: NotifLesson,
+) {
 	let period: Date | undefined
 	let date: Date
-	const studentSettings = XSettings.forStudentOrThrow()
-	const beforeLessonNotifTime = currentLesson.notifyBeforeTime
-
-	const current = currentLesson && {
-		start: Lesson.prototype.start.call(currentLesson, studentSettings),
-	}
-
-	const previous = previousLesson && {
-		start: Lesson.prototype.start.call(previousLesson, studentSettings),
-		end: Lesson.prototype.end.call(previousLesson, studentSettings),
-	}
+	const beforeLessonNotifTime = current.notifyBeforeTime
 
 	// If previous lesson is in the same day, send notification in the end of the lesson
 	if (
@@ -170,17 +194,16 @@ function getLessonPeriod(previousLesson: Lesson, currentLesson: Lesson) {
 }
 
 async function showNotification(
-	lesson: Lesson,
+	lesson: NotifLesson,
 	now: number,
 	period: Date | undefined,
 ) {
 	const lessonId = lesson.classmeetingId + '' + lesson.subjectId
 	const lessonName = getSubjectName(lesson)
-	const studentSettings = XSettings.forStudentOrThrow()
 
 	const { state, startsAfter, progress, elapsed, remaining } = Lesson.status(
-		lesson,
-		studentSettings,
+		lesson.start.getDate(),
+		lesson.end.getDate(),
 		now,
 	)
 
@@ -191,7 +214,7 @@ async function showNotification(
 
 	let body = ''
 
-	body += `${Lesson.prototype.start.call(lesson, studentSettings).toHHMM()} - ${Lesson.prototype.end.call(lesson, studentSettings).toHHMM()}. `
+	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 	if (state === LessonState.NotStarted) {
 		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter

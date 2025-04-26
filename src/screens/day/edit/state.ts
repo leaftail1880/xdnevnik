@@ -17,7 +17,7 @@ export const EditDiaryState = new (class {
 })()
 
 export function setLessonTimeOffset(
-	lesson: Lesson,
+	lesson: Pick<Lesson, 'offsetId' | 'dayId'>,
 	offset: number,
 	studentSettings: StudentSettings,
 ) {
@@ -30,12 +30,12 @@ export function setLessonTimeOffset(
 	if (!dayOrder) throw new TypeError('Day order is undefined!')
 
 	if (offset) {
-		dayOrder[lesson.subjectId] = offset
+		dayOrder[lesson.dayId] = offset
 	} else {
-		delete dayOrder[lesson.subjectId]
+		delete dayOrder[lesson.dayId]
 		if (!Object.keys(dayOrder).length) {
 			delete studentSettings.lessonOrder[lesson.offsetId]
 		}
 	}
-	debug({ offset, s: lesson.subjectId })
+	debug({ offset, s: lesson.dayId })
 }

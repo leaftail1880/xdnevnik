@@ -46,7 +46,7 @@ export const EditSingleLesson = observer(function EditSingleLesson({
 				mode="outlined"
 				onPress={() => {
 					runInAction(() => {
-						delete studentSettings.subjectNamesDay[lesson.dayNameId]
+						delete studentSettings.subjectNamesDay[lesson.offsetDayId]
 						setLessonTimeOffset(lesson, 0, studentSettings)
 					})
 					ModalAlert.close()
@@ -62,7 +62,7 @@ export const EditSingleLesson = observer(function EditSingleLesson({
 						if (offset) setLessonTimeOffset(lesson, offset, studentSettings)
 
 						if (name !== getSubjectName(lesson)) {
-							studentSettings.subjectNamesDay[lesson.dayNameId] = name
+							studentSettings.subjectNamesDay[lesson.offsetDayId] = name
 						}
 					})
 					ModalAlert.close()

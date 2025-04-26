@@ -136,8 +136,7 @@ export const DiaryLessonShort = observer(function DraggableLesson({
 	isEdited?: boolean
 } & TouchableOpacityProps) {
 	const studentSettings = XSettings.forStudentOrThrow()
-	const isMoved =
-		!!studentSettings.lessonOrder[lesson.offsetId]?.[lesson.subjectId]
+	const isMoved = !!studentSettings.lessonOrder[lesson.offsetId]?.[lesson.dayId]
 
 	return (
 		<TouchableOpacity

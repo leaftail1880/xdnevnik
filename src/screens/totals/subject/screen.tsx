@@ -60,10 +60,13 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 	performance,
 	navigateToDiary,
 	finalMark,
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	flatList: FL = FlatList,
 }: {
 	performance: AsyncState<SubjectPerformance>
 	navigateToDiary: () => void
 	finalMark: string | number | null
+	flatList?: typeof FlatList
 }) {
 	const { studentId } = XSettings
 	const studentSettings = XSettings.forStudentOrThrow()
@@ -103,7 +106,7 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 				performance={performance.result}
 				finalMark={finalMark}
 			></SubjectScreenHeader>
-			<FlatList
+			<FL
 				refreshControl={performance.refreshControl}
 				contentContainerStyle={{
 					gap: Spacings.s2,

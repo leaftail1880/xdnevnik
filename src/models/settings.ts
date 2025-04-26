@@ -2,7 +2,7 @@ import { HoursMinutes } from '@/components/SelectTime'
 import { Logger } from '@/constants'
 import { NSEntity } from '@/services/net-school/entities'
 import { StudentsStore } from '@/services/net-school/store'
-import { isObservable, makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
 import { makeReloadPersistable } from '../utils/makePersistable'
 
@@ -45,8 +45,6 @@ export interface StudentSettings {
 	defaultMarkWeight?: number
 }
 
-export type StudentSettingsWithSave = ReturnType<SettingsStore['forStudent']>
-
 class SettingsStore {
 	studentIndex = 0
 
@@ -81,7 +79,7 @@ class SettingsStore {
 		if (student) return student.studentId
 	}
 
-	forStudent(id: number) {
+	forStudent(id: number): StudentSettings {
 		const defaultValue: StudentSettings = {
 			subjectNames: {},
 			lessonOrder: {},
@@ -169,13 +167,3 @@ class SettingsStore {
 }
 
 export const XSettings = new SettingsStore() as Readonly<SettingsStore>
-
-export function changeSettings<T extends object>(
-	settings: T,
-	toChange: Partial<T>,
-) {
-	if (!isObservable(settings)) Logger.warn(new Error('Non-observable settings'))
-	runInAction(() => {
-		Object.assign(settings, toChange)
-	})
-}

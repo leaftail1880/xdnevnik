@@ -99,8 +99,11 @@ const ToGetMarkChipPossible = observer(function ToGetMarkChipPossible({
 		<>
 			{compact && (
 				<Chip mode="flat" compact style={style} onPress={onPress}>
-					<Text>Нужно </Text>
-					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+					<Text variant="labelLarge">Нужно </Text>
+					<Text
+						variant="labelLarge"
+						style={{ fontWeight: 'bold', color: Theme.colors.primary }}
+					>
 						{amount}x
 					</Text>
 				</Chip>
@@ -118,15 +121,18 @@ const ToGetMarkChipPossible = observer(function ToGetMarkChipPossible({
 						style,
 					]}
 				>
-					<Text>До</Text>
+					<Text variant="labelLarge">До</Text>
 					<Mark
 						mark={target}
 						duty={false}
 						style={{ padding: 2 }}
 						onPress={onPress}
 					/>
-					<Text>нужно</Text>
-					<Text style={{ fontWeight: 'bold', color: Theme.colors.primary }}>
+					<Text variant="labelLarge">нужно</Text>
+					<Text
+						variant="labelLarge"
+						style={{ fontWeight: 'bold', color: Theme.colors.primary }}
+					>
 						{amount}x
 					</Text>
 

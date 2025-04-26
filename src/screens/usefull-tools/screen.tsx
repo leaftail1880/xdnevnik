@@ -48,7 +48,7 @@ export default observer(function UsefullToolsScreen() {
 				</Container>
 			</View>
 		</View>,
-		<Container flex={5}>
+		<View>
 			<SubjectTotalsImpl
 				finalMark={null}
 				performance={{
@@ -70,8 +70,19 @@ export default observer(function UsefullToolsScreen() {
 					reload: () => void 0,
 				}}
 				navigateToDiary={() => void 0}
+				// @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+				flatList={
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					((props: any) => (
+						<View style={props.contentContainerStyle}>
+							{(props.data as unknown[]).map((item, index) =>
+								props.renderItem({ item, index }),
+							)}
+						</View>
+					)) as unknown as typeof FlatList
+				}
 			/>
-		</Container>,
+		</View>,
 		<LogoutButton />,
 		<View style={{ minHeight: 30 }}></View>,
 	]

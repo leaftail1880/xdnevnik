@@ -3,12 +3,8 @@ import NumberInputSetting from '@/components/NumberInput'
 import { RoundedSurface } from '@/components/RoundedSurface'
 import SelectModal from '@/components/SelectModal'
 import SwitchSetting from '@/components/SwitchSetting'
-import {
-	changeSettings,
-	StudentSettings,
-	StudentSettingsWithSave,
-	XSettings,
-} from '@/models/settings'
+import { StudentSettings, XSettings } from '@/models/settings'
+import { setInAction } from '@/utils/setInAction'
 import { Spacings } from '@/utils/Spacings'
 import { StackScreenProps } from '@react-navigation/stack'
 import { observer } from 'mobx-react-lite'
@@ -111,7 +107,7 @@ const MarkInput = observer(function MarkInput(props: MarkInputProps) {
 })
 
 type MarkInputPropsWithStudent = MarkInputProps & {
-	student: StudentSettingsWithSave
+	student: StudentSettings
 }
 
 const MarkInputForm = observer(function MarkInputForm(
@@ -123,9 +119,7 @@ const MarkInputForm = observer(function MarkInputForm(
 				label="Оценка"
 				defaultValue={undefined}
 				value={props.student[props.markSetting]}
-				onChange={v =>
-					changeSettings(props.student, { [props.markSetting]: v })
-				}
+				onChange={v => setInAction(props.student, { [props.markSetting]: v })}
 			/>
 			{props.weightSetting && (
 				<NumberInputSetting
@@ -133,7 +127,7 @@ const MarkInputForm = observer(function MarkInputForm(
 					defaultValue={undefined}
 					value={props.student[props.weightSetting]}
 					onChange={v =>
-						changeSettings(props.student, { [props.weightSetting!]: v })
+						setInAction(props.student, { [props.weightSetting!]: v })
 					}
 				/>
 			)}

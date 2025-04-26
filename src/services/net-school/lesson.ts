@@ -56,12 +56,12 @@ function getLessonOverridenDate(
 	studentSettings: StudentSettings,
 	offsetId: number,
 	date: ReadonlyDate,
-	subjectId: number,
+	dayId: string,
 	access: string,
 ) {
 	const lessonOrder = studentSettings.lessonOrder[offsetId] ?? {}
 	try {
-		const offset = lessonOrder?.[subjectId]
+		const offset = lessonOrder?.[dayId]
 		if (offset) {
 			const newDate = new Date(date.getTime() + offset)
 			// debug(
@@ -118,7 +118,11 @@ export class Lesson {
 		return this.dayDate.getDay()
 	}
 
-	get dayNameId() {
+	get dayId() {
+		return `${this.order}${this.subjectId}`
+	}
+
+	get offsetDayId() {
 		return `${this.offsetId}${this.order}${this.subjectId}`
 	}
 
@@ -128,7 +132,7 @@ export class Lesson {
 			studentSettings,
 			this.offsetId,
 			this.startDate,
-			this.subjectId,
+			this.dayId,
 			'start',
 		)
 	}
@@ -144,7 +148,7 @@ export class Lesson {
 			studentSettings,
 			this.offsetId,
 			this.endDate,
-			this.subjectId,
+			this.dayId,
 			'end',
 		)
 	}
@@ -178,16 +182,12 @@ export class Lesson {
 			end: false,
 			start: false,
 			offsetId: false,
+			dayId: false,
+			offsetDayId: false,
 		})
 	}
 
-	static status(
-		lesson: Lesson,
-		studentSettings: StudentSettings,
-		now = Date.now(),
-	) {
-		const start = Lesson.prototype.start.call(lesson, studentSettings).getTime()
-		const end = Lesson.prototype.end.call(lesson, studentSettings).getTime()
+	static status(start: number, end: number, now = Date.now()) {
 		const beforeStart = toSecondsAndMinutes(start - now)
 		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
 			toSecondsAndMinutes(now - start)

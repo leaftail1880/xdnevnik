@@ -57,7 +57,9 @@ export const AttendanceStatsChip = observer(function AttendanceStatsChip({
 
 	return (
 		<Chip compact onPress={onPress}>
-			<Text style={colorStyle}>Посещаемость {attendance}%</Text>
+			<Text variant="labelLarge" style={colorStyle}>
+				Посещаемость {attendance}%
+			</Text>
 		</Chip>
 	)
 })
