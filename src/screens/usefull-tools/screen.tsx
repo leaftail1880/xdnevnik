@@ -75,9 +75,11 @@ export default observer(function UsefullToolsScreen() {
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					((props: any) => (
 						<View style={props.contentContainerStyle}>
-							{(props.data as unknown[]).map((item, index) =>
-								props.renderItem({ item, index }),
-							)}
+							{(props.data as unknown[]).map((item, index) => (
+								<View key={index.toString()}>
+									{props.renderItem({ item, index })}
+								</View>
+							))}
 						</View>
 					)) as unknown as typeof FlatList
 				}
