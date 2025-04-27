@@ -1,17 +1,23 @@
 import NumberInput from '@/components/NumberInput'
+import { SelectTime } from '@/components/SelectTime'
 import { Size } from '@/components/Size'
+import SwitchSetting from '@/components/SwitchSetting'
+import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
+import { Spacings } from '@/utils/Spacings'
 import { observable, runInAction } from 'mobx'
 import { PersistStore, PersistStoreMap } from 'mobx-persist-store'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { List, Text } from 'react-native-paper'
+import { DatePickerInput } from 'react-native-paper-dates'
 
 export default observer(function Appearance() {
 	Theme.key
 
+	const overrideTime = new Date(XSettings.overrideTimeD)
 	return (
 		<ScrollView>
 			<List.Section title="Общие">
@@ -31,6 +37,36 @@ export default observer(function Appearance() {
 					}
 					defaultValue={6}
 				/>
+
+				<View style={{ gap: Spacings.s2 }}>
+					<SwitchSetting
+						setting="useOverrideTime"
+						title="Использовать кастомное время"
+						description="Полезно для демонстрации"
+					/>
+					<SelectTime
+						label="Время в приложении"
+						value={{
+							minutes: overrideTime.getMinutes(),
+							hours: overrideTime.getHours(),
+						}}
+						onSelect={({ hours, minutes }) =>
+							runInAction(() => {
+								overrideTime.setHours(hours, minutes)
+								XSettings.save({ overrideTimeD: overrideTime.getTime() })
+							})
+						}
+						key={overrideTime.getTime().toString()}
+					/>
+					<DatePickerInput
+						locale="ru"
+						value={overrideTime}
+						onChange={d =>
+							!!d && XSettings.save({ overrideTimeD: d.getTime() })
+						}
+						inputMode="start"
+					/>
+				</View>
 			</List.Section>
 			<List.Section title="Хранилище">
 				<SizeOfCache />

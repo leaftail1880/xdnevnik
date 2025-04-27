@@ -128,14 +128,15 @@ autorun(function notificationFromDiary() {
 
 	const lessons = diaryLessons.concat(...customLessons)
 	LessonNotifStore.day
+	const useOverrideTime = XSettings.useOverrideTime
+	const overrideTime = XSettings.overrideTimeD
 
-	currentLessonInterval = setBackgroundInterval(
+	const inter = setBackgroundInterval(
 		() =>
 			runInAction(async () => {
-				// const date = new Date()
-				// date.setHours(7, 32)
-				// const now = date.getTime()
-				const now = Date.now()
+				if (inter !== currentLessonInterval) return
+
+				const now = useOverrideTime ? overrideTime : Date.now()
 
 				// just to trigger rerun of the code above and use custom subjects for new day
 				LessonNotifStore.day = new Date().getDate()
@@ -162,6 +163,7 @@ autorun(function notificationFromDiary() {
 			}),
 		1000,
 	)
+	currentLessonInterval = inter
 })
 
 const minute = 60 * 1000
@@ -202,8 +204,8 @@ async function showNotification(
 	const lessonName = getSubjectName(lesson)
 
 	const { state, startsAfter, progress, elapsed, remaining } = Lesson.status(
-		lesson.start.getDate(),
-		lesson.end.getDate(),
+		lesson.start.getTime(),
+		lesson.end.getTime(),
 		now,
 	)
 

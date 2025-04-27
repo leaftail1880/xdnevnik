@@ -68,6 +68,9 @@ class SettingsStore {
 
 	markRoundAdd = -0.1
 
+	overrideTimeD = Date.now()
+	useOverrideTime = false
+
 	/**
 	 * Map containing per student overrides
 	 */

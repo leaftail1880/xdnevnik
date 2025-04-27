@@ -25,11 +25,12 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 		useMemo(
 			() =>
 				Lesson.status(
-					props.lesson.start(studentSettings).getDate(),
-					props.lesson.end(studentSettings).getDate(),
+					props.lesson.start(studentSettings).getTime(),
+					props.lesson.end(studentSettings).getTime(),
+					XSettings.useOverrideTime ? XSettings.overrideTimeD : store.now,
 				),
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			[props.lesson, store.now],
+			[props.lesson, store.now, XSettings.overrideTimeD],
 		)
 
 	useEffect(() => {
