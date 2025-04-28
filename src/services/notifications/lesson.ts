@@ -87,6 +87,7 @@ type NotifLesson = {
 		| 'subjectId'
 		| 'classmeetingId'
 		| 'subjectName'
+    | 'offsetDayId'
 	>
 >
 
@@ -102,6 +103,7 @@ function lessonToNotifLesson(
 		subjectId: lesson.subjectId,
 		classmeetingId: lesson.classmeetingId,
 		subjectName: lesson.subjectName,
+    offsetDayId: lesson.offsetDayId
 	}
 }
 

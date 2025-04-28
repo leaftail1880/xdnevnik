@@ -119,7 +119,7 @@ const Name = observer(function Name({
 				style={Theme.fonts.titleMedium}
 				subjectId={lesson.subjectId}
 				subjectName={lesson.subjectName}
-				dayNameId={lesson.offsetDayId}
+				offsetDayId={lesson.offsetDayId}
 			/>
 		</View>
 	)
