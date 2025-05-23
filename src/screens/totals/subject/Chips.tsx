@@ -64,7 +64,7 @@ export const SubjectTotalsBottomChips = observer(function BottomChips(props: {
 }) {
 	return (
 		<Chips style={styles.paddingVertical0}>
-			{props.length > 7 && (
+			{/* {props.length > 7 && (
 				<Chip
 					mode="flat"
 					compact
@@ -77,7 +77,7 @@ export const SubjectTotalsBottomChips = observer(function BottomChips(props: {
 				>
 					Свернуть старые оценки
 				</Chip>
-			)}
+			)} */}
 			{props.totalsTypes.size &&
 				[...props.totalsTypes].map(type => (
 					<Chip

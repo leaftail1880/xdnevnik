@@ -120,12 +120,12 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
 						performance={performance.result}
 					></SubjectTotalsTopChips>,
 					...totalsAndSheduledTotals
-						.slice(
-							SubjectTotalsState.collapsed && totalsAndSheduledTotals.length > 7
-								? totalsAndSheduledTotals.length - 7
-								: 0,
-						)
-						.reverse()
+						// .slice(
+						// 	SubjectTotalsState.collapsed && totalsAndSheduledTotals.length > 7
+						// 		? totalsAndSheduledTotals.length - 7
+						// 		: 0,
+						// )
+						// .reverse()
 						.filter(
 							e =>
 								!SubjectTotalsState.disabledTotalTypes.has(

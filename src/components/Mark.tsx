@@ -44,6 +44,7 @@ export default observer(function Mark({
 	duty,
 	noColor = '#7A7A7A',
 	unseen = false,
+	avgMarkWithFinal = true,
 	...props
 }: TouchableOpacityProps & {
 	finalMark?: number | null | string
@@ -53,6 +54,7 @@ export default observer(function Mark({
 	textStyle?: TextStyle
 	subTextStyle?: TextStyle
 	unseen?: boolean
+	avgMarkWithFinal?: boolean
 } & (Weight | Partial<Weight>)) {
 	const {
 		bg,
@@ -103,7 +105,7 @@ export default observer(function Mark({
 					{weight}
 				</Text>
 			)}
-			{!!finalMark && calculatedMark && (
+			{!!finalMark && calculatedMark && avgMarkWithFinal && (
 				<Text
 					style={[
 						{ alignSelf: 'center', fontSize: 7, color: textColor },
