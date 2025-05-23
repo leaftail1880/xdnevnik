@@ -24,7 +24,7 @@ import {
 
 type SubjectNameOptions = {
 	subjectId: number
-	dayNameId?: string
+	offsetDayId?: string
 } & ({ subjects: Subject[] } | { subjectName: string })
 
 export function getSubjectName(from: SubjectNameOptions) {
@@ -32,8 +32,8 @@ export function getSubjectName(from: SubjectNameOptions) {
 	if (!studentId) return 'Загрузка'
 
 	const studentSettings = XSettings.forStudent(studentId)
-	if (from.dayNameId) {
-		const dayOverriden = studentSettings.subjectNamesDay[from.dayNameId]
+	if (from.offsetDayId) {
+		const dayOverriden = studentSettings.subjectNamesDay[from.offsetDayId]
 
 		if (dayOverriden) return dayOverriden
 	}
