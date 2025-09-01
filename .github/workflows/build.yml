@@ -1,7 +1,7 @@
 name: Build APK for Android
 on:
   push:
-    tags: '*'
+    tags: ['*']
   workflow_dispatch:
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
 
       - name: 🏗 Enable corepack
         run: corepack enable
-  
+
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
         with:

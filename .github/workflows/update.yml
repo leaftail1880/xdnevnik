@@ -57,15 +57,10 @@ jobs:
           key: ${{ runner.os }}-jest-cache
 
       - name: 🏃‍♂️ Run tests
-        run: yarn jest --coverage
+        run: yarn jest
 
       - name: ✈ Create update
         run: eas update --auto --non-interactive --channel production --platform android
 
       - name: 🚀 Upload Sentry sourcemaps
         run: npx sentry-expo-upload-sourcemaps dist
-
-      - name: 🚀 Upload test coverage results
-        uses: paambaati/codeclimate-action@v8
-        env:
-          CC_TEST_REPORTER_ID: 021dac39683c4a9332b1aa0d79272875b0e945ad7529556617c9f7a1e073b0d2
