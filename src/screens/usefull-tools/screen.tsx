@@ -134,7 +134,7 @@ const AverageMarkItem = observer(function AverageMarkItem(
 	const avgMark = props.term?.avgMark ?? 0
 	const classAverageMark = performance.result?.classAverageMark ?? 0
 	const level = classAverageMark === 0 ? 0 : (avgMark / classAverageMark) * 1000
-	const up = level >= 1000
+	const up = level >= 1000 || level === 0
 	return (
 		<View
 			style={[
@@ -156,15 +156,15 @@ const AverageMarkItem = observer(function AverageMarkItem(
 					color: up ? MarkColorsBG[5] : MarkColorsBG[2],
 				}}
 			>
-				{(up ? '+' : '') + (level - 1000).toFixed(0) + '%'}
+				{(up ? '+' : '') + (level == 0 ? 0 : (level - 1000).toFixed(0)) + '%'}
 			</Text>
 			<Mark
-				mark={avgMark}
+				mark={avgMark == 0 ? null : avgMark}
 				duty={false}
 				style={{ padding: Spacings.s1 * 0.5, flex: 2 }}
 			/>
 			<Mark
-				mark={classAverageMark}
+				mark={classAverageMark == 0 ? null : classAverageMark}
 				duty={false}
 				style={{ padding: Spacings.s1 * 0.5, flex: 2 }}
 			/>
