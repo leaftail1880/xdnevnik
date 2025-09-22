@@ -60,9 +60,7 @@ export const TermStore = new (class {
 		if (TotalsStateStore.search) {
 			return TotalsStore.result
 				.slice()
-				.map(e => ({ element: e, order: this.getSearchOrder(e) }))
-				.sort((a, b) => b.order - a.order)
-				.map(e => e.element)
+				.sort((a, b) => this.getSearchOrder(b) - this.getSearchOrder(a))
 		}
 
 		if (this.sortMode === 'averageMark') {
@@ -138,6 +136,7 @@ export const TermStore = new (class {
 
 	private getToGetMarkOrder(a: Total) {
 		const order = this.subjectGetMarks[a.subjectId]?.[0]?.amount ?? 0
+		if (order <= 0) return 999999 // make subjects with no marks be at top
 		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
 	}
 
