@@ -135,8 +135,9 @@ export const TermStore = new (class {
 	}
 
 	private getToGetMarkOrder(a: Total) {
+    if (this.getMarkAmountOrder(a) === 0) return 9999999
+
 		const order = this.subjectGetMarks[a.subjectId]?.[0]?.amount ?? 0
-		if (order <= 0) return 999999 // make subjects with no marks be at top
 		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
 	}
 
