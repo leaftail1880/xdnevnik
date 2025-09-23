@@ -87,7 +87,7 @@ type NotifLesson = {
 		| 'subjectId'
 		| 'classmeetingId'
 		| 'subjectName'
-    | 'offsetDayId'
+		| 'offsetDayId'
 	>
 >
 
@@ -103,7 +103,7 @@ function lessonToNotifLesson(
 		subjectId: lesson.subjectId,
 		classmeetingId: lesson.classmeetingId,
 		subjectName: lesson.subjectName,
-    offsetDayId: lesson.offsetDayId
+		offsetDayId: lesson.offsetDayId,
 	}
 }
 
@@ -213,8 +213,12 @@ async function showNotification(
 
 	let title = ''
 	title += lessonName
+	if (lesson.roomName) {
+		title += ' | '
+		title += lesson.roomName ?? 'Нет кабинета'
+	}
 	title += ' | '
-	title += lesson.roomName ?? 'Нет кабинета'
+	title += remaining
 
 	let body = ''
 
@@ -223,7 +227,7 @@ async function showNotification(
 		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter
 	} else if (state === LessonState.Going) {
-		body += `Прошло ${elapsed} мин, осталось ${remaining}`
+		body += `Прошло ${elapsed}`
 	}
 
 	try {
