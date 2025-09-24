@@ -226,8 +226,8 @@ async function showNotification(
 
 	body += `${lesson.start.toHHMM()} - ${lesson.end.toHHMM()}. `
 	if (state === LessonState.NotStarted) {
-		if (period) body += `Перемена ${period.getMinutes()} мин. `
 		body += startsAfter
+		if (period) body += `Перемена ${period.getMinutes()} мин. `
 	} else if (state === LessonState.Going) {
 		body += `Прошло ${elapsed}`
 	}
