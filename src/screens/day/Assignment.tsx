@@ -73,8 +73,8 @@ export default observer(function DiaryAssignment({
           maxWeight={assignment.weight}
           minWeight={assignment.weight}
           style={{ padding: 2, paddingHorizontal: 2 }}
-          textStyle={{ fontSize: 10 }}
-          subTextStyle={{ fontSize: 7 }}
+          textStyle={{ fontSize: 12 }}
+          subTextStyle={{ fontSize: 10 }}
           onPress={navigateToLessonMarks}
         />
       </View>
