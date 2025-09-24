@@ -213,12 +213,14 @@ async function showNotification(
 
 	let title = ''
 	title += lessonName
+	if (state === LessonState.Going) {
+		title += ' | '
+		title += remaining
+	}
 	if (lesson.roomName) {
 		title += ' | '
 		title += lesson.roomName ?? 'Нет кабинета'
 	}
-	title += ' | '
-	title += remaining
 
 	let body = ''
 
