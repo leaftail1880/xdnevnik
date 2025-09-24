@@ -14,6 +14,7 @@ import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 import { getAttendance } from './AttendanceStatsChip'
 import { getAttestation } from './AttestationStatsChip'
 import { RenderSubject } from './screen'
+import { removeNonExistentLessons } from '../utils'
 
 export const TermStoreSortModes = [
 	{ value: 'averageMark', label: 'Средний балл' },
@@ -57,47 +58,47 @@ export const TermStore = new (class {
 			return []
 		}
 
+		const totals = SubjectsStore.result
+			? removeNonExistentLessons(TotalsStore.result, SubjectsStore.result)
+			: TotalsStore.result.slice()
+
 		if (TotalsStateStore.search) {
-			return TotalsStore.result
-				.slice()
-				.sort((a, b) => this.getSearchOrder(b) - this.getSearchOrder(a))
+			return totals.sort(
+				(a, b) => this.getSearchOrder(b) - this.getSearchOrder(a),
+			)
 		}
 
 		if (this.sortMode === 'averageMark') {
-			return TotalsStore.result
-				.slice()
-				.sort(
-					(a, b) => this.getAverageMarkOrder(a) - this.getAverageMarkOrder(b),
-				)
+			return totals.sort(
+				(a, b) => this.getAverageMarkOrder(a) - this.getAverageMarkOrder(b),
+			)
 		}
 
 		if (this.sortMode === 'toGetMarkAmount') {
-			return TotalsStore.result
-				.slice()
-				.sort((a, b) => this.getToGetMarkOrder(b) - this.getToGetMarkOrder(a))
+			return totals.sort(
+				(a, b) => this.getToGetMarkOrder(b) - this.getToGetMarkOrder(a),
+			)
 		}
 
 		if (this.sortMode === 'markAmount') {
-			return TotalsStore.result
-				.slice()
-				.sort((a, b) => this.getMarkAmountOrder(a) - this.getMarkAmountOrder(b))
+			return totals.sort(
+				(a, b) => this.getMarkAmountOrder(a) - this.getMarkAmountOrder(b),
+			)
 		}
 
 		if (this.sortMode === 'attendance') {
-			return TotalsStore.result
-				.slice()
-				.sort((a, b) => this.getAttendanceOrder(a) - this.getAttendanceOrder(b))
+			return totals.sort(
+				(a, b) => this.getAttendanceOrder(a) - this.getAttendanceOrder(b),
+			)
 		}
 
 		if (this.sortMode === 'attestation') {
-			return TotalsStore.result
-				.slice()
-				.sort(
-					(a, b) => this.getAttestationOrder(a) - this.getAttestationOrder(b),
-				)
+			return totals.sort(
+				(a, b) => this.getAttestationOrder(a) - this.getAttestationOrder(b),
+			)
 		}
 
-		return TotalsStore.result
+		return totals
 	}
 
 	subjectGetMarks: Record<string, ToGetMarkTargetCalculated[] | undefined> = {}
@@ -135,7 +136,7 @@ export const TermStore = new (class {
 	}
 
 	private getToGetMarkOrder(a: Total) {
-    if (this.getMarkAmountOrder(a) === 0) return 9999999
+		if (this.getMarkAmountOrder(a) === 0) return 9999999
 
 		const order = this.subjectGetMarks[a.subjectId]?.[0]?.amount ?? 0
 		return order + (10000 - this.getAverageMarkOrder(a) * 0.0001)
