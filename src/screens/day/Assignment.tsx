@@ -67,14 +67,14 @@ export default observer(function DiaryAssignment({
         </ScrollTextCopyable>
 
         <Mark
-          mark={assignment.result ?? ' '}
+          mark={assignment.result ?? '-'}
           duty={assignment.duty}
           weight={assignment.weight}
           maxWeight={assignment.weight}
           minWeight={assignment.weight}
-          style={{ padding: 2, paddingHorizontal: 4, minWidth: 10 }}
-          textStyle={{ fontSize: 14 }}
-          subTextStyle={{ fontSize: 12 }}
+          style={{ padding: 2, paddingHorizontal: 2, minWidth: 12 }}
+          textStyle={{ fontSize: 13 }}
+          subTextStyle={{ fontSize: 11 }}
           onPress={navigateToLessonMarks}
         />
       </View>
