@@ -72,7 +72,7 @@ export default observer(function DiaryAssignment({
           weight={assignment.weight}
           maxWeight={assignment.weight}
           minWeight={assignment.weight}
-          style={{ padding: 2, paddingHorizontal: 2, minWidth: 12 }}
+          style={{ padding: 2, paddingHorizontal: 2, minWidth: 16 }}
           textStyle={{ fontSize: 13 }}
           subTextStyle={{ fontSize: 11 }}
           onPress={navigateToLessonMarks}
