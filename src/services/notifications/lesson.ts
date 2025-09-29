@@ -82,7 +82,7 @@ type NotifLesson = {
 } & Readonly<
 	Pick<
 		Lesson,
-		| 'notifyBeforeTime'
+		| 'notifyBeforeSeconds'
 		| 'roomName'
 		| 'subjectId'
 		| 'classmeetingId'
@@ -98,7 +98,7 @@ function lessonToNotifLesson(
 	return {
 		start: lesson.start(settings),
 		end: lesson.end(settings),
-		notifyBeforeTime: lesson.notifyBeforeTime,
+		notifyBeforeSeconds: lesson.notifyBeforeSeconds,
 		roomName: lesson.roomName,
 		subjectId: lesson.subjectId,
 		classmeetingId: lesson.classmeetingId,
@@ -168,7 +168,7 @@ autorun(function notificationFromDiary() {
 	currentLessonInterval = inter
 })
 
-const minute = 60 * 1000
+const second = 1000
 
 function getLessonPeriod(
 	previous: NotifLesson | undefined,
@@ -176,15 +176,15 @@ function getLessonPeriod(
 ) {
 	let period: Date | undefined
 	let date: Date
-	const beforeLessonNotifTime = current.notifyBeforeTime
+	const notifyBeforeSeconds = current.notifyBeforeSeconds
 
 	// If previous lesson is in the same day, send notification in the end of the lesson
 	if (
 		previous &&
 		current.start.toYYYYMMDD() === previous.start.toYYYYMMDD() &&
 		// Only when delay between lessons is less then 15
-		(current.start.getTime() - previous.end.getTime()) / minute <=
-			beforeLessonNotifTime
+		(current.start.getTime() - previous.end.getTime()) / second <=
+			notifyBeforeSeconds
 	) {
 		date = new Date(previous.end.getTime())
 		// date.setMinutes(date.getMinutes() + 1)
@@ -192,7 +192,7 @@ function getLessonPeriod(
 	} else {
 		// Send before lesson
 		date = new Date(current.start.getTime())
-		date.setMinutes(date.getMinutes() - beforeLessonNotifTime)
+		date.setMinutes(date.getMinutes() - ~~(notifyBeforeSeconds / 60))
 	}
 	return { date, period }
 }

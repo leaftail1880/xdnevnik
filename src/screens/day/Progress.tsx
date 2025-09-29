@@ -21,7 +21,7 @@ const store = LessonProgressStore
 
 export default observer(function LessonProgress(props: { lesson: Lesson }) {
 	const studentSettings = XSettings.forStudentOrThrow()
-	const { elapsed, startsAfter, beforeStart, progress, state, remaining } =
+	const { elapsed, startsAfter, beforeStartMs, progress, state, remaining } =
 		useMemo(
 			() =>
 				Lesson.status(
@@ -52,7 +52,7 @@ export default observer(function LessonProgress(props: { lesson: Lesson }) {
 
 	if (state === LessonState.NotStarted) {
 		// Do not show time above 15 mins
-		if (beforeStart < 15) {
+		if (beforeStartMs < props.lesson.notifyBeforeSeconds * 1000) {
 			return <Text style={textStyle}>{startsAfter}</Text>
 		}
 	} else if (state === LessonState.Going) {

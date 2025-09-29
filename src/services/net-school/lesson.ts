@@ -30,18 +30,30 @@ export interface RawLesson extends BaseLesson {
 	day: string
 }
 
-export function toTime(...args: number[]) {
-	return args.map(e => e.toString().padStart(2, '0')).join(':')
+function toTime(...args: number[]) {
+	return (
+		args
+			// Hide hours if they are 0, e.g. seconds i is 2, mins i is 1, hrs i is 0
+			.filter((e, i) => (i === 0 ? e !== 0 : true))
+			.map(e => e.toString().padStart(2, '0'))
+			.join(':')
+	)
+}
+
+function toHours(ms: number) {
+	return Math.ceil(ms / (1000 * 60 * 60))
 }
 
 function toMinutes(ms: number) {
 	return Math.ceil(ms / (1000 * 60))
 }
 
-export function toSecondsAndMinutes(ms: number) {
+function separateTime(ms: number) {
+	const hours = toHours(ms)
 	const minutes = toMinutes(ms)
 	return {
-		minutes: minutes - 1,
+		hours: hours - 1,
+		minutes: 60 - (hours * 60 - minutes) - 1,
 		seconds: 60 - (minutes * 60 - Math.ceil(ms / 1000)) - 1,
 	}
 }
@@ -160,7 +172,7 @@ export class Lesson {
 	constructor(
 		lesson: RawLesson,
 		public readonly isCustom = false,
-		public readonly notifyBeforeTime = 15,
+		public readonly notifyBeforeSeconds = 15 * 60,
 	) {
 		const { endTime, startTime, day, ...ours } = lesson
 		Object.assign(this, ours)
@@ -188,19 +200,21 @@ export class Lesson {
 	}
 
 	static status(start: number, end: number, now = Date.now()) {
-		const beforeStart = toSecondsAndMinutes(start - now)
-		const { minutes: beforeEnd, seconds: beforeEndSeconds } =
-			toSecondsAndMinutes(now - start)
-		const { minutes: total, seconds: totalSeconds } = toSecondsAndMinutes(
-			end - start,
-		)
+		const beforeStartMs = start - now
+		const beforeStart = separateTime(beforeStartMs)
+		const beforeEnd = separateTime(now - start)
+		const total = separateTime(end - start)
 		const progress = 100 - Math.ceil(((end - now) * 100) / (end - start))
 
 		return {
-			beforeStart: beforeStart.minutes,
-			startsAfter: `Начнется через ${toTime(beforeStart.minutes, beforeStart.seconds)}`,
-			elapsed: `${beforeEnd}/${total + 1}`,
-			remaining: toTime(total - beforeEnd, totalSeconds - beforeEndSeconds),
+			beforeStartMs: beforeStartMs,
+			startsAfter: `Начнется через ${toTime(beforeStart.hours, beforeStart.minutes, beforeStart.seconds)}`,
+			elapsed: `${total.hours >= 1 ? toTime(0, beforeEnd.hours, beforeEnd.minutes + 1) : toTime(beforeEnd.hours, beforeEnd.minutes + 1)}/${toTime(...(total.minutes + 1 >= 60 ? [total.hours + 1, 0] : [total.hours, total.minutes + 1]))}`,
+			remaining: toTime(
+				total.hours - beforeEnd.hours,
+				total.minutes - beforeEnd.minutes,
+				total.seconds - beforeEnd.seconds,
+			),
 			progress,
 			state:
 				now < start

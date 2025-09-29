@@ -114,7 +114,7 @@ export function customSubjectToLessons(
 					distanceMeetingId: id,
 				},
 				true,
-				e.sendNotificationBeforeMins,
+				e.sendNotificationBeforeMins * 60,
 			)
 		})
 }
