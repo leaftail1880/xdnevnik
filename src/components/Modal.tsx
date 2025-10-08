@@ -1,16 +1,8 @@
 import { Theme } from '@/models/theme'
+import { Spacings } from '@/utils/Spacings'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
-import {
-	Button,
-	Dialog,
-	IconButton,
-	Portal,
-	Snackbar,
-	Text,
-} from 'react-native-paper'
-import Animated from 'react-native-reanimated'
-import { globalStyles } from '../constants'
+import { Button, Dialog, Portal, Text } from 'react-native-paper'
 import { ModalAlert, Toast } from '../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -26,39 +18,28 @@ export default function ModalProvider() {
 const ToastModal = observer(function ToastModal() {
 	return (
 		Toast.state && (
-			<Animated.View>
-				<Snackbar
-					visible={!!Toast.state}
-					onDismiss={Toast.hide}
-					onTouchStart={Toast.hide}
-					style={{
-						bottom: 62,
-						width: '100%',
-						margin: 0,
-						backgroundColor: Toast.state.error
-							? Theme.colors.errorContainer
-							: Theme.colors.elevation.level5,
-					}}
-				>
-					<View style={[globalStyles.stretch, { flex: 1, width: '100%' }]}>
-						<View style={{ flex: 8 }}>
-							<Text style={[Theme.fonts.titleSmall, {}]}>
-								{Toast.state.title}
-							</Text>
-							{Toast.state.body && (
-								<Text style={[Theme.fonts.bodySmall, {}]}>
-									{Toast.state.body}
-								</Text>
-							)}
-						</View>
-						<IconButton
-							icon={'close'}
-							onPress={Toast.hide}
-							style={{ flex: 1, margin: 0, padding: 0 }}
-						/>
-					</View>
-				</Snackbar>
-			</Animated.View>
+			<View
+				onTouchStart={Toast.hide}
+				style={{
+					position: 'absolute',
+					bottom: 63,
+					width: '100%',
+					margin: 0,
+					backgroundColor: Toast.state.error
+						? Theme.colors.errorContainer
+						: Theme.colors.elevation.level5,
+					justifyContent: 'center',
+					alignContent: 'center',
+					padding: Spacings.s1 / 2,
+				}}
+			>
+				<Text style={[Theme.fonts.titleSmall, {}]}>
+					{Toast.state.title + ': '}
+					{Toast.state.body && (
+						<Text style={[Theme.fonts.bodySmall, {}]}>{Toast.state.body}</Text>
+					)}
+				</Text>
+			</View>
 		)
 	)
 })

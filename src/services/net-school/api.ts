@@ -3,6 +3,7 @@ import {
 	abortSignalTimeout,
 	RequestError,
 	RequestErrorOptions,
+	RequestErrorReason,
 } from '@/utils/RequestError'
 import { Toast } from '@/utils/Toast'
 import { makeReloadPersistable } from '@/utils/makePersistable'
@@ -358,6 +359,10 @@ export class NetSchoolApi {
 				// 	if (Date.now() - date > 1000 * 60 * 60 * 24 * 7)
 				// 		delete this.cache[key]
 				// }
+				if (Toast.state?.error) {
+					const body = Toast.state.body
+					if (typeof body === 'string' && isLongToast(body)) Toast.hide()
+				}
 			})
 
 			return json
@@ -367,10 +372,12 @@ export class NetSchoolApi {
 				const errText = beforeAuth ? '' : 'error: ' + error
 
 				if (!beforeAuth && !init.skipErrorMessages) {
+					const body = RequestError.stringify(error)
 					Toast.show({
 						error: true,
 						title: `Ошибка ${init.store ?? 'запроса'}`,
-						body: RequestError.stringify(error),
+						body: body,
+						timeout: isLongToast(body) ? 1000 * 60 : undefined,
 					})
 				}
 
@@ -562,3 +569,9 @@ export class NetSchoolApi {
 }
 
 export const API = new NetSchoolApi()
+function isLongToast(body: string) {
+	return (
+		body.includes(RequestErrorReason.timeout) ||
+		body.includes(RequestErrorReason.noConnection)
+	)
+}

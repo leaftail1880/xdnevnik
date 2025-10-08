@@ -14,7 +14,7 @@ import {
 	NavigationContainerRef,
 } from '@react-navigation/native'
 import * as Sentry from '@sentry/react-native'
-import { StatusBar } from 'expo-status-bar'
+import { setStatusBarStyle } from 'expo-status-bar'
 import { makeAutoObservable, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
@@ -80,12 +80,14 @@ export default Sentry.wrap(
 		const { loading, theme } = ThemeStore.meta(Theme)
 		if (loading) return AppStore.loadingTheme
 
+		// If i use it as react component it does not update half of the time
+		setStatusBarStyle(theme.dark ? 'light' : 'dark', true)
+
 		const ProvidedTheme = toJS(theme)
 		return (
 			<GestureHandlerRootView>
 				<SafeAreaProvider>
 					<PaperProvider theme={ProvidedTheme}>
-						<StatusBar style="auto" />
 						<NavigationContainer
 							theme={ProvidedTheme}
 							ref={navigation}
@@ -153,6 +155,7 @@ const Navigation = observer(function Navigation() {
 			theme={toJS(ThemeStore.meta(Theme).theme)}
 			sceneAnimationEnabled={true}
 			sceneAnimationType={'shifting'}
+			keyboardHidesNavigationBar
 			barStyle={{
 				height: '7%',
 				alignContent: 'center',
@@ -162,7 +165,7 @@ const Navigation = observer(function Navigation() {
 			}}
 			activeColor={Theme.colors.onPrimaryContainer}
 			activeIndicatorStyle={{
-				height: '120%',
+				height: '110%',
 			}}
 			style={{
 				backgroundColor: Theme.colors.primary,
