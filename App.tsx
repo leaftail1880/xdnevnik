@@ -80,9 +80,6 @@ export default Sentry.wrap(
 		const { loading, theme } = ThemeStore.meta(Theme)
 		if (loading) return AppStore.loadingTheme
 
-		// If i use it as react component it does not update half of the time
-		setStatusBarStyle(theme.dark ? 'light' : 'dark', true)
-
 		const ProvidedTheme = toJS(theme)
 		return (
 			<GestureHandlerRootView>

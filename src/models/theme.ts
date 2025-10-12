@@ -7,6 +7,7 @@ import * as NavigationBar from 'expo-navigation-bar'
 import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
+import { setStatusBarStyle } from 'expo-status-bar'
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
 import { Appearance, Platform } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
@@ -128,6 +129,9 @@ export class ThemeStore {
 			)
 		}
 		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.background))
+
+		// If i use it as react component it does not update half of the time
+		setStatusBarStyle(this.isDark ? 'light' : 'dark', true)
 
 		return Promise.all(promises).catch(captureException)
 	}
