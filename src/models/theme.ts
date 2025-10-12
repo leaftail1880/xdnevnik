@@ -4,12 +4,11 @@ import {
 } from '@react-navigation/native'
 
 import * as NavigationBar from 'expo-navigation-bar'
-import * as StatusBar from 'expo-status-bar'
 import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Appearance, Platform } from 'react-native'
+import { Appearance, Platform, StatusBar } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -118,7 +117,7 @@ export class ThemeStore {
 		this.updateSystemBars().then(() => this.updateSystemBars())
 	}
 
-	private updateSystemBars() {
+	private async updateSystemBars() {
 		const promises: Promise<void>[] = []
 
 		if (Platform.OS === 'android') {
@@ -131,10 +130,10 @@ export class ThemeStore {
 		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.background))
 
 		// If i use it as react component it does not update half of the time
-		StatusBar.setStatusBarStyle('auto', true)
-		StatusBar.setStatusBarBackgroundColor(Theme.colors.navigationBar, true)
+		StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
+		StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
 
-		return Promise.all(promises).catch(captureException)
+		await Promise.all(promises).catch(captureException)
 	}
 
 	private generateTheme() {
