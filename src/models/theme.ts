@@ -8,7 +8,7 @@ import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Appearance, Platform, StatusBar } from 'react-native'
+import { Appearance, AppState, Platform, StatusBar } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -92,6 +92,10 @@ export class ThemeStore {
 		)
 
 		Appearance.addChangeListener(this.updateColorScheme)
+    AppState.addEventListener("change", (state) => {
+       if (state === "inactive" || state === "background") return
+       this.updateSystemBars()
+    })
 	}
 
 	private get isDark() {
