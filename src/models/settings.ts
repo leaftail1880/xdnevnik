@@ -38,7 +38,7 @@ export interface StudentSettings {
 	/**
 	 * Current term of the student
 	 */
-	currentTerm?: NSEntity
+	currentTermv2?: NSEntity
 
 	targetMark?: number
 	defaultMark?: number

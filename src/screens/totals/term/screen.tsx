@@ -68,7 +68,7 @@ const ChipsRow = observer(function Header() {
 					inlineChip
 					label={'Четверть/полугодие'}
 					onSelect={v =>
-						runInAction(() => (studentSettings.currentTerm = v.term))
+						runInAction(() => (studentSettings.currentTermv2 = v.term))
 					}
 				/>
 			)}

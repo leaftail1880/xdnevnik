@@ -211,6 +211,7 @@ export interface Total {
 	termTotals: {
 		term: NSEntity
 		mark: string | number | null
+		markCode: 'NotExamined' | 'PointSystem'
 		avgMark: number | null
 	}[]
 	yearTotals: {

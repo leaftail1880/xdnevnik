@@ -11,10 +11,10 @@ import { stringSimilarity } from '@/utils/search'
 import { makeAutoObservable } from 'mobx'
 import { ToGetMarkTargetCalculated } from '../../../utils/calculateMarks'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
+import { removeNonExistentLessons } from '../utils'
 import { getAttendance } from './AttendanceStatsChip'
 import { getAttestation } from './AttestationStatsChip'
 import { RenderSubject } from './screen'
-import { removeNonExistentLessons } from '../utils'
 
 export const TermStoreSortModes = [
 	{ value: 'averageMark', label: 'Средний балл' },
@@ -33,8 +33,14 @@ export const TermStore = new (class {
 	attendanceStats = true
 	attestationStats = true
 
+	protected get termsOfficial() {
+		return TotalsStore.result?.find(
+			e => e.termTotals[0].markCode === 'PointSystem',
+		)
+	}
+
 	get terms() {
-		return TotalsStore.result?.[0]?.termTotals.map(total => ({
+		return this.termsOfficial?.termTotals.map(total => ({
 			label: total.term.name,
 			value: total.term.id + '',
 			term: total.term,
@@ -44,8 +50,9 @@ export const TermStore = new (class {
 	get currentTerm() {
 		return (
 			(XSettings.studentId
-				? XSettings.forStudent(XSettings.studentId)?.currentTerm
-				: undefined) ?? TotalsStore.result?.[0]?.termTotals[0].term
+				? (XSettings.forStudent(XSettings.studentId)?.currentTermv2 ??
+					this.termsOfficial?.termTotals[0].term)
+				: undefined) ?? this.termsOfficial?.termTotals[0].term
 		)
 	}
 
