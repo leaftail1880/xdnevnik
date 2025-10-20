@@ -46,7 +46,8 @@ export const LessonNotifStore = new (class {
 })()
 
 function enabled() {
-	return XSettings.notificationsEnabled && XSettings.lessonNotifications
+  const {notificationsEnabled, lessonNotifications} = XSettings
+	return notificationsEnabled && lessonNotifications
 }
 
 export async function setupLessonChannel() {
