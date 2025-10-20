@@ -2,7 +2,7 @@ import { getSubjectName } from '@/components/SubjectName'
 import { Logger } from '@/constants'
 import { StudentSettings, XSettings } from '@/models/settings'
 import { Lesson, LessonState } from '@/services/net-school/lesson'
-import { DiaryStore } from '@/services/net-school/store'
+import { NotifyDiaryStore } from '@/services/net-school/store'
 import {
 	clearBackgroundInterval,
 	setBackgroundInterval,
@@ -12,7 +12,6 @@ import notifee, {
 	AndroidVisibility,
 } from '@notifee/react-native'
 import { autorun, makeAutoObservable, runInAction } from 'mobx'
-import { customSubjectToLessons } from '../net-school/entities'
 import { MarksNotificationStore } from './marks'
 
 let foregroundServiceRegistered = false
@@ -114,31 +113,33 @@ autorun(function notificationFromDiary() {
 		return LessonNotifStore.remove()
 	}
 
-	const { result } = DiaryStore
+	const { studentId, overrideTimeD, useOverrideTime } = XSettings
+
+	const date = new Date(useOverrideTime ? overrideTimeD : Date.now())
+	const week = Date.week(date)
+
+	NotifyDiaryStore.withParams({
+		studentId,
+		startDate: week[0].toNetSchool(),
+		endDate: week[6].toNetSchool(),
+	})
+
+	const { result } = NotifyDiaryStore
 	if (!result) return
 
 	const studentSettings = XSettings.forStudentOrThrow()
-	const diaryLessons = result.lessons.map(lesson =>
-		lessonToNotifLesson(lesson, studentSettings),
-	)
-
-	const date = new Date()
-	const customLessons = studentSettings.customSubjects
-		.map((e, i) => customSubjectToLessons(e, date, i))
-		.flat()
+	const lessons = result
+		.forDay(date.toYYYYMMDD(), studentSettings)
 		.map(lesson => lessonToNotifLesson(lesson, studentSettings))
 
-	const lessons = diaryLessons.concat(...customLessons)
 	LessonNotifStore.day
-	const useOverrideTime = XSettings.useOverrideTime
-	const overrideTime = XSettings.overrideTimeD
 
 	const inter = setBackgroundInterval(
 		() =>
 			runInAction(async () => {
 				if (inter !== currentLessonInterval) return
 
-				const now = useOverrideTime ? overrideTime : Date.now()
+				const now = useOverrideTime ? overrideTimeD : Date.now()
 
 				// just to trigger rerun of the code above and use custom subjects for new day
 				LessonNotifStore.day = new Date().getDate()
@@ -150,7 +151,7 @@ autorun(function notificationFromDiary() {
 						if (end < now) continue // Already was
 
 						// period - перемена
-						const previous = diaryLessons[i - 1]
+						const previous = lessons[i - 1]
 						const { date, period } = getLessonPeriod(previous, lesson)
 						if (date.getTime() > now) continue
 

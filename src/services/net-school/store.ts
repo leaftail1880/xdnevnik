@@ -14,6 +14,7 @@ export const SubjectsStore = method('subjects', 'списка предметов
 export const TotalsStore = method('totals', 'итоговых оценок')
 
 export const DiaryStore = method('diary', 'дневника')
+export const NotifyDiaryStore = method('diary', 'дневника уведомлений')
 export const AssignmentsStore = method('assignments', 'оценок')
 export const MarkAssignmentsStore = method(
 	'assignments',

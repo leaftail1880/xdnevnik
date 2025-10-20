@@ -2,7 +2,6 @@ import type { CustomSubject, StudentSettings } from '@/models/settings'
 import { add, set } from 'date-fns'
 import { makeAutoObservable } from 'mobx'
 import { Lesson, RawLesson } from './lesson'
-import { da } from 'date-fns/locale'
 
 export interface Endpoint {
 	name: string
@@ -151,6 +150,11 @@ export class Diary {
 				],
 			)
 			.filter(lesson => lesson.start(studentSettings).toYYYYMMDD() === day)
+			.sort(
+				(a, b) =>
+					a.start(studentSettings).getTime() -
+					b.start(studentSettings).getTime(),
+			)
 	}
 
 	isNow(lesson: Lesson, studentSettings: StudentSettings) {
