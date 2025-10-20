@@ -93,7 +93,7 @@ export class ThemeStore {
 
 		Appearance.addChangeListener(this.updateColorScheme)
     AppState.addEventListener("change", (state) => {
-       if (state === "inactive" || state === "background") return
+       // if (state === "inactive" || state === "background") return
        this.updateSystemBars()
     })
 	}
