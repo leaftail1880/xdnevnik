@@ -43,10 +43,15 @@ export const EditSingleLesson = observer(function EditSingleLesson({
       <SelectTime label="Начало" value={startTime} onSelect={setStartTime} />
 
       {!studentSettings.ignoreLessons?.includes(lesson.offsetDayId) ? <Button mode="outlined" onPress={() => {
-        studentSettings.ignoreLessons ??= []
-        studentSettings.ignoreLessons.push(lesson.offsetDayId)
+        runInAction(() => {
+
+          studentSettings.ignoreLessons ??= []
+          studentSettings.ignoreLessons.push(lesson.offsetDayId)
+        })
       }}>Скрыть</Button> : <Button mode="outlined" onPress={() => {
-        studentSettings.ignoreLessons = studentSettings.ignoreLessons?.filter(e => e !== lesson.offsetDayId)
+        runInAction(() => {
+          studentSettings.ignoreLessons = studentSettings.ignoreLessons?.filter(e => e !== lesson.offsetDayId)
+        })
       }}>Показать</Button>}
       <Button
         mode="outlined"
