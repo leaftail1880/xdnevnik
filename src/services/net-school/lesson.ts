@@ -126,6 +126,10 @@ export class Lesson {
 	startDate: ReadonlyDate
 	dayDate: ReadonlyDate
 
+	isIgnored(studentSettings: StudentSettings) {
+		return studentSettings.ignoreLessons?.includes(this.offsetDayId)
+	}
+
 	get offsetId() {
 		return this.dayDate.getDay()
 	}

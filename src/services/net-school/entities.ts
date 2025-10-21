@@ -149,7 +149,11 @@ export class Diary {
 						: [],
 				],
 			)
-			.filter(lesson => lesson.start(studentSettings).toYYYYMMDD() === day)
+			.filter(
+				lesson =>
+					lesson.start(studentSettings).toYYYYMMDD() === day &&
+					!lesson.isIgnored(studentSettings),
+			)
 			.sort(
 				(a, b) =>
 					a.start(studentSettings).getTime() -

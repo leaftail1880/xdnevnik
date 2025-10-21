@@ -13,75 +13,81 @@ import { Button, Text, TextInput } from 'react-native-paper'
 import { setLessonTimeOffset } from './state'
 
 export const EditSingleLesson = observer(function EditSingleLesson({
-	lesson,
+  lesson,
 }: {
-	lesson: Lesson
+  lesson: Lesson
 }) {
-	const studentSettings = XSettings.forStudentOrThrow()
-	const [startTime, setStartTime] = useState(
-		dateToHoursMinutes(lesson.start(studentSettings)),
-	)
-	const [name, setName] = useState(getSubjectName(lesson))
-	return (
-		<View style={{ gap: Spacings.s2 }}>
-			<Text>
-				Это изменит только конкретный урок во{' '}
-				{LANG.days[lesson.dayDate.getDayFromMonday()].toLowerCase()}, если вам
-				нужно переименовать предмет для всех дней, нажмите на его название на
-				странице дневника
-			</Text>
-			<Text>
-				Время в журнале: {lesson.startDate.toHHMM()} - {lesson.endDate.toHHMM()}
-			</Text>
-			<Text>Название предмета в журнале: {lesson.subjectName}</Text>
-			<TextInput
-				mode="outlined"
-				value={name}
-				onChangeText={t => setName(t)}
-				defaultValue={lesson.subjectName}
-			></TextInput>
-			<SelectTime label="Начало" value={startTime} onSelect={setStartTime} />
+  const studentSettings = XSettings.forStudentOrThrow()
+  const [startTime, setStartTime] = useState(
+    dateToHoursMinutes(lesson.start(studentSettings)),
+  )
+  const [name, setName] = useState(getSubjectName(lesson))
+  return (
+    <View style={{ gap: Spacings.s2 }}>
+      <Text>
+        Это изменит только конкретный урок во{' '}
+        {LANG.days[lesson.dayDate.getDayFromMonday()].toLowerCase()}, если вам
+        нужно переименовать предмет для всех дней, нажмите на его название на
+        странице дневника
+      </Text>
+      <Text>
+        Время в журнале: {lesson.startDate.toHHMM()} - {lesson.endDate.toHHMM()}
+      </Text>
+      <Text>Название предмета в журнале: {lesson.subjectName}</Text>
+      <TextInput
+        mode="outlined"
+        value={name}
+        onChangeText={t => setName(t)}
+        defaultValue={lesson.subjectName}
+      ></TextInput>
+      <SelectTime label="Начало" value={startTime} onSelect={setStartTime} />
 
-			<Button
-				mode="outlined"
-				onPress={() => {
-					runInAction(() => {
-						delete studentSettings.subjectNamesDay[lesson.offsetDayId]
-						setLessonTimeOffset(lesson, 0, studentSettings)
-					})
-					ModalAlert.close()
-				}}
-			>
-				Сбросить
-			</Button>
-			<Button
-				mode="outlined"
-				onPress={() => {
-					runInAction(() => {
-						const offset = getOffset(lesson.startDate, startTime)
-						if (offset) setLessonTimeOffset(lesson, offset, studentSettings)
+      {!studentSettings.ignoreLessons?.includes(lesson.offsetDayId) ? <Button mode="outlined" onPress={() => {
+        studentSettings.ignoreLessons ??= []
+        studentSettings.ignoreLessons.push(lesson.offsetDayId)
+      }}>Скрыть</Button> : <Button mode="outlined" onPress={() => {
+        studentSettings.ignoreLessons = studentSettings.ignoreLessons?.filter(e => e !== lesson.offsetDayId)
+      }}>Показать</Button>}
+      <Button
+        mode="outlined"
+        onPress={() => {
+          runInAction(() => {
+            delete studentSettings.subjectNamesDay[lesson.offsetDayId]
+            setLessonTimeOffset(lesson, 0, studentSettings)
+          })
+          ModalAlert.close()
+        }}
+      >
+        Сбросить
+      </Button>
+      <Button
+        mode="outlined"
+        onPress={() => {
+          runInAction(() => {
+            const offset = getOffset(lesson.startDate, startTime)
+            if (offset) setLessonTimeOffset(lesson, offset, studentSettings)
 
-						if (name !== getSubjectName(lesson)) {
-							studentSettings.subjectNamesDay[lesson.offsetDayId] = name
-						}
-					})
-					ModalAlert.close()
-				}}
-			>
-				Сохранить
-			</Button>
-		</View>
-	)
+            if (name !== getSubjectName(lesson)) {
+              studentSettings.subjectNamesDay[lesson.offsetDayId] = name
+            }
+          })
+          ModalAlert.close()
+        }}
+      >
+        Сохранить
+      </Button>
+    </View>
+  )
 })
 function getOffset(startDate: ReadonlyDate, startTime: HoursMinutes) {
-	const start = new Date(startDate.getTime())
-	start.setHours(startTime.hours)
-	start.setMinutes(startTime.minutes)
-	return start.getTime() - startDate.getTime()
+  const start = new Date(startDate.getTime())
+  start.setHours(startTime.hours)
+  start.setMinutes(startTime.minutes)
+  return start.getTime() - startDate.getTime()
 }
 
 function dateToHoursMinutes(date: ReadonlyDate): HoursMinutes {
-	const hours = date.getHours()
-	const minutes = date.getMinutes()
-	return { hours, minutes }
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  return { hours, minutes }
 }

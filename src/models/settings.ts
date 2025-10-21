@@ -43,6 +43,8 @@ export interface StudentSettings {
 	targetMark?: number
 	defaultMark?: number
 	defaultMarkWeight?: number
+
+  ignoreLessons?: string[]
 }
 
 class SettingsStore {
