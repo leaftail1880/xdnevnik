@@ -92,10 +92,11 @@ export class ThemeStore {
 		)
 
 		Appearance.addChangeListener(this.updateColorScheme)
-    AppState.addEventListener("change", (state) => {
-       // if (state === "inactive" || state === "background") return
-       this.updateSystemBars()
-    })
+		AppState.addEventListener('change', state => {
+			// if (state === "inactive" || state === "background") return
+			this.updateSystemBars()
+		})
+		this.updateSystemBars().then(() => this.updateSystemBars()) // shit aint working for the first time
 	}
 
 	private get isDark() {

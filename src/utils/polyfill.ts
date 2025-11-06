@@ -1,3 +1,5 @@
+import 'react-native-url-polyfill'
+
 // @ts-expect-error Global variable
 globalThis.__TEST__ = false
 

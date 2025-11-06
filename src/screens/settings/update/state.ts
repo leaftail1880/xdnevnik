@@ -1,6 +1,6 @@
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import { makeAutoObservable } from 'mobx'
-import { makeReloadPersistable } from '../../../utils/makePersistable'
+import { makeReloadPersistable } from '@/utils/makePersistable'
 
 class UpdateState {
 	progress: null | { i: number; bar?: number; version: string } = null

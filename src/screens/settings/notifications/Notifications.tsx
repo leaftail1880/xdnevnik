@@ -17,7 +17,7 @@ import { SettingsRoutes } from '../navigation'
 function usePromise<T>(promise: () => Promise<T>) {
 	const [state, setState] = useState<T | undefined>(undefined)
 
-	const interval = useRef<ReturnType<typeof setTimeout> | undefined>()
+	const interval = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 	useEffect(() => {
 		if (interval.current) clearInterval(interval.current)
 		interval.current = setInterval(() => {

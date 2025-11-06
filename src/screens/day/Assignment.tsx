@@ -96,7 +96,7 @@ const AttachmentFile = observer(function AttachmentFile({
 }: {
   attachment: Attachment
 }) {
-  const fileUri = `${FileSystem.cacheDirectory}${attachment.attachmentId}-${attachment.fileName}`
+  const fileUri = `${FileSystem.Paths.cache}${attachment.attachmentId}-${attachment.fileName}`
   const isImage = /\.(jpeg|png|jpg)$/.test(attachment.fileName)
 
   const [progress, setProgress] = useState<null | string>(null)

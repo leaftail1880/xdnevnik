@@ -12247,6 +12247,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-url-polyfill@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-native-url-polyfill@npm:3.0.0"
+  dependencies:
+    whatwg-url-without-unicode: "npm:8.0.0-3"
+  peerDependencies:
+    react-native: "*"
+  checksum: 10c0/a1e539c2a28dc48125ada8bf29f3536ee2c149e4a5e3d205858755783afafe7f871ce1de8b66cb1c4cc05e15e212c74c49e93ddde856cda63fcf660cf943522a
+  languageName: node
+  linkType: hard
+
 "react-native-vector-icons@npm:^10.3.0":
   version: 10.3.0
   resolution: "react-native-vector-icons@npm:10.3.0"
@@ -15136,6 +15147,7 @@ __metadata:
     react-native-reorderable-list: "npm:^0.16.2"
     react-native-safe-area-context: "npm:~5.6.0"
     react-native-screens: "npm:~4.16.0"
+    react-native-url-polyfill: "npm:^3.0.0"
     react-native-vector-icons: "npm:^10.3.0"
     react-native-webview: "npm:13.15.0"
     react-native-worklets: "npm:0.5.1"

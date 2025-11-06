@@ -2,11 +2,18 @@ import * as Sentry from '@sentry/react-native'
 import { StyleSheet } from 'react-native'
 import { logger, mapConsoleTransport, sentryTransport } from 'react-native-logs'
 
-export const Logger = logger.createLogger<'debug' | 'info' | 'warn' | 'error'>({
+export const Logger = logger.createLogger({
+	levels: {
+		debug: 0,
+		info: 1,
+		warn: 2,
+		error: 3,
+	},
 	transport: __DEV__
 		? mapConsoleTransport
 		: /* istanbul ignore next */ sentryTransport,
 	transportOptions: {
+		// @ts-expect-error This is error in their typings
 		SENTRY: Sentry,
 		errorLevels: 'error',
 	},

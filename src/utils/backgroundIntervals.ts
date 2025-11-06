@@ -1,4 +1,3 @@
-// @ts-expect-error AAAAAAAAAAA
 import BackgroundTimer from '@boterop/react-native-background-timer'
 
 interface Timer {
