@@ -1,5 +1,6 @@
 // @ts-check
 import withBuildProperties from 'expo-build-properties'
+import {} from 'expo-notifications'
 import {
 	AndroidConfig,
 	withAndroidManifest,
@@ -7,14 +8,14 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.19.6'
+const version = '0.19.7'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
 
 const id = IS_DEV
-	? 'com.leaftail1880.xdnevnik.dev2'
-	: 'com.leaftail1880.xdnevnik2'
+	? 'com.leaftail1880.xdnevnik.dev'
+	: 'com.leaftail1880.xdnevnik'
 
 const sentry = {
 	organization: 'leaftail1880',
@@ -37,10 +38,6 @@ const Config = {
 		icon: './assets/icon.png',
 		assetBundlePatterns: ['**/*'],
 		userInterfaceStyle: 'automatic',
-		notification: {
-			icon: './assets/notification_icon.png',
-			color: splashBackgroundLight,
-		},
 
 		ios: {
 			bundleIdentifier: id,
@@ -48,6 +45,10 @@ const Config = {
 			infoPlist: {
 				UIBackgroundModes: ['lesson-notifications'],
 			},
+		},
+
+		androidNavigationBar: {
+			enforceContrast: true,
 		},
 
 		android: {
@@ -88,6 +89,13 @@ const Config = {
 						backgroundColor: splashBackgroundDark,
 					},
 					imageWidth: 1284,
+				},
+			],
+			[
+				'expo-notifications',
+				{
+					icon: './assets/notification_icon.png',
+					color: splashBackgroundLight,
 				},
 			],
 		],
