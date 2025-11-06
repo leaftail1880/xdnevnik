@@ -112,7 +112,6 @@ Config.expo = withBuildProperties(Config.expo, {
 	android: {
 		enableMinifyInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true, 
 	},
 })
 
@@ -127,11 +126,6 @@ Config.expo = withGradleProperties(Config.expo, config => {
 			type: 'property',
 			key: 'org.gradle.jvmargs',
 			value: '-Xmx3096m -XX:MaxMetaspaceSize=512m',
-		},
-		{
-			type: 'property',
-			key: 'gradle',
-			value: 'build -x lint -x lintVitalRelease',
 		},
 	)
 
