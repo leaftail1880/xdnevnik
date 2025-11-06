@@ -112,7 +112,7 @@ Config.expo = withBuildProperties(Config.expo, {
 	android: {
 		enableMinifyInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
-		useLegacyPackaging: true,
+		useLegacyPackaging: true, 
 	},
 })
 

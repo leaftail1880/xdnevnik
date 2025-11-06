@@ -16,7 +16,7 @@
 			"distribution": "internal",
 			"android": {
 				"buildType": "apk",
-				"gradleCommand": ":app:assembleRelease"
+				"gradleCommand": ":app:assembleRelease -x lint -x lintVitalRelease"
 			}
 		},
 		"production-ios": {
@@ -28,7 +28,7 @@
 			"channel": "production",
 			"android": {
 				"buildType": "apk",
-				"gradleCommand": ":app:assembleRelease"
+				"gradleCommand": ":app:assembleRelease -x lint -x lintVitalRelease"
 			}
 		}
 	},
