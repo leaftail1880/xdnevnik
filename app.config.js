@@ -13,8 +13,8 @@ const version = '0.19.4'
 const IS_DEV = !!process.env.DEV
 
 const id = IS_DEV
-	? 'com.leaftail1880.xdnevnik.dev2'
-	: 'com.leaftail1880.xdnevnik2'
+	? 'com.leaftail1880.xdnevnik.dev'
+	: 'com.leaftail1880.xdnevnik'
 
 const sentry = {
 	organization: 'leaftail1880',
