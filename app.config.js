@@ -13,8 +13,8 @@ const version = '0.18.0'
 const IS_DEV = !!process.env.DEV
 
 const id = IS_DEV
-	? 'com.leaftail1880.xdnevnik.dev'
-	: 'com.leaftail1880.xdnevnik'
+	? 'com.leaftail1880.xdnevnik.dev2'
+	: 'com.leaftail1880.xdnevnik2'
 
 const sentry = {
 	organization: 'leaftail1880',
@@ -110,7 +110,7 @@ Config.expo.plugins = Config.expo.plugins?.filter(Boolean)
 
 Config.expo = withBuildProperties(Config.expo, {
 	android: {
-		enableProguardInReleaseBuilds: true,
+		enableMinifyInReleaseBuilds: true,
 		enableShrinkResourcesInReleaseBuilds: true,
 		useLegacyPackaging: true,
 	},
