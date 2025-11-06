@@ -34,13 +34,13 @@ export const TermStore = new (class {
 	attestationStats = true
 
 	protected get termsOfficial() {
-		return TotalsStore.result?.find(
-			e => e.termTotals[0].markCode === 'PointSystem',
-		)
+		return TotalsStore.result
+			?.find(e => e.termTotals[0].markCode === 'PointSystem')
+			?.termTotals.filter(e => !!e.markCode)
 	}
 
 	get terms() {
-		return this.termsOfficial?.termTotals.map(total => ({
+		return this.termsOfficial?.map(total => ({
 			label: total.term.name,
 			value: total.term.id + '',
 			term: total.term,
@@ -48,12 +48,10 @@ export const TermStore = new (class {
 	}
 
 	get currentTerm() {
-		return (
-			(XSettings.studentId
-				? (XSettings.forStudent(XSettings.studentId)?.currentTermv2 ??
-					this.termsOfficial?.termTotals[0].term)
-				: undefined) ?? this.termsOfficial?.termTotals[0].term
-		)
+		const termFromSettings = XSettings.studentId
+			? XSettings.forStudent(XSettings.studentId)?.currentTermv2
+			: undefined
+		return termFromSettings ?? this.termsOfficial?.[0].term
 	}
 
 	get totalsResult() {

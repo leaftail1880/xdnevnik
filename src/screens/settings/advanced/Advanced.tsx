@@ -14,58 +14,61 @@ import { ScrollView, View } from 'react-native'
 import { List, Text } from 'react-native-paper'
 import { DatePickerInput } from 'react-native-paper-dates'
 
-export default observer(function Appearance() {
+export default observer(function Advanced() {
 	Theme.key
 
 	const overrideTime = new Date(XSettings.overrideTimeD)
 	return (
 		<ScrollView>
 			<List.Section title="Общие">
-				<NumberInput
-					label="Timeout"
-					description="Максимальная длительность запроса, в секундах. Чем меньше значение, тем раньше приложение начнет использовать кеш вместо ожидания ответа от сервера"
-					value={API.timeoutLimit}
-					onChange={value => runInAction(() => (API.timeoutLimit = value))}
-					defaultValue={6}
-				/>
-				<NumberInput
-					label="Cache latency"
-					description="Использовать кэш если паралельных запросов больше чем это число. Полезно для оптимизации большого кол-ва запросов. 0 заставляет все запросы возвращать кеш по умолчанию."
-					value={API.useCacheOnMoreThenReqs}
-					onChange={value =>
-						runInAction(() => (API.useCacheOnMoreThenReqs = value))
-					}
-					defaultValue={6}
-				/>
-
+				<View style={{ paddingHorizontal: Spacings.s2 }}>
+					<NumberInput
+						label="Timeout"
+						description="Максимальная длительность запроса, в секундах. Чем меньше значение, тем раньше приложение начнет использовать кеш вместо ожидания ответа от сервера"
+						value={API.timeoutLimit}
+						onChange={value => runInAction(() => (API.timeoutLimit = value))}
+						defaultValue={6}
+					/>
+					<NumberInput
+						label="Cache latency"
+						description="Использовать кэш если паралельных запросов больше чем это число. Полезно для оптимизации большого кол-ва запросов. 0 заставляет все запросы возвращать кеш по умолчанию."
+						value={API.useCacheOnMoreThenReqs}
+						onChange={value =>
+							runInAction(() => (API.useCacheOnMoreThenReqs = value))
+						}
+						defaultValue={6}
+					/>
+				</View>
 				<View style={{ gap: Spacings.s2 }}>
 					<SwitchSetting
 						setting="useOverrideTime"
 						title="Использовать кастомное время"
 						description="Полезно для демонстрации"
 					/>
-					<SelectTime
-						label="Время в приложении"
-						value={{
-							minutes: overrideTime.getMinutes(),
-							hours: overrideTime.getHours(),
-						}}
-						onSelect={({ hours, minutes }) =>
-							runInAction(() => {
-								overrideTime.setHours(hours, minutes)
-								XSettings.save({ overrideTimeD: overrideTime.getTime() })
-							})
-						}
-						key={overrideTime.getTime().toString()}
-					/>
-					<DatePickerInput
-						locale="ru"
-						value={overrideTime}
-						onChange={d =>
-							!!d && XSettings.save({ overrideTimeD: d.getTime() })
-						}
-						inputMode="start"
-					/>
+					<View style={{ paddingHorizontal: Spacings.s2 }}>
+						<SelectTime
+							label="Время в приложении"
+							value={{
+								minutes: overrideTime.getMinutes(),
+								hours: overrideTime.getHours(),
+							}}
+							onSelect={({ hours, minutes }) =>
+								runInAction(() => {
+									overrideTime.setHours(hours, minutes)
+									XSettings.save({ overrideTimeD: overrideTime.getTime() })
+								})
+							}
+							key={overrideTime.getTime().toString()}
+						/>
+						<DatePickerInput
+							locale="ru"
+							value={overrideTime}
+							onChange={d =>
+								!!d && XSettings.save({ overrideTimeD: d.getTime() })
+							}
+							inputMode="start"
+						/>
+					</View>
 				</View>
 			</List.Section>
 			<List.Section title="Хранилище">

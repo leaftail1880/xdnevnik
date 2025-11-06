@@ -6,7 +6,7 @@ import './src/services/sentry'
 
 import './src/utils/configure'
 
-import { LANG } from './src/constants'
+import { Screens } from './src/constants'
 
 // External dependencies
 import {
@@ -19,8 +19,9 @@ import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
-import { makeAutoObservable, toJS } from 'mobx'
+import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
 import { View } from 'react-native'
@@ -53,55 +54,7 @@ import SettingsScreen from './src/screens/settings/screen'
 import TotalsNavigation from './src/screens/totals/screen'
 import UsefullTools from './src/screens/usefull-tools/screen'
 
-export type ParamListBase = Record<
-	(typeof LANG)[
-		| 's_log_in'
-		| 's_log_out'
-		| 's_totals'
-		| 's_settings'
-		| 's_diary'
-		| 's_usefull_tools'],
-	undefined
->
-
-const ScreenIcons = {
-	[LANG['s_log_in']]: 'login',
-	[LANG['s_log_out']]: 'logout',
-	[LANG['s_diary']]: 'book',
-	[LANG['s_totals']]: 'school',
-	[LANG['s_settings']]: 'cog',
-	[LANG['s_usefull_tools']]: 'tools',
-}
-
-// Refactored route configuration to be less repetitive
-const AppRoutes = [
-	{
-		name: LANG['s_log_in'] as keyof ParamListBase,
-		component: LoginScreen,
-		hideCondition: () => API.session,
-	},
-	{
-		name: LANG['s_diary'] as keyof ParamListBase,
-		component: DiaryScreen,
-		fallback: true,
-	},
-	{
-		name: LANG['s_totals'] as keyof ParamListBase,
-		component: TotalsNavigation,
-		fallback: true,
-	},
-	{
-		name: LANG['s_settings'] as keyof ParamListBase,
-		component: SettingsScreen,
-	},
-	{
-		name: LANG['s_usefull_tools'] as keyof ParamListBase,
-		component: UsefullTools,
-	},
-]
-
-const Tab = createBottomTabNavigator<ParamListBase>()
-
+import type { TermNavigationParamMap } from '@/screens/totals/navigation'
 import * as SplashScreen from 'expo-splash-screen'
 
 SplashScreen.setOptions({
@@ -109,14 +62,68 @@ SplashScreen.setOptions({
 	fade: true,
 })
 
+type BottomTabsParams = Record<
+	| Screens.LogIn
+	| Screens.LogOut
+	| Screens.Diary
+	| Screens.Settings
+	| Screens.UsefullTools,
+	undefined
+> & {
+	[Screens.Totals]:
+		| {
+				screen: Screens.SubjectTotals
+				params: TermNavigationParamMap[Screens.SubjectTotals]
+		  }
+		| undefined
+}
+
+export type BottomTabsScreenProps = StackScreenProps<BottomTabsParams>
+
+const ScreenIcons = {
+	[Screens.LogIn]: 'login',
+	[Screens.LogOut]: 'logout',
+	[Screens.Diary]: 'book',
+	[Screens.Totals]: 'school',
+	[Screens.Settings]: 'cog',
+	[Screens.UsefullTools]: 'tools',
+}
+
+// Refactored route configuration to be less repetitive
+const AppRoutes = [
+	{
+		name: Screens.LogIn,
+		component: LoginScreen,
+		hideCondition: () => API.session,
+	},
+	{
+		name: Screens.Diary,
+		component: DiaryScreen,
+		fallback: true,
+	},
+	{
+		name: Screens.Totals,
+		component: TotalsNavigation,
+		fallback: true,
+	},
+	{
+		name: Screens.Settings,
+		component: SettingsScreen,
+	},
+	{
+		name: Screens.UsefullTools,
+		component: UsefullTools,
+	},
+]
+
+const Tab = createBottomTabNavigator<BottomTabsParams>()
+
 // Custom Tab Bar Component using BottomNavigation.Bar
 const CustomTabBar = observer(function CustomTabBar({
 	navigation,
 	state,
 	insets,
 }: BottomTabBarProps) {
-	const theme = toJS(ThemeStore.meta(Theme).theme)
-
 	return (
 		<BottomNavigation.Bar
 			navigationState={state}
@@ -141,26 +148,24 @@ const CustomTabBar = observer(function CustomTabBar({
 				const iconName = ScreenIcons[route.name as keyof typeof ScreenIcons]
 				return <Icon source={iconName} color={color} size={23} />
 			}}
-			getLabelText={({ route }) => {
-				return route.name
-			}}
-			activeColor={theme.colors.onPrimaryContainer}
-			inactiveColor={theme.colors.onSurfaceVariant}
+			getLabelText={({ route }) => route.name}
+			activeColor={Theme.colors.onPrimaryContainer}
+			inactiveColor={Theme.colors.onSurfaceVariant}
 			style={{
-				backgroundColor: theme.colors.navigationBar,
-				height: 56, // Fixed height instead of percentage
+				backgroundColor: Theme.colors.navigationBar,
+				height: 65, // Fixed height instead of percentage
 			}}
-			renderTouchable={props => <TouchableRipple {...props} />}
+			renderTouchable={props => <TouchableRipple {...props} key={props.key} />}
 		/>
 	)
 })
 
 export default Sentry.wrap(
 	observer(function App() {
-		const navigation = useRef<NavigationContainerRef<ParamListBase>>(null)
+		const navigation = useRef<NavigationContainerRef<BottomTabsParams>>(null)
 
 		const { loading, theme } = ThemeStore.meta(Theme)
-		if (loading) return AppStore.loadingTheme
+		if (loading) return <Loading text="Загрузка темы" />
 
 		const ProvidedTheme = toJS(theme)
 		return (
@@ -187,72 +192,45 @@ export default Sentry.wrap(
 	}),
 )
 
-// Show header when component's custom header is not rendered
-// eslint-disable-next-line mobx/missing-observer
-function AppScreenFallback(props: { fallback: React.ReactNode }) {
-	return (
-		<View>
-			<Header title="Загрузка..." />
-			{props.fallback}
-		</View>
-	)
-}
-
-const AppStore = new (class AppStore {
-	constructor() {
-		makeAutoObservable(this, { loadingTheme: false })
-	}
-
-	get fallback() {
-		let Fallback: React.ReactNode | undefined
-		if (!API.session) {
-			Fallback = <Loading text="Авторизация..." />
-		} else if (StudentsStore.fallback) {
-			Fallback = StudentsStore.fallback
-		}
-
-		return Fallback && (() => <AppScreenFallback fallback={Fallback} />)
-	}
-
-	loadingTheme = (
-		<View
-			style={{
-				height: '100%',
-				width: '100%',
-				flex: 1,
-				justifyContent: 'center',
-				alignItems: 'center',
-			}}
-		>
-			<Loading text="Загрузка темы" />
-		</View>
-	)
-})()
-
 const Navigation = observer(function Navigation() {
-	const FallbackScreen = AppStore.fallback
+	let innerFallback: React.ReactNode | undefined
+	if (!API.session) {
+		innerFallback = <Loading text="Ожидание авторизации..." />
+	} else if (StudentsStore.fallback) {
+		innerFallback = StudentsStore.fallback
+	}
+
+	let FallbackScreen: React.FC | undefined
+	if (innerFallback) {
+		FallbackScreen = () => (
+			<View>
+				{/* Show header when component's custom header is not rendered */}
+				<Header title="Загрузка..." />
+				{innerFallback}
+			</View>
+		)
+	}
 
 	return (
 		<Tab.Navigator
 			tabBar={props => <CustomTabBar {...props} />}
 			screenOptions={{
 				headerShown: false,
+				animation: 'shift',
 			}}
 		>
 			{AppRoutes.map(route => {
 				if (route.hideCondition?.()) return null
 
-				let Component = route.component
-				// Apply fallback to specific screens that need it
-				if (route.fallback && FallbackScreen) {
-					Component = FallbackScreen
-				}
-
 				return (
 					<Tab.Screen
 						key={route.name}
-						name={route.name}
-						component={Component}
+						name={route.name as keyof BottomTabsParams}
+						component={
+							route.fallback && FallbackScreen
+								? FallbackScreen
+								: route.component
+						}
 					/>
 				)
 			})}

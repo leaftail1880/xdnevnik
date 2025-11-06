@@ -23,7 +23,7 @@ export function Chips(props: {
 			style={[styles.style, props.style]}
 			contentContainerStyle={styles.contentContainerStyle}
 			showsHorizontalScrollIndicator={false}
-			fadingEdgeLength={100}
+			fadingEdgeLength={{ end: 20, start: 10 }}
 			horizontal
 		>
 			{props.children}

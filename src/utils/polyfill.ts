@@ -26,9 +26,11 @@ export {}
 /* istanbul ignore else */
 if (__DEV__) {
 	// eslint-disable-next-line no-console
-	debug = console.log.bind(console)
+	// @ts-expect-error Global variable
+	globalThis.debug = console.log.bind(console)
 } else {
-	debug = () => {}
+	// @ts-expect-error Global variable
+	globalThis.debug = () => {}
 }
 
 Date.prototype.toNetSchool = function (this: Date) {

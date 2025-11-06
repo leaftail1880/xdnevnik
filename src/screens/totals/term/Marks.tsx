@@ -200,7 +200,7 @@ const ScrollableMarks = observer(function ScrollableMarks({
 			horizontal
 			style={viewStyle}
 			contentContainerStyle={styles.container}
-			fadingEdgeLength={100}
+			fadingEdgeLength={{ end: 10, start: 20 }}
 			showsHorizontalScrollIndicator={false}
 		>
 			{totalsAndSheduledTotals

@@ -5,7 +5,6 @@ import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { Lesson } from '@/services/net-school/lesson'
 import { DiaryStore } from '@/services/net-school/store'
-import { StackScreenProps } from '@react-navigation/stack'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
@@ -14,7 +13,7 @@ import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Chip } from 'react-native-paper'
-import { ParamListBase } from '../../../App'
+import { BottomTabsScreenProps } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
 import Day from './Day'
 import { DiaryState } from './state'
@@ -72,7 +71,7 @@ LocaleConfig.locales['ru-RU'] = {
 }
 LocaleConfig.defaultLocale = 'ru-RU'
 
-export default observer(function DiaryScreen(props: DiaryLessonNavigation) {
+export default observer(function DiaryScreen(props: BottomTabsScreenProps) {
 	return (
 		<View style={styles.flex}>
 			<Header title="Дневник"></Header>
@@ -217,5 +216,3 @@ export type DiaryLessonProps = {
 	lesson: Lesson
 	navigateToLessonMarks: VoidFunction
 }
-
-export type DiaryLessonNavigation = StackScreenProps<ParamListBase>

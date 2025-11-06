@@ -3,10 +3,10 @@ import { Education } from '@/services/net-school/entities'
 import { EducationStore } from '@/services/net-school/store'
 import { StackScreenProps, createStackNavigator } from '@react-navigation/stack'
 import { autorun, makeAutoObservable, runInAction, toJS } from 'mobx'
-import { LANG } from '../../constants'
+import { Screens } from '../../constants'
 
-export const S_SUBJECT_TOTALS = LANG['s_subject_totals']
-export const S_TOTALS = LANG['s_totalsN']
+export const S_SUBJECT_TOTALS = Screens.SubjectTotals
+export const S_TOTALS = Screens.TotalsN
 export type TermNavigationParamMap = {
 	[S_TOTALS]: undefined
 	[S_SUBJECT_TOTALS]: {

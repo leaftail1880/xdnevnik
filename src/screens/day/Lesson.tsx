@@ -10,40 +10,49 @@ import { ChipLike } from '@/components/ChipLike'
 import { ScrollTextCopyable } from '@/components/ScrollTextCopyable'
 import SubjectName from '@/components/SubjectName'
 import { XSettings } from '@/models/settings'
-import { TermNavigationParamMap } from '@/screens/totals/navigation'
 import { TermStore } from '@/screens/totals/term/state'
 import { Lesson } from '@/services/net-school/lesson'
 import { ModalAlert } from '@/utils/Toast'
 import { useStyles } from '@/utils/useStyles'
 import { useCallback, useMemo } from 'react'
-import { LANG, globalStyles } from '../../constants'
+import { BottomTabsScreenProps } from '../../../App'
+import { Screens, globalStyles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import { EditSingleLesson } from './edit/EditSingleLesson'
 import LessonProgress, { LessonProgressStore } from './Progress'
-import { DiaryLessonNavigation, DiaryLessonProps } from './screen'
+import { DiaryLessonProps } from './screen'
 
 export default observer(function DiaryLesson({
 	lesson,
 	navigation,
 	i,
 	...props
-}: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & DiaryLessonNavigation) {
+}: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & BottomTabsScreenProps) {
 	const currentTerm = TermStore.currentTerm
 	const navigateToLessonMarks = useCallback(async () => {
-		if (!currentTerm) return
+		if (!currentTerm)
+			return ModalAlert.show(
+				'Четверть/полугодие не выбрано!',
+				'Перейдите в раздел оценки и выберите его',
+				true,
+				[
+					{
+						label: 'Перейти',
+						callback: () => (
+							navigation.navigate(Screens.Totals),
+							ModalAlert.close()
+						),
+					},
+				],
+			)
 
-		navigation.navigate(LANG['s_totals'])
-
-		await new Promise<void>(r => setTimeout(r, 100))
-
-		// @ts-expect-error Huh
-		navigation.navigate(LANG['s_totals'], {
-			screen: LANG['s_subject_totals'],
+		navigation.navigate(Screens.Totals, {
+			screen: Screens.SubjectTotals,
 			params: {
 				subjectId: lesson.subjectId,
 				termId: currentTerm.id,
 				finalMark: null,
-			} satisfies TermNavigationParamMap[(typeof LANG)['s_subject_totals']],
+			},
 		})
 	}, [currentTerm, lesson, navigation])
 

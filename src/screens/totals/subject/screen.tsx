@@ -1,6 +1,6 @@
 import { RoundedSurface } from '@/components/RoundedSurface'
 import UpdateDate from '@/components/UpdateDate'
-import { LANG } from '@/constants'
+import { Screens } from '@/constants'
 import { AsyncState } from '@/models/async.store'
 import { XSettings } from '@/models/settings'
 import type {
@@ -46,7 +46,7 @@ export default observer(function SubjectTotals({
 		<SubjectTotalsImpl
 			{...route.params}
 			performance={performance}
-			navigateToDiary={() => navigation.getParent()?.navigate(LANG.s_diary)}
+			navigateToDiary={() => navigation.getParent()?.navigate(Screens.Diary)}
 		/>
 	)
 })

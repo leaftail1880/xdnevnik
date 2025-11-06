@@ -3,7 +3,7 @@ import Header from '@/components/Header'
 import Mark, { MarkColorsBG } from '@/components/Mark'
 import { RoundedSurface } from '@/components/RoundedSurface'
 import { getSubjectName } from '@/components/SubjectName'
-import { LANG, globalStyles } from '@/constants'
+import { Screens, globalStyles } from '@/constants'
 import { XSettings } from '@/models/settings'
 import { SubjectPerformanceStores } from '@/services/net-school/store'
 import { Spacings } from '@/utils/Spacings'
@@ -49,48 +49,52 @@ export default observer(function UsefullToolsScreen() {
 			</View>
 		</View>,
 		<View>
-			<SubjectTotalsImpl
-				finalMark={null}
-				performance={{
-					result: {
-						attendance: [],
-						averageMark: 0,
-						classAverageMark: 0,
-						classmeetingsStats: { passed: 0, scheduled: 99999 },
-						markStats: [],
-						maxMark: 0,
-						results: [],
-						subject: { id: 0, name: 'Калькулятор оценок' },
-						teachers: [],
-						term: { id: 0, name: '' },
-					},
-					fallback: undefined,
-					refreshControl: <></>,
-					updateDate: '',
-					reload: () => void 0,
-				}}
-				navigateToDiary={() => void 0}
-				// @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-				flatList={
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					((props: any) => (
-						<View style={props.contentContainerStyle}>
-							{(props.data as unknown[]).map((item, index) => (
-								<View key={index.toString()}>
-									{props.renderItem({ item, index })}
-								</View>
-							))}
-						</View>
-					)) as unknown as typeof FlatList
-				}
-			/>
+			{XSettings.studentId ? (
+				<SubjectTotalsImpl
+					finalMark={null}
+					performance={{
+						result: {
+							attendance: [],
+							averageMark: 0,
+							classAverageMark: 0,
+							classmeetingsStats: { passed: 0, scheduled: 99999 },
+							markStats: [],
+							maxMark: 0,
+							results: [],
+							subject: { id: 0, name: 'Калькулятор оценок' },
+							teachers: [],
+							term: { id: 0, name: '' },
+						},
+						fallback: undefined,
+						refreshControl: <></>,
+						updateDate: '',
+						reload: () => void 0,
+					}}
+					navigateToDiary={() => void 0}
+					// @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+					flatList={
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						((props: any) => (
+							<View style={props.contentContainerStyle}>
+								{(props.data as unknown[]).map((item, index) => (
+									<View key={index.toString()}>
+										{props.renderItem({ item, index })}
+									</View>
+								))}
+							</View>
+						)) as unknown as typeof FlatList
+					}
+				/>
+			) : (
+				<Text>Авторизуйтесь, чтобы увидеть больше инструментов</Text>
+			)}
 		</View>,
 		<LogoutButton />,
 		<View style={{ minHeight: 30 }}></View>,
 	]
 	return (
 		<View style={{ flex: 1 }}>
-			<Header title={LANG['s_usefull_tools']}></Header>
+			<Header title={Screens.UsefullTools}></Header>
 			<FlatList<React.ReactElement>
 				contentContainerStyle={{
 					justifyContent: 'center',

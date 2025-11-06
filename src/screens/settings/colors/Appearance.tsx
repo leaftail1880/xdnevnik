@@ -48,17 +48,19 @@ export default observer(function AppearanceSettings_() {
 					onSelect={({ value }) => XSettings.save({ nameFormat: value })}
 				/>
 
-				<NumberInputSetting
-					label="Округлость"
-					value={Theme.roundness}
-					defaultValue={5}
-					onChange={value =>
-						runInAction(() => {
-							Theme.roundness = value
-							ThemeStore.meta(Theme).updateColorScheme()
-						})
-					}
-				/>
+				<View style={{ paddingHorizontal: Spacings.s2 }}>
+					<NumberInputSetting
+						label="Округлость"
+						value={Theme.roundness}
+						defaultValue={5}
+						onChange={value =>
+							runInAction(() => {
+								Theme.roundness = value
+								ThemeStore.meta(Theme).updateColorScheme()
+							})
+						}
+					/>
+				</View>
 			</List.Section>
 			<Divider style={{ margin: Spacings.s1 }} />
 

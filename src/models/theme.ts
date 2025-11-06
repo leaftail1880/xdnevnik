@@ -3,12 +3,11 @@ import {
 	DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native'
 
-import * as NavigationBar from 'expo-navigation-bar'
 import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Appearance, AppState, Platform, StatusBar } from 'react-native'
+import { Appearance, AppState } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -125,18 +124,18 @@ export class ThemeStore {
 	private async updateSystemBars() {
 		const promises: Promise<void>[] = []
 
-		if (Platform.OS === 'android') {
-			promises.push(
-				NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark'),
-				NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar),
-				NavigationBar.setVisibilityAsync('visible'),
-			)
-		}
-		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.background))
+		// if (Platform.OS === 'android') {
+		// 	promises.push(
+		// 		NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark'),
+		// 		// NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar), // disabled with edge-to-edge enabled
+		// 		NavigationBar.setVisibilityAsync('visible'),
+		// 	)
+		// }
+		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.navigationBar))
 
 		// If i use it as react component it does not update half of the time
-		StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
-		StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
+		// StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
+		// StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
 
 		await Promise.all(promises).catch(captureException)
 	}
