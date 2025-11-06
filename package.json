@@ -18,14 +18,15 @@
 		"no-dev": "yarn expo start --dev-client --minify --no-dev",
 		"start": "yarn expo start --dev-client",
 		"update": "eas update --channel production --auto",
-		"eslint": "./node_modules/.bin/eslint App.tsx src",
+		"lint": "./node_modules/.bin/eslint App.tsx src",
 		"format": "./node_modules/.bin/prettier -w App.tsx src",
 		"test": "jest"
 	},
 	"resolutions": {
 		"whatwg-url-without-unicode@npm:8.0.0-3": "patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch",
 		"metro-file-map@npm:0.81.0": "patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch",
-		"form-data": "4.0.1"
+		"form-data": "4.0.1",
+		"react-native-safe-area-context": "5.6.2"
 	},
 	"dependencies": {
 		"@boterop/react-native-background-timer": "^2.6.0",
