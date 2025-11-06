@@ -110,8 +110,8 @@ Config.expo.plugins = Config.expo.plugins?.filter(Boolean)
 
 Config.expo = withBuildProperties(Config.expo, {
 	android: {
-		enableMinifyInReleaseBuilds: true,
-		enableShrinkResourcesInReleaseBuilds: true,
+		// enableMinifyInReleaseBuilds: true,
+		// enableShrinkResourcesInReleaseBuilds: true,
 	},
 })
 
