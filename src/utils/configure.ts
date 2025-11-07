@@ -16,3 +16,19 @@ configurePersistable({
 		removeItem: key => void storage.remove(key),
 	},
 })
+
+setTimeout(() => storage.trim(), 20000) // Cleanup
+
+export function getTotalStorageSize() {
+	return storage.size
+}
+export function getStorageKeySize(key: string) {
+	return storage.getBuffer(key)?.byteLength ?? 0
+}
+
+export function getStorageValue(key: string) {
+	return storage.getString(key)!
+}
+export function setStorageValue(key: string, value: string) {
+	storage.set(key, value)
+}

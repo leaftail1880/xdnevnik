@@ -5,14 +5,15 @@ import SwitchSetting from '@/components/SwitchSetting'
 import { XSettings } from '@/models/settings'
 import { Theme } from '@/models/theme'
 import { API } from '@/services/net-school/api'
+import { getStorageKeySize, getTotalStorageSize } from '@/utils/configure'
 import { Spacings } from '@/utils/Spacings'
-import { observable, runInAction } from 'mobx'
-import { PersistStore, PersistStoreMap } from 'mobx-persist-store'
+import { runInAction } from 'mobx'
+import { PersistStoreMap } from 'mobx-persist-store'
 import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { List, Text } from 'react-native-paper'
 import { DatePickerInput } from 'react-native-paper-dates'
+import { ExportImportSettings } from './ExportSettings'
 
 export default observer(function Appearance() {
 	Theme.key
@@ -72,6 +73,7 @@ export default observer(function Appearance() {
 				</View>
 			</List.Section>
 			<List.Section title="Хранилище">
+				<ExportImportSettings />
 				<SizeOfCache />
 				<List.Item
 					title={
@@ -80,9 +82,7 @@ export default observer(function Appearance() {
 							<Size t={API.cache} />)
 						</Text>
 					}
-					onPress={() =>
-						runInAction(() => ((API.cache = {}), delete stores['api']))
-					}
+					onPress={() => runInAction(() => (API.cache = {}))}
 				/>
 				<Stores />
 			</List.Section>
@@ -95,61 +95,23 @@ const SizeOfCache = observer(function SizeOfCache() {
 		<List.Item
 			title={
 				<Text>
-					Занятое место:{' '}
-					<Size
-						t={Object.entries(stores).reduce(
-							(p, e) => p + JSON.stringify(e).length,
-							0,
-						)}
-					/>
+					Занятое место: <Size t={getTotalStorageSize()} />
 				</Text>
 			}
 		/>
-	)
-})
-
-const ExportImportSettings = observer(function ExportImportSettings() {
-	return (
-		<>
-			<List.Item title={<Text>Экспортировать</Text>} />
-			<List.Item title={<Text>Импортировать</Text>} />
-		</>
 	)
 })
 
 // eslint-disable-next-line mobx/missing-observer
 function Stores() {
 	return [...PersistStoreMap.values()].map(e => (
-		<Store store={e} key={e.storageName} />
-	))
-}
-
-const stores: Record<string, unknown> = observable(
-	{},
-	{},
-	{ defaultDecorator: observable.struct },
-)
-
-const Store = observer(function Store({
-	store,
-}: {
-	store: PersistStore<unknown, never>
-}) {
-	useEffect(() => {
-		store.getPersistedStore().then(e => {
-			runInAction(() => {
-				stores[store.storageName] = e
-			})
-		})
-	})
-
-	return (
 		<List.Item
+			key={e.storageName}
 			title={
 				<Text>
-					{store.storageName}: <Size t={stores[store.storageName]} />
+					{e.storageName}: <Size t={getStorageKeySize(e.storageName)} />
 				</Text>
 			}
 		/>
-	)
-})
+	))
+}
