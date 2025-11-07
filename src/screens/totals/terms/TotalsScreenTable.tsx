@@ -1,7 +1,9 @@
+import { Chips } from '@/components/Chips'
 import Loading from '@/components/Loading'
 import Mark from '@/components/Mark'
 import SelectModal from '@/components/SelectModal'
 import SubjectName from '@/components/SubjectName'
+import { ToggleChip } from '@/components/ToggleChip'
 import UpdateDate from '@/components/UpdateDate'
 import { Total } from '@/services/net-school/entities'
 import {
@@ -9,6 +11,7 @@ import {
 	SubjectsStore,
 	TotalsStore,
 } from '@/services/net-school/store'
+import { Spacings } from '@/utils/Spacings'
 import { ModalAlert } from '@/utils/Toast'
 import { runInAction, toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -17,6 +20,7 @@ import { DataTable, Text } from 'react-native-paper'
 import { Screens } from '../../../constants'
 import { TotalsScreenParams, TotalsStateStore } from '../navigation'
 import { removeNonExistentLessons } from '../utils'
+import { TermsScreenSettings } from './state'
 
 export default observer(function TotalsScreenTable({
 	navigation,
@@ -48,43 +52,47 @@ export default observer(function TotalsScreenTable({
 			contentContainerStyle={{ flex: 0 }}
 			refreshControl={TotalsStore.refreshControl}
 		>
+			<Chips>
+				<SchoolYear />
+				<ToggleChip
+					store={TermsScreenSettings}
+					storeKey="yearTotals"
+					label="Итоги года"
+				/>
+			</Chips>
 			<DataTable style={{ alignSelf: 'center' }}>
-				<DataTable.Header>
-					<View
+				<DataTable.Header style={{ paddingHorizontal: Spacings.s2 }}>
+					<DataTable.Title
 						style={{
 							flex: flexSize,
-							padding: 0,
-							margin: 0,
-							alignItems: 'center',
-							justifyContent: 'center',
+							paddingVertical: Spacings.s1,
 						}}
 					>
-						<SchoolYear />
-					</View>
+						Предмет/период
+					</DataTable.Title>
 
 					{normalizedTerms?.map((_, i, a) => (
 						<DataTable.Title
 							key={i.toString()}
 							style={{
 								justifyContent: 'center',
-								alignContent: 'center',
-								alignItems: 'center',
 								flex: 1,
+								paddingVertical: Spacings.s1,
 							}}
 						>
 							{i + 1}/{a.length}
 						</DataTable.Title>
 					))}
 
-					{yearTotals?.length &&
+					{TermsScreenSettings.yearTotals &&
+						yearTotals?.length &&
 						yearTotals?.map((year, i) => (
 							<DataTable.Title
 								key={i.toString()}
 								style={{
 									justifyContent: 'center',
-									alignContent: 'center',
-									alignItems: 'center',
 									flex: 1,
+									paddingVertical: Spacings.s1,
 								}}
 								numberOfLines={flexSize > 4 ? 1 : undefined}
 							>
@@ -96,11 +104,12 @@ export default observer(function TotalsScreenTable({
 
 			{removeNonExistentLessons(TotalsStore.result, SubjectsStore.result).map(
 				total => (
-					<DataTable.Row key={total.subjectId.toString()}>
+					<DataTable.Row
+						key={total.subjectId.toString()}
+						style={{ paddingHorizontal: Spacings.s2 }}
+					>
 						<DataTable.Cell style={{ flex: flexSize }}>
 							<SubjectName
-								// style={{ maxWidth: '80%' }}
-								// viewStyle={{ width: '100%' }}
 								subjectId={total.subjectId}
 								subjects={SubjectsStore.result!}
 							/>
@@ -130,7 +139,8 @@ export default observer(function TotalsScreenTable({
 								</DataTable.Cell>
 							))}
 
-						{yearTotals?.length &&
+						{TermsScreenSettings.yearTotals &&
+							yearTotals?.length &&
 							yearTotals?.map((targetYear, i) => {
 								const style: ViewStyle = {
 									flex: 0,
@@ -204,6 +214,7 @@ const SchoolYear = observer(function SchoolYear() {
 	return (
 		<SelectModal
 			mode="chip"
+			inlineChip
 			label={'Год'}
 			value={schoolYear.id + ''}
 			data={TotalsStateStore.years}

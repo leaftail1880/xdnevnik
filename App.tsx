@@ -1,16 +1,17 @@
 // Initial setup & polyfills & monitoring
+import '@/utils/polyfill'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import './src/utils/polyfill'
 
-import './src/services/sentry'
+import '@/services/sentry'
 
-import './src/utils/configure'
+import '@/utils/configure'
 
-import { Screens } from './src/constants'
+import { Screens } from '@/constants'
 
 // External dependencies
 import {
 	BottomTabBarProps,
+	BottomTabScreenProps,
 	createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
 import {
@@ -19,12 +20,12 @@ import {
 	NavigationContainer,
 	NavigationContainerRef,
 } from '@react-navigation/native'
-import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
+import * as SplashScreen from 'expo-splash-screen'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRef } from 'react'
-import { View } from 'react-native'
+import { Easing, useWindowDimensions, View } from 'react-native'
 import {
 	BottomNavigation,
 	Icon,
@@ -34,28 +35,27 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 // Components
-import Header from './src/components/Header'
-import Loading from './src/components/Loading'
-import Toast from './src/components/Modal'
+import Header from '@/components/Header'
+import Loading from '@/components/Loading'
+import Toast from '@/components/Modal'
 
 // Services
-import { API } from './src/services/net-school/api'
-import './src/services/notifications/setup'
-import { SENTRY_ROUTING } from './src/services/sentry'
+import { API } from '@/services/net-school/api'
+import '@/services/notifications/setup'
+import { SENTRY_ROUTING } from '@/services/sentry'
 
 // State
-import { Theme, ThemeStore } from './src/models/theme'
-import { StudentsStore } from './src/services/net-school/store'
+import { Theme } from '@/models/theme'
+import { StudentsStore } from '@/services/net-school/store'
 
 // Screens
-import DiaryScreen from './src/screens/day/screen'
-import LoginScreen from './src/screens/login/in'
-import SettingsScreen from './src/screens/settings/screen'
-import TotalsNavigation from './src/screens/totals/screen'
-import UsefullTools from './src/screens/usefull-tools/screen'
+import DiaryScreen from '@/screens/day/screen'
+import LoginScreen from '@/screens/login/in'
+import SettingsScreen from '@/screens/settings/screen'
+import TotalsNavigation from '@/screens/totals/screen'
+import UsefullTools from '@/screens/usefull-tools/screen'
 
 import type { TermNavigationParamMap } from '@/screens/totals/navigation'
-import * as SplashScreen from 'expo-splash-screen'
 
 SplashScreen.setOptions({
 	duration: 400,
@@ -78,7 +78,7 @@ type BottomTabsParams = Record<
 		| undefined
 }
 
-export type BottomTabsScreenProps = StackScreenProps<BottomTabsParams>
+export type XBottomTabScreenProps = BottomTabScreenProps<BottomTabsParams>
 
 const ScreenIcons = {
 	[Screens.LogIn]: 'login',
@@ -164,10 +164,9 @@ export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<BottomTabsParams>>(null)
 
-		const { loading, theme } = ThemeStore.meta(Theme)
-		if (loading) return <Loading text="Загрузка темы" />
+		if (Theme.manage.isLoading()) return <Loading text="Загрузка темы" />
 
-		const ProvidedTheme = toJS(theme)
+		const ProvidedTheme = toJS(Theme.manage.getTheme())
 		return (
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<SafeAreaProvider>
@@ -211,12 +210,42 @@ const Navigation = observer(function Navigation() {
 		)
 	}
 
+	const { width } = useWindowDimensions()
+
 	return (
 		<Tab.Navigator
 			tabBar={props => <CustomTabBar {...props} />}
 			screenOptions={{
 				headerShown: false,
+				// The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7
+				// and changing bottom tabs navigator from paper to rn navigation shadows are not affected by opacity
+				// hence they flicker on screen. So instead we move the screen from the screen (lol)
+
+				// Also i just found out that i like custom easing much more the default one
 				animation: 'shift',
+				transitionSpec: {
+					animation: 'timing',
+					config: {
+						duration: 300,
+						easing: Easing.out(Easing.exp), // Easing.elastic(1), // Easing.out(Easing.exp),
+					},
+				},
+				sceneStyleInterpolator: ({ current }) => ({
+					sceneStyle: {
+						opacity: current.progress.interpolate({
+							inputRange: [-1, 0, 1],
+							outputRange: [1, 1, 1],
+						}),
+						transform: [
+							{
+								translateX: current.progress.interpolate({
+									inputRange: [-1, 0, 1],
+									outputRange: [-width, 0, width],
+								}),
+							},
+						],
+					},
+				}),
 			}}
 		>
 			{AppRoutes.map(route => {

@@ -5,7 +5,7 @@ import * as Updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { Button, HelperText, Text } from 'react-native-paper'
+import { Button, HelperText, Text, TouchableRipple } from 'react-native-paper'
 
 export default observer(function MicroUpdateId() {
 	const updateId = Updates.updateId?.slice(-6) ?? 'из сборки'
@@ -13,22 +13,35 @@ export default observer(function MicroUpdateId() {
 
 	const update = isUpdateAvailable
 
-	return (
+	const text = (
 		<Text
 			onPress={openModal}
 			style={{
-				backgroundColor: update
-					? Theme.colors.errorContainer
-					: Theme.colors.background,
-
 				color: update ? Theme.colors.error : Theme.colors.onSecondaryContainer,
 
 				fontWeight: update ? 'bold' : 'normal',
 			}}
 		>
+			{update && 'Обновление: '}
 			{updateId}
 		</Text>
 	)
+
+	if (update)
+		return (
+			<TouchableRipple
+				onPress={openModal}
+				style={{
+					backgroundColor: Theme.colors.errorContainer,
+					paddingVertical: 2,
+					paddingHorizontal: 8,
+					borderRadius: Theme.roundness,
+				}}
+			>
+				{text}
+			</TouchableRipple>
+		)
+	return text
 })
 
 enum UpdateCheckState {

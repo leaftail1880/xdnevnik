@@ -7,12 +7,7 @@ import { Text } from 'react-native-paper'
 export default memo(function ReleaseBody(props: { body: string }) {
 	let body = props.body
 
-	let whatsChanged = false
-	const headerR = body.replace(/^## What's Changed/, '')
-	if (body !== headerR) {
-		whatsChanged = true
-		body = headerR
-	}
+	body = body.replace(/^## What's Changed/, '')
 
 	let fullchangelog: { versions: string; link: string } | undefined
 	const footerR = body.match(
@@ -23,12 +18,15 @@ export default memo(function ReleaseBody(props: { body: string }) {
 		body = body.replace(footerR[1], '')
 	}
 
-	body = body.replace(/\n\*\s/g, '\n- ')
+	body = body.replace(/\n?\*\s/g, '\n- ')
 
 	return (
 		<Text variant="bodyMedium">
-			{whatsChanged && <Text variant="titleMedium">Изменения</Text>}
-			<Text>{body}</Text>
+			<Text variant="titleMedium">Изменения:</Text>
+			<Text>
+				{body ||
+					'\nКак всегда, исправления ошибок и ускорение работы приложения'}
+			</Text>
 			{fullchangelog && (
 				<Text variant="titleSmall">
 					Все изменения:{' '}

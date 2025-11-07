@@ -13,7 +13,7 @@ import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
 import { Positions } from 'react-native-calendars/src/expandableCalendar'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Chip } from 'react-native-paper'
-import { BottomTabsScreenProps } from '../../../App'
+import { XBottomTabScreenProps } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
 import Day from './Day'
 import { DiaryState } from './state'
@@ -71,7 +71,7 @@ LocaleConfig.locales['ru-RU'] = {
 }
 LocaleConfig.defaultLocale = 'ru-RU'
 
-export default observer(function DiaryScreen(props: BottomTabsScreenProps) {
+export default observer(function DiaryScreen(props: XBottomTabScreenProps) {
 	return (
 		<View style={styles.flex}>
 			<Header title="Дневник"></Header>

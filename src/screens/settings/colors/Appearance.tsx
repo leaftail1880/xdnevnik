@@ -3,11 +3,11 @@ import NumberInputSetting from '@/components/NumberInput'
 import SelectModal from '@/components/SelectModal'
 import SwitchSetting from '@/components/SwitchSetting'
 import { XSettings } from '@/models/settings'
-import { Theme, ThemeStore } from '@/models/theme'
+import { Theme } from '@/models/theme'
 import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { Suspense, lazy } from 'react'
-import { Appearance, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Button, Divider, List, Surface, Text } from 'react-native-paper'
 import { globalStyles } from '../../../constants'
 import { Spacings } from '../../../utils/Spacings'
@@ -18,9 +18,6 @@ const themes = [
 	{ label: 'Темная', value: 'dark' as const },
 	{ label: 'Светлая', value: 'light' as const },
 ]
-
-const toAppearance = (theme: 'dark' | 'light' | 'system') =>
-	theme === 'system' ? null : theme
 
 const nameFormat = [
 	{ label: 'ФИО', value: 'fio' as const },
@@ -34,11 +31,8 @@ export default observer(function AppearanceSettings_() {
 				<SelectModal
 					label="Тема"
 					data={themes}
-					value={Theme.scheme}
-					onSelect={({ value }) => {
-						runInAction(() => (Theme.scheme = value))
-						Appearance.setColorScheme(toAppearance(value))
-					}}
+					value={Theme.manage.getScheme()}
+					onSelect={({ value }) => Theme.manage.setScheme(value)}
 				/>
 
 				<SelectModal
@@ -53,12 +47,7 @@ export default observer(function AppearanceSettings_() {
 						label="Округлость"
 						value={Theme.roundness}
 						defaultValue={5}
-						onChange={value =>
-							runInAction(() => {
-								Theme.roundness = value
-								ThemeStore.meta(Theme).updateColorScheme()
-							})
-						}
+						onChange={value => runInAction(() => (Theme.roundness = value))}
 					/>
 				</View>
 			</List.Section>

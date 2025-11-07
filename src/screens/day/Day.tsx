@@ -3,12 +3,12 @@ import { DiaryStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
-import { BottomTabsScreenProps } from '../../../App'
+import { XBottomTabScreenProps } from '../../../App'
 import { Spacings } from '../../utils/Spacings'
 import DiaryLesson from './Lesson'
 import { DiaryState } from './state'
 
-export default observer(function DiaryDay(props: BottomTabsScreenProps) {
+export default observer(function DiaryDay(props: XBottomTabScreenProps) {
 	if (DiaryStore.fallback) return DiaryStore.fallback
 
 	const studentSettings = XSettings.forStudentOrThrow()

@@ -15,7 +15,7 @@ import { Lesson } from '@/services/net-school/lesson'
 import { ModalAlert } from '@/utils/Toast'
 import { useStyles } from '@/utils/useStyles'
 import { useCallback, useMemo } from 'react'
-import { BottomTabsScreenProps } from '../../../App'
+import { XBottomTabScreenProps } from '../../../App'
 import { Screens, globalStyles } from '../../constants'
 import DiaryAssignment from './Assignment'
 import { EditSingleLesson } from './edit/EditSingleLesson'
@@ -27,7 +27,7 @@ export default observer(function DiaryLesson({
 	navigation,
 	i,
 	...props
-}: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & BottomTabsScreenProps) {
+}: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & XBottomTabScreenProps) {
 	const currentTerm = TermStore.currentTerm
 	const navigateToLessonMarks = useCallback(async () => {
 		if (!currentTerm)

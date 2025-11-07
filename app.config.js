@@ -7,9 +7,9 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.19.9 '
-const slug = "xdnevnik"
-const name = "XDnevnik2"
+const version = '0.19.9'
+const slug = 'xdnevnik'
+const name = 'XDnevnik2'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
 
 // eslint-disable-next-line no-undef
@@ -43,7 +43,7 @@ const Config = {
 			bundleIdentifier: id,
 			userInterfaceStyle: 'automatic',
 			infoPlist: {
-				UIBackgroundModes: ['lesson-notifications'],
+				UIBackgroundModes: ['processing'],
 			},
 		},
 
