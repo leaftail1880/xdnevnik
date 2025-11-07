@@ -1,6 +1,5 @@
 // @ts-check
 import withBuildProperties from 'expo-build-properties'
-import {} from 'expo-notifications'
 import {
 	AndroidConfig,
 	withAndroidManifest,
@@ -48,7 +47,7 @@ const Config = {
 		},
 
 		androidNavigationBar: {
-			enforceContrast: true,
+			enforceContrast: false,
 		},
 
 		android: {
