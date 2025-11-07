@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.20.0'
+const version = '0.25.0'
 const slug = 'xdnevnik'
 const name = 'XDnevnik2'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
