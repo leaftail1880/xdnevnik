@@ -14,7 +14,7 @@ import { ScrollView, View } from 'react-native'
 import { List, Text } from 'react-native-paper'
 import { DatePickerInput } from 'react-native-paper-dates'
 
-export default observer(function Advanced() {
+export default observer(function Appearance() {
 	Theme.key
 
 	const overrideTime = new Date(XSettings.overrideTimeD)
@@ -105,6 +105,15 @@ const SizeOfCache = observer(function SizeOfCache() {
 				</Text>
 			}
 		/>
+	)
+})
+
+const ExportImportSettings = observer(function ExportImportSettings() {
+	return (
+		<>
+			<List.Item title={<Text>Экспортировать</Text>} />
+			<List.Item title={<Text>Импортировать</Text>} />
+		</>
 	)
 })
 
