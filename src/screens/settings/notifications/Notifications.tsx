@@ -6,8 +6,10 @@ import {
 	MarksNotificationStore,
 } from '@/services/notifications/marks'
 import { Spacings } from '@/utils/Spacings'
+import { ModalAlert } from '@/utils/Toast'
 import notifee from '@notifee/react-native'
 import { StackScreenProps } from '@react-navigation/stack'
+import * as TaskManager from 'expo-task-manager'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { Linking, ScrollView, View } from 'react-native'
@@ -44,6 +46,7 @@ export default observer(function Notifications(
 	const powerManager = !!usePromise(() =>
 		notifee.getPowerManagerInfo().then(e => e.activity),
 	)
+	const taskManager = !usePromise(() => TaskManager.isAvailableAsync())
 
 	return (
 		<ScrollView>
@@ -68,7 +71,7 @@ export default observer(function Notifications(
 				/>
 			</List.Section>
 			<View style={{ padding: Spacings.s2, gap: Spacings.s2 }}>
-				{(batteryOptimizations || powerManager) && (
+				{(batteryOptimizations || powerManager || taskManager) && (
 					<HelperText type="error">Уведомления могут не работать</HelperText>
 				)}
 				<Warning
@@ -79,12 +82,46 @@ export default observer(function Notifications(
 				/>
 				{powerManager && (
 					<Warning
-						enabled={false}
+						enabled={true}
 						label="Менеджер питания"
 						description="Включен менеджер питания. Система выключит приложение и уведомления перестанут работать."
 						onPress={notifee.openPowerManagerSettings}
 					/>
 				)}
+				{taskManager && (
+					<Warning
+						enabled={true}
+						label="Фоновые задачи выключены"
+						description="Уведомления об оценках не будут работать"
+						onPress={() => {}}
+					/>
+				)}
+				<Button
+					mode="elevated"
+					onPress={() => MarksNotificationStore.clearNotified()}
+				>
+					Очистить список оценок о которых уже было уведомление
+				</Button>
+				<Button
+					mode="elevated"
+					onPress={async () =>
+						ModalAlert.show(
+							'Задачи',
+							(await TaskManager.getRegisteredTasksAsync())
+								.map(
+									e =>
+										e.taskName +
+										' ' +
+										e.taskType +
+										' ' +
+										JSON.stringify(e.options),
+								)
+								.join('\n'),
+						)
+					}
+				>
+					Список фоновых задач
+				</Button>
 				<Button mode="elevated" onPress={Linking.openSettings}>
 					Системные настройки приложения
 				</Button>

@@ -6,8 +6,8 @@ import notifee, {
 	AndroidImportance,
 	AndroidVisibility,
 } from '@notifee/react-native'
-import * as BackgroundFetch from 'expo-background-fetch'
-import { BackgroundFetchResult } from 'expo-background-fetch'
+import * as BackgroundTask from 'expo-background-task'
+import { BackgroundTaskResult } from 'expo-background-task'
 import * as TaskManager from 'expo-task-manager'
 import { action, autorun, makeAutoObservable, runInAction } from 'mobx'
 import { Platform } from 'react-native'
@@ -35,6 +35,10 @@ export const MarksNotificationStore = new (class {
 			name: 'marksNotifications',
 			properties: ['notified', 'logs', 'students'],
 		})
+	}
+
+	clearNotified() {
+		this.notified = []
 	}
 
 	getStudent(studentId: number) {
@@ -81,8 +85,8 @@ export const MarksNotificationStore = new (class {
 		Logger[level]('[BACKGROUND MARKS NOTIFICATIONS FETCH]', ...messages)
 		if (this.logs.length >= 100) this.logs.pop()
 		return level === 'error'
-			? BackgroundFetchResult.Failed
-			: BackgroundFetchResult.NoData
+			? BackgroundTaskResult.Failed
+			: BackgroundTaskResult.Success
 	}
 
 	clearLogs() {
@@ -118,9 +122,8 @@ if (Platform.OS !== 'ios') {
 	autorun(function registerTask() {
 		if (enabled()) {
 			MarksNotificationStore.log('info', 'Состояние: Включено')
-			BackgroundFetch.registerTaskAsync(TASK_ID, {
-				startOnBoot: true,
-				stopOnTerminate: false,
+			BackgroundTask.registerTaskAsync(TASK_ID, {
+				minimumInterval: 15,
 			}).catch(onError)
 			interval = setInterval(
 				() => checkForNewMarksAndNotify('Активное приложение'),
@@ -128,7 +131,7 @@ if (Platform.OS !== 'ios') {
 			)
 		} else {
 			MarksNotificationStore.log('info', 'Состояние: Выключено')
-			BackgroundFetch.unregisterTaskAsync(TASK_ID).catch(() => {})
+			BackgroundTask.unregisterTaskAsync(TASK_ID).catch(() => {})
 			clearInterval(interval)
 		}
 	})
@@ -140,7 +143,7 @@ function onError(reason: unknown) {
 
 export async function checkForNewMarksAndNotify(
 	text = 'Фоновый запрос',
-): Promise<BackgroundFetchResult> {
+): Promise<BackgroundTaskResult> {
 	MarksNotificationStore.log('info', `${text}: Запрос новых оценок...`)
 
 	const { studentId } = XSettings
@@ -163,9 +166,7 @@ export async function checkForNewMarksAndNotify(
 			`Успешно! ${newMarks ? `Новых оценок: ${newMarks}` : 'Новых оценок нет'}`,
 		)
 
-		return newMarks
-			? BackgroundFetchResult.NewData
-			: BackgroundFetchResult.NoData
+		return BackgroundTaskResult.Success
 	} catch (e) {
 		return MarksNotificationStore.log('error', 'Unable to fetch:', e)
 	}
@@ -173,6 +174,7 @@ export async function checkForNewMarksAndNotify(
 
 function checkForNewMarks(marks: Assignment[]) {
 	let newMarks = 0
+	const firstRun = MarksNotificationStore.notified.length === 0
 
 	for (const assignment of marks.filter(e => typeof e.result === 'number')) {
 		const oldId = assignment.assignmentId + ''
@@ -187,6 +189,8 @@ function checkForNewMarks(marks: Assignment[]) {
 			!MarksNotificationStore.notified.includes(superNewId)
 		) {
 			runInAction(() => MarksNotificationStore.notified.push(newId))
+
+			if (firstRun) continue
 
 			MarksNotificationStore.log('info', newId)
 
