@@ -97,9 +97,11 @@ const MainSettings = memo(function MainSettings(
 				description={'Тех поддержка и юр. сведения'}
 			/>
 			<View style={{ alignItems: 'center', margin: Spacings.s2 }}>
-				<HelperText type="info">
+				<HelperText type="info" style={{ textAlign: 'center' }}>
 					{Application.applicationName} {Application.nativeApplicationVersion}{' '}
 					<MicroUpdate />
+					{'\n'}
+					{Application.applicationId}
 				</HelperText>
 			</View>
 		</ScrollView>
@@ -123,6 +125,6 @@ const SelectStudent = observer(function SelectStudent() {
 			/>
 		)
 	) : (
-		<Loading text="Войдите в аккаунт!" />
+		<Loading text="Для выбора ученика авторизуйтесь" />
 	)
 })

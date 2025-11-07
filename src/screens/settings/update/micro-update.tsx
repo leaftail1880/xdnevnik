@@ -5,7 +5,7 @@ import * as Updates from 'expo-updates'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { Button, HelperText, Text } from 'react-native-paper'
+import { Button, HelperText, Text, TouchableRipple } from 'react-native-paper'
 
 export default observer(function MicroUpdateId() {
 	const updateId = Updates.updateId?.slice(-6) ?? 'из сборки'
@@ -13,36 +13,49 @@ export default observer(function MicroUpdateId() {
 
 	const update = isUpdateAvailable
 
-	return (
+	const text = (
 		<Text
 			onPress={openModal}
 			style={{
-				backgroundColor: update
-					? Theme.colors.errorContainer
-					: Theme.colors.background,
-
 				color: update ? Theme.colors.error : Theme.colors.onSecondaryContainer,
 
 				fontWeight: update ? 'bold' : 'normal',
 			}}
 		>
+			{update && 'Обновление: '}
 			{updateId}
 		</Text>
 	)
+
+	if (update)
+		return (
+			<TouchableRipple
+				onPress={openModal}
+				style={{
+					backgroundColor: Theme.colors.errorContainer,
+					paddingVertical: 2,
+					paddingHorizontal: 8,
+					borderRadius: Theme.roundness,
+				}}
+			>
+				{text}
+			</TouchableRipple>
+		)
+	return text
 })
 
 enum UpdateCheckState {
-	default,
-	notAvailable,
-	available,
-	error,
+	Default,
+	NotAvailable,
+	Available,
+	Error,
 }
 
 const states: Record<UpdateCheckState, string> = {
-	[UpdateCheckState.default]: 'Проверить наличие микрообновлений',
-	[UpdateCheckState.error]: 'Ошибка',
-	[UpdateCheckState.available]: 'Проверить наличие микрообновлений',
-	[UpdateCheckState.notAvailable]: 'Нет обновлений',
+	[UpdateCheckState.Default]: 'Проверить наличие микрообновлений',
+	[UpdateCheckState.Error]: 'Ошибка',
+	[UpdateCheckState.Available]: 'Проверить наличие микрообновлений',
+	[UpdateCheckState.NotAvailable]: 'Нет обновлений',
 }
 
 const openModal = () => ModalAlert.show('Микрообновления', <MicroUpdateModal />)
@@ -63,14 +76,14 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		? 'Запущено из сборки'
 		: 'Запущено из микрообновления'
 
-	const [state, setState] = useState(UpdateCheckState.default)
+	const [state, setState] = useState(UpdateCheckState.Default)
 
-	const timeout = useRef<number | undefined>()
+	const timeout = useRef<number | undefined>(undefined)
 	useEffect(() => {
 		if (timeout.current) clearTimeout(timeout.current)
-		if (state !== UpdateCheckState.default) {
+		if (state !== UpdateCheckState.Default) {
 			timeout.current = setTimeout(
-				() => setState(UpdateCheckState.default),
+				() => setState(UpdateCheckState.Default),
 				5000,
 			) as unknown as number
 		}
@@ -80,7 +93,7 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 		try {
 			onResolve(await promise)
 		} catch (e) {
-			setState(UpdateCheckState.error)
+			setState(UpdateCheckState.Error)
 		}
 	}
 
@@ -93,8 +106,8 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 						wrap(Updates.checkForUpdateAsync(), e =>
 							setState(
 								e.isAvailable
-									? UpdateCheckState.available
-									: UpdateCheckState.notAvailable,
+									? UpdateCheckState.Available
+									: UpdateCheckState.NotAvailable,
 							),
 						)
 					}
@@ -108,10 +121,10 @@ const MicroUpdateModal = observer(function MicroUpdateModal() {
 					onPress={() =>
 						wrap(Updates.fetchUpdateAsync(), result => {
 							if (result.isNew || result.isRollBackToEmbedded) {
-								setState(UpdateCheckState.available)
+								setState(UpdateCheckState.Available)
 								Updates.reloadAsync()
 							} else {
-								setState(UpdateCheckState.notAvailable)
+								setState(UpdateCheckState.NotAvailable)
 							}
 						})
 					}

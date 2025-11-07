@@ -2,7 +2,6 @@ import { runInAction } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import React, { memo, useCallback } from 'react'
 import { FlatList, FlatListProps, ListRenderItem } from 'react-native'
-import { Chip } from 'react-native-paper'
 import { TotalsScreenParams } from '../navigation'
 
 import Loading from '@/components/Loading'
@@ -20,6 +19,7 @@ import {
 	TotalsStore,
 } from '@/services/net-school/store'
 import { Spacings } from '@/utils/Spacings'
+import { ToggleChip } from '@/components/ToggleChip'
 import SubjectPerformanceInline from './Subject'
 import { TermStore, TermStoreSortModes } from './state'
 
@@ -73,48 +73,28 @@ const ChipsRow = observer(function Header() {
 				/>
 			)}
 
-			<Filter store={TermStore} storeKey="attendance" label="Пропуски" />
-			<Filter store={TermStore} storeKey="toGetMark" label="Целевая оценка" />
-			<Filter
+			<ToggleChip store={TermStore} storeKey="attendance" label="Пропуски" />
+			<ToggleChip
+				store={TermStore}
+				storeKey="toGetMark"
+				label="Целевая оценка"
+			/>
+			<ToggleChip
 				store={TermStore}
 				storeKey="shortStats"
 				label="Краткая статистика"
 			/>
-			<Filter
+			<ToggleChip
 				store={TermStore}
 				storeKey="attendanceStats"
 				label="Посещаемость"
 			/>
-			<Filter
+			<ToggleChip
 				store={TermStore}
 				storeKey="attestationStats"
 				label="Аттестация"
 			/>
 		</Chips>
-	)
-})
-
-const Filter = observer(function Filter<T extends object>(props: {
-	store: T
-	storeKey: keyof FilterObject<T, boolean>
-	label: string
-}) {
-	const onPress = useCallback(() => {
-		runInAction(
-			() =>
-				((props.store[props.storeKey] as boolean) =
-					!props.store[props.storeKey]),
-		)
-	}, [props.store, props.storeKey])
-	return (
-		<Chip
-			mode="flat"
-			selected={props.store[props.storeKey] as boolean}
-			compact
-			onPress={onPress}
-		>
-			{props.label}
-		</Chip>
 	)
 })
 

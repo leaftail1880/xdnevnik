@@ -5,7 +5,7 @@ import Loading from '@/components/Loading'
 import SubjectName from '@/components/SubjectName'
 import SubjectMarks from './Marks'
 
-import { LANG } from '@/constants'
+import { Screens } from '@/constants'
 import { Theme } from '@/models/theme'
 import { Spacings } from '@/utils/Spacings'
 import { useCallback } from 'react'
@@ -16,7 +16,7 @@ export default observer(function TermSubject(props: SubjectInfo) {
 	const openDetails = useCallback(
 		() =>
 			term &&
-			props.navigation.navigate(LANG['s_subject_totals'], {
+			props.navigation.navigate(Screens.SubjectTotals, {
 				termId: props.selectedTerm.id,
 				finalMark: term.mark,
 				subjectId: props.total.subjectId,

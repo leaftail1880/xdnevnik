@@ -102,7 +102,7 @@ export class NetSchoolError extends RequestError {
 export class NetSchoolApi {
 	static async fetchEndpoints() {
 		const result = await fetch(ROUTES.getEndPointsList)
-			.then<RawEndpoints>(res => res.json())
+			.then(res => res.json() as unknown as RawEndpoints)
 			.then<Endpoint[]>(res =>
 				res.items
 					.filter(e => !e.demo && !/demo/i.test(e.name))
@@ -231,7 +231,11 @@ export class NetSchoolApi {
 		}
 
 		if (response.ok) {
-			const json = await response.json()
+			const json = (await response.json()) as {
+				access_token?: string
+				refresh_token?: string
+				expires_in?: string
+			}
 			runInAction(() => {
 				this.session = {
 					access_token: json.access_token || '',
@@ -274,9 +278,16 @@ export class NetSchoolApi {
 		fetchFn: (
 			url: string,
 			init: RequestInit,
-		) => Promise<{ status: number; ok: boolean; json(): Promise<T> }> = fetch,
+		) => Promise<{
+			status: number
+			ok: boolean
+			json(): Promise<unknown>
+		}> = fetch,
 	): Promise<T> {
-		const request: RequestInit & { headers: Record<string, string> } = {
+		const request: RequestInit & {
+			headers: Record<string, string>
+			signal?: any
+		} = {
 			headers: {},
 		}
 
@@ -351,7 +362,7 @@ export class NetSchoolApi {
 				throw error
 			}
 
-			const json = await response.json()
+			const json = (await response.json()) as T
 			runInAction(() => {
 				this.cache[url] = [Date.now(), json]
 				// for (const [key, [date]] of Object.entries(this.cache)) {

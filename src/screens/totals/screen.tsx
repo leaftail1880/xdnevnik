@@ -23,7 +23,7 @@ export default observer(function TotalsNavigation() {
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				animationEnabled: true,
+				animation: 'default',
 				presentation: 'modal',
 			}}
 		>

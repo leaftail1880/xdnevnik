@@ -1,7 +1,7 @@
 name: Build APK for Android
 on:
   push:
-    tags: ['*']
+    tags: ["*"]
   workflow_dispatch:
 
 jobs:
@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      NODE_ENV: production
     steps:
       - name: 🏗 Check for EXPO_TOKEN
         run: |
@@ -32,8 +33,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           architecture: x64
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: 🏗 Enable corepack
         run: corepack enable
@@ -45,7 +46,7 @@ jobs:
           cache: yarn
 
       - name: 🏗 Setup EAS
-        uses: expo/expo-github-action@v8
+        uses: expo/expo-github-action@main # expo hates users who refuse to use their managed workflows: https://github.com/expo/expo-github-action/issues/340#issuecomment-2939175617
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
@@ -59,13 +60,13 @@ jobs:
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
-      - name: 🚀 Upload main apk
+      - name: 🚀 Upload main apk to github release assts
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: XDnevnik.apk
 
-      - name: 🚀 Upload main apk
+      - name: 🏁 Upload main apk to actions artifacts
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
@@ -75,13 +76,13 @@ jobs:
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
 
-      - name: 🚀 Upload dev client
+      - name: 🚀 Upload dev client to github release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: XDnevnik Dev Client.apk
 
-      - name: 🚀 Upload main apk
+      - name: 🏁 Upload dev client apk to actions artifacts
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:

@@ -1,5 +1,5 @@
 import { GithubRelease } from '@/services/github/entities'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import * as IntentLauncherAndroid from 'expo-intent-launcher'
 import * as ExpoSharing from 'expo-sharing'
 import { runInAction } from 'mobx'

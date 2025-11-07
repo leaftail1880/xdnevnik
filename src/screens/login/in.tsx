@@ -69,10 +69,11 @@ export const LoginScreenContent = observer(function LoginScreenContent() {
 		}
 
 		if (regionName) {
-			BackHandler.addEventListener('hardwareBackPress', goBack)
+			const listener = BackHandler.addEventListener('hardwareBackPress', goBack)
+			return () => listener.remove()
 		}
 
-		return () => BackHandler.removeEventListener('hardwareBackPress', goBack)
+		return () => void 0
 	}, [regionName])
 
 	if (loggingIn) return <Loading text="Авторизация..." />

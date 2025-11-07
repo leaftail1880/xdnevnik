@@ -1,4 +1,4 @@
-import { Theme, ThemeStore } from '@/models/theme'
+import { Theme } from '@/models/theme'
 import { observer } from 'mobx-react-lite'
 import { memo } from 'react'
 import { View } from 'react-native'
@@ -10,21 +10,20 @@ import ColorPicker, {
 } from 'reanimated-color-picker'
 
 export default observer(function AccentColorPicker() {
-	const meta = ThemeStore.meta(Theme)
 	return (
 		<List.Section title="Акценты">
 			<List.Item title="Цвет акцентов"></List.Item>
 			<ColorPicker
 				style={{ width: '90%', alignSelf: 'center' }}
-				value={meta.accentColor}
-				onComplete={color => Theme.setAccentColor(color.hex)}
+				value={Theme.manage.getAccentColor()}
+				onComplete={color => Theme.manage.setAccentColor(color.hex)}
 			>
 				<ColorPickerPanel />
-				<Swatches colors={meta.accentColors} />
+				<Swatches colors={Theme.manage.getAccentColors()} />
 			</ColorPicker>
 			<List.Item
 				title={'Очистить использованные цвета'}
-				onPress={meta.clearAccentColors}
+				onPress={Theme.manage.clearSelectedAccentColors}
 				left={props => <List.Icon icon="delete" {...props}></List.Icon>}
 			></List.Item>
 		</List.Section>

@@ -1,15 +1,15 @@
 name: Expo Update
-on: 
+on:
   push:
     branches:
       - master
     paths:
-      - 'src/**.ts'
-      - 'src/**.tsx'
+      - "src/**.ts"
+      - "src/**.tsx"
   workflow_dispatch:
 
 env:
-  SENTRY_URL: 'https://sentry.io'
+  SENTRY_URL: "https://sentry.io"
 
 jobs:
   update:
@@ -42,7 +42,7 @@ jobs:
           cache: yarn
 
       - name: 🏗 Setup EAS
-        uses: expo/expo-github-action@v8
+        uses: expo/expo-github-action@main # expo hates users who refuse to use their managed workflows: https://github.com/expo/expo-github-action/issues/340#issuecomment-2939175617
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: 📦 Cache jest
         uses: actions/cache@v4
-        with: 
+        with:
           path: .jest
           key: ${{ runner.os }}-jest-cache
 

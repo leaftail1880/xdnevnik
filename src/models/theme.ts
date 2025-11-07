@@ -3,12 +3,11 @@ import {
 	DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native'
 
-import * as NavigationBar from 'expo-navigation-bar'
 import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
-import { makeAutoObservable, runInAction, toJS } from 'mobx'
-import { Appearance, AppState, Platform, StatusBar } from 'react-native'
+import { makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
+import { Appearance, AppState, StatusBar } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -25,17 +24,6 @@ type PersistentKeys = Record<'scheme' | 'accentColor', string> & {
 
 export class ThemeStore {
 	static readonly defaultAccentColor = '#578059'
-	static readonly defaultScheme: ThemeName = 'light'
-	static meta(store: ThemeStore) {
-		return {
-			accentColor: store.accentColor,
-			accentColors: store.accentColors,
-			clearAccentColors: store.clearSelectedAccentColors,
-			theme: store.theme,
-			loading: store.loading,
-			updateColorScheme: store.updateColorScheme,
-		}
-	}
 	static getDefaultAccentColors() {
 		return [this.defaultAccentColor, '#427979', '#3C639C', '#967857', '#926759']
 	}
@@ -45,8 +33,21 @@ export class ThemeStore {
 	private theme = this.generateTheme()
 	private loading = true
 
-	public scheme: SchemeName = ThemeStore.defaultScheme
+	private scheme: SchemeName = 'system'
 	public roundness = 5
+
+	public manage = {
+		isLoading: () => this.loading,
+		getTheme: () => this.theme,
+
+		getScheme: () => this.scheme,
+		setScheme: this.setScheme.bind(this),
+
+		getAccentColor: () => this.accentColor,
+		getAccentColors: () => this.accentColors,
+		setAccentColor: this.setAccentColor.bind(this),
+		clearSelectedAccentColors: this.clearSelectedAccentColors.bind(this),
+	}
 
 	get key() {
 		return this.accentColor + this.theme
@@ -68,7 +69,9 @@ export class ThemeStore {
 		return toJS(this.theme.fonts)
 	}
 
-	constructor() {
+	constructor(setup = true) {
+		if (!setup) return
+
 		makeAutoObservable<this, 'isDark'>(
 			this,
 			{ isDark: false },
@@ -91,18 +94,29 @@ export class ThemeStore {
 			}),
 		)
 
+		AppState.addEventListener('change', state => {
+			if (state === 'inactive' || state === 'background') return
+			this.updateSystemBars()
+		})
+
+		reaction(
+			() => this.roundness,
+			() => this.updateColorScheme(),
+		)
+
 		Appearance.addChangeListener(this.updateColorScheme)
-    AppState.addEventListener("change", (state) => {
-       // if (state === "inactive" || state === "background") return
-       this.updateSystemBars()
-    })
 	}
 
 	private get isDark() {
 		return Appearance.getColorScheme() === 'dark'
 	}
 
-	setAccentColor(color: string) {
+	private setScheme(theme: SchemeName) {
+		this.scheme = theme
+		Appearance.setColorScheme(theme === 'system' ? null : theme)
+	}
+
+	private setAccentColor(color: string) {
 		color = color.slice(0, 7)
 		if (!this.accentColors.includes(color)) this.accentColors.push(color)
 		this.accentColor = color
@@ -124,14 +138,15 @@ export class ThemeStore {
 	private async updateSystemBars() {
 		const promises: Promise<void>[] = []
 
-		if (Platform.OS === 'android') {
-			promises.push(
-				NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark'),
-				NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar),
-				NavigationBar.setVisibilityAsync('visible'),
-			)
-		}
-		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.background))
+		// disabled with edge-to-edge enabled
+		// if (Platform.OS === 'android') {
+		// 	promises.push(
+		// 		NavigationBar.setButtonStyleAsync(this.isDark ? 'light' : 'dark'),
+		// 		NavigationBar.setBackgroundColorAsync(Theme.colors.navigationBar),
+		// 		NavigationBar.setVisibilityAsync('visible'),
+		// 	)
+		// }
+		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.navigationBar))
 
 		// If i use it as react component it does not update half of the time
 		StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
