@@ -26,10 +26,10 @@ export default {
 		'/node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@material)',
 		'/node_modules/react-native-reanimated/plugin/',
 	],
-	setupFiles: [
+	setupFilesAfterEnv: [
+		'./jest.setup.ts',
 		'./src/utils/configure.ts',
 		'./src/utils/polyfill.ts',
-		'./jest.setup.ts',
 	],
 	globals: {
 		__DEV__: true,

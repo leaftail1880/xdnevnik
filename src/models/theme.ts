@@ -7,7 +7,13 @@ import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
-import { Appearance, AppState, StatusBar } from 'react-native'
+import {
+	Appearance,
+	AppState,
+	Platform,
+	PlatformColor,
+	StatusBar,
+} from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -150,7 +156,9 @@ export class ThemeStore {
 
 		// If i use it as react component it does not update half of the time
 		StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
-		StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
+		if (Platform.OS === 'android') {
+			StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
+		}
 
 		await Promise.all(promises).catch(captureException)
 	}

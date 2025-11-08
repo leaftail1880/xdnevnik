@@ -17,7 +17,7 @@ configurePersistable({
 	},
 })
 
-setTimeout(() => storage.trim(), 20000) // Cleanup
+if (!__TEST__) setTimeout(() => storage.trim(), 20000) // Cleanup
 
 export function getTotalStorageSize() {
 	return storage.size
