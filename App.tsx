@@ -10,32 +10,31 @@ import { Screens } from '@/constants'
 
 // External dependencies
 import {
-	BottomTabBarProps,
-	BottomTabScreenProps,
-	createBottomTabNavigator,
+  BottomTabBarProps,
+  BottomTabScreenProps,
+  createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
 import {
-	CommonActions,
-	DefaultTheme,
-	NavigationContainer,
-	NavigationContainerRef,
+  CommonActions,
+  DefaultTheme,
+  NavigationContainer,
+  NavigationContainerRef,
 } from '@react-navigation/native'
 import * as Sentry from '@sentry/react-native'
 import * as SplashScreen from 'expo-splash-screen'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Easing, useWindowDimensions, View } from 'react-native'
 import {
-	BottomNavigation,
-	Icon,
-	PaperProvider,
-	TouchableRipple,
+  BottomNavigation,
+  Icon,
+  PaperProvider,
+  TouchableRipple,
 } from 'react-native-paper'
 import {
-	SafeAreaProvider,
-	SafeAreaView,
-	useSafeAreaInsets,
+  SafeAreaProvider,
+  SafeAreaView,
 } from 'react-native-safe-area-context'
 
 // Components
@@ -61,214 +60,212 @@ import UsefullTools from '@/screens/usefull-tools/screen'
 
 import type { TermNavigationParamMap } from '@/screens/totals/navigation'
 
-SplashScreen.setOptions({
-	duration: 400,
-	fade: true,
-})
 
 type BottomTabsParams = Record<
-	| Screens.LogIn
-	| Screens.LogOut
-	| Screens.Diary
-	| Screens.Settings
-	| Screens.UsefullTools,
-	undefined
+  | Screens.LogIn
+  | Screens.LogOut
+  | Screens.Diary
+  | Screens.Settings
+  | Screens.UsefullTools,
+  undefined
 > & {
-	[Screens.Totals]:
-		| {
-				screen: Screens.SubjectTotals
-				params: TermNavigationParamMap[Screens.SubjectTotals]
-		  }
-		| undefined
+  [Screens.Totals]:
+  | {
+    screen: Screens.SubjectTotals
+    params: TermNavigationParamMap[Screens.SubjectTotals]
+  }
+  | undefined
 }
 
 export type XBottomTabScreenProps = BottomTabScreenProps<BottomTabsParams>
 
 const ScreenIcons = {
-	[Screens.LogIn]: 'login',
-	[Screens.LogOut]: 'logout',
-	[Screens.Diary]: 'book',
-	[Screens.Totals]: 'school',
-	[Screens.Settings]: 'cog',
-	[Screens.UsefullTools]: 'tools',
+  [Screens.LogIn]: 'login',
+  [Screens.LogOut]: 'logout',
+  [Screens.Diary]: 'book',
+  [Screens.Totals]: 'school',
+  [Screens.Settings]: 'cog',
+  [Screens.UsefullTools]: 'tools',
 }
 
 // Refactored route configuration to be less repetitive
 const AppRoutes = [
-	{
-		name: Screens.LogIn,
-		component: LoginScreen,
-		hideCondition: () => API.session,
-	},
-	{
-		name: Screens.Diary,
-		component: DiaryScreen,
-		fallback: true,
-	},
-	{
-		name: Screens.Totals,
-		component: TotalsNavigation,
-		fallback: true,
-	},
-	{
-		name: Screens.Settings,
-		component: SettingsScreen,
-	},
-	{
-		name: Screens.UsefullTools,
-		component: UsefullTools,
-	},
+  {
+    name: Screens.LogIn,
+    component: LoginScreen,
+    hideCondition: () => API.session,
+  },
+  {
+    name: Screens.Diary,
+    component: DiaryScreen,
+    fallback: true,
+  },
+  {
+    name: Screens.Totals,
+    component: TotalsNavigation,
+    fallback: true,
+  },
+  {
+    name: Screens.Settings,
+    component: SettingsScreen,
+  },
+  {
+    name: Screens.UsefullTools,
+    component: UsefullTools,
+  },
 ]
 
 const Tab = createBottomTabNavigator<BottomTabsParams>()
 
 // Custom Tab Bar Component using BottomNavigation.Bar
 const CustomTabBar = observer(function CustomTabBar({
-	navigation,
-	state,
-	insets,
+  navigation,
+  state,
+  insets,
 }: BottomTabBarProps) {
-	return (
-		<BottomNavigation.Bar
-			navigationState={state}
-			safeAreaInsets={insets}
-			onTabPress={({ route, preventDefault }) => {
-				const event = navigation.emit({
-					type: 'tabPress',
-					target: route.key,
-					canPreventDefault: true,
-				})
+  return (
+    <BottomNavigation.Bar
+      navigationState={state}
+      safeAreaInsets={insets}
+      onTabPress={({ route, preventDefault }) => {
+        const event = navigation.emit({
+          type: 'tabPress',
+          target: route.key,
+          canPreventDefault: true,
+        })
 
-				if (event.defaultPrevented) {
-					preventDefault()
-				} else {
-					navigation.dispatch({
-						...CommonActions.navigate(route.name, route.params),
-						target: state.key,
-					})
-				}
-			}}
-			renderIcon={({ route, color }) => {
-				const iconName = ScreenIcons[route.name as keyof typeof ScreenIcons]
-				return <Icon source={iconName} color={color} size={23} />
-			}}
-			getLabelText={({ route }) => route.name}
-			activeColor={Theme.colors.onPrimaryContainer}
-			inactiveColor={Theme.colors.onSurfaceVariant}
-			style={{
-				backgroundColor: Theme.colors.navigationBar,
-				height: 65, // Fixed height instead of percentage
-			}}
-			renderTouchable={props => <TouchableRipple {...props} key={props.key} />}
-		/>
-	)
+        if (event.defaultPrevented) {
+          preventDefault()
+        } else {
+          navigation.dispatch({
+            ...CommonActions.navigate(route.name, route.params),
+            target: state.key,
+          })
+        }
+      }}
+      renderIcon={({ route, color }) => {
+        const iconName = ScreenIcons[route.name as keyof typeof ScreenIcons]
+        return <Icon source={iconName} color={color} size={23} />
+      }}
+      getLabelText={({ route }) => route.name}
+      activeColor={Theme.colors.onPrimaryContainer}
+      inactiveColor={Theme.colors.onSurfaceVariant}
+      style={{
+        backgroundColor: Theme.colors.navigationBar,
+        height: 65, // Fixed height instead of percentage
+      }}
+      renderTouchable={props => <TouchableRipple {...props} key={props.key} />}
+    />
+  )
 })
 
 export default Sentry.wrap(
-	observer(function App() {
-		const navigation = useRef<NavigationContainerRef<BottomTabsParams>>(null)
+  observer(function App() {
+    const navigation = useRef<NavigationContainerRef<BottomTabsParams>>(null)
 
-		if (Theme.manage.isLoading()) return <Loading text="Загрузка темы" />
+    if (Theme.manage.isLoading()) return <Loading text="Загрузка темы" />
 
-		const ProvidedTheme = toJS(Theme.manage.getTheme())
-		return (
-			<GestureHandlerRootView style={{ flex: 1 }}>
-				<SafeAreaProvider>
-					<SafeAreaView>
-						<PaperProvider theme={ProvidedTheme}>
-							<NavigationContainer
-								theme={{
-									...ProvidedTheme,
-									fonts: DefaultTheme.fonts,
-								}}
-								ref={navigation}
-								onReady={() =>
-									SENTRY_ROUTING.registerNavigationContainer(navigation)
-								}
-							>
-								<Navigation />
-							</NavigationContainer>
-							<Toast />
-						</PaperProvider>
-					</SafeAreaView>
-				</SafeAreaProvider>
-			</GestureHandlerRootView>
-		)
-	}),
+    const ProvidedTheme = toJS(Theme.manage.getTheme())
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <SafeAreaView>
+            <PaperProvider theme={ProvidedTheme}>
+              <NavigationContainer
+                theme={{
+                  ...ProvidedTheme,
+                  fonts: DefaultTheme.fonts,
+                }}
+                ref={navigation}
+                onReady={() =>
+                  SENTRY_ROUTING.registerNavigationContainer(navigation)
+                }
+              >
+                <Navigation />
+              </NavigationContainer>
+              <Toast />
+            </PaperProvider>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    )
+  }),
 )
 
 const Navigation = observer(function Navigation() {
-	let innerFallback: React.ReactNode | undefined
-	if (!API.session) {
-		innerFallback = <Loading text="Ожидание авторизации..." />
-	} else if (StudentsStore.fallback) {
-		innerFallback = StudentsStore.fallback
-	}
+  let innerFallback: React.ReactNode | undefined
+  if (!API.session) {
+    innerFallback = <Loading text="Ожидание авторизации..." />
+  } else if (StudentsStore.fallback) {
+    innerFallback = StudentsStore.fallback
+  }
 
-	let FallbackScreen: React.FC | undefined
-	if (innerFallback) {
-		FallbackScreen = () => (
-			<View>
-				{/* Show header when component's custom header is not rendered */}
-				<Header title="Загрузка..." />
-				{innerFallback}
-			</View>
-		)
-	}
+  let FallbackScreen: React.FC | undefined
+  if (innerFallback) {
+    FallbackScreen = () => (
+      <View>
+        {/* Show header when component's custom header is not rendered */}
+        <Header title="Загрузка..." />
+        {innerFallback}
+      </View>
+    )
+  }
 
-	const { width } = useWindowDimensions()
+  const { width } = useWindowDimensions()
 
-	return (
-		<Tab.Navigator
-			tabBar={props => <CustomTabBar {...props} />}
-			screenOptions={{
-				headerShown: false,
-				// The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7
-				// and changing bottom tabs navigator from paper to rn navigation shadows are not affected by opacity
-				// hence they flicker on screen. So instead we move the screen from the screen (lol)
+  useEffect(() => SplashScreen.hide(), [])
 
-				// Also i just found out that i like custom easing much more the default one
-				animation: 'shift',
-				transitionSpec: {
-					animation: 'timing',
-					config: {
-						duration: 300,
-						easing: Easing.out(Easing.exp), // Easing.elastic(1), // Easing.out(Easing.exp),
-					},
-				},
-				sceneStyleInterpolator: ({ current }) => ({
-					sceneStyle: {
-						opacity: current.progress.interpolate({
-							inputRange: [-1, 0, 1],
-							outputRange: [1, 1, 1],
-						}),
-						transform: [
-							{
-								translateX: current.progress.interpolate({
-									inputRange: [-1, 0, 1],
-									outputRange: [-width, 0, width],
-								}),
-							},
-						],
-					},
-				}),
-			}}
-		>
-			{AppRoutes.map(route => {
-				if (route.hideCondition?.()) return null
+  return (
+    <Tab.Navigator
+      tabBar={props => <CustomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+        // The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7
+        // and changing bottom tabs navigator from paper to rn navigation shadows are not affected by opacity
+        // hence they flicker on screen. So instead we move the screen from the screen (lol)
 
-				return (
-					<Tab.Screen
-						key={route.name}
-						name={route.name as keyof BottomTabsParams}
-						component={
-							route.fallback && FallbackScreen
-								? FallbackScreen
-								: route.component
-						}
-					/>
-				)
-			})}
-		</Tab.Navigator>
-	)
+        // Also i just found out that i like custom easing much more the default one
+        animation: 'shift',
+        transitionSpec: {
+          animation: 'timing',
+          config: {
+            duration: 300,
+            easing: Easing.out(Easing.exp), // Easing.elastic(1), // Easing.out(Easing.exp),
+          },
+        },
+        sceneStyleInterpolator: ({ current }) => ({
+          sceneStyle: {
+            opacity: current.progress.interpolate({
+              inputRange: [-1, 0, 1],
+              outputRange: [1, 1, 1],
+            }),
+            transform: [
+              {
+                translateX: current.progress.interpolate({
+                  inputRange: [-1, 0, 1],
+                  outputRange: [-width, 0, width],
+                }),
+              },
+            ],
+          },
+        }),
+      }}
+    >
+      {AppRoutes.map(route => {
+        if (route.hideCondition?.()) return null
+
+        return (
+          <Tab.Screen
+            key={route.name}
+            name={route.name as keyof BottomTabsParams}
+            component={
+              route.fallback && FallbackScreen
+                ? FallbackScreen
+                : route.component
+            }
+          />
+        )
+      })}
+    </Tab.Navigator>
+  )
 })
