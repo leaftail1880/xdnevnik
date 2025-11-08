@@ -59,3 +59,13 @@ export enum Screens {
 	UsefullTools = 'Инструменты',
 	SubjectTotals = 'Итоги по предмету',
 }
+
+import * as SplashScreen from 'expo-splash-screen'
+
+Logger.info('LOAD SPLASH SCREEN')
+
+SplashScreen.setOptions({
+	duration: 400,
+	fade: true,
+})
+SplashScreen.preventAutoHideAsync()

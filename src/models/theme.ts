@@ -7,13 +7,7 @@ import * as SystemUI from 'expo-system-ui'
 
 import { captureException } from '@sentry/react-native'
 import { makeAutoObservable, reaction, runInAction, toJS } from 'mobx'
-import {
-	Appearance,
-	AppState,
-	Platform,
-	PlatformColor,
-	StatusBar,
-} from 'react-native'
+import { Appearance, AppState, Platform, StatusBar } from 'react-native'
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper'
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types'
 import { Logger } from '../constants'
@@ -75,9 +69,8 @@ export class ThemeStore {
 		return toJS(this.theme.fonts)
 	}
 
-	constructor(setup = true) {
-		if (!setup) return
-
+	constructor() {
+		Logger.info('THEME CREATE')
 		makeAutoObservable<this, 'isDark'>(
 			this,
 			{ isDark: false },
@@ -92,6 +85,7 @@ export class ThemeStore {
 		).then(() =>
 			runInAction(() => {
 				try {
+					Logger.info('THEME LOADED')
 					this.loading = false
 					this.setAccentColor(this.accentColor)
 				} catch (e) {
@@ -105,12 +99,14 @@ export class ThemeStore {
 			this.updateSystemBars()
 		})
 
+		Appearance.addChangeListener(this.updateColorScheme)
+
 		reaction(
 			() => this.roundness,
 			() => this.updateColorScheme(),
 		)
 
-		Appearance.addChangeListener(this.updateColorScheme)
+		this.updateSystemBars()
 	}
 
 	private get isDark() {
@@ -161,6 +157,8 @@ export class ThemeStore {
 		}
 
 		await Promise.all(promises).catch(captureException)
+
+		Logger.info('UPDATE SYSTEM BARS')
 	}
 
 	private generateTheme() {

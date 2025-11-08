@@ -6,7 +6,7 @@ import '@/services/sentry'
 
 import '@/utils/configure'
 
-import { Screens } from '@/constants'
+import { Logger, Screens } from '@/constants'
 
 // External dependencies
 import {
@@ -21,10 +21,10 @@ import {
 	NavigationContainerRef,
 } from '@react-navigation/native'
 import * as Sentry from '@sentry/react-native'
-// import * as SplashScreen from 'expo-splash-screen'
+import * as SplashScreen from 'expo-splash-screen'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Easing, useWindowDimensions, View } from 'react-native'
 import {
 	BottomNavigation,
@@ -151,7 +151,6 @@ const CustomTabBar = observer(function CustomTabBar({
 			inactiveColor={Theme.colors.onSurfaceVariant}
 			style={{
 				backgroundColor: Theme.colors.navigationBar,
-				height: 65, // Fixed height instead of percentage
 			}}
 			renderTouchable={props => <TouchableRipple {...props} key={props.key} />}
 		/>
@@ -161,6 +160,8 @@ const CustomTabBar = observer(function CustomTabBar({
 export default Sentry.wrap(
 	observer(function App() {
 		const navigation = useRef<NavigationContainerRef<BottomTabsParams>>(null)
+
+		Logger.info('APP LOAD THEME IS LOADING ' + Theme.manage.isLoading())
 
 		if (Theme.manage.isLoading()) return <Loading text="Загрузка темы" />
 
@@ -190,6 +191,8 @@ export default Sentry.wrap(
 )
 
 const Navigation = observer(function Navigation() {
+	Logger.info('NAVIGATION RENDER')
+
 	let innerFallback: React.ReactNode | undefined
 	if (!API.session) {
 		innerFallback = <Loading text="Ожидание авторизации..." />
@@ -210,12 +213,16 @@ const Navigation = observer(function Navigation() {
 
 	const { width } = useWindowDimensions()
 
-	// useEffect(() => SplashScreen.hide(), [])
+	const insets = useSafeAreaInsets()
+	useEffect(() => {
+		Logger.info('SPLASH SCREEN HIDE')
+		SplashScreen.hide()
+	}, [])
 
 	return (
 		<Tab.Navigator
 			tabBar={props => <CustomTabBar {...props} />}
-			safeAreaInsets={useSafeAreaInsets()}
+			safeAreaInsets={insets}
 			screenOptions={{
 				headerShown: false,
 				// The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7

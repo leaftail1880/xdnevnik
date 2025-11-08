@@ -1,13 +1,5 @@
 import 'react-native-url-polyfill'
 
-// import * as SplashScreen from 'expo-splash-screen'
-
-// SplashScreen.setOptions({
-// 	duration: 400,
-// 	fade: true,
-// })
-// SplashScreen.preventAutoHideAsync()
-
 // @ts-expect-error Global variable
 globalThis.__TEST__ ??= false
 

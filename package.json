@@ -109,9 +109,6 @@
 	"dependenciesMeta": {
 		"react-native-mmkv": {
 			"built": false
-		},
-		"react-native-nitro-modules": {
-			"built": false
 		}
 	},
 	"packageManager": "yarn@4.9.1"

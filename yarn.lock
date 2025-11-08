@@ -15216,8 +15216,6 @@ __metadata:
   dependenciesMeta:
     react-native-mmkv:
       built: false
-    react-native-nitro-modules:
-      built: false
   languageName: unknown
   linkType: soft
 
