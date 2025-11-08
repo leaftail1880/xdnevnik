@@ -7326,17 +7326,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-background-fetch@npm:~14.0.7":
-  version: 14.0.7
-  resolution: "expo-background-fetch@npm:14.0.7"
-  dependencies:
-    expo-task-manager: "npm:~14.0.7"
-  peerDependencies:
-    expo: "*"
-  checksum: 10c0/4934f99f95a43ab7ac1fd85ca0f70d76f7bf2701d8896cd76b9dfb0485547dd47258319954bc9fdac7de199c896ec32c6b1770a75436daa85aefd8ee1609e433
-  languageName: node
-  linkType: hard
-
 "expo-background-task@npm:^1.0.8":
   version: 1.0.8
   resolution: "expo-background-task@npm:1.0.8"
@@ -15208,7 +15197,6 @@ __metadata:
     eslint-plugin-react-native: "npm:^5.0.0"
     expo: "npm:54"
     expo-application: "npm:~7.0.7"
-    expo-background-fetch: "npm:~14.0.7"
     expo-background-task: "npm:^1.0.8"
     expo-build-properties: "npm:~1.0.9"
     expo-dev-client: "npm:~6.0.17"
