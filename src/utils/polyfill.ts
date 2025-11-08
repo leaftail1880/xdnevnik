@@ -1,12 +1,12 @@
 import 'react-native-url-polyfill'
 
-import * as SplashScreen from 'expo-splash-screen'
+// import * as SplashScreen from 'expo-splash-screen'
 
-SplashScreen.setOptions({
-	duration: 400,
-	fade: true,
-})
-SplashScreen.preventAutoHideAsync()
+// SplashScreen.setOptions({
+// 	duration: 400,
+// 	fade: true,
+// })
+// SplashScreen.preventAutoHideAsync()
 
 // @ts-expect-error Global variable
 globalThis.__TEST__ ??= false
@@ -44,7 +44,6 @@ if (__DEV__) {
 Date.prototype.toNetSchool = function (this: Date) {
 	return this.toJSON().split('T')[0]
 }
-
 
 Date.prototype.getDayFromMonday = function (this: Date) {
 	return [6, 0, 1, 2, 3, 4, 5][this.getDay()]

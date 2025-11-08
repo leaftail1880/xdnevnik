@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.26.1'
+const version = '0.26.2'
 const slug = 'xdnevnik'
 const name = 'XDnevnik'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
@@ -73,10 +73,10 @@ const Config = {
 			[
 				'expo-navigation-bar',
 				{
-					position: 'relative',
+					// position: 'relative',
 					visibility: 'visible',
-					behavior: 'inset-swipe',
-          backgroundColor: "#ffffff00"
+					// behavior: 'inset-swipe',
+					backgroundColor: '#ffffff00',
 				},
 			],
 			[
@@ -138,8 +138,8 @@ Config.expo = withGradleProperties(Config.expo, config => {
 		{
 			type: 'property',
 			key: 'org.gradle.caching',
-			value: 'true'
-		}
+			value: 'true',
+		},
 	)
 
 	return config
