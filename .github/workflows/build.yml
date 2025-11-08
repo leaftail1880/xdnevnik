@@ -11,6 +11,8 @@ jobs:
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       NODE_ENV: production
+      EAS_LOCAL_BUILD_WORKINGDIR: "/home/runner/work/xdnevnik/android-build"
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: 1 # preserve directory from above
 
     steps:
       - name: 🏗 Check for EXPO_TOKEN
@@ -83,13 +85,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-build
 
-      - name: CHeck
-        run: node -e "const {AndroidConfig}=require('@expo/config-plugins');const projectRoot='.';Promise.all([AndroidConfig.Paths.getAppBuildGradleAsync(projectRoot),AndroidConfig.Paths.getProjectBuildGradleAsync(projectRoot),AndroidConfig.Paths.getAndroidManifestAsync(projectRoot),AndroidConfig.Paths.getMainApplicationAsync(projectRoot)]).then(console.log).catch(console.error)"
-
-      - run: node -e "import fs from 'fs'; fs.writeFileSync('.gitignore', '')"
-
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
+
+      - run: ls $EAS_LOCAL_BUILD_WORKINGDIR
+
+      - run: ls $EAS_LOCAL_BUILD_WORKINGDIR/build/
+
+      - run: ls android
+
+      - run: mkdir ./android/build || true
+
+      - run: cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/ ./android/
 
       - name: 🚀 Upload main apk to github release assts
         uses: softprops/action-gh-release@v1
@@ -107,6 +114,8 @@ jobs:
       - run: ls
 
       - run: ls android
+
+      - run: rm -rf $EAS_LOCAL_BUILD_WORKINGDIR
 
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local

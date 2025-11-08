@@ -26,8 +26,7 @@
 		"whatwg-url-without-unicode@npm:8.0.0-3": "patch:whatwg-url-without-unicode@npm%3A8.0.0-3#~/.yarn/patches/whatwg-url-without-unicode-npm-8.0.0-3-d98937d586.patch",
 		"metro-file-map@npm:0.81.0": "patch:metro-file-map@npm%3A0.81.0#~/.yarn/patches/metro-file-map-npm-0.81.0-e187ae7c0f.patch",
 		"form-data": "4.0.1",
-		"react-native-safe-area-context": "5.6.2",
-		"@expo/cli@npm:54.0.16": "patch:@expo/cli@npm%3A54.0.16#~/.yarn/patches/@expo-cli-npm-54.0.16-eac0c81453.patch"
+		"react-native-safe-area-context": "5.6.2"
 	},
 	"dependencies": {
 		"@boterop/react-native-background-timer": "^2.6.0",
@@ -52,7 +51,7 @@
 		"expo-status-bar": "~3.0.8",
 		"expo-system-ui": "~6.0.8",
 		"expo-task-manager": "~14.0.8",
-		"expo-updates": "patch:expo-updates@npm%3A29.0.12#~/.yarn/patches/expo-updates-npm-29.0.12-9437c70864.patch",
+		"expo-updates": "~29.0.12",
 		"mobx": "^6.15.0",
 		"mobx-persist-store": "^1.1.8",
 		"mobx-react-lite": "^4.1.1",
@@ -106,6 +105,14 @@
 		"swc-flow-jest": "portal:swc-flow-jest::locator=xdnevnik%40workspace%3A.",
 		"typescript": "~5.9.3",
 		"typescript-eslint": "^8.46.3"
+	},
+	"dependenciesMeta": {
+		"react-native-mmkv": {
+			"built": false
+		},
+		"react-native-nitro-modules": {
+			"built": false
+		}
 	},
 	"packageManager": "yarn@4.9.1"
 }
