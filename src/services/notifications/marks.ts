@@ -82,7 +82,7 @@ export const MarksNotificationStore = new (class {
 				.map(e => (e instanceof Error ? e.stack : String(e)))
 				.join(' ')}`,
 		)
-		Logger[level]('[BACKGROUND MARKS NOTIFICATIONS FETCH]', ...messages)
+		Logger[level]('[MARKS NOTIFICATIONS FETCH]', ...messages)
 		if (this.logs.length >= 100) this.logs.pop()
 		return level === 'error'
 			? BackgroundTaskResult.Failed
@@ -160,7 +160,6 @@ export async function checkForNewMarksAndNotify(
 			withoutMarks: false,
 			withExpiredClassAssign: true,
 		})
-    console.log()
 		const newMarks = checkForNewMarks(marks)
 		MarksNotificationStore.log(
 			'info',
