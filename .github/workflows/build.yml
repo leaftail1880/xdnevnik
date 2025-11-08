@@ -88,15 +88,11 @@ jobs:
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
-      - run: ls $EAS_LOCAL_BUILD_WORKINGDIR
-
-      - run: ls $EAS_LOCAL_BUILD_WORKINGDIR/build/
-
-      - run: ls android
-
-      - run: mkdir ./android/build || true
-
-      - run: cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/ ./android/
+      - name: 💾 Extract cache from build dir to local folders to be reused by devclient build and saved for later
+        run: |
+          cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/android/.gradle ./android/ 
+          cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/android/build ./android/ 
+          rm -rf $EAS_LOCAL_BUILD_WORKINGDIR
 
       - name: 🚀 Upload main apk to github release assts
         uses: softprops/action-gh-release@v1
@@ -115,7 +111,8 @@ jobs:
 
       - run: ls android
 
-      - run: rm -rf $EAS_LOCAL_BUILD_WORKINGDIR
+      - run: ls android/build
+      - run: ls android/.gradle
 
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
