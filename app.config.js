@@ -100,9 +100,7 @@ const Config = {
 			],
 		],
 
-		runtimeVersion: {
-			policy: 'appVersion',
-		},
+		runtimeVersion: version,
 		updates: {
 			url: `https://u.expo.dev/${projectId}`,
 		},
