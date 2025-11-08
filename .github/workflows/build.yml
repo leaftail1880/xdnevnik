@@ -49,8 +49,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            android/.gradle/
-            android/build/
+            ./android/.gradle/
+            ./android/build/
           key: ${{ runner.os }}-gradle-build
           restore-keys: |
             ${{ runner.os }}-gradle-build
@@ -92,6 +92,10 @@ jobs:
         with:
           name: XDnevnik.apk
           path: XDnevnik.apk
+
+      - run: ls 
+
+      - run: ls android
 
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
