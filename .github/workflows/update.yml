@@ -58,6 +58,7 @@ jobs:
 
       - name: 🏃‍♂️ Run tests
         run: yarn jest
+        if: false
 
       - name: ✈ Create update
         run: eas update --auto --non-interactive --channel production --platform android

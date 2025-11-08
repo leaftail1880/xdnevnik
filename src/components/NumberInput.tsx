@@ -69,7 +69,8 @@ export default function NumberInputSetting<
 				/>
 
 				{typeof props.defaultValue !== 'undefined' && (
-					<Button
+					<IconButton
+            icon={"undo-variant"}
 						onPress={() =>
 							runInAction(() => {
 								if (typeof props.defaultValue === 'undefined') return
@@ -77,9 +78,7 @@ export default function NumberInputSetting<
 								setValue(props.defaultValue?.toString() ?? '')
 							})
 						}
-					>
-						Сбросить...
-					</Button>
+					/>
 				)}
 			</View>
 
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		alignContent: 'center',
-		gap: Spacings.s2,
+		gap: Spacings.s1,
 		marginVertical: Spacings.s2,
 	},
 	textInput: { flex: 2, maxWidth: '50%' },
