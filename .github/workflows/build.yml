@@ -73,6 +73,9 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: 🏗 Install dependencies
+        run: yarn install
+
       - name: 🏗 Install sharp cli for image processing and eas-cli
         run: npm add -g sharp-cli eas-cli
 
