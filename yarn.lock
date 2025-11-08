@@ -7337,6 +7337,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-background-task@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "expo-background-task@npm:1.0.8"
+  dependencies:
+    expo-task-manager: "npm:~14.0.7"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/9cb9e1e7f6f5150df5da3df580ebb731be64dfb30a03dd9aff98d3aaab0dc72e30698fa328d6380692f69a7395283ebf9db64e3fb72b86eed651e9859b82d199
+  languageName: node
+  linkType: hard
+
 "expo-build-properties@npm:~1.0.9":
   version: 1.0.9
   resolution: "expo-build-properties@npm:1.0.9"
@@ -15198,6 +15209,7 @@ __metadata:
     expo: "npm:54"
     expo-application: "npm:~7.0.7"
     expo-background-fetch: "npm:~14.0.7"
+    expo-background-task: "npm:^1.0.8"
     expo-build-properties: "npm:~1.0.9"
     expo-dev-client: "npm:~6.0.17"
     expo-device: "npm:~8.0.9"
