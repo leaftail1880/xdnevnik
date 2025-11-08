@@ -16,3 +16,5 @@ jest.mock('react-native-webview', () => {
   const rn = jest.requireActual('react-native')
   return rn.View
 })
+
+jest.mock('react-native-nitro-modules', () => ({}));
