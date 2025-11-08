@@ -60,9 +60,11 @@ jobs:
       - name: 🏗 Install sharp cli for image processing and eas-cli
         run: npm add -g sharp-cli
 
-      # We can't inject cache into the place where building happens because
-      # it expects it to be empty directory. And yeaj building happens in separate place and
-      # whole project is archived and then transfered and thus yarn is run twicd
+      # Building happens at the separate directory. Files are being zipped into tar and then extracted
+      # gitignored files are ignored thus android folder is ignored and no cache is being used
+      # thats why we make gitignore empty
+      - run: node -e "import fs from 'fs'; fs.writeFileSync('.gitignore', '')"
+
       - name: Run prebuild to inject cache
         run: yarn expo prebuild -p android
 
