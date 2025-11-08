@@ -134,6 +134,11 @@ Config.expo = withGradleProperties(Config.expo, config => {
 			key: 'org.gradle.jvmargs',
 			value: '-Xmx3096m -XX:MaxMetaspaceSize=512m',
 		},
+		{
+			type: 'property',
+			key: 'org.gradle.caching',
+			value: 'true
+		}
 	)
 
 	return config
