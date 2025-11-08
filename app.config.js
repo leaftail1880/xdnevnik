@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.26.2'
+const version = '0.26.3'
 const slug = 'xdnevnik'
 const name = 'XDnevnik'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
@@ -100,7 +100,9 @@ const Config = {
 			],
 		],
 
-		runtimeVersion: version,
+		runtimeVersion: {
+			policy: 'appVersion',
+		},
 		updates: {
 			url: `https://u.expo.dev/${projectId}`,
 		},

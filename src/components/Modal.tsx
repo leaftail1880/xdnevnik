@@ -3,6 +3,7 @@ import { Spacings } from '@/utils/Spacings'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
 import { Button, Dialog, Portal, Text } from 'react-native-paper'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ModalAlert, Toast } from '../utils/Toast'
 
 // eslint-disable-next-line mobx/missing-observer
@@ -16,13 +17,14 @@ export default function ModalProvider() {
 }
 
 const ToastModal = observer(function ToastModal() {
+	const insets = useSafeAreaInsets()
 	return (
 		Toast.state && (
 			<View
 				onTouchStart={Toast.hide}
 				style={{
 					position: 'absolute',
-					bottom: 63,
+					bottom: insets.bottom + 80,
 					width: '100%',
 					margin: 0,
 					backgroundColor: Toast.state.error

@@ -60,11 +60,6 @@ jobs:
       - name: 🏗 Install sharp cli for image processing and eas-cli
         run: npm add -g sharp-cli
 
-      # Building happens at the separate directory. Files are being zipped into tar and then extracted
-      # gitignored files are ignored thus android folder is ignored and no cache is being used
-      # thats why we make gitignore empty
-      - run: node -e "import fs from 'fs'; fs.writeFileSync('.gitignore', '')"
-
       - name: Run prebuild to inject cache
         run: yarn expo prebuild -p android
 
@@ -75,26 +70,10 @@ jobs:
             ~/.gradle/
           key: ${{ runner.os }}-gradle
           restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: 💾 Cache Gradle build outputs
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./android/.gradle/
-            ./android/build/
-          key: ${{ runner.os }}-gradle-build
-          restore-keys: |
-            ${{ runner.os }}-gradle-build
+            ${{ runner.os }}-gradle
 
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
-
-      - name: 💾 Extract cache from build dir to local folders to be reused by devclient build and saved for later
-        run: |
-          cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/android/.gradle ./android/ 
-          cp -r $EAS_LOCAL_BUILD_WORKINGDIR/build/android/build ./android/ 
-          rm -rf $EAS_LOCAL_BUILD_WORKINGDIR
 
       - name: 🚀 Upload main apk to github release assts
         uses: softprops/action-gh-release@v1
@@ -108,13 +87,6 @@ jobs:
         with:
           name: XDnevnik.apk
           path: XDnevnik.apk
-
-      - run: ls
-
-      - run: ls android
-
-      - run: ls android/build
-      - run: ls android/.gradle
 
       - name: 📦 Build dev client
         run: eas build -p android --profile development --non-interactive --output "XDnevnik Dev Client.apk" --local
