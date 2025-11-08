@@ -12,6 +12,7 @@ jobs:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       NODE_ENV: production
       EAS_LOCAL_BUILD_WORKINGDIR: "/home/runner/work/xdnevnik/xdnevnik/android"
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: 1 # preserve directory from above
 
     steps:
       - name: 🏗 Check for EXPO_TOKEN
@@ -72,11 +73,8 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 🏗 Install dependencies
-        run: yarn install
-
-      - name: 🏗 Install sharp cli for image processing
-        run: npm add -g sharp-cli
+      - name: 🏗 Install sharp cli for image processing and eas-cli
+        run: npm add -g sharp-cli eas-cli
 
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
