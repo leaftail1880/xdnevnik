@@ -160,6 +160,7 @@ export async function checkForNewMarksAndNotify(
 			withoutMarks: false,
 			withExpiredClassAssign: true,
 		})
+    console.log()
 		const newMarks = checkForNewMarks(marks)
 		MarksNotificationStore.log(
 			'info',
