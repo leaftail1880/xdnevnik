@@ -169,23 +169,21 @@ export default Sentry.wrap(
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <SafeAreaView>
-            <PaperProvider theme={ProvidedTheme}>
-              <NavigationContainer
-                theme={{
-                  ...ProvidedTheme,
-                  fonts: DefaultTheme.fonts,
-                }}
-                ref={navigation}
-                onReady={() =>
-                  SENTRY_ROUTING.registerNavigationContainer(navigation)
-                }
-              >
-                <Navigation />
-              </NavigationContainer>
-              <Toast />
-            </PaperProvider>
-          </SafeAreaView>
+          <PaperProvider theme={ProvidedTheme}>
+            <NavigationContainer
+              theme={{
+                ...ProvidedTheme,
+                fonts: DefaultTheme.fonts,
+              }}
+              ref={navigation}
+              onReady={() =>
+                SENTRY_ROUTING.registerNavigationContainer(navigation)
+              }
+            >
+              <Navigation />
+            </NavigationContainer>
+            <Toast />
+          </PaperProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>
     )
