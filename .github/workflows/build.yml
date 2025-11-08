@@ -36,6 +36,26 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/
+          key: ${{ runner.os }}-gradle
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 💾 Cache Gradle build outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            android/.gradle/
+            android/build/
+          key: ${{ runner.os }}-gradle-build
+          restore-keys: |
+            ${{ runner.os }}-gradle-build
+
+      
       - name: 🏗 Enable corepack
         run: corepack enable
 
