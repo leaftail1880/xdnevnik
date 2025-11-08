@@ -76,7 +76,7 @@ const Config = {
 					position: 'relative',
 					visibility: 'visible',
 					behavior: 'inset-swipe',
-          backgroundColor: "transparent"
+          backgroundColor: "#ffffff00"
 				},
 			],
 			[
