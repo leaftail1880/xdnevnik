@@ -86,6 +86,8 @@ jobs:
       - name: CHeck
         run: node -e "const {AndroidConfig}=require('@expo/config-plugins');const projectRoot='.';Promise.all([AndroidConfig.Paths.getAppBuildGradleAsync(projectRoot),AndroidConfig.Paths.getProjectBuildGradleAsync(projectRoot),AndroidConfig.Paths.getAndroidManifestAsync(projectRoot),AndroidConfig.Paths.getMainApplicationAsync(projectRoot)]).then(console.log).catch(console.error)"
 
+      - run: node -e "import fs from 'fs'; fs.writeFileSync('.gitignore', '')"
+
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
 
