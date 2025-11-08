@@ -32,7 +32,11 @@ import {
 	PaperProvider,
 	TouchableRipple,
 } from 'react-native-paper'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
+import {
+	SafeAreaProvider,
+	SafeAreaView,
+	useSafeAreaInsets,
+} from 'react-native-safe-area-context'
 
 // Components
 import Header from '@/components/Header'
@@ -170,21 +174,23 @@ export default Sentry.wrap(
 		return (
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<SafeAreaProvider>
-					<PaperProvider theme={ProvidedTheme}>
-						<NavigationContainer
-							theme={{
-								...ProvidedTheme,
-								fonts: DefaultTheme.fonts,
-							}}
-							ref={navigation}
-							onReady={() =>
-								SENTRY_ROUTING.registerNavigationContainer(navigation)
-							}
-						>
-							<Navigation />
-						</NavigationContainer>
-						<Toast />
-					</PaperProvider>
+					<SafeAreaView>
+						<PaperProvider theme={ProvidedTheme}>
+							<NavigationContainer
+								theme={{
+									...ProvidedTheme,
+									fonts: DefaultTheme.fonts,
+								}}
+								ref={navigation}
+								onReady={() =>
+									SENTRY_ROUTING.registerNavigationContainer(navigation)
+								}
+							>
+								<Navigation />
+							</NavigationContainer>
+							<Toast />
+						</PaperProvider>
+					</SafeAreaView>
 				</SafeAreaProvider>
 			</GestureHandlerRootView>
 		)
