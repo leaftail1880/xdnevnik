@@ -7,17 +7,17 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.25.0'
+const version = '0.26.0'
 const slug = 'xdnevnik'
-const name = 'XDnevnik2'
+const name = 'XDnevnik'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
 
 // eslint-disable-next-line no-undef
 const IS_DEV = !!process.env.DEV
 
 const id = IS_DEV
-	? 'com.leaftail1880.xdnevnik.dev2'
-	: 'com.leaftail1880.xdnevnik2'
+	? 'com.leaftail1880.xdnevnik.dev'
+	: 'com.leaftail1880.xdnevnik'
 
 const sentry = {
 	organization: 'leaftail1880',
