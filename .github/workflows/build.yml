@@ -37,7 +37,6 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-
       - name: 🏗 Enable corepack
         run: corepack enable
 
@@ -59,8 +58,8 @@ jobs:
       - name: 🏗 Install sharp cli for image processing and eas-cli
         run: npm add -g sharp-cli
 
-      # We can't inject cache into the place where building happens because 
-      # it expects it to be empty directory. And yeaj building happens in separate place and 
+      # We can't inject cache into the place where building happens because
+      # it expects it to be empty directory. And yeaj building happens in separate place and
       # whole project is archived and then transfered and thus yarn is run twicd
       - name: Run prebuild to inject cache
         run: yarn expo prebuild -p android
@@ -84,6 +83,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-build
 
+      - name: CHeck
+        run: node -e "const {AndroidConfig}=require('@expo/config-plugins');const projectRoot='.';Promise.all([AndroidConfig.Paths.getAppBuildGradleAsync(projectRoot),AndroidConfig.Paths.getProjectBuildGradleAsync(projectRoot),AndroidConfig.Paths.getAndroidManifestAsync(projectRoot),AndroidConfig.Paths.getMainApplicationAsync(projectRoot)]).then(console.log).catch(console.error)"
 
       - name: 📦 Build main apk
         run: eas build -p android --non-interactive --output XDnevnik.apk --local
