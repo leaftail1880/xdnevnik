@@ -34,7 +34,7 @@ import {
 } from 'react-native-paper'
 import {
   SafeAreaProvider,
-  SafeAreaView,
+  useSafeAreaInsets,
 } from 'react-native-safe-area-context'
 
 // Components
@@ -216,6 +216,7 @@ const Navigation = observer(function Navigation() {
   return (
     <Tab.Navigator
       tabBar={props => <CustomTabBar {...props} />}
+      safeAreaInsets={useSafeAreaInsets()}
       screenOptions={{
         headerShown: false,
         // The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7
