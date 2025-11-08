@@ -137,7 +137,7 @@ Config.expo = withGradleProperties(Config.expo, config => {
 		{
 			type: 'property',
 			key: 'org.gradle.caching',
-			value: 'true
+			value: 'true'
 		}
 	)
 
