@@ -216,7 +216,9 @@ const Navigation = observer(function Navigation() {
 	const insets = useSafeAreaInsets()
 	useEffect(() => {
 		Logger.info('SPLASH SCREEN HIDE')
-		SplashScreen.hide()
+		setTimeout(() => {
+			SplashScreen.hide()
+		}, 2000)
 	}, [])
 
 	return (
