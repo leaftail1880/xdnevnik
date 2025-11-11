@@ -38,7 +38,7 @@ export default observer(function TotalsNavigation() {
 				component={SubjectTotals}
 				name={S_SUBJECT_TOTALS}
 				options={subjectTotalsOptions}
-			></Stack.Screen>
+			/>
 		</Stack.Navigator>
 	)
 })

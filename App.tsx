@@ -227,6 +227,7 @@ const Navigation = observer(function Navigation() {
 			safeAreaInsets={insets}
 			screenOptions={{
 				headerShown: false,
+        tabBarHideOnKeyboard: true,
 				// The problem with default animation is that after upgrading to expo sdk 54 from 52, react-navigation 7
 				// and changing bottom tabs navigator from paper to rn navigation shadows are not affected by opacity
 				// hence they flicker on screen. So instead we move the screen from the screen (lol)
