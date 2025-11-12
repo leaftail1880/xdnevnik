@@ -1,0 +1,13 @@
+diff --git a/src/watchers/FallbackWatcher.js b/src/watchers/FallbackWatcher.js
+index e431e90cba1d0700a45b4b5e21c95c8fd1bb0eba..eced435bb863807aecdbce245992c86578892811 100644
+--- a/src/watchers/FallbackWatcher.js
++++ b/src/watchers/FallbackWatcher.js
+@@ -113,6 +113,8 @@ class FallbackWatcher extends _AbstractWatcher.AbstractWatcher {
+     }
+   };
+   _watchdir = (dir) => {
++    if (dir.includes("node_modules") || dir.includes(".git") || dir.includes(".expo")) return true;
++
+     if (this.watched[dir]) {
+       return false;
+     }
