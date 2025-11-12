@@ -21,11 +21,10 @@ import {
   NavigationContainerRef,
 } from '@react-navigation/native'
 import * as Sentry from '@sentry/react-native'
-import * as SplashScreen from 'expo-splash-screen'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef } from 'react'
-import { Easing, useWindowDimensions, View } from 'react-native'
+import { useRef } from 'react'
+import { Easing, KeyboardAvoidingView, Platform, useWindowDimensions, View } from 'react-native'
 import {
   BottomNavigation,
   Icon,
@@ -112,7 +111,7 @@ const AppRoutes = [
     name: Screens.UsefullTools,
     component: UsefullTools,
   },
-].map(e => ({ ...e, component: Sentry.withErrorBoundary(e.component, { fallback: <View><Text>Error occured</Text></View> }) }))
+].map(e => ({ ...e, component: Sentry.withErrorBoundary(e.component, { fallback: <View><Text>Error occured</Text></View>, showDialog: true }) }))
 
 const Tab = createBottomTabNavigator<BottomTabsParams>()
 
@@ -167,24 +166,29 @@ export default Sentry.wrap(
 
     const ProvidedTheme = toJS(Theme.manage.getTheme())
     return (
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'red' }}>
-        <SafeAreaProvider>
-          <PaperProvider theme={ProvidedTheme}>
-            <NavigationContainer
-              theme={{
-                ...ProvidedTheme,
-                fonts: DefaultTheme.fonts,
-              }}
-              ref={navigation}
-              onReady={() =>
-                SENTRY_ROUTING.registerNavigationContainer(navigation)
-              }
-            >
-              <Navigation />
-            </NavigationContainer>
-            <Toast />
-          </PaperProvider>
-        </SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: Theme.colors.background }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : 'height'}
+          keyboardVerticalOffset={160 + 47}
+        >
+          <SafeAreaProvider>
+            <PaperProvider theme={ProvidedTheme}>
+              <NavigationContainer
+                theme={{
+                  ...ProvidedTheme,
+                  fonts: DefaultTheme.fonts,
+                }}
+                ref={navigation}
+                onReady={() =>
+                  SENTRY_ROUTING.registerNavigationContainer(navigation)
+                }
+              >
+                <Navigation />
+              </NavigationContainer>
+              <Toast />
+            </PaperProvider>
+          </SafeAreaProvider>
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
     )
   }),
@@ -214,12 +218,6 @@ const Navigation = observer(function Navigation() {
   const { width } = useWindowDimensions()
 
   const insets = useSafeAreaInsets()
-  useEffect(() => {
-    Logger.info('SPLASH SCREEN HIDE')
-    setTimeout(() => {
-      SplashScreen.hide()
-    }, 2000)
-  }, [])
 
   return (
     <Tab.Navigator

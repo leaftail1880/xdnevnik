@@ -60,8 +60,3 @@ export enum Screens {
 	SubjectTotals = 'Итоги по предмету',
 }
 
-import * as SplashScreen from 'expo-splash-screen'
-
-Logger.info('LOAD SPLASH SCREEN')
-
-SplashScreen.preventAutoHideAsync()
