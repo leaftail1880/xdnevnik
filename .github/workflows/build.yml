@@ -11,8 +11,6 @@ jobs:
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       NODE_ENV: production
-      EAS_LOCAL_BUILD_WORKINGDIR: "/home/runner/work/xdnevnik/android-build"
-      EAS_LOCAL_BUILD_SKIP_CLEANUP: 1 # preserve directory from above
 
     steps:
       - name: 🏗 Check for EXPO_TOKEN
@@ -59,9 +57,6 @@ jobs:
 
       - name: 🏗 Install sharp cli for image processing and eas-cli
         run: npm add -g sharp-cli
-
-      - name: Run prebuild to inject cache
-        run: yarn expo prebuild -p android
 
       - name: 💾 Cache Gradle dependencies
         uses: actions/cache@v4
