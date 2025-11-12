@@ -167,10 +167,10 @@ export default Sentry.wrap(
     const ProvidedTheme = toJS(Theme.manage.getTheme())
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {/* <KeyboardAvoidingView */}
-        {/*   behavior={Platform.OS === "ios" ? "padding" : 'height'} */}
-        {/*   keyboardVerticalOffset={160 + 47} */}
-        {/* > */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : 'height'}
+          keyboardVerticalOffset={160 + 47}
+        >
           <SafeAreaProvider>
             <PaperProvider theme={ProvidedTheme}>
               <NavigationContainer
@@ -188,7 +188,7 @@ export default Sentry.wrap(
               <Toast />
             </PaperProvider>
           </SafeAreaProvider>
-        {/* </KeyboardAvoidingView> */}
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
     )
   }),
