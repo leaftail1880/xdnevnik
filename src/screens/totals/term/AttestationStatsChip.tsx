@@ -11,87 +11,86 @@ import { Chip, Text } from 'react-native-paper'
 import { getColorFromPercent } from './AttendanceStatsChip'
 
 export const AttestationStatsChip = observer(function AttestationStatsChip({
-	perf,
+  perf,
 }: {
-	perf: SubjectPerformance
+  perf: SubjectPerformance
 }) {
-	const settings = XSettings.forStudentOrThrow()
-	const { need, attestation, marks } = getAttestation(settings, perf)
+  const settings = XSettings.forStudentOrThrow()
+  const { need, attestation, marks } = getAttestation(settings, perf)
 
-	const { colorStyle } = getColorFromPercent(~~(attestation / 30) + 2)
-	const onPress = useCallback(
-		() =>
-			ModalAlert.show(
-				'Аттестация',
-				<AttestationStatsChipSettings
-					subjectId={perf.subject.id}
-					perf={perf}
-				/>,
-			),
-		[perf],
-	)
+  const { colorStyle } = getColorFromPercent(~~(attestation / 30) + 2)
+  const onPress = useCallback(
+    () =>
+      ModalAlert.show(
+        'Аттестация',
+        <AttestationStatsChipSettings
+          subjectId={perf.subject.id}
+          perf={perf}
+        />,
+      ),
+    [perf],
+  )
 
-	return (
-		<Chip compact onPress={onPress}>
-			<Text variant="labelLarge" style={colorStyle}>
-				Аттестация {marks}/{need}
-			</Text>
-		</Chip>
-	)
+  return (
+    <Chip compact onPress={onPress}>
+      <Text variant="labelLarge" style={colorStyle}>
+        Аттестация {marks}/{need}
+      </Text>
+    </Chip>
+  )
 })
 
 const AttestationStatsChipSettings = observer(
-	function AttestationStatsChipSettings({
-		subjectId,
-		perf,
-	}: {
-		subjectId: number
-		perf: SubjectPerformance
-	}) {
-		const settings = XSettings.forStudentOrThrow()
-		const { need, attestation, marks } = getAttestation(settings, perf)
+  function AttestationStatsChipSettings({
+    subjectId,
+    perf,
+  }: {
+    subjectId: number
+    perf: SubjectPerformance
+  }) {
+    const settings = XSettings.forStudentOrThrow()
+    const { need, attestation, marks } = getAttestation(settings, perf)
 
-		return (
-			<View>
-				<Text>Оценок: {marks}</Text>
-				<Text>Нужно: {need}</Text>
-				<Text>
-					Аттестация {marks}/{need} ({~~attestation}%)
-				</Text>
-				<NumberInputSetting
-					value={settings.subjectAttestation[subjectId] ?? 0}
-					onChange={v =>
-						v === 0
-							? runInAction(() => delete settings.subjectAttestation[subjectId])
-							: setInAction(settings, {
-									subjectAttestation: { [subjectId]: v },
-								})
-					}
-					defaultValue={0}
-					label="Для этого предмета"
-					description="Кол-во оценок для этого предмета. 0 чтобы использовать значение по умолчанию."
-				/>
-				<NumberInputSetting
-					value={settings.defaultAttestation}
-					onChange={v => setInAction(settings, { defaultAttestation: v })}
-					defaultValue={0}
-					label="Для всех предметов"
-					description="Кол-во оценок для всех предметов по умолчанию. 0 чтобы отключить проверку аттестации."
-				/>
-			</View>
-		)
-	},
+    return (
+      <View>
+        <Text>Оценок: {marks}</Text>
+        <Text>Нужно: {need}</Text>
+        <Text>
+          Аттестация {marks}/{need} ({~~attestation}%)
+        </Text>
+        <NumberInputSetting
+          value={settings.subjectAttestation[subjectId] ?? 0}
+          onChange={v =>
+            v === 0
+              ? runInAction(() => delete settings.subjectAttestation[subjectId])
+              : runInAction(() => settings.subjectAttestation[subjectId] = v)
+
+          }
+          defaultValue={0}
+          label="Для этого предмета"
+          description="Кол-во оценок для этого предмета. 0 чтобы использовать значение по умолчанию."
+        />
+        <NumberInputSetting
+          value={settings.defaultAttestation}
+          onChange={v => setInAction(settings, { defaultAttestation: v })}
+          defaultValue={0}
+          label="Для всех предметов"
+          description="Кол-во оценок для всех предметов по умолчанию. 0 чтобы отключить проверку аттестации."
+        />
+      </View>
+    )
+  },
 )
 
 export function getAttestation(
-	settings: StudentSettings,
-	perf: SubjectPerformance,
+  settings: StudentSettings,
+  perf: SubjectPerformance,
 ) {
-	const marks = perf.results.length
-	const need =
-		settings.subjectAttestation[perf.subject.id] ?? settings.defaultAttestation
+  const marks = perf.results.length
+  const need =
+    settings.subjectAttestation[perf.subject.id] ?? settings.defaultAttestation
 
-	const attestation = marks >= need ? 100 : (marks / need) * 100
+  const attestation = marks >= need ? 100 : (marks / need) * 100
 
-	return { attestation, need, marks }
+  return { attestation, need, marks }
 }
