@@ -167,10 +167,7 @@ export default Sentry.wrap(
     const ProvidedTheme = toJS(Theme.manage.getTheme())
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : 'height'}
-          keyboardVerticalOffset={160 + 47}
-        >
+        <KeyboardAvoidingView>
           <SafeAreaProvider>
             <PaperProvider theme={ProvidedTheme}>
               <NavigationContainer
