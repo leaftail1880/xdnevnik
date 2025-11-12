@@ -71,25 +71,22 @@ const Config = {
 			'expo-updates',
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
-			// [
-			// 	'expo-navigation-bar',
-			// 	{
-			// 		// position: 'relative',
-			// 		visibility: 'visible',
-			// 		// behavior: 'inset-swipe',
-			// 		backgroundColor: '#ffffff00',
-			// 	},
-			// ],
+			[
+				'expo-navigation-bar',
+				{
+					backgroundColor: '#ffffff00',
+				},
+			],
 			[
 				'expo-splash-screen',
 				{
 					backgroundColor: splashBackgroundLight,
-					image: './assets/splash.png',
+					image: './assets/icon.png',
 					dark: {
-						image: './assets/splash.png',
+						image: './assets/icon.png',
 						backgroundColor: splashBackgroundDark,
 					},
-					imageWidth: 1284,
+					imageWidth: 1024,
 				},
 			],
 			[

@@ -8,12 +8,13 @@ import { observer } from 'mobx-react-lite'
 import { StyleSheet } from 'react-native'
 import { Chip } from 'react-native-paper'
 import { ToGetMarkChips } from '../term/ToGetMarkChip'
-import { SubjectTotalsState } from './state'
+import { SubjectTotalsStore } from './state'
 
 export const SubjectTotalsTopChips = observer(
 	function SubjectTotalsTopChips(props: {
 		toGetMarks: ToGetMarkTargetCalculated[]
-		performance: SubjectPerformance
+		performance: SubjectPerformance,
+    store: SubjectTotalsStore
 	}) {
 		return (
 			<Chips
@@ -28,10 +29,10 @@ export const SubjectTotalsTopChips = observer(
 						<Chip
 							mode="flat"
 							compact
-							selected={SubjectTotalsState.attendance}
+							selected={props.store.attendance}
 							onPress={() =>
-								setInAction(SubjectTotalsState, {
-									attendance: !SubjectTotalsState.attendance,
+								setInAction(props.store, {
+									attendance: !props.store.attendance,
 								})
 							}
 						>
@@ -40,10 +41,10 @@ export const SubjectTotalsTopChips = observer(
 						<Chip
 							mode="flat"
 							compact
-							selected={SubjectTotalsState.lessonsWithoutMark}
+							selected={props.store.lessonsWithoutMark}
 							onPress={() =>
-								setInAction(SubjectTotalsState, {
-									lessonsWithoutMark: !SubjectTotalsState.lessonsWithoutMark,
+								setInAction(props.store, {
+									lessonsWithoutMark: !props.store.lessonsWithoutMark,
 								})
 							}
 						>
@@ -63,7 +64,8 @@ const styles = StyleSheet.create({
 export const SubjectTotalsBottomChips = observer(
 	function SubjectTotalsBottomChips(props: {
 		length: number
-		totalsTypes: Set<string>
+		totalsTypes: Set<string>,
+    store: SubjectTotalsStore
 	}) {
 		return (
 			<Chips style={styles.paddingVertical0}>
@@ -86,12 +88,12 @@ export const SubjectTotalsBottomChips = observer(
 							<Chip
 								onPress={() =>
 									runInAction(() => {
-										if (SubjectTotalsState.disabledTotalTypes.has(type))
-											SubjectTotalsState.disabledTotalTypes.delete(type)
-										else SubjectTotalsState.disabledTotalTypes.add(type)
+										if (props.store.disabledTotalTypes.has(type))
+											props.store.disabledTotalTypes.delete(type)
+										else props.store.disabledTotalTypes.add(type)
 									})
 								}
-								selected={!SubjectTotalsState.disabledTotalTypes.has(type)}
+								selected={!props.store.disabledTotalTypes.has(type)}
 								mode="flat"
 								compact
 								key={type}

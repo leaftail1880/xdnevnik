@@ -23,7 +23,7 @@ import { SubjectTotalsBottomChips, SubjectTotalsTopChips } from './Chips'
 import { SubjectScreenHeader } from './Header'
 import { SubjectTotalMarkRow } from './Marks'
 import { SubjectTotalsStatistic } from './Stats'
-import { SubjectTotalsStates } from './state'
+import { SubjectTotalsStates, SubjectTotalsStore } from './state'
 import { AsyncState } from '@/models/async.store'
 
 type ScreenProps = StackScreenProps<
@@ -116,6 +116,7 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
           <SubjectTotalsTopChips
             toGetMarks={toGetMarks}
             performance={performance}
+            store={SubjectTotalsState}
             key="topChips"
           />,
           ...totalsAndSheduledTotals
@@ -154,6 +155,7 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
           <SubjectTotalsBottomChips
             length={totalsAndSheduledTotals.length}
             totalsTypes={totalsTypes}
+            store={SubjectTotalsState}
             key="bottomChips"
           />,
           <RoundedSurface elevation={1} key="addmarkformSurface">
@@ -164,7 +166,10 @@ export const SubjectTotalsImpl = observer(function SubjectTotalsImpl({
               key="addmarkform"
             />
           </RoundedSurface>,
-          <SubjectTotalsStatistic performance={performance} key="stats" />,
+          <SubjectTotalsStatistic performance={performance} key="stats"
+
+            store={SubjectTotalsState}
+          />,
           !!performanceStore?.updateDate && <UpdateDate store={performanceStore} />,
         ].filter(e => !!e)}
       />

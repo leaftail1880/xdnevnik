@@ -2,7 +2,7 @@ import { KeyStore } from '@/models/key.store'
 import type { PartialAssignment } from '@/services/net-school/entities'
 import { makeAutoObservable, ObservableSet } from 'mobx'
 
-class SubjectTotalsStoreImpl {
+export class SubjectTotalsStore {
 	constructor() {
 		makeAutoObservable(this)
 	}
@@ -14,7 +14,7 @@ class SubjectTotalsStoreImpl {
 	disabledTotalTypes = new ObservableSet<string | undefined>()
 }
 
-export const SubjectTotalsStates = new KeyStore<number, SubjectTotalsStoreImpl>(
+export const SubjectTotalsStates = new KeyStore<number, SubjectTotalsStore>(
 	s => s.toString(),
-	() => new SubjectTotalsStoreImpl(),
+	() => new SubjectTotalsStore(),
 )
