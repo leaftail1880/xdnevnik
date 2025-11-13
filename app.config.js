@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.26.5'
+const version = '0.26.6'
 const slug = 'xdnevnik'
 const name = 'XDnevnik'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
@@ -59,7 +59,7 @@ const Config = {
 				'REQUEST_INSTALL_PACKAGES',
 				'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
 			],
-      edgeToEdgeEnabled: true,
+			edgeToEdgeEnabled: true,
 			adaptiveIcon: {
 				foregroundImage: './assets/adaptive-icon.png',
 				backgroundColor: splashBackgroundLight,
@@ -71,12 +71,12 @@ const Config = {
 			'expo-updates',
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
-			// [
-			// 	'expo-navigation-bar',
-			// 	{
-			// 		backgroundColor: '#ffffff00',
-			// 	},
-			// ],
+			[
+				'expo-navigation-bar',
+				{
+					backgroundColor: '#FFFFFF00',
+				},
+			],
 			[
 				'expo-splash-screen',
 				{
