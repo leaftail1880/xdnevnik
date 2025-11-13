@@ -167,7 +167,7 @@ export default Sentry.wrap(
     const ProvidedTheme = toJS(Theme.manage.getTheme())
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardAvoidingView>
+        {/* <KeyboardAvoidingView> */}
           <SafeAreaProvider>
             <PaperProvider theme={ProvidedTheme}>
               <NavigationContainer
@@ -185,7 +185,7 @@ export default Sentry.wrap(
               <Toast />
             </PaperProvider>
           </SafeAreaProvider>
-        </KeyboardAvoidingView>
+        {/* </KeyboardAvoidingView> */}
       </GestureHandlerRootView>
     )
   }),
