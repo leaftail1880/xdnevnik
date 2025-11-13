@@ -6939,21 +6939,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-navigation-bar@npm:~5.0.9":
-  version: 5.0.9
-  resolution: "expo-navigation-bar@npm:5.0.9"
-  dependencies:
-    "@react-native/normalize-colors": "npm:0.81.5"
-    debug: "npm:^4.3.2"
-    react-native-is-edge-to-edge: "npm:^1.2.1"
-  peerDependencies:
-    expo: "*"
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/9055f15b49ef533e0aeaeb37c67188881e150a0520b6079d21ebc330cd722944766df8a76cb432dcfd53948798504aaf0cf9a0299b6d8e4fc6f457b81794d41d
-  languageName: node
-  linkType: hard
-
 "expo-notifications@npm:^0.32.12":
   version: 0.32.12
   resolution: "expo-notifications@npm:0.32.12"
@@ -11554,17 +11539,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-error-boundary@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "react-native-error-boundary@npm:3.1.0"
-  peerDependencies:
-    react: ">=16.6.0"
-    react-native: ">=0.74.0"
-    react-native-safe-area-context: ">=5.0.0"
-  checksum: 10c0/556750269272f327647c9b34dc6563bf8efe5279cf570ce4985ac52a078a72ca239764e1364395f39d083f66fa60d1c076c3967d1b158b551698200bf184536d
-  languageName: node
-  linkType: hard
-
 "react-native-gesture-handler@npm:~2.28.0":
   version: 2.28.0
   resolution: "react-native-gesture-handler@npm:2.28.0"
@@ -14454,7 +14428,6 @@ __metadata:
     expo-dev-client: "npm:~6.0.17"
     expo-device: "npm:~8.0.9"
     expo-intent-launcher: "npm:~13.0.7"
-    expo-navigation-bar: "npm:~5.0.9"
     expo-notifications: "npm:^0.32.12"
     expo-sharing: "npm:~14.0.7"
     expo-splash-screen: "npm:~31.0.10"
@@ -14474,7 +14447,6 @@ __metadata:
     react-dom: "npm:19.1.0"
     react-native: "npm:0.81.5"
     react-native-calendars: "npm:^1.1313.0"
-    react-native-error-boundary: "npm:^3.1.0"
     react-native-gesture-handler: "npm:~2.28.0"
     react-native-logs: "npm:^5.5.0"
     react-native-mmkv: "npm:^4.0.0"
