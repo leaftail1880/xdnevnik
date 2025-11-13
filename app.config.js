@@ -71,12 +71,12 @@ const Config = {
 			'expo-updates',
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
-			[
-				'expo-navigation-bar',
-				{
-					backgroundColor: '#ffffff00',
-				},
-			],
+			// [
+			// 	'expo-navigation-bar',
+			// 	{
+			// 		backgroundColor: '#ffffff00',
+			// 	},
+			// ],
 			[
 				'expo-splash-screen',
 				{
@@ -86,7 +86,7 @@ const Config = {
 						image: './assets/icon.png',
 						backgroundColor: splashBackgroundDark,
 					},
-					imageWidth: 1024,
+					imageWidth: 200,
 				},
 			],
 			[
