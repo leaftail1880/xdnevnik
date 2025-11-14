@@ -22,6 +22,11 @@ export const EditSingleLesson = observer(function EditSingleLesson({
     dateToHoursMinutes(lesson.start(studentSettings)),
   )
   const [name, setName] = useState(getSubjectName(lesson))
+  const showLesson = () => {
+    runInAction(() => {
+      studentSettings.ignoreLessons = studentSettings.ignoreLessons?.filter(e => e !== lesson.offsetDayId)
+    })
+  }
   return (
     <View style={{ gap: Spacings.s2 }}>
       <Text>
@@ -37,10 +42,22 @@ export const EditSingleLesson = observer(function EditSingleLesson({
       <TextInput
         mode="outlined"
         value={name}
-        onChangeText={t => setName(t)}
         defaultValue={lesson.subjectName}
+        onChangeText={t => {
+          setName(t)
+          if (t !== getSubjectName(lesson)) {
+            studentSettings.subjectNamesDay[lesson.offsetDayId] = t
+          }
+        }}
       ></TextInput>
-      <SelectTime label="Начало" value={startTime} onSelect={setStartTime} />
+      <SelectTime label="Начало" value={startTime} onSelect={startTime => {
+        setStartTime(startTime)
+
+        runInAction(() => {
+          const offset = getOffset(lesson.startDate, startTime)
+          setLessonTimeOffset(lesson, offset, studentSettings)
+        })
+      }} />
 
       {!studentSettings.ignoreLessons?.includes(lesson.offsetDayId) ? <Button mode="outlined" onPress={() => {
         runInAction(() => {
@@ -48,38 +65,19 @@ export const EditSingleLesson = observer(function EditSingleLesson({
           studentSettings.ignoreLessons ??= []
           studentSettings.ignoreLessons.push(lesson.offsetDayId)
         })
-      }}>Скрыть</Button> : <Button mode="outlined" onPress={() => {
-        runInAction(() => {
-          studentSettings.ignoreLessons = studentSettings.ignoreLessons?.filter(e => e !== lesson.offsetDayId)
-        })
-      }}>Показать</Button>}
+      }}>Скрыть</Button> : <Button mode="outlined" onPress={showLesson}>Показать</Button>}
       <Button
         mode="outlined"
         onPress={() => {
           runInAction(() => {
             delete studentSettings.subjectNamesDay[lesson.offsetDayId]
             setLessonTimeOffset(lesson, 0, studentSettings)
+            showLesson()
           })
           ModalAlert.close()
         }}
       >
-        Сбросить
-      </Button>
-      <Button
-        mode="outlined"
-        onPress={() => {
-          runInAction(() => {
-            const offset = getOffset(lesson.startDate, startTime)
-            if (offset) setLessonTimeOffset(lesson, offset, studentSettings)
-
-            if (name !== getSubjectName(lesson)) {
-              studentSettings.subjectNamesDay[lesson.offsetDayId] = name
-            }
-          })
-          ModalAlert.close()
-        }}
-      >
-        Сохранить
+        Сбросить до официального
       </Button>
     </View>
   )

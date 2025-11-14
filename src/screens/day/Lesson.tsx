@@ -2,7 +2,7 @@ import { Theme } from '@/models/theme'
 import { AssignmentsStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
-import { Card, Chip, Text } from 'react-native-paper'
+import { Card, Chip, Divider, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
@@ -23,169 +23,171 @@ import LessonProgress, { LessonProgressStore } from './Progress'
 import { DiaryLessonProps } from './screen'
 
 export default observer(function DiaryLesson({
-	lesson,
-	navigation,
-	i,
-	...props
+  lesson,
+  navigation,
+  i,
+  ...props
 }: Omit<DiaryLessonProps, 'navigateToLessonMarks'> & XBottomTabScreenProps) {
-	const currentTerm = TermStore.currentTerm
-	const navigateToLessonMarks = useCallback(async () => {
-		if (!currentTerm)
-			return ModalAlert.show(
-				'Четверть/полугодие не выбрано!',
-				'Перейдите в раздел оценки и выберите его',
-				true,
-				[
-					{
-						label: 'Перейти',
-						callback: () => (
-							navigation.navigate(Screens.Totals),
-							ModalAlert.close()
-						),
-					},
-				],
-			)
+  const currentTerm = TermStore.currentTerm
+  const navigateToLessonMarks = useCallback(async () => {
+    if (!currentTerm)
+      return ModalAlert.show(
+        'Четверть/полугодие не выбрано!',
+        'Перейдите в раздел оценки и выберите его',
+        true,
+        [
+          {
+            label: 'Перейти',
+            callback: () => (
+              navigation.navigate(Screens.Totals),
+              ModalAlert.close()
+            ),
+          },
+        ],
+      )
 
-		navigation.navigate(Screens.Totals, {
-			screen: Screens.SubjectTotals,
-			params: {
-				subjectId: lesson.subjectId,
-				termId: currentTerm.id,
-				finalMark: null,
-			},
-		})
-	}, [currentTerm, lesson, navigation])
+    navigation.navigate(Screens.Totals, {
+      screen: Screens.SubjectTotals,
+      params: {
+        subjectId: lesson.subjectId,
+        termId: currentTerm.id,
+        finalMark: null,
+      },
+    })
+  }, [currentTerm, lesson, navigation])
 
-	const newProps: DiaryLessonProps = useMemo(
-		() => ({
-			i,
-			lesson,
-			navigateToLessonMarks,
-			...props,
-		}),
-		[props, i, lesson, navigateToLessonMarks],
-	)
+  const newProps: DiaryLessonProps = useMemo(
+    () => ({
+      i,
+      lesson,
+      navigateToLessonMarks,
+      ...props,
+    }),
+    [props, i, lesson, navigateToLessonMarks],
+  )
 
-	const onLongPress = useCallback(
-		() =>
-			ModalAlert.show('Редактировать', <EditSingleLesson lesson={lesson} />),
-		[lesson],
-	)
+  const onLongPress = useCallback(
+    () =>
+      ModalAlert.show('Редактировать', <EditSingleLesson lesson={lesson} />),
+    [lesson],
+  )
 
-	const cardStyle = useStyles(
-		() => ({
-			margin: Spacings.s1,
-			borderCurve: 'continuous',
+  const cardStyle = useStyles(
+    () => ({
+      margin: Spacings.s1,
+      borderCurve: 'continuous',
 
-			// Display border frame only when lesson is going
-			borderWidth:
-				LessonProgressStore.currentLesson === lesson.classmeetingId
-					? Spacings.s1
-					: 0,
+      // Display border frame only when lesson is going
+      borderWidth:
+        LessonProgressStore.currentLesson === lesson.classmeetingId
+          ? Spacings.s1
+          : 0,
 
-			borderColor: Theme.colors.primary,
-			padding: Spacings.s2,
-			flex: 1,
-			gap: Spacings.s2,
-		}),
-		[LessonProgressStore.currentLesson],
-	)
+      borderColor: Theme.colors.primary,
+      padding: Spacings.s2,
+      flex: 1,
+      gap: Spacings.s2,
+    }),
+    [LessonProgressStore.currentLesson],
+  )
 
-	return (
-		<Card
-			style={cardStyle}
-			onLongPress={!lesson.isCustom ? onLongPress : undefined}
-		>
-			<TopRow {...newProps} />
-			<MiddleRow {...newProps} />
-			{DiaryState.showHomework && <Assignments {...newProps} />}
-			<LessonProgress lesson={lesson} />
-		</Card>
-	)
+  return (
+    <Card
+      style={cardStyle}
+      onLongPress={!lesson.isCustom ? onLongPress : undefined}
+    >
+      <TopRow {...newProps} />
+      <Divider bold style={{marginVertical: Spacings.s1}}/>
+      <MiddleRow {...newProps} />
+      <Divider bold style={{marginVertical: Spacings.s1}}/>
+      {DiaryState.showHomework && <Assignments {...newProps} />}
+      <LessonProgress lesson={lesson} />
+    </Card>
+  )
 })
 
 const TopRow = observer(function TopRow({ lesson, i }: DiaryLessonProps) {
-	return (
-		<View style={{ gap: Spacings.s1 }}>
-			<Name lesson={lesson} i={i}></Name>
-			<View style={[globalStyles.row, { gap: Spacings.s1 }]}>
-				<LessonTimeChip lesson={lesson} />
-				<Chip compact>{lesson.roomName ?? '?'}</Chip>
-			</View>
-		</View>
-	)
+  return (
+    <Name lesson={lesson} i={i}></Name>
+  )
 })
 
 const Name = observer(function Name({
-	lesson,
-	i,
+  lesson,
+  i,
 }: Pick<DiaryLessonProps, 'lesson' | 'i'>) {
-	return (
-		<View style={styles.name}>
-			<ChipLike>{i + 1}</ChipLike>
-			<SubjectName
-				editDisabled={lesson.isCustom}
-				style={Theme.fonts.titleMedium}
-				subjectId={lesson.subjectId}
-				subjectName={lesson.subjectName}
-				offsetDayId={lesson.offsetDayId}
-			/>
-		</View>
-	)
+  return (
+    <View style={[globalStyles.stretch, {paddingBottom: Spacings.s1, flex: 1}]}>
+      <View style={styles.name}>
+        <ChipLike>{i + 1}</ChipLike>
+        <SubjectName
+          editDisabled={lesson.isCustom}
+          style={Theme.fonts.titleMedium}
+          subjectId={lesson.subjectId}
+          subjectName={lesson.subjectName}
+          offsetDayId={lesson.offsetDayId}
+        />
+      </View>
+      <View style={styles.name}>
+        <ChipLike>{lesson.roomName || '?'}</ChipLike>
+        <LessonTimeChip lesson={lesson} />
+      </View>
+    </View>
+  )
 })
 
 const styles = StyleSheet.create({
-	name: {
-		gap: Spacings.s1,
-		flex: 1,
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		alignItems: 'center',
-	},
+  name: {
+    gap: Spacings.s1,
+    // flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
 })
 
 export const LessonTimeChip = observer(function Time({
-	lesson,
+  lesson,
 }: {
-	lesson: Lesson
+  lesson: Lesson
 }) {
-	const studentSettings = XSettings.forStudentOrThrow()
-	return (
-		<Chip compact>
-			{lesson.start(studentSettings).toHHMM()} -{' '}
-			{lesson.end(studentSettings).toHHMM()}
-		</Chip>
-	)
+  const studentSettings = XSettings.forStudentOrThrow()
+  return (
+    <ChipLike>
+      {lesson.start(studentSettings).toHHMM()} -{' '}
+      {lesson.end(studentSettings).toHHMM()}
+    </ChipLike>
+  )
 })
 
 const MiddleRow = observer(function MiddleRow({ lesson }: DiaryLessonProps) {
-	return (
-		<>
-			{DiaryState.showLessonTheme && (
-				<ScrollTextCopyable>
-					{lesson.lessonTheme ?? 'Темы нет'}
-				</ScrollTextCopyable>
-			)}
+  return (
+    <>
+      {DiaryState.showLessonTheme && (
+        <ScrollTextCopyable>
+          {lesson.lessonTheme ?? 'Темы нет'}
+        </ScrollTextCopyable>
+      )}
 
-			{DiaryState.showAttachments && lesson.attachmentsExists && (
-				<Text>Есть прикрепленные файлы</Text>
-			)}
-		</>
-	)
+      {DiaryState.showAttachments && lesson.attachmentsExists && (
+        <Text>Есть прикрепленные файлы</Text>
+      )}
+    </>
+  )
 })
 
 const Assignments = observer(function Assignments(props: DiaryLessonProps) {
-	if (AssignmentsStore.fallback) return AssignmentsStore.fallback
+  if (AssignmentsStore.fallback) return AssignmentsStore.fallback
 
-	const results = AssignmentsStore.result.filter(e => {
-		const sameLesson = e.classmeetingId === props.lesson.classmeetingId
-		// const sameDay = !e.weight && new Date(e.assignmentDate).toYYYYMMDD() === props.lesson.start.toYYYYMMDD()
-		return sameLesson // || sameDay
-	})
+  const results = AssignmentsStore.result.filter(e => {
+    const sameLesson = e.classmeetingId === props.lesson.classmeetingId
+    // const sameDay = !e.weight && new Date(e.assignmentDate).toYYYYMMDD() === props.lesson.start.toYYYYMMDD()
+    return sameLesson // || sameDay
+  })
 
-	if (results.length) {
-		return results.map(e => (
-			<DiaryAssignment key={e.assignmentId} assignment={e} {...props} />
-		))
-	}
+  if (results.length) {
+    return results.map(e => (
+      <DiaryAssignment key={e.assignmentId} assignment={e} {...props} />
+    ))
+  }
 })
