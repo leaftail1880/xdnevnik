@@ -72,12 +72,6 @@ const Config = {
 			'expo-build-properties',
 			['@sentry/react-native/expo', sentry],
 			[
-				'expo-navigation-bar',
-				{
-					backgroundColor: '#FFFFFF00',
-				},
-			],
-			[
 				'expo-splash-screen',
 				{
 					backgroundColor: splashBackgroundLight,
@@ -158,20 +152,10 @@ Config.expo = withAndroidStyles(Config.expo, config => {
 	// NEW: Fix splash screen contrast enforcement
 	const splashScreenTheme = AndroidConfig.Styles.getStyleParent(
 		config.modResults,
-		{name: 'Theme.App.SplashScreen'},
+		{ name: 'Theme.App.SplashScreen' },
 	)
 
-
 	if (splashScreenTheme) {
- console.log(splashScreenTheme) 
-  // config.modResults = AndroidConfig.Styles.assignStylesValue(
-  //   config.modResults,
-  //   {
-  //     add: true, 
-  //     parent: {name: "Theme.App.SplashScreen"},
-  //       name: ""
-  //   }
-  // )
 		splashScreenTheme.item.push(
 			{
 				$: {
