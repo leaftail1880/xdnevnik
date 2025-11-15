@@ -148,7 +148,6 @@ export class ThemeStore {
 		// 		NavigationBar.setVisibilityAsync('visible'),
 		// 	)
 		// }
-    return
 
 		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.navigationBar))
 

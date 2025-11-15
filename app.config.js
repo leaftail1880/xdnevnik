@@ -90,6 +90,12 @@ const Config = {
 					color: splashBackgroundLight,
 				},
 			],
+			[
+				'expo-navigation-bar',
+				{
+					backgroundColor: '#FFFFFF00',
+				},
+			],
 		],
 
 		runtimeVersion: {
