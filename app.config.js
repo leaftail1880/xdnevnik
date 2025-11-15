@@ -154,6 +154,42 @@ Config.expo = withAndroidStyles(Config.expo, config => {
 			value: 'false',
 		},
 	)
+
+	// NEW: Fix splash screen contrast enforcement
+	const splashScreenTheme = AndroidConfig.Styles.getStyleParent(
+		config.modResults,
+		{name: 'Theme.App.SplashScreen'},
+	)
+
+
+	if (splashScreenTheme) {
+ console.log(splashScreenTheme) 
+  // config.modResults = AndroidConfig.Styles.assignStylesValue(
+  //   config.modResults,
+  //   {
+  //     add: true, 
+  //     parent: {name: "Theme.App.SplashScreen"},
+  //       name: ""
+  //   }
+  // )
+		splashScreenTheme.item.push(
+			{
+				$: {
+					'name': 'android:enforceNavigationBarContrast',
+					'tools:targetApi': '29',
+				},
+				_: 'false',
+			},
+			{
+				$: {
+					'name': 'android:enforceStatusBarContrast',
+					'tools:targetApi': '29',
+				},
+				_: 'false',
+			},
+		)
+	}
+
 	return config
 })
 
