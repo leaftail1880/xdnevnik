@@ -97,9 +97,8 @@ export default observer(function DiaryLesson({
       onLongPress={!lesson.isCustom ? onLongPress : undefined}
     >
       <TopRow {...newProps} />
-      <Divider bold style={{marginVertical: Spacings.s1}}/>
+      <Divider bold style={{ marginBottom: Spacings.s1 }} />
       <MiddleRow {...newProps} />
-      <Divider bold style={{marginVertical: Spacings.s1}}/>
       {DiaryState.showHomework && <Assignments {...newProps} />}
       <LessonProgress lesson={lesson} />
     </Card>
@@ -117,8 +116,8 @@ const Name = observer(function Name({
   i,
 }: Pick<DiaryLessonProps, 'lesson' | 'i'>) {
   return (
-    <View style={[globalStyles.stretch, {paddingBottom: Spacings.s1, flex: 1}]}>
-      <View style={styles.name}>
+    <View style={[globalStyles.stretch, { paddingBottom: Spacings.s1, flex: 2, width: "100%" }]}>
+      <View style={[styles.name, { flexWrap: "nowrap" }]}>
         <ChipLike>{i + 1}</ChipLike>
         <SubjectName
           editDisabled={lesson.isCustom}
@@ -128,7 +127,7 @@ const Name = observer(function Name({
           offsetDayId={lesson.offsetDayId}
         />
       </View>
-      <View style={styles.name}>
+      <View style={[styles.name, { justifyContent: "flex-end", height: "100%" }]}>
         <ChipLike>{lesson.roomName || '?'}</ChipLike>
         <LessonTimeChip lesson={lesson} />
       </View>
@@ -139,10 +138,11 @@ const Name = observer(function Name({
 const styles = StyleSheet.create({
   name: {
     gap: Spacings.s1,
-    // flex: 1,
+    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'center',
+    alignItems: "flex-start"
+    // alignItems: 'center',
   },
 })
 
