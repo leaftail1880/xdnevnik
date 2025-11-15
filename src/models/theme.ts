@@ -148,6 +148,8 @@ export class ThemeStore {
 		// 		NavigationBar.setVisibilityAsync('visible'),
 		// 	)
 		// }
+    return
+
 		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.navigationBar))
 
 		// If i use it as react component it does not update half of the time
