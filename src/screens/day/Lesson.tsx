@@ -2,7 +2,7 @@ import { Theme } from '@/models/theme'
 import { AssignmentsStore } from '@/services/net-school/store'
 import { observer } from 'mobx-react-lite'
 import { StyleSheet, View } from 'react-native'
-import { Card, Chip, Divider, Text } from 'react-native-paper'
+import { Card, Divider, Text } from 'react-native-paper'
 import { Spacings } from '../../utils/Spacings'
 import { DiaryState } from './state'
 
@@ -54,6 +54,7 @@ export default observer(function DiaryLesson({
         finalMark: null,
       },
     })
+    ModalAlert.close()
   }, [currentTerm, lesson, navigation])
 
   const newProps: DiaryLessonProps = useMemo(
@@ -68,7 +69,7 @@ export default observer(function DiaryLesson({
 
   const onLongPress = useCallback(
     () =>
-      ModalAlert.show('Редактировать', <EditSingleLesson lesson={lesson} />),
+      ModalAlert.show('Редактировать', <EditSingleLesson goToDay={navigateToLessonMarks} lesson={lesson} />),
     [lesson],
   )
 
@@ -142,7 +143,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: "flex-start"
-    // alignItems: 'center',
   },
 })
 

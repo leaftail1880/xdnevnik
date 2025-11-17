@@ -32,3 +32,7 @@ export function getStorageValue(key: string) {
 export function setStorageValue(key: string, value: string) {
 	storage.set(key, value)
 }
+
+import * as SplashScreen from 'expo-splash-screen'
+
+SplashScreen.setOptions({ fade: false, duration: 0 })

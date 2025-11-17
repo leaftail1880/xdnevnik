@@ -14,8 +14,10 @@ import { setLessonTimeOffset } from './state'
 
 export const EditSingleLesson = observer(function EditSingleLesson({
   lesson,
+  goToDay,
 }: {
   lesson: Lesson
+  goToDay: VoidFunction
 }) {
   const studentSettings = XSettings.forStudentOrThrow()
   const [startTime, setStartTime] = useState(
@@ -66,6 +68,9 @@ export const EditSingleLesson = observer(function EditSingleLesson({
           studentSettings.ignoreLessons.push(lesson.offsetDayId)
         })
       }}>Скрыть</Button> : <Button mode="outlined" onPress={showLesson}>Показать</Button>}
+      <Button 
+          mode='outlined'
+          onPress={goToDay}>Оценки по предмету</Button>
       <Button
         mode="outlined"
         onPress={() => {
