@@ -23,8 +23,8 @@ import {
 import * as Sentry from '@sentry/react-native'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { JSX, useRef } from 'react'
-import { Easing, KeyboardAvoidingView, useWindowDimensions, View } from 'react-native'
+import { useRef } from 'react'
+import { Easing, useWindowDimensions, View } from 'react-native'
 import {
   BottomNavigation,
   Icon,
@@ -85,11 +85,6 @@ const ScreenIcons = {
   [Screens.Settings]: 'cog',
   [Screens.UsefullTools]: 'tools',
 }
-function withKBAvoid<T extends JSX.IntrinsicAttributes>(Target: (props: T) => ReturnType<React.FC>) {
-  return (props: T) => <KeyboardAvoidingView>
-    <Target {...props} />
-  </KeyboardAvoidingView>
-}
 // Refactored route configuration to be less repetitive
 const AppRoutes = [
   {
@@ -115,7 +110,7 @@ const AppRoutes = [
     name: Screens.UsefullTools,
     component: UsefullTools,
   },
-].map(e => ({ ...e, component: withKBAvoid(Sentry.withErrorBoundary(e.component, { fallback: <View><Text>Error occured</Text></View>, showDialog: true })) }))
+].map(e => ({ ...e, component: Sentry.withErrorBoundary(e.component, { fallback: <View><Text>Error occured</Text></View>, showDialog: true }) }))
 
 const Tab = createBottomTabNavigator<BottomTabsParams>()
 

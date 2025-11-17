@@ -7,7 +7,7 @@ import {
 	withGradleProperties,
 } from 'expo/config-plugins'
 
-const version = '0.26.6'
+const version = '0.26.7'
 const slug = 'xdnevnik'
 const name = 'XDnevnik'
 const projectId = '97163afe-5c7e-4856-ba8f-348e00aa7c04'
@@ -59,6 +59,7 @@ const Config = {
 				'REQUEST_INSTALL_PACKAGES',
 				'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
 			],
+      softwareKeyboardLayoutMode: "pan",
 			edgeToEdgeEnabled: true,
 			adaptiveIcon: {
 				foregroundImage: './assets/adaptive-icon.png',
