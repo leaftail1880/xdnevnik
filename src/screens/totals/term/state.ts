@@ -191,7 +191,7 @@ export const TermStore = new (class {
 		const settings = XSettings.forStudentOrThrow()
 		const { attestation, marks } = getAttestation(settings, store.result)
 
-		return attestation <= 100 ? marks : attestation
+		return attestation < 100 ? attestation : (100 + marks)
 	}
 
 	constructor() {
