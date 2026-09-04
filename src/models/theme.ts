@@ -149,12 +149,12 @@ export class ThemeStore {
 		// 	)
 		// }
 
-		promises.push(SystemUI.setBackgroundColorAsync(Theme.colors.navigationBar))
+		promises.push(SystemUI.setBackgroundColorAsync(this.colors.navigationBar))
 
 		// If i use it as react component it does not update half of the time
 		StatusBar.setBarStyle(this.isDark ? 'light-content' : 'dark-content', true)
 		if (Platform.OS === 'android') {
-			StatusBar.setBackgroundColor(Theme.colors.navigationBar, true)
+			StatusBar.setBackgroundColor(this.colors.navigationBar, true)
 		}
 
 		await Promise.all(promises).catch(captureException)
